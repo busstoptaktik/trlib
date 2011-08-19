@@ -1,0 +1,282 @@
+
+
+/* etrs89_trans  ver 2009.03          # page 1   04 Mar 2009 11 36 */
+
+
+/* Copyright (c) 2009, National Space Institude, Danish Technical */
+/* University and Kort-og Matrikelstyrelsen, Denmark              */
+/* All rights reserved.                                           */
+
+/* This is unpublished proprietary source code of National Space  */
+/* Institude DTU.  This copyright claim does not indicate an      */
+/* intention of publishing this code.                             */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "geo_lab.h"
+
+/*             Actions                     */
+#define PTG    2   /* Proj     -> Geo      */
+#define GTP    6   /* Geo      -> Proj     */
+#define IDT    9   /* Ident                */
+
+#define ILL   -1   /* Illegal           */
+
+/* TEST
+#define  DEBUGTRANS 
+TEST */
+
+int                       etrs89_trans(
+/*___________________________________*/
+char                     *i_lab_str,
+char                     *o_lab_str,
+double                    N_in,
+double                    E_in,
+double                   *X,
+double                   *Y,
+FILE                     *tr_error
+)
+{
+
+  /* etrs89_trans is a tiny version of gd_trans having        */
+  /* transformations between projections in etrs89 Datum ONLY */
+  /* crt and ellipsoidal heights are not included             */
+  /* leagal i_lab_str and o_lab_str are                       */
+  /* (zz is two digits for zone):                             */
+  /*   "geo", "utmzz", "dktm1", "dktm2", "dktm3", "dktm4",    */
+  /*   "kp2000j", "kp2000s", "kp2000b", "kfmr", "fke",        */
+  /*   "etrs-tmzz", "ETRS-TMzz", "etrs-lcc", "ETRS-LCC",      */
+  /*   "etrs-laea", "ETRS-LAEA"                               */
+
+
+/* etrs89_trans  ver 2009.03          # page 2   04 Mar 2009 11 36 */
+
+
+#include              "conv_lab.h"
+#include              "get_mlb.h"
+#include              "gtc.h"
+#include              "ptg.h"
+#include              "t_status.h"
+
+  static char                 si_lab_str[MLBLNG];
+  static char                 so_lab_str[MLBLNG];
+  static union geo_lab        i_lab;
+  static union geo_lab        o_lab;
+
+  static short                init = 0;
+  static short                sta, stp, ptp, ste;
+
+  static struct coord_lab    *i_clb, *o_clb;
+
+  struct cstm_lng {
+    char cstm_str[16];
+    int  str_lng;
+  };
+
+  struct cstm_lng *p_cstm_lst;
+  struct cstm_lng  cstm_lst[] = {{"geo", 3}, {"utm", 3},
+    {"dktm1", 5}, {"dktm2", 5}, {"dktm3", 5}, {"dktm4", 5},
+    {"kp2000j", 7}, {"kp2000s", 7}, {"kp2000b", 7}, {"kfmr", 4},
+    {"etrs-tm", 7}, {"ETRS-TM", 7}, {"fke", 3},
+    {"etrs-lcc", 8}, {"ETRS-LCC", 8},
+    {"etrs-laea", 9}, {"ETRS-LAEA", 9}, {"", 0}};
+
+
+/* etrs89_trans  ver 2009.03          # page 3   04 Mar 2009 11 36 */
+
+
+  struct coord_lab           *o_wclb;
+  char                        mlb_str[MLBLNG];
+  int                         action;
+  int                         ies = 0, res;
+  double                      N, E;
+
+  /*            ENGSAGER'S TRANSFORMATION PRODUCTION LINE (ETPL)   */
+  /*             <--UP-HILL--><--DOWN-HILL-->    */
+  /* cstm:       PRJ   GEO         GEO   PRJ     */
+  /* cstm:       3-7    2           2    3-7     */
+  /* io_nr:       2     3           3     2      */
+  /* action:        PTG               GTP        */
+  /* action:         2                 6         */
+  /* nmb_sequence at datum shift = both up-hill and down-hill */
+  /* strt_nr =     *io_nr_tab[i_cstm]                         */
+  /* stop_no = 8 - *io_nr_tab[o_cstm]                         */
+ 
+  /* nmb_seq, no dshift, increasing io_nmb = only up-hill     */
+  /* strt_nr =     *io_nr_tab[i_cstm]                         */
+  /* stop_no =     *io_nr_tab[o_cstm] - 1                     */
+
+  /* nmb_seq, no dshift, decreasing io_nmb = only down-hill   */
+  /* strt_nr = 9 - *io_nr_tab[i_cstm]                         */
+  /* stop_no = 8 - *io_nr_tab[o_cstm]                         */
+
+  short                 io_nr_tab [] = {
+    /* 0 -  7, regular transf. */ -1, 4, 3, 2, 2, 2, 2, 2,
+  };
+
+  short                 stop_ell [] = {
+    /* 0 -  7, regular transf. */  0, 0, 0, 1, 1, 1, 1, 0,
+  };
+
+  /* sequence of transformations : (part of ETPL)               */
+  /* lev == 3 : transform coordinates                           */
+
+
+/* etrs89_trans  ver 2009.03          # page 4   04 Mar 2009 11 36 */
+
+
+  /* Init of tables */
+  /*________________*/
+  if (init == 0 ||
+      (strcmp(i_lab_str, si_lab_str) != 0) ||
+      (strcmp(o_lab_str, so_lab_str) != 0)) {
+
+    i_clb = &(i_lab.u_c_lab);
+    o_clb = &(o_lab.u_c_lab);
+
+    /* Test for leagal systems */
+    for (p_cstm_lst = cstm_lst, res = 1;
+         p_cstm_lst->str_lng && res > 0; ++ p_cstm_lst) {
+      if (strncmp(i_lab_str,
+          p_cstm_lst->cstm_str, p_cstm_lst->str_lng) == 0) {
+        res = 0;
+      }
+    }
+    if (res) return(t_status(tr_error, "",
+             "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
+
+    for (p_cstm_lst = cstm_lst, res = 1;
+         p_cstm_lst->str_lng && res > 0; ++ p_cstm_lst) {
+      if (strncmp(o_lab_str,
+          p_cstm_lst->cstm_str, p_cstm_lst->str_lng) == 0) {
+        res = 0;
+      }
+    }
+    if (res) return(t_status(tr_error, "",
+             "etrs89_trans(unintelligible output_str)", TRF_ILLEG_));
+
+    (void) sprintf(mlb_str, "%s_etrs89", i_lab_str);
+    res = conv_lab(mlb_str, &i_lab, "");
+    if (res != CRD_LAB) return(t_status(tr_error, "",
+             "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
+    (void) strcpy(si_lab_str, i_lab_str);
+
+    (void) sprintf(mlb_str, "%s_etrs89", o_lab_str);
+    res = conv_lab(mlb_str, &o_lab, "");
+    if (res != CRD_LAB) return(t_status(tr_error, "",
+             "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
+    (void) strcpy(so_lab_str, o_lab_str);
+
+    init =  1;
+
+
+/* etrs89_trans  ver 2009.03          # page 5   04 Mar 2009 11 36 */
+
+
+    /* init of transformation  (b_lev == 3) */
+    o_wclb  = &(o_lab.u_c_lab);
+
+#ifdef DEBUGTRANS
+(void) fprintf(stdout,
+"\n*etrs89_trans inlab = %s  outlab = (%s) %s;",
+i_clb->mlb, o_wclb->mlb, o_clb->mlb);
+#endif
+    /* reg->reg */
+    sta = *(io_nr_tab + i_clb->cstm);
+    stp = *(io_nr_tab + o_wclb->cstm) - (short) 1;
+    ptp = (short) (((2<i_clb->cstm) && (2<o_wclb->cstm)) ? 1 : 0);
+    if (ptp) {
+      stp = -stp + 7;
+      ste = (*(stop_ell + i_clb->cstm) && *(stop_ell + o_clb->cstm)) ? 1 : 2;
+    } else {
+      if (sta > stp + 1) {
+        /* e.g.: (CRT=3)->(GEO=2)->(PRJ=1): */
+        /*       (GTC, PTG) changed to (CTG, GTP)   */
+        sta = -sta + (short) IDT;
+        stp = -stp + 7;
+      }
+      ste = 1;
+    }
+
+    /* test for identical systems */
+    if (i_clb->ch_sum == o_wclb->ch_sum) {
+      sta = IDT;
+      stp = IDT;
+    }
+
+#ifdef DEBUGTRANS
+(void) fprintf(stdout, "\n*sta,sto,ptp = %d, %d, %d;",
+sta, stp, ptp);
+#endif
+
+  } /* end of init of tables */
+
+
+/* etrs89_trans  ver 2009.03          # page 6   04 Mar 2009 11 36 */
+
+
+  N      = N_in;
+  E      = E_in;
+
+  for (action = sta, res = 0;
+       action <= stp && res >= TRF_TOLLE_; action++) {
+/*
+(void) fprintf(stdout, "\n*etrs89_trans :  action  %d;", action);
+*/
+    switch(action) {
+    case  PTG: /* PRJ (or GEO) -> GEO */
+      /*______________________________*/
+#ifdef DEBUGTRANS
+  (void) fprintf(stdout, "\n*case 2: PRJ -> GEO");
+  (void) fprintf(stdout, "   %s;", (i_lab.u_c_lab).mlb);
+#endif
+      ies = ptg(&i_lab, (int) ste, N, E, &N, &E, "etrs89_trans", tr_error);
+      if (ptp) action += 3;
+      break;
+
+    case  GTP: /* GEO -> PRJ (or GEO) */
+      /*______________________________*/
+#ifdef DEBUGTRANS
+  (void) fprintf(stdout, "\n*case 6: GEO -> PRJ");
+  (void) fprintf(stdout, "   %s;", (o_lab.u_c_lab).mlb);
+#endif
+      ies = ptg(&o_lab, (int) (-ste), N, E, &N, &E, "etrs89_trans", tr_error);
+      break;
+
+    case  IDT: /* No action, ident, ok */
+      ies  = 0;
+      break;
+
+    case  ILL: /* Illegal */
+    default:
+      *X  = *Y = 0.0;
+      return(t_status(tr_error, "",
+             "etrs89_trans(unintelligible labels)", TRF_ILLEG_));
+      break;
+    } /* end switch(action) */
+
+    if (res > ies) res = ies;
+#ifdef DEBUGTRANS
+(void) fprintf(stdout, "*    res = %d;", res);
+#endif
+  } /* action LOOP */
+
+
+/* etrs89_trans  ver 2009.03          # page 7   04 Mar 2009 11 36 */
+
+
+  /* return of transformation */
+  *X = N;
+  *Y = E;
+  return(res);
+
+  /* Undef macros */
+
+#undef PTG
+#undef GTP
+#undef IDT
+#undef ILL
+
+}
+

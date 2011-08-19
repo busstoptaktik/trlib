@@ -1,0 +1,73 @@
+
+
+/* t_status    ver 1999.01        # page 1    3 Feb 1999 14 05 */
+
+
+/* Copyright (c) 1999, LG,  Kort & Matrikelstyrelsen, Denmark  */
+/* All rights reserved.                                        */
+
+/* This is unpublished proprietary source code of LG, Kort &   */
+/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
+/* indicate an intention of publishing this code.              */
+
+#include    <stdio.h>
+#include    <stdarg.h>
+#include    <string.h>
+#include    "geo_lab.h"
+
+int                      t_status(
+/*______________________________*/
+FILE                    *tr_error,
+char                    *usertxt,
+char                    *fnc_name,
+int                      err_type,
+...
+)
+
+/* ADDITIONAL PARAMETERS 
+char                    *c_unit;
+char                    *h_unit;
+double                    N,  E,  H; 
+double                   dN, dE, dH;
+*/
+
+{
+
+#include             "s_status.h"
+
+  va_list              cp;
+
+  char               *c_unit, *h_unit;
+  double              N, E, H = 0.0;
+  char                tpt[512];
+  int                 c_err, t_err;
+
+  va_start(cp, err_type);
+  if (tr_error != NULL) {
+
+
+/* t_status    ver 1999.01        # page 2    3 Feb 1999 14 05 */
+
+
+    c_err =  err_type        % 100;
+    t_err = ((err_type / 100) % 100) * 100;
+    if ((TRF_AREA_  <= c_err && c_err < 0) ||
+        (TAB_C_ARE_ <= t_err && t_err < 0)) {
+      c_unit = va_arg(cp, char *);
+      h_unit = va_arg(cp, char *);
+      N      = va_arg(cp, double);
+      E      = va_arg(cp, double);
+      if (*h_unit != '\0') H = va_arg(cp, double);
+      (void) s_status(tpt, fnc_name, err_type, c_unit, h_unit, N, E, H);
+    }
+    else (void) s_status(tpt, fnc_name, err_type);
+
+    if (strlen(usertxt)) (void) fprintf(tr_error, "\n%-20s", usertxt);
+    (void) fprintf(tr_error, "%s", tpt);
+
+  }
+  va_end(cp);
+  return(err_type);
+}
+
+
