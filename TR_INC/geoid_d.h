@@ -50,6 +50,13 @@ union  tdd_pages {
 /* geoid_d  ver 2004.01           # page 2   25 Jun 2004 11 37 */
 
 
+/*
+geoid_c is IMPORTANT to call before releasing the struct mgde_str
+        to close the file pointer used.
++++ IMPORTANT to release file pointers in system +++
+gd_trans(NULL, .... will close file pointers to special tables used
++++ IMPORTANT to release file pointers in system +++
+*/
 struct mgde_str {
   union  tab_pages     g_pg[GEOIDPAGES];  /* pages loaded in RAM  */
   struct gde_lab       table_u[MAXGEOIDS];/* geoid_units no. 0-7  */
@@ -153,8 +160,10 @@ int                      info,
 FILE                    *out
 );
 
-geoid_c may be neglected, because the file is closed when
-the programme terminates.
+geoid_c is IMPORTANT to call before releasing the struct mgde_str
+        to close the file pointer used.
++++ IMPORTANT to release file pointers in system +++
+
 The value of info determines the information given about
 the use of the tables, so that
 info == 0 suppresses the information and

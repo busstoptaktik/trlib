@@ -179,7 +179,7 @@ g, *tab_max, t_lab->mlb);
           } /* end t-switch ; */
 
           for (s = -1, i = 0; i < GEOIDPAGES; i++) {
-            if (/* g == *(ppsg+i) && */ pos == *(ppge+i)) {
+            if (g == *(ppsg+i) && pos == *(ppge+i)) {
               s      = i;
               g_pg_i = g_pg + i;
               pfgh   = &(g_pg_i->fghtab[0]);

@@ -133,6 +133,17 @@ struct gde_lab          *t_lab,
   case 2: /* file input */
     /* The grid label is created from the binary grid file head */
 
+    /* free any open file pointer */
+    if ((t_lab->fd != NULL)    && (t_lab->lab_type == 777 ||
+         t_lab->lab_type == 776 || t_lab->lab_type == 775 ||
+         t_lab->lab_type == 774 || t_lab->lab_type == 773 ||
+         t_lab->lab_type == 772 || t_lab->lab_type == 771 ||
+         t_lab->lab_type == 770 || t_lab->lab_type == 769 ||
+         t_lab->lab_type == 768)) {
+      f_close(t_lab->fd);
+      t_lab->fd = NULL;
+    }
+
     /* clear the gde_lab structure */
     p_tp = (char *) t_lab;
     for (r = sizeof (*t_lab) - 1; r >= 0; r--) *(p_tp + r) = 0;
@@ -157,11 +168,13 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n blokaddr %8ld antal  = %4ld size = %4ld ;",
                 pos, qr, sizeof (int));
+      f_close(tab_file);
       return (-1);
     }
     if (f777 < 768 || 777 < f777) {
       if (all_out) (void) fprintf(stdout,
          "\n*** conv_tab: %s not a table_file ;\n", t_lab->mlb);
+      f_close(tab_file);
       return (-2);
     }
     /* table file detected */
@@ -179,6 +192,7 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n blokaddr %8ld antal  = %4ld size = %4ld ;\n",
                 pos, qr, 6 * sizeof (double));
+      f_close(tab_file);
       return (-2);
     }
 
@@ -191,6 +205,7 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n blokaddr %8ld antal  = %4ld size = %4ld ;\n",
                 pos, qr, sizeof (ezf));
+      f_close(tab_file);
       return (-2);
     }
 
@@ -198,6 +213,7 @@ struct gde_lab          *t_lab,
     if (ezf[1] != 0 && f777 == 777) {
       (void) fprintf(stdout,
                 "\n*** conv_tab: %s not geogr. grid ;\n", pth_mlb);
+      f_close(tab_file);
       return (ILL_LAB);
     }
 
@@ -252,7 +268,6 @@ struct gde_lab          *t_lab,
                       (f777 == 768) ? TDD_LAB : ILL_LAB;
     t_lab->version  = LAB_VERSION;
     t_lab->cmplt    = 0;
-    t_lab->fd       = tab_file;
     t_lab->sepix    = (short) strlen(t_lab->mlb);
     /* 0 : geo, > 0 : utm zone, < 0 : -cstm */
     t_lab->cstm     = (short) ezf[1];
@@ -262,6 +277,7 @@ struct gde_lab          *t_lab,
     r = geoid_t(t_lab, d_name, h_dtm, pth_mlb);
     if (r) {
       t_lab->lab_type = ILL_LAB;
+      f_close(tab_file);
       return(r);
     } 
 
@@ -269,6 +285,7 @@ struct gde_lab          *t_lab,
       if (all_out) (void) fprintf(stdout,
          "\n*** conv_tab: label inconsistent to table_file %s;\n",
          pth_mlb);
+      f_close(tab_file);
       return (-2);
     }
 
@@ -294,6 +311,7 @@ struct gde_lab          *t_lab,
       if (r) {
         (void) fprintf(stdout,
                "\n***conv_tab: Unknown coordsys %s", d_name);
+        f_close(tab_file);
         return(ILL_LAB);
       }
       (void) strcpy(t_lab->clb, d_name);
@@ -302,6 +320,8 @@ struct gde_lab          *t_lab,
       (void) set_dtm_1(-1, h_dtm, &t_lab->p_dtm, p_name, e_name,
                        rgn_pref.prfx, &mask, &trp_a);
     }
+
+    t_lab->fd = tab_file; // NOW SET THE FILE POINTER
 
     r_size = abs(t_lab->rec_size);
     t_3d   = (t_lab->lab_type == T3D_LAB) ? 3

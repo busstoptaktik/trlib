@@ -123,6 +123,7 @@ FILE                *tr_error
 
   if (in_lab == NULL) {
     if (init) (void) fclose(nadg_gr96_tab.table_u.fd);
+    init               = 0;
     nadg_gr96_tab.init = 0;
     return(0);
   }
