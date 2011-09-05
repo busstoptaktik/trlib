@@ -265,7 +265,7 @@ void trclose (TR *tr) {
 int tr(TR *tr, double *X, double *Y, double *Z, int n) {
     double x, y, z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i;
-    int use_geoids=(IsGeoidTableInitialised()?0:0-1);
+    int use_geoids=(IsGeoidTableInitialised()?0:-1);
     if ((0==tr)||(0==X)||(0==Y))
         return TR_ERROR;
         
