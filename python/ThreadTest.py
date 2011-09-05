@@ -1,0 +1,75 @@
+import threading
+import RandomTests
+import TrLib
+import numpy as np
+import time
+import os
+import sys
+GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #pointer to geoid directory
+OUTPUT_DIR=os.path.join(os.path.dirname(__file__),"THREAD_OUTPUT")
+NTHREADS_2D=2
+NTHREADS_3D=2
+NITERATIONS=3
+NPOINTS=10000
+class BadGuy(threading.Thread):
+	def __init__(self,id,n,iterations=3,is3d=False,log_file=None):
+		self.N=n
+		self.id=id
+		self.is3d=is3d
+		self.iterations=iterations
+		self.log_file=log_file
+		threading.Thread.__init__(self)
+	def run(self):
+		n=self.N #+something random??
+		if self.log_file is None:
+			fp=sys.stdout
+		else:
+			fp=open(self.log_file,"w")
+		while self.iterations>0:
+			fp.write("This is thread %i\n" %self.id)
+			if self.is3d:
+				RandomTests.RandomTests_3D(n,log_file=fp)
+			else:
+				RandomTests.RandomTests_2D(n,log_file=fp)
+			time.sleep(float(np.random.rand(1)[0]*0.1))
+			self.iterations-=1
+		fp.write("Thread finished\n")
+		if self.log_file is not None:
+			fp.close()
+
+def main(args):
+	progname=os.path.basename(args[0])
+	if "-lib" in args: #In this case we assume that input is the library that we want to test....
+		lib=args[args.index("-lib")+1]
+		lib=os.path.splitext(os.path.basename(args[2]))[0]
+		dir=os.path.dirname(args[2])
+		IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
+	else:
+		print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)
+		IS_INIT=TrLib.InitLibrary(GEOIDS)
+	if not IS_INIT:
+		print("Could not initialize library...")
+		print("Find a proper shared library and geoid dir and try again!")
+		sys.exit()
+	print("Running %s at %s" %(progname,time.asctime()))
+	print("Using TrLib v. %s" %TrLib.GetVersion())
+	print("DLL is: %s" %repr(TrLib.tr_lib))
+	if not os.path.exists(OUTPUT_DIR):
+		os.mkdir(OUTPUT_DIR)
+	threads=[]
+	for i in range(NTHREADS_2D):
+		threads.append(BadGuy(i,NPOINTS,NITERATIONS,False,os.path.join(OUTPUT_DIR,"2dthread_%i.txt"%i)))
+	for i in range(NTHREADS_3D):
+		threads.append(BadGuy(NTHREADS_2D+i,NPOINTS,NITERATIONS,True,os.path.join(OUTPUT_DIR,"3dthread_%i.txt"%i)))
+	for thread in threads:
+		thread.start()
+	while threading.activeCount()>1:
+		print("Active threads: %i" %threading.activeCount())
+		time.sleep(3)
+	sys.exit()
+
+if __name__=="__main__":
+	main(sys.argv)
+	
+	
+	

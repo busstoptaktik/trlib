@@ -1,0 +1,11 @@
+EXPORTS
+	InitLibrary
+	Transform
+	IsGeoidTableInitialised
+	GetEsriText
+	GetVersion
+	tropen
+	trclose
+	tr
+	trstream
+	TerminateLibrary
