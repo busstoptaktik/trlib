@@ -140,7 +140,7 @@ struct gde_lab          *t_lab,
          t_lab->lab_type == 772 || t_lab->lab_type == 771 ||
          t_lab->lab_type == 770 || t_lab->lab_type == 769 ||
          t_lab->lab_type == 768)) {
-      f_close(t_lab->fd);
+      fclose(t_lab->fd);
       t_lab->fd = NULL;
     }
 
@@ -168,13 +168,13 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n blokaddr %8ld antal  = %4ld size = %4ld ;",
                 pos, qr, sizeof (int));
-      f_close(tab_file);
+      fclose(tab_file);
       return (-1);
     }
     if (f777 < 768 || 777 < f777) {
       if (all_out) (void) fprintf(stdout,
          "\n*** conv_tab: %s not a table_file ;\n", t_lab->mlb);
-      f_close(tab_file);
+      fclose(tab_file);
       return (-2);
     }
     /* table file detected */
@@ -192,7 +192,7 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n blokaddr %8ld antal  = %4ld size = %4ld ;\n",
                 pos, qr, 6 * sizeof (double));
-      f_close(tab_file);
+      fclose(tab_file);
       return (-2);
     }
 
@@ -205,7 +205,7 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n blokaddr %8ld antal  = %4ld size = %4ld ;\n",
                 pos, qr, sizeof (ezf));
-      f_close(tab_file);
+      fclose(tab_file);
       return (-2);
     }
 
@@ -213,7 +213,7 @@ struct gde_lab          *t_lab,
     if (ezf[1] != 0 && f777 == 777) {
       (void) fprintf(stdout,
                 "\n*** conv_tab: %s not geogr. grid ;\n", pth_mlb);
-      f_close(tab_file);
+      fclose(tab_file);
       return (ILL_LAB);
     }
 
@@ -277,7 +277,7 @@ struct gde_lab          *t_lab,
     r = geoid_t(t_lab, d_name, h_dtm, pth_mlb);
     if (r) {
       t_lab->lab_type = ILL_LAB;
-      f_close(tab_file);
+      fclose(tab_file);
       return(r);
     } 
 
@@ -285,7 +285,7 @@ struct gde_lab          *t_lab,
       if (all_out) (void) fprintf(stdout,
          "\n*** conv_tab: label inconsistent to table_file %s;\n",
          pth_mlb);
-      f_close(tab_file);
+      fclose(tab_file);
       return (-2);
     }
 
@@ -311,7 +311,7 @@ struct gde_lab          *t_lab,
       if (r) {
         (void) fprintf(stdout,
                "\n***conv_tab: Unknown coordsys %s", d_name);
-        f_close(tab_file);
+        fclose(tab_file);
         return(ILL_LAB);
       }
       (void) strcpy(t_lab->clb, d_name);
