@@ -48,7 +48,7 @@ grad:  4
 me  =   1.172 cm    PKT = 620   excl = 72
 */
 
-static double FK89_U29[] = {
+static   double FK89_U29[] = {
 /*deg*/  4.0,
 
 /* Coefficients for y-polynomium, forward transformation: */
@@ -86,7 +86,7 @@ static double FK89_U29[] = {
 /* fk89tu_g   ver 1999.01         # page 3   12 Jan 1999 12 58 */
 
 
-static double U29_FK89[] = {
+static   double U29_FK89[] = {
 /*deg*/  4.0,
 
 /* Coefficients for y-polynomium, backward transformation: */

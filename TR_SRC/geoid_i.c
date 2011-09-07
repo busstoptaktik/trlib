@@ -20,6 +20,7 @@
 
 #include        "geo_lab.h"
 #include        "geoid_d.h"
+#include        "trthread.h"
 
 int                     geoid_i(
 /*____________________________*/
@@ -36,8 +37,8 @@ char                    *err_str
 #include     "i_tabdir_file.h"
 #include     "s_status.h"
 
-extern FILE               *man_tab_file;
-extern size_t              init_tab_pos;
+extern THREAD_SAFE  FILE               *man_tab_file;
+extern THREAD_SAFE size_t              init_tab_pos;
 
   char                       ftx[128], wrk[16], wr1[16], *p_tp;
   size_t                     size;

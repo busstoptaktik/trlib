@@ -15,6 +15,7 @@
 #include <math.h>
 #include "geo_lab.h"
 #include "kms_math.h"
+#include "trthread.h"
 
 
 int                      h_trans(
@@ -39,8 +40,8 @@ char                    *tr_str
 #include              "set_dtm.h"
 #include              "sgetg.h"
 
-  extern FILE               *def_lab_file;
-  extern size_t              init_prj_pos, init_hth_pos;
+  extern THREAD_SAFE FILE               *def_lab_file;
+  extern THREAD_SAFE size_t              init_prj_pos, init_hth_pos;
 
 
 /* h_trans  ver 2004.01          # page 2    24 Jan 2004 11 57 */
@@ -52,8 +53,8 @@ char                    *tr_str
     double LAT0, LON0, M0, N0;
     double a1, a2, a3;};
 
-  static struct h_trc_str     h_trc;
-  static short                sh_dtm = 0, inv = 0;
+  static THREAD_SAFE  struct h_trc_str     h_trc;
+  static THREAD_SAFE  short                sh_dtm = 0, inv = 0;
   struct coord_lab           *ic_lab = &i_lab->u_c_lab;
   struct coord_lab           *rc_lab = &(h_trc.ref_lab.u_c_lab);
   char                        pth_mlb[512], c_mlb[MLBLNG], *p_tp;

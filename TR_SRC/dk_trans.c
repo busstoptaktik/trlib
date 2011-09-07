@@ -15,6 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "geo_lab.h"
+#include "trthread.h"
 
 /* ACTION NUMBERS */
 #define  IDNT    0
@@ -87,9 +88,9 @@ FILE                *tr_error
 #include        "dks_tr.h"
 #include        "t_status.h"
 
-  static int               in_chsum = 0;
-  static int               outchsum = 0;
-  static int               TC_init = 0, proj_proj = 0;
+  static THREAD_SAFE  int               in_chsum = 0;
+  static THREAD_SAFE  int               outchsum = 0;
+  static THREAD_SAFE  int               TC_init = 0, proj_proj = 0;
 
   char                     p_dtm[32], *pl;
 
@@ -104,11 +105,11 @@ FILE                *tr_error
   struct coord_lab        *in_lab = &(in_lab_a->u_c_lab);
   struct coord_lab        *outlab = &(outlab_a->u_c_lab);
 
-  static char              outcs[32], in_cs[32];
-  static union geo_lab     TC_u32, TC_u33, TC_tr2, TC__gs, TC_gsb;
+  static THREAD_SAFE  char              outcs[32], in_cs[32];
+  static THREAD_SAFE  union geo_lab     TC_u32, TC_u33, TC_tr2, TC__gs, TC_gsb;
 
 #ifdef   DEBUGDKTRANS
-  static char          *ACTION[] = {
+  static THREAD_SAFE  char          *ACTION[] = {
     "idnt", "t32j", "j32t", "t32s", "st32", "t32b", "bt32",
     "u32g", "gu32", "p_tg", "g_tp", "ztzu", "ztzd", "u_gs", "gs_u",
     "ugsb", "gsbu", "j_os", "os_j", "s_kk", "kk_s", "u_sb", "sb_u",
@@ -128,7 +129,7 @@ FILE                *tr_error
   } *pml;
 
 
-  static struct nr_mlb    mlab[] = {
+  static THREAD_SAFE  struct nr_mlb    mlab[] = {
     /* GENERAL GLOBAL */
     /*  0 */ { 0,  0,   "tc32_ed50"},  /* tr system to/from EUREF */
     /*  1 */ { 0,  1,   "geo_ed50"},
@@ -185,11 +186,11 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static struct act_nst     *ptab, *pt[2];
-  static int                 in_nr, stlev, levst, in[2];
-  static int                 ed_w, js_w, bo_w, gs_w, bs_w;
+  static THREAD_SAFE  struct act_nst     *ptab, *pt[2];
+  static THREAD_SAFE  int                 in_nr, stlev, levst, in[2];
+  static THREAD_SAFE  int                 ed_w, js_w, bo_w, gs_w, bs_w;
 
-  static struct act_nst edtab[] = {
+  static THREAD_SAFE  struct act_nst edtab[] = {
     /* i/o_sys :: TC 32: 0 */
     /* input    tc32     geo      u32      sb      proj     tcgeo */
     /* state no. 0        1        2        3        4        5   */
@@ -206,7 +207,7 @@ FILE                *tr_error
     /* tcge*/ {U32G,5},{GTTP,2},{U32T,0},{SB_U,2},{P_TG,1},{IDNT,5}
   };
 
-  static struct act_nst jstab[] = {
+  static THREAD_SAFE  struct act_nst jstab[] = {
     /* i/o_sys :: TC 32: 0 */
     /* input     : */
     /* tc32    s34j     s34s      os       kk       dks      s34  */
@@ -228,7 +229,7 @@ FILE                *tr_error
     {T32L,6},{IDNT,6},{IDNT,6},{ILLG,0},{ILLG,0},{ILLG,0},{IDNT,6}
   };
 
-  static struct act_nst botab[] = {
+  static THREAD_SAFE  struct act_nst botab[] = {
     /* i/o_sys :: TC 32: 0 */
     /* input    tc32    s45b      u32  */
     /* state no. 0        1        2   */
@@ -243,7 +244,7 @@ FILE                *tr_error
 /* dk_trans  ver 2003.01        # page 5   12 Jan 2003 13 55 */
 
 
-  static struct act_nst gstab[] = {
+  static THREAD_SAFE  struct act_nst gstab[] = {
     /* i/o_sys :: TC32: 0 */
     /* input   tc32       gs     u32      gsgeo  */
     /* state no. 0        1        2        3    */
@@ -256,7 +257,7 @@ FILE                *tr_error
     /*gsgeo*/ {T32U,2},{PTGS,3},{U_GS,1},{IDNT,3}
   };
 
-  static struct act_nst bstab[] = {
+  static THREAD_SAFE  struct act_nst bstab[] = {
     /* i/o_sys :: TC32: 0 */
     /* input   tc32      gsb      u32    gsbgeo    u33   */
     /* state no. 0        1        2        3        4   */

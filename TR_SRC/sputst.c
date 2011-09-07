@@ -47,7 +47,7 @@ int                       sputst(
   /* region number, prefix and name */
   char                    rgn_pref[8], rgn_name[24];
 
-  static char            *niv_tab[] = {
+  static  char            *niv_tab[] = {
     NIVTAB
   };
 

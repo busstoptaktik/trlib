@@ -23,8 +23,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
-
 #include "geo_lab.h"
+#include "trthread.h"
 
 int                      conv_cnd(
 /*___________________________*/
@@ -75,7 +75,7 @@ struct obs_lab          *o_lab,
 
   struct otype_str   *p_otype;
 
-  static struct otype_str  ctype[] = {
+  static THREAD_SAFE  struct otype_str  ctype[] = {
     { 1, 0, "ngrp",  "Nivellementsgruppe",
          "", "", "", "", "", "", "", "" },
     { 0, 0, "", "", "", "", "", "", "", "", "", "" }

@@ -95,7 +95,7 @@ Prog: Knud Poder, APR 1991
 #include    "inpoly.h"
 #include    "t_status.h"
 
-  static double      P_tcla[] = {
+  static  double      P_tcla[] = {
     /*ant*/  11.0,
     /*  1*/  6080000.0, 460000.0, 6130000.0, 440000.0, 
     /*  3*/  6280000.0, 440000.0, 6370000.0, 496000.0, 
@@ -105,7 +105,7 @@ Prog: Knud Poder, APR 1991
     /* 11*/  6060000.0, 540000.0, 
   };
 
-  static double      P_tcj[] = {
+  static  double      P_tcj[] = {
     /*ant*/   8.0,
     /* 1 */  6080000.0, 460000.0, 6130000.0, 435000.0,
     /* 3 */  6280000.0, 435000.0, 6370000.0, 496000.0,
@@ -113,7 +113,7 @@ Prog: Knud Poder, APR 1991
     /* 7 */  6050000.0, 670000.0, 6060000.0, 540000.0  
   };
 
-  static double      P_s34j[] = {
+  static  double      P_s34j[] = {
     /*ant*/   8.0,
     /* 1 */    49741.6, 338404.7, 100249.6, 362414.7,
     /* 3 */   250280.9, 359416.9, 339073.3, 296600.2,
@@ -125,19 +125,19 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 3   17 Nov 1999 13 25 */
 
 
-  static double      P_tcbo[] = {
+  static  double      P_tcbo[] = {
     /*ant*/   4.0,
     /*  1*/  6150000.0, 894000.0, 6146000.0, 862000.0,
     /*  3*/  6116000.0, 860000.0, 6106000.0, 894000.0
   };
 
-  static double      P_s45b[] = {
+  static  double      P_s45b[] = {
     /*ant*/   4.0,
     /*  1*/  76000.0, 26000.0, 76000.0, 70000.0,
     /*  3*/  30000.0, 70000.0, 30000.0, 26000.0
   };
 
-  static double      P_tcs[] = {
+  static  double      P_tcs[] = {
     /*ant*/   8.0,
     /*  1*/  6300000.0, 670000.0, 6250000.0, 750000.0,
     /*  3*/  6190000.0, 770000.0, 6120000.0, 770000.0,
@@ -145,7 +145,7 @@ Prog: Knud Poder, APR 1991
     /*  7*/  6260000.0, 580000.0, 6290000.0, 620000.0
   };
 
-  static double      P_s34s[] = {
+  static  double      P_s34s[] = {
     /*ant*/   8.0,
     /*  1*/  265558.8, 123989.1, 213963.1,  45022.2,
     /*  3*/  153598.1,  26229.5,  83639.7,  27605.4,
@@ -174,7 +174,7 @@ Prog: Knud Poder, APR 1991
      } 
   */
 
-  static double      C_ttj[] = {
+  static  double      C_ttj[] = {
     /* tc32_ed50 -> s34j */
     /* my =  1.73 cm    my_loss =    +7  y_enp =  +5.4 */
     /* mx =  1.58 cm    mx_loss =    +8  x_enp =  +4.6 */
@@ -307,7 +307,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 6   17 Nov 1999 13 25 */
 
 
-  static double        C_jtt[] = {
+  static  double        C_jtt[] = {
     /* s34j -> tc32_ed50                               */
     /* my =  1.73 cm    my_loss =    +7  y_enp =  +5.4 */
     /* mx =  1.58 cm    mx_loss =    +8  x_enp =  +4.8 */
@@ -439,7 +439,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 8   17 Nov 1999 13 25 */
 
 
-  static double     C_tts[] = {
+  static  double     C_tts[] = {
     /* tc32_ed50 -> s34s */
     /* my =  1.26 cm    my_loss =    +6  y_enp =  +9.8 */
     /* mx =  1.19 cm    mx_loss =    +5  x_enp = +10.2 */
@@ -523,7 +523,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 10  17 Nov 1999 13 25 */
 
 
-  static double     C_stt[] = {
+  static  double     C_stt[] = {
     /* s34s -> tc32_ed50 */
     /* m_lim_gen:  0.101  red = 0       OBS    =  8106 */
     /* my =  1.26 cm    my_loss =    +6  y_enp =  +9.9 */
@@ -607,7 +607,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 11   17 Nov 1999 13 25 */
 
 
-  static double     C_ttb[] = {
+  static  double     C_ttb[] = {
     /* tc32_ed50 -> s45b */
     /* m_lim_gen:  0.153  red  = 0      OBS   = 1074    */
     /* m = 1.51 cm my_loss =    +3  y_enp = +8.4 */
@@ -668,7 +668,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 12   17 Nov 1999 13 25 */
 
 
-  static double      C_btt[] = {
+  static  double      C_btt[] = {
     /* s45b -> tc32_ed50 */
     /* m_lim_gen:  0.154  red  = 0      OBS   = 1074    */
     /* m = 1.50 cm my_loss =    +3  y_enp = +8.5 */
@@ -729,7 +729,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 13   17 Nov 1999 13 25 */
 
 
-  static double      C_ttu_b[] = {
+  static  double      C_ttu_b[] = {
     /* tc32_ed50 -> utm32_ed50 : Bornholm */
     /* m_lim_gen:  0.086  red  = 0      OBS   =    852   */
     /* m = 1.38 cm my_loss =    +2  y_enp = +10.5 */
@@ -775,7 +775,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 14   17 Nov 1999 13 25 */
 
 
-  static double      C_utt_b[] = {
+  static  double      C_utt_b[] = {
     /* utm32_ed50 -> tc32_ed50 : Bornholm */
     /* m_lim_gen:  0.086  red  = 0      OBS   =    852   */
     /* m = 1.38 cm my_loss =    +2  y_enp = +10.8 */
@@ -818,7 +818,7 @@ Prog: Knud Poder, APR 1991
   };
 
 
-  static double      C_ttu_l[] = {
+  static  double      C_ttu_l[] = {
     /* tc32_ed50 -> utm32_ed50                         */
     /* my =  1.59 cm    my_loss =    +9  y_enp =  +4.1 */
     /* mx =  1.48 cm    mx_loss =   +10  x_enp =  +3.9 */
@@ -978,7 +978,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 17   17 Nov 1999 13 25 */
 
 
-  static double      C_utt_l[] = {
+  static  double      C_utt_l[] = {
     /* utm32_ed50 -> tc32_ed50 : Jylland & Sjæland      */
     /* my =  1.59 cm    my_loss =    +9  y_enp =  +4.0  */
     /* mx =  1.48 cm    mx_loss =   +10  x_enp =  +3.7  */

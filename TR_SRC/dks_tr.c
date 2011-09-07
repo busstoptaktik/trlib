@@ -14,6 +14,7 @@
 #include     <math.h>
 #include     <string.h>
 #include     "geo_lab.h"
+#include     "trthread.h"
 
 int              dks_tr(
 /*____________________*/
@@ -60,10 +61,10 @@ FILE           *tr_error
 
   double                      N, E;
 
-  static int                  in_nr, outnr;
-  static char                 c_outlab[32] = "UMBA # GUF";
-  static char                 c_in_lab[32] = "UMBA # GUF";
-  static int                  TC_init, as_w, as_z;
+  static THREAD_SAFE  int                  in_nr, outnr;
+  static THREAD_SAFE  char                 c_outlab[32] = "UMBA # GUF";
+  static THREAD_SAFE  char                 c_in_lab[32] = "UMBA # GUF";
+  static THREAD_SAFE  int                  TC_init, as_w, as_z;
 
   int                         result = 0, res = 0, nst, act;
 

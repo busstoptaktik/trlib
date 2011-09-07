@@ -67,7 +67,7 @@ char                        *udt
     short      nstate;
   };
 
-  static struct act_nst acns_tab[] = {
+  static  struct act_nst acns_tab[] = {
     /*state           init   sign    pnt     nmb   nmb+pnt */
     /*                 0      1       2       3       4    */
     /*class*/

@@ -20,6 +20,7 @@
 #include <ctype.h>
 #include <math.h>
 #include "geo_lab.h"
+#include "trthread.h"
 
 int                      conv_plm(
 /*______________________________*/
@@ -72,8 +73,8 @@ struct plm_lab          *p_lab,
 #include     "labchsum.h"
 #include     "sgetg.h"
 #include     "t_status.h"
-extern FILE               *man_gps_file;
-extern size_t              init_gps_pos;
+extern THREAD_SAFE FILE               *man_gps_file;
+extern THREAD_SAFE size_t              init_gps_pos;
 
 #define YEAR(yy) ((yy) +(((yy)<88) ? 2000 : (((yy)<100) ? 1900 : 0)))
 

@@ -13,6 +13,7 @@
 #include   <stdio.h>
 #include   <string.h>
 #include   "geo_lab.h"
+#include   "trthread.h"
 
 int                      scn_cho(
 /*_____________________________*/
@@ -41,10 +42,10 @@ double                  *old_cmt
   int                              type, r_val = 1;
   int                              dec = 3, used;
 
-  static short                     iN, iE, q_c, grp1, grp2, grp3;
-  static int                       c_check;
-  static struct typ_dec            id_tpd;
-  static char                      *id_ch, *id_hh;
+  static THREAD_SAFE  short                     iN, iE, q_c, grp1, grp2, grp3;
+  static THREAD_SAFE  int                       c_check;
+  static THREAD_SAFE  struct typ_dec            id_tpd;
+  static THREAD_SAFE  char                      *id_ch, *id_hh;
 
 
   p_stop = p_in + (int) strlen(p_in) - 2;

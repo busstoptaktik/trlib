@@ -15,6 +15,7 @@
 #include <math.h>
 #include "geo_lab.h"
 #include "kms_math.h"
+#include "trthread.h"
 
 
 int                      htr_init(
@@ -38,14 +39,14 @@ char                    *dh_tr_info
 #include              "set_dtm.h"
 #include              "sgetg.h"
 
-  extern FILE               *def_lab_file;
-  extern size_t              init_prj_pos, init_hth_pos;
+  extern THREAD_SAFE FILE               *def_lab_file;
+  extern THREAD_SAFE size_t              init_prj_pos, init_hth_pos;
 
 
 /* htr_init  ver 2004.01          # page 2    24 Jan 2004 11 57 */
 
 
-  static short          sh_dtm = 0;
+  static THREAD_SAFE  short          sh_dtm = 0;
   union  geo_lab        test_lab;
   char                  pth_mlb[512], c_mlb[MLBLNG], *p_tp;
   int                   tr_type = HTRF_ILLEG_, res = 1, l_inv, qr, used;

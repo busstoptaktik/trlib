@@ -18,6 +18,7 @@
 #include    <sys/stat.h>
 #include    <stdarg.h>
 #include    "geo_lab.h"
+#include "trthread.h"
 
 short            conv_rgn(
 /*______________________*/
@@ -70,12 +71,12 @@ char            *rgn_name
 #include              "fgetlhtx.h"
 #include              "i_tabdir_file.h"
 
-extern FILE               *def_lab_file;
-extern size_t              init_prj_pos, init_rgn_pos;
+extern THREAD_SAFE FILE               *def_lab_file;
+extern THREAD_SAFE size_t              init_prj_pos, init_rgn_pos;
 
 
-  static size_t    pos = 0;
-  static int       r_quest = 0;
+  static THREAD_SAFE  size_t    pos = 0;
+  static THREAD_SAFE  int       r_quest = 0;
 
   char             pth_mlb[512], *p_tp;
   char             w_name[24], *w = w_name;

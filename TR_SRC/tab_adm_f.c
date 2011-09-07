@@ -24,6 +24,7 @@
 #include         "c_tabdir_file.h"
 #include         "i_tabdir_file.h"
 #include         "gettabdir.h"
+#include         "trthread.h"
 
 #ifndef    M_PI
 #include   "kms_math.h"
@@ -100,7 +101,7 @@ int                  tab_adm_f(
 #include         "sgetg.h"
 #include         "sputg.h"
 
-  extern FILE           *man_tab_file;
+  extern THREAD_SAFE FILE           *man_tab_file;
 
   void                   reset_dir();
   union geo_lab          t_lab_u;

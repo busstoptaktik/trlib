@@ -9,6 +9,7 @@
 /* indicate an intention of publishing this code.              */
 
 #include      <stdio.h>
+#include      "trthread.h"
 
 char                *f_nxt(
 /*_______________________*/
@@ -21,7 +22,7 @@ int                 used
 {
 #include         "fgetln.h"
 
-  static char      *cp;
+  static THREAD_SAFE  char      *cp;
 
   if (*items == 0) {
     (void) fgetln(str, items, infile);

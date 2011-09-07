@@ -73,7 +73,7 @@ in Sealand or Jutland. Note the & operator on N1, E1.
   int           i, d, t;
   int           res = 0;
 
-  static double    Cu32gs[] = {
+  static  double    Cu32gs[] = {
     /*lng*/   -16.0,              /*tol*/  GSTOLMS,
     /*N,E*/    6206216.610000,     500000.000000,
     /* 0 */     112123.507889,      85938.100252,
@@ -83,7 +83,7 @@ in Sealand or Jutland. Note the & operator on N1, E1.
     /* 4 */    2.351689064e-22,   -4.394110355e-24,
     /* 5 */    5.021865838e-29,   -1.008031811e-30
   };
-  static double    Cu33gsb[] = {
+  static  double    Cu33gsb[] = {
     /*lng*/   -14.0,              /*tol*/  GSTOLMS,
     /*N,E*/    6107000.000000,      493000.000000,
     /* 0 */     17606.901573,      21150.097571,
@@ -92,7 +92,7 @@ in Sealand or Jutland. Note the & operator on N1, E1.
     /* 3 */    2.481016058e-15,    1.683466885e-14,
     /* 4 */    1.795149378e-19,   -9.161067528e-19
   };
-  static double    Cgsu32[] = {
+  static  double    Cgsu32[] = {
     /*lng*/   -14.0,                /*tol*/  GSTOLMS,
     /*N,E*/     112177.020000,       85948.680000,
     /* 0 */    6206269.880000,      499988.360000,
@@ -101,7 +101,7 @@ in Sealand or Jutland. Note the & operator on N1, E1.
     /* 3 */   -4.079000000e-15,    2.440000000e-16,
     /* 4 */   -2.340000000e-22,    1.900000000e-23
   };
-  static double    Cgsbu33[] = {
+  static  double    Cgsbu33[] = {
     /*lng*/   -14.0,              /*tol*/  GSTOLMS,
     /*N,E*/       18000.000000,      21000.000000,
     /* 0 */     6107392.748060,     493150.391692,

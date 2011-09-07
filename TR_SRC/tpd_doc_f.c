@@ -14,6 +14,7 @@
 #include <math.h>
 #include "geo_lab.h"
 #include "typ_dec.h"
+#include "trthread.h" /*is this really needed here??? */
 
 extern struct na_gr_tp_fc    ngtf[];
 
@@ -23,8 +24,8 @@ char                        *head_txt,
 char                        *tpd_txt
 )
 {
-  static struct na_gr_tp_fc  *p_t = NULL;
-  static unsigned char        s_gr = 0;
+  static THREAD_SAFE  struct na_gr_tp_fc  *p_t = NULL;
+  static THREAD_SAFE  unsigned char        s_gr = 0;
   char                       *p_c, *p_f;   
 
   if (p_t == NULL) p_t = ngtf; else ++ p_t;

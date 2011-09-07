@@ -21,8 +21,9 @@
 #include        "fgetln.h"
 #include        "sgetdt.h"
 #include        "s_status.h"
-extern FILE               *man_gps_file;
-extern size_t              init_gps_pos;
+#include        "trthread.h"
+extern THREAD_SAFE FILE               *man_gps_file;
+extern THREAD_SAFE size_t              init_gps_pos;
 
 int                   set_itrf_c(
 /*____________________________*/

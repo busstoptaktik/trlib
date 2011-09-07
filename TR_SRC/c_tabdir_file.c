@@ -35,14 +35,15 @@
 /*                 : else the file pointer to be closed        */
 
 #include <stdio.h>
+#include "trthread.h"
 
-extern FILE               *def_lab_file;
-extern FILE               *man_tab_file;
-extern FILE               *man_gps_file;
-extern size_t              init_lab_pos;
-extern size_t              init_prj_pos, init_rgn_pos;
-extern size_t              init_dtm_pos, init_grs_pos;
-extern size_t              init_tab_pos, init_gps_pos;
+extern THREAD_SAFE  FILE               *def_lab_file;
+extern  THREAD_SAFE  FILE               *man_tab_file;
+extern THREAD_SAFE FILE               *man_gps_file;
+extern THREAD_SAFE size_t              init_lab_pos;
+extern THREAD_SAFE size_t              init_prj_pos, init_rgn_pos;
+extern THREAD_SAFE  size_t              init_dtm_pos, init_grs_pos;
+extern THREAD_SAFE size_t              init_tab_pos, init_gps_pos;
 
 void              c_tabdir_file(
 /*____________________________*/

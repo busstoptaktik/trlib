@@ -45,6 +45,7 @@
 
 #include "geo_lab.h"
 #include "geoid_d.h"
+#include "trthread.h"
 
 int                      tab_doc_f(
 /*____________________________*/
@@ -64,16 +65,16 @@ FILE                    *fh_out
 #include              "i_tabdir_file.h"
 #include              "srch_tab_typ.h"
 
-extern FILE               *man_tab_file;
-extern size_t              init_tab_pos;
+extern THREAD_SAFE FILE               *man_tab_file;
+extern THREAD_SAFE size_t              init_tab_pos;
 
 #define  LAST_TP       (767)
 // To be edited when new table types are added
 
-  static int                 n_quest = 0, type_quest = 0, new_table = 0, stype = 0;
-  static int                 first = 1;
-  static long                init_pos = 0, pos = 0;
-  static char                s_name[24], pth_mlb[512];
+  static THREAD_SAFE  int                 n_quest = 0, type_quest = 0, new_table = 0, stype = 0;
+  static THREAD_SAFE  int                 first = 1;
+  static THREAD_SAFE  long                init_pos = 0, pos = 0;
+  static THREAD_SAFE  char                s_name[24], pth_mlb[512];
   size_t                     b_t;
   char                       datum[MLBLNG], p_dtm[MLBLNG];
   char                       tab_typ_txt[12], *p_nm = s_name +1, *p_tp, *p_te;

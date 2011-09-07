@@ -15,6 +15,7 @@
 #include <string.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
+#include "trthread.h"
 
 /*             Actions                     */
 #define PRE    0   /* crt_???? -> geoE???? */
@@ -77,7 +78,7 @@ FILE                     *tr_error
 #include              "ptg.h"
 #include              "t_status.h"
 
-  static int      (*dfb_trf)(
+  static THREAD_SAFE  int      (*dfb_trf)(
     union geo_lab      *in_lab,
     union geo_lab      *outlab,
     double              N,    double   E,    double   H,
@@ -87,32 +88,32 @@ FILE                     *tr_error
   );
 
   char                        err_txt[1024];
-  static union geo_lab        g_lab;   /* DK_geo_ed50        */
-  static union geo_lab        H0_lab, H1_lab; /* grid systems gde/tv */
-  static union geo_lab        H2_lab, H3_lab; /* grid systems  dh  */
-  static union geo_lab       *i_Rlab;  /* begin REG of ETPL  */
-  static union geo_lab       *G_Rlab;  /* end   REG of ETPL geoid */
-  static union geo_lab       *T_Rlab;  /* end   REG of ETPL dh    */
-  static union geo_lab       *O_Rlab;  /* end   REG of ETPL trans */
-  static union geo_lab       *i_Nlab;  /* begin NON of ETPL  */
-  static union geo_lab       *G_Nlab;  /* end   NON of ETPL geoid */
-  static union geo_lab       *T_Nlab;  /* end   NON of ETPL dh    */
-  static union geo_lab       *O_Nlab;  /* end   NON of ETPL trans */
-  static union geo_lab        t_lab;   /* non-reg gateway */
+  static THREAD_SAFE  union geo_lab        g_lab;   /* DK_geo_ed50        */
+  static THREAD_SAFE  union geo_lab        H0_lab, H1_lab; /* grid systems gde/tv */
+  static THREAD_SAFE  union geo_lab        H2_lab, H3_lab; /* grid systems  dh  */
+  static THREAD_SAFE  union geo_lab       *i_Rlab;  /* begin REG of ETPL  */
+  static THREAD_SAFE  union geo_lab       *G_Rlab;  /* end   REG of ETPL geoid */
+  static THREAD_SAFE  union geo_lab       *T_Rlab;  /* end   REG of ETPL dh    */
+  static THREAD_SAFE  union geo_lab       *O_Rlab;  /* end   REG of ETPL trans */
+  static THREAD_SAFE  union geo_lab       *i_Nlab;  /* begin NON of ETPL  */
+  static THREAD_SAFE  union geo_lab       *G_Nlab;  /* end   NON of ETPL geoid */
+  static THREAD_SAFE  union geo_lab       *T_Nlab;  /* end   NON of ETPL dh    */
+  static THREAD_SAFE  union geo_lab       *O_Nlab;  /* end   NON of ETPL trans */
+  static THREAD_SAFE  union geo_lab        t_lab;   /* non-reg gateway */
 
-  static struct mgde_str     *s_grid_tab = NULL;
-  static struct mgde_str      h_grid_tab;
-  static struct htr_c_str     htr_const;
+  static THREAD_SAFE  struct mgde_str     *s_grid_tab = NULL;
+  static THREAD_SAFE  struct mgde_str      h_grid_tab;
+  static THREAD_SAFE  struct htr_c_str     htr_const;
 
-  static int                  i_chsum = 0, o_chsum = 0, b_lev, s_lev;
-  static short                init = 0, iEh_req =0, oEh_req =0;
-  static short                s_req_gh = 0, ghr = 0;
-  static short                s_req_dh = 0, s_req_tv = 0;
-  static short                sta[4], stp[4], ptp[4];
-  static char                 i_sep, o_sep;
-  static char                 ed50_i, ed50_o[4], nonp_i[4], nonp_o[4];
+  static THREAD_SAFE  int                  i_chsum = 0, o_chsum = 0, b_lev, s_lev;
+  static THREAD_SAFE  short                init = 0, iEh_req =0, oEh_req =0;
+  static THREAD_SAFE  short                s_req_gh = 0, ghr = 0;
+  static THREAD_SAFE  short                s_req_dh = 0, s_req_tv = 0;
+  static THREAD_SAFE  short                sta[4], stp[4], ptp[4];
+  static THREAD_SAFE  char                 i_sep, o_sep;
+  static THREAD_SAFE  char                 ed50_i, ed50_o[4], nonp_i[4], nonp_o[4];
 
-  static struct coord_lab    *i_clb, *o_clb;
+  static THREAD_SAFE  struct coord_lab    *i_clb, *o_clb;
   struct coord_lab           *H_clb  = &(H0_lab.u_c_lab);
   struct coord_lab           *H1_clb = &(H1_lab.u_c_lab);
   struct coord_lab           *t_clb  = &(t_lab.u_c_lab);

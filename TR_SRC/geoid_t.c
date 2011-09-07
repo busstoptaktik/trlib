@@ -30,6 +30,7 @@
 
 #include "geo_lab.h"
 #include "geoid_d.h"
+#include "trthread.h"
 
 int                      geoid_t(
 /*____________________________*/
@@ -46,8 +47,8 @@ char                    *descr
 #include              "s_status.h"
 #include              "srch_tab_typ.h"
 
-extern FILE               *man_tab_file;
-extern size_t              init_tab_pos;
+extern THREAD_SAFE FILE               *man_tab_file;
+extern THREAD_SAFE size_t              init_tab_pos;
 
   long                       pos;
   size_t                     b_t;

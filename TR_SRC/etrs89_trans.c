@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "geo_lab.h"
+#include "trthread.h"
 
 /*             Actions                     */
 #define PTG    2   /* Proj     -> Geo      */
@@ -59,15 +60,15 @@ FILE                     *tr_error
 #include              "ptg.h"
 #include              "t_status.h"
 
-  static char                 si_lab_str[MLBLNG];
-  static char                 so_lab_str[MLBLNG];
-  static union geo_lab        i_lab;
-  static union geo_lab        o_lab;
+  static THREAD_SAFE  char                 si_lab_str[MLBLNG];
+  static THREAD_SAFE  char                 so_lab_str[MLBLNG];
+  static THREAD_SAFE  union geo_lab        i_lab;
+  static THREAD_SAFE  union geo_lab        o_lab;
 
-  static short                init = 0;
-  static short                sta, stp, ptp, ste;
+  static THREAD_SAFE  short                init = 0;
+  static THREAD_SAFE  short                sta, stp, ptp, ste;
 
-  static struct coord_lab    *i_clb, *o_clb;
+  static THREAD_SAFE  struct coord_lab    *i_clb, *o_clb;
 
   struct cstm_lng {
     char cstm_str[16];

@@ -16,6 +16,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "geo_lab.h"
+#include "trthread.h"
 
 /* ACTION NUMBERS */
 
@@ -56,10 +57,10 @@ FILE                *tr_error
 /* fh_trans  ver 2010.1        # page 2    12 Jan 2010 13 55 */
 
 
-  static int               in_chsum = 0L;
-  static int               outchsum = 0L;
-  static int               init = 0;
-  static double            lim[4], date = -10.0;
+  static THREAD_SAFE  int               in_chsum = 0L;
+  static THREAD_SAFE  int               outchsum = 0L;
+  static THREAD_SAFE  int               init = 0;
+  static THREAD_SAFE  double            lim[4], date = -10.0;
 
   int                      outnr = 0, fh_z, RES = 0, IES = 0;
   int                      act, nst, res = 0, ies = 0, rrs = 0;
@@ -73,12 +74,12 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static struct act_nst     *ptab;
-  static int                 in_nr;
-  static int                 fh_w;
+  static THREAD_SAFE  struct act_nst     *ptab;
+  static THREAD_SAFE  int                 in_nr;
+  static THREAD_SAFE  int                 fh_w;
 
   /* Action/state table */
-  static struct act_nst fhtab[] = {
+  static THREAD_SAFE  struct act_nst fhtab[] = {
     /*         input ::   crt     geo     prj*/
     /*         state ::    0       1       2 */
     /* OUTPUT::     */

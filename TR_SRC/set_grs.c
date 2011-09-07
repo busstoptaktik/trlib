@@ -22,12 +22,13 @@
 #include <fcntl.h>
 #include <stdarg.h>
 #include <sys/stat.h>
+#include "trthread.h"
 
 #ifndef    M_PI
 #include   "kms_math.h"
 #endif
-extern FILE               *def_lab_file;
-extern size_t              init_prj_pos, init_grs_pos;
+extern THREAD_SAFE FILE               *def_lab_file;
+extern THREAD_SAFE size_t              init_prj_pos, init_grs_pos;
 
 int          set_grs(
 /*_________________*/
@@ -42,8 +43,8 @@ double      *e,
 #include   "fgetlhtx.h"
 #include   "i_tabdir_file.h"
 
-  static int                  e_quest = 0;
-  static size_t               pos = 0;
+  static THREAD_SAFE  int                  e_quest = 0;
+  static THREAD_SAFE  size_t               pos = 0;
   char                        pth_mlb[512];
   char                        s_name[24], e_name[24], *ell_nm = s_name;
   char                       *p_tp, param_v[24];

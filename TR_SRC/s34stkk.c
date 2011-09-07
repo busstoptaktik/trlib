@@ -65,7 +65,7 @@ double           *c, *cb = NULL, *cw = NULL;
 int               i, d, t;
 int               res = 0;
 
-  static double    C34kk[] =
+  static  double    C34kk[] =
   {
     /*lng*/   -14.0,                /*tol*/  0.005,
     /*N,E*/    140000.000000,      72000.000000,
@@ -76,7 +76,7 @@ int               res = 0;
     /* 4 */    9.257340940e-18,   -1.247871289e-18
   };
 
-  static double    Ckk34[] =
+  static  double    Ckk34[] =
   {
     /*lng*/   -14.0,                /*tol*/  0.005,
     /*N,E*/     77000.000000,     -137000.000000,

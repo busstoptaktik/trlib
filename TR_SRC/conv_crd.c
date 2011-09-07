@@ -26,6 +26,7 @@
 #include <math.h>
 
 #include "geo_lab.h"
+#include "trthread.h"
 
 int                      conv_crd(
 /*______________________________*/
@@ -80,7 +81,7 @@ struct coord_lab        *c_lab,
   char                       rgn_name[24];
   union rgn_un               rgn_EE, rgn_pref, dum_pref;
 
-  static char    *c_types[] = {
+  static THREAD_SAFE  char    *c_types[] = {
     /*  1 */ "3-d Cartesian",
     /*  2 */ "Geographic",
     /*  3 */ "Transversal Mercator",

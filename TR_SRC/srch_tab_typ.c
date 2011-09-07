@@ -29,6 +29,7 @@
 
 #include "geo_lab.h"
 #include "geoid_d.h"
+#include "trthread.h"
 
 int                      srch_tab_typ(
 /*__________________________________*/
@@ -40,8 +41,8 @@ long                    *pos
 
 #include              "fgetln.h"
 #include              "fgetlhtx.h"
-extern FILE               *man_tab_file;
-extern size_t              init_tab_pos;
+extern THREAD_SAFE FILE               *man_tab_file;
+extern THREAD_SAFE size_t              init_tab_pos;
 
 #define  LAST_TP       (767)
 // To be edited when new table types are added

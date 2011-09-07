@@ -19,6 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "geo_lab.h"
+#include "trthread.h"
 
 /* ACTION NUMBERS */
 
@@ -65,9 +66,9 @@ FILE                *tr_error
 #include        "fk89tu_g.h"
 #include        "t_status.h"
 
-  static int               in_chsum = 0L;
-  static int               outchsum = 0L;
-  static int               init = 0;
+  static THREAD_SAFE  int               in_chsum = 0L;
+  static THREAD_SAFE  int               outchsum = 0L;
+  static THREAD_SAFE  int               init = 0;
 
   char                     in_cs[32], outcs[32];
   char                     p_dtm[32], *pl;
@@ -79,10 +80,10 @@ FILE                *tr_error
   struct coord_lab        *in_lab = &(in_lab_u->u_c_lab);
   struct coord_lab        *outlab = &(outlab_u->u_c_lab);
 
-  static union geo_lab     TC_u29;
-  static union geo_lab     TC_fke;
-  static union geo_lab     TC_u50;
-  static union geo_lab     TC_f54;
+  static THREAD_SAFE  union geo_lab     TC_u29;
+  static THREAD_SAFE  union geo_lab     TC_fke;
+  static THREAD_SAFE  union geo_lab     TC_u50;
+  static THREAD_SAFE  union geo_lab     TC_f54;
 
   /* minilabels */
 
@@ -92,7 +93,7 @@ FILE                *tr_error
     char         *s_lab;
   } *pml;
 
-  static struct nr_mlb    mlab[] = {
+  static THREAD_SAFE  struct nr_mlb    mlab[] = {
     /*  0 */ { 0,  0,   "utm29"},   /* Datum checked later  */
     /*  1 */ { 0,  1,   "geo"},     /* Datum checked later  */
     /*  2 */ { 1,  2,   "fke"},     /* Region checked later */
@@ -114,12 +115,12 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static struct act_nst     *ptab;
-  static int                 in_nr;
-  static int                 fe_w;
+  static THREAD_SAFE  struct act_nst     *ptab;
+  static THREAD_SAFE  int                 in_nr;
+  static THREAD_SAFE  int                 fe_w;
 
   /* Action/state table */
-  static struct act_nst fetab[] = {
+  static THREAD_SAFE  struct act_nst fetab[] = {
 
     /* u29 = utm29_euref89: 0 */
     /* input ::                                                   */

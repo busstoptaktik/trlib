@@ -75,6 +75,7 @@
 #include "geoid_d.h"
 #include "conv_lab.h"
 #include "gd_trans.h"
+#include "trthread.h"
 
 #define FALSE 0
 #define TRUE  1
@@ -113,9 +114,9 @@ char           kvartstg[20])
 
   /* Følgende variable er tilføjet d. 24/07/00 for at kunne hånd- */
   /* tere ny version af gd_trans til erstatning af unitrans. frs. */
-  static char              G_req = -1;
+  static THREAD_SAFE  char              G_req = -1;
   double            Gh;
-  static struct mgde_str   grid_tab;
+  static THREAD_SAFE  struct mgde_str   grid_tab;
 
 
 

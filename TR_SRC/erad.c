@@ -12,6 +12,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include "trthread.h"
 
 
 /* erad.c                             # page 2   29 sep 2009 13 05 */
@@ -85,8 +86,8 @@ Prog. KP OCT 1989/JAN 1992.
   double       n, n2, h = 0.0, h1, h2 = 0.0, *p;
   double       e2p, cos_b, cos2_b, V2, c;
 
-  static double    gtm[5], nQ = 0.0, FQ;
-  static double    mtg[5], nL = 0.0, FL;
+  static THREAD_SAFE  double    gtm[5], nQ = 0.0, FQ;
+  static THREAD_SAFE  double    mtg[5], nL = 0.0, FL;
 
   if (f >= 1.0) f = 1.0/f;
   n  = f/(2.0 - f);

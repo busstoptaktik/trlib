@@ -20,6 +20,7 @@
 #include <ctype.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
+#include "trthread.h"
 
 /* ACTION NUMBERS */
 
@@ -51,11 +52,11 @@ FILE                *tr_error
 #include        "tab3d_val.h"
 #include        "t_status.h"
 
-  static int                 in_chsum = 0L;
-  static int                 outchsum = 0L;
-  static int                 init = 0;
-  static struct mtab3d_str   nadg_gr96_tab;
-  static union  geo_lab      w_lab;
+  static THREAD_SAFE  int                 in_chsum = 0L;
+  static THREAD_SAFE  int                 outchsum = 0L;
+  static THREAD_SAFE  int                 init = 0;
+  static THREAD_SAFE  struct mtab3d_str   nadg_gr96_tab;
+  static THREAD_SAFE  union  geo_lab      w_lab;
 
 
 /* ng_trans  ver 2006          # page 2    3 Oct 2006 13 55 */
@@ -79,7 +80,7 @@ FILE                *tr_error
     char        *s_lab;
   } *pml;
 
-  static struct nr_mlb    mlab[] = {
+  static THREAD_SAFE  struct nr_mlb    mlab[] = {
     /*  0 */ { 0,  0,  10,   "geo_nad83g"},
     /*  1 */ { 0,  1,   8,   "geo_gr96"},
     /*  2 */ { 1,  2,   6,   "*nad83g"},
@@ -93,12 +94,12 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static struct act_nst     *ptab;
-  static int                 in_nr;
-  static int                 ng_w;
+  static THREAD_SAFE  struct act_nst     *ptab;
+  static THREAD_SAFE  int                 in_nr;
+  static THREAD_SAFE  int                 ng_w;
 
   /* Action/state table */
-  static struct act_nst ngtab[] = {
+  static THREAD_SAFE  struct act_nst ngtab[] = {
     /* nadg  = geo_nad83g: 0   */
     /* input   nadg    ggr96    *nadg    *gr96 */
     /* state :    0        1        2        3 */

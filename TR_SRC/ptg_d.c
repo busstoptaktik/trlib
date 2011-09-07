@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "geo_lab.h"
+#include "trthread.h"
 
 #ifndef    M_PI
 #include   "kms_math.h"
@@ -51,7 +52,7 @@ The constants for the trig series to calc 1/m and c.
 #include          "sftr.h"
 #include          "t_status.h"
 #include          "setDtrc.h"
-  static int        D_init = 0, s_ell_no = 0;
+  static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
 
 
   struct coord_lab  *TC = &(TC_u->u_c_lab);

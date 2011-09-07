@@ -12,6 +12,7 @@
 
 #include   <stdio.h>
 #include   "geo_lab.h"
+#include   "trthread.h"
 
 short                    prn_cho(
 /*_____________________________*/
@@ -30,8 +31,8 @@ double                  *old_cmt
 #include                 "fputcw.h"
 
   struct coord_lab                *c_lab = &(d_lab->u_c_lab);
-  static short                     oN, oE, q_c;
-  static int                       id_check;
+  static THREAD_SAFE  short                     oN, oE, q_c;
+  static THREAD_SAFE  int                       id_check;
 
 
   switch(c_lab->lab_type) {

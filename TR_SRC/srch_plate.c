@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "geo_lab.h"
-
+#include "trthread.h"
 
 int                       srch_plate(
 /*_________________________________*/
@@ -39,9 +39,9 @@ char                     *err_txt
 
   /* search plate containing coordinates */
 
-  static char                 s_plm_mlb[MLBLNG];
-  static double               poly[4500];
-  static int                  s_plate = -1;
+  static THREAD_SAFE  char                 s_plm_mlb[MLBLNG];
+  static THREAD_SAFE  double               poly[4500];
+  static THREAD_SAFE  int                  s_plate = -1;
   struct plate_info          *p_pl_inf = NULL;
   struct plm_c_str           *p_entry = &(plm_tab->plm__tr[0]);
   double                      lon;

@@ -23,6 +23,7 @@
 #include    <fcntl.h>
 #include    <math.h>
 #include    "geo_lab.h"
+#include    "trthread.h"
 
 int             set_dtm(
 /*____________________*/
@@ -162,11 +163,11 @@ struct dsh_str     *trp
   /* type        tx         ty         tz     */
   /* dm          rx         ry         rz     */
   /* Datumtext                                */
-extern FILE               *def_lab_file;
-extern size_t              init_dtm_pos, init_prj_pos;
+extern THREAD_SAFE FILE               *def_lab_file;
+extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
 
-  static int                  d_quest = 0;
-  static size_t               pos = 0;
+  static THREAD_SAFE  int                  d_quest = 0;
+  static THREAD_SAFE  size_t               pos = 0;
   char                        pth_mlb[512], *p_tp;
   char                        d_name[24], e_name[24], p_name[24];
   short                       d_nmb;  /* datum number    */

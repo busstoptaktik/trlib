@@ -19,6 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "geo_lab.h"
+#include "trthread.h"
 
 /* ACTION NUMBERS */
 /* termination action */
@@ -43,14 +44,14 @@
 
 #ifdef   DEBUGEETRANS
 
-static char          *ACTION[] = {
+static THREAD_SAFE  char          *ACTION[] = {
   "idt", "etg", "gte", "otg", "gto", "vtg", "gtv",
   "ttg", "gtt", "upe", "peu", "ope", "peo",
   "upv", "pvu", "ctg", "gtc"
 };
 
 #include "typ_dec.h"
-static struct typ_dec mtpd;
+static THREAD_SAFE  struct typ_dec mtpd;
 #endif
 
 int                    ee_trans(
@@ -77,9 +78,9 @@ FILE                *tr_error
 /* ee_trans   version 2.0           # page 2   10 Sep 1998 11 36 */
 
 
-  static int               in_chsum = 0L;
-  static int               outchsum = 0L;
-  static int               init = 0;
+  static THREAD_SAFE  int               in_chsum = 0L;
+  static THREAD_SAFE  int               outchsum = 0L;
+  static THREAD_SAFE  int               init = 0;
 
   char                     in_cs[32], outcs[32];
   char                     p_dtm[32], *pl;
@@ -91,10 +92,10 @@ FILE                *tr_error
   struct coord_lab        *in_lab = &(in_lab_u->u_c_lab);
   struct coord_lab        *outlab = &(outlab_u->u_c_lab);
 
-  static union geo_lab     TC_u35;
-  static union geo_lab     TC_eetm;
-  static union geo_lab     TC_eold;
-  static union geo_lab     TC_elmn;
+  static THREAD_SAFE  union geo_lab     TC_u35;
+  static THREAD_SAFE  union geo_lab     TC_eetm;
+  static THREAD_SAFE  union geo_lab     TC_eold;
+  static THREAD_SAFE  union geo_lab     TC_elmn;
 
 
   /* minilabels */
@@ -105,7 +106,7 @@ FILE                *tr_error
     char         *s_lab;
   } *pml;
 
-  static struct nr_mlb    mlab[] = {
+  static THREAD_SAFE  struct nr_mlb    mlab[] = {
     /*  0 */ { 0,  0,   "utm35"},    /* Datum checked later  */
 
     /*  1 */ { 1,  0,   "eetm27"},   /*                      */
@@ -142,12 +143,12 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static struct act_nst     *ptab, *pt[3];
-  static int                 in_nr, stlev, levst, in[3];
-  static int                 ee_w, ol_w, pv_w, gr_w;
+  static THREAD_SAFE  struct act_nst     *ptab, *pt[3];
+  static THREAD_SAFE  int                 in_nr, stlev, levst, in[3];
+  static THREAD_SAFE  int                 ee_w, ol_w, pv_w, gr_w;
 
   /* Action/state table :: inter group */
-  static struct act_nst gr_tab[] = {
+  static THREAD_SAFE  struct act_nst gr_tab[] = {
     /* utm35_euref89: 0 */
     /* input    u35      etm      tmo     eelmne  */
     /* state no. 0        1        2        3     */
@@ -161,7 +162,7 @@ FILE                *tr_error
   };
 
   /* Action/state table grp 1 : eesti42 */
-  static struct act_nst ee_tab[] = {
+  static THREAD_SAFE  struct act_nst ee_tab[] = {
     /* eetm27: 0 */
     /* input    etm      tmi      geo     */
     /* state no. 0        1        2      */
@@ -173,7 +174,7 @@ FILE                *tr_error
   };
 
   /* Action/state table grp 2 : eeold42 */
-  static struct act_nst ol_tab[] = {
+  static THREAD_SAFE  struct act_nst ol_tab[] = {
     /* tm27_eeold42: 0 */
     /* input    tmo      tmi      geo     */
     /* state no. 0        1        2      */
@@ -185,7 +186,7 @@ FILE                *tr_error
   };
 
   /* Action/state table grp 3 : eepv37 */
-  static struct act_nst pv_tab[] = {
+  static THREAD_SAFE  struct act_nst pv_tab[] = {
     /* eelmne: 0 */
     /* input    lmn      lms      geo     */
     /* state no. 0        1        2      */

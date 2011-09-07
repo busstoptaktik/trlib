@@ -15,7 +15,8 @@
 #include "geo_lab.h"
 #include "geoid_d.h"
 
-#include              "conv_lab.h"
+#include "conv_lab.h"
+#include "trthread.h"
 
 
 int                      itrf_trans(
@@ -168,25 +169,25 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
 #define     OGAT  (4)
 #define     ILLE  (9)
 
-  static struct coord_lab    *i_clb = NULL, *o_clb = NULL;
-  static int                  i_chsum = 0, o_chsum = 0, b_lev=-99;
-  static int                  o_stn_vel = 0, s_lev, seq_max = -1;
-  static int                  s_stn_vel = -1;
-  static double               sate_in = 0.0, sate_out = 0.0;
-  static struct gps_str       gps_table;
-  static struct gps_c_str     plm_tr;
-  static struct plate_info    pl_inf[MAX_ENT_PLM];
-  static char                 s_tab_t[MLBLNG], s_tab_i[MLBLNG];
-  static char                 s_used_plm_nam[MLBLNG];
-  static char                 s_used_ipl_nam[MLBLNG];
+  static THREAD_SAFE  struct coord_lab    *i_clb = NULL, *o_clb = NULL;
+  static THREAD_SAFE  int                  i_chsum = 0, o_chsum = 0, b_lev=-99;
+  static THREAD_SAFE  int                  o_stn_vel = 0, s_lev, seq_max = -1;
+  static THREAD_SAFE  int                  s_stn_vel = -1;
+  static THREAD_SAFE  double               sate_in = 0.0, sate_out = 0.0;
+  static THREAD_SAFE  struct gps_str       gps_table;
+  static THREAD_SAFE  struct gps_c_str     plm_tr;
+  static THREAD_SAFE  struct plate_info    pl_inf[MAX_ENT_PLM];
+  static THREAD_SAFE  char                 s_tab_t[MLBLNG], s_tab_i[MLBLNG];
+  static THREAD_SAFE  char                 s_used_plm_nam[MLBLNG];
+  static THREAD_SAFE  char                 s_used_ipl_nam[MLBLNG];
 
 
 /* itrf_trans  ver 2007.02          # page 3    10 Oct 2008 11 57 */
 
 
-  static struct mtab3d_str    ipl_table;
-  static union geo_lab        plm_lab_a;
-  static union geo_lab        Hipl_lab;      /* prj_datum    */
+  static THREAD_SAFE  struct mtab3d_str    ipl_table;
+  static THREAD_SAFE  union geo_lab        plm_lab_a;
+  static THREAD_SAFE  union geo_lab        Hipl_lab;      /* prj_datum    */
 
   struct plm_lab             *plm_lab = &plm_lab_a.u_m_lab;
   struct gps_c_str           *shp = NULL, *Dshp = NULL;

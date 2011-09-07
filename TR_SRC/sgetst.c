@@ -15,6 +15,7 @@
 #include  <string.h>
 #include  <ctype.h>
 #include  "geo_lab.h"
+#include  "trthread.h"
 
 #define    ERR    (17)
 
@@ -72,10 +73,10 @@ int                *used
   short             *suf = &stn->suf;
   char              *txt = (char *) &stn->hnr;
 
-  static char       *niv_tab[] = {
+  static THREAD_SAFE  char       *niv_tab[] = {
     NIVTAB 
   };
-  static int         nz = sizeof(niv_tab) / sizeof(*niv_tab);
+  static THREAD_SAFE  int         nz = sizeof(niv_tab) / sizeof(*niv_tab);
 
   /* region prefix and name */
   union rgn_un       rgn_FI;
@@ -87,7 +88,7 @@ int                *used
   int                d;
 
 
-  static unsigned short  first_5[288] = {
+  static THREAD_SAFE  unsigned short  first_5[288] = {
     /*             0     1     2     3     4     5     6     7     8 */
     /* INPUT class D     C     S     P    sp     c    CR     /  other*/
     /*            dig   CAP   SIG   POI         low   EOF   sla      */

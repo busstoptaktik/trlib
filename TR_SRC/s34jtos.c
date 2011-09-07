@@ -14,6 +14,7 @@
 #include <math.h>
 #include "geo_lab.h"
 
+
 int                         s34jtos(
 /*________________________________*/
 double                      y,
@@ -68,7 +69,7 @@ Note the operator & on Y and X.
   int                  i, d, t;
   int                  res = 0;
 
-  static double    C34os[] =
+  static   double    C34os[] =
   {
     /*lng*/    18.0,                /*tol*/  0.0005,
     /*N,E*/     73000.000000,       280000.000000,
@@ -81,7 +82,7 @@ Note the operator & on Y and X.
     /* 6 */    2.410664720e-29,   -7.990298697e-30
   };
 
-  static double    Cos34[] =
+  static   double    Cos34[] =
   {
     /*lng*/    18.0,                /*tol*/  0.0005,
     /*N,E*/    68000.000000,        2000.000000,

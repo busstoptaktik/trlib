@@ -13,6 +13,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "geo_lab.h"
+#include "trthread.h"
 
 #define   ID   0
 #define   EW   1
@@ -48,7 +49,7 @@ FILE                  *tr_error
   char               pn[24], *p_nm = pn;
   char               en[24], *e_nm = en;
   int                id, od, ci, co;
-  static int         init = 0;
+  static THREAD_SAFE  int         init = 0;
 
   struct act_nst {
     short     action;
@@ -73,7 +74,7 @@ FILE                  *tr_error
   };
   /* WHEN CHANGE OF SIZE OF TABLE:: remenber width on page 3 */
 
-  static struct dsh_str   ew_a, *ew = &ew_a;
+  static struct dsh_str   ew_a, *ew = &ew_a; /* PERHAPS THESE NEED TO BE THREAD LOCAL? */
   static struct dsh_str   nw_a, *nw = &nw_a;
   static struct dsh_str   iw_a, *iw = &iw_a;
   static struct dsh_str   *fc, *tc, *wc;
