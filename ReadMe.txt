@@ -57,9 +57,9 @@ conv_crd: mere fejlsikker version
      NYT: geoi  (lon, lat) (til forskel fra geo (lat, lon)
      NYT: utmi  (E, N)     (til forskel fra utm (N, E)
      NYT: dktm<i>  (E, N) <i> = {1,2,3,4}
-     NYT: kfmr  København Frederiksberg Metro Ring
-     NYT: tm<zz> betegner en Gauss-Krüger med zonenr centralmeridian <zz>
-                 <zz> SKAL VÆRE multipla af 3.   
+     NYT: kfmr  KÃ¸benhavn Frederiksberg Metro Ring
+     NYT: tm<zz> betegner en Gauss-KrÃ¼ger med zonenr centralmeridian <zz>
+                 <zz> SKAL VÃ†RE multipla af 3.   
      qbc kaldes nu: Qatar Bahrain Causeway 2001
 
 
@@ -73,18 +73,18 @@ sputg:
 fputg:    hvis typedec->df == 255 udskrives bedst mulig terminator
           {km, m, dm, cm} eller {dg, nt, sx} 
 
-set_dtm   :   KRÆVER filen def_dtm.txt i geoidekataloget!!!
-set_grs   :   KRÆVER filen def_grs.txt i geoidekataloget!!!
+set_dtm   :   KRÃ†VER filen def_dtm.txt i geoidekataloget!!!
+set_grs   :   KRÃ†VER filen def_grs.txt i geoidekataloget!!!
 
 
 NYT:
 etrs89_trans: transformationer mellem projektioner i ETRS89
 fputshpprj:   skriver en SHAPE .prj fil fra en geo_lab
-          :   KRÆVER filen def_shp.txt i geoidekataloget!!!
+          :   KRÃ†VER filen def_shp.txt i geoidekataloget!!!
 fgetshpprj:   danner en geo_lab fra en .prj fil
-          :   KRÆVER filen def_shp.txt i geoidekataloget!!!
+          :   KRÃ†VER filen def_shp.txt i geoidekataloget!!!
 kmsshp_tr :   transformerer en SHAPE fil til SHAPE.
-fgetdt    :   læser en dato, tid.
+fgetdt    :   lÃ¦ser en dato, tid.
 
 DELTAG TIL AT FORBEDRE KMSTRANS::
 Specielt SHAPE trans delen er skrevet til ESRI.prj formatet
@@ -100,10 +100,10 @@ uni_trans        opdateringer  pr 1. maj 2007
 
 
 conv_crd: mere fejlsikker version
-          nad83g ændret
+          nad83g Ã¦ndret
           qatar National system inkluderet: qng
           stereografisk proj lidt forbedret
-       -  ITRFyy kræver epoke
+       -  ITRFyy krÃ¦ver epoke
 
 conv_lab: mere fejlsikker version
        -  ny: condition label
@@ -123,13 +123,13 @@ fe_trans: udvidet fra 2D til 3D kald !!! H_out = H_in
           ALVORLIG FEJL RETTET
 
 
-fgetg:    local variabel class omdøbt til clss
+fgetg:    local variabel class omdÃ¸bt til clss
 
-fgetln:   local variabel class omdøbt til klasse
+fgetln:   local variabel class omdÃ¸bt til klasse
 
-gatg:     mere præcis beregning med tilføjelse af 5 grad
+gatg:     mere prÃ¦cis beregning med tilfÃ¸jelse af 5 grad
 
-gd_trans: ny behandling af grønlands transformationer !!!
+gd_trans: ny behandling af grÃ¸nlands transformationer !!!
 
 geoid_i:  mindre fejl rettet
 
@@ -141,7 +141,7 @@ grid_val: udvidet med T3D_LAB, T2D_LAB og TDD_LAB
 
 ng_trans: NY FUNKTION transformation af GR
 
-ptg:      udvidet grænser for UTM
+ptg:      udvidet grÃ¦nser for UTM
           flere projektioner respekterer B0
 
 set_dtm:  ny: nahrwan: Qatar Nahwan 1967
@@ -150,11 +150,11 @@ set_dtm:  ny: nahrwan: Qatar Nahwan 1967
           ny: 7-par for qornoq -> gr96
           ny: 7-par for scosd -> gr96
           ny: 7-par for ammlk -> gr96
-          benyttes ikke længere: 7-par for nad83g -> nwl9d
+          benyttes ikke lÃ¦ngere: 7-par for nad83g -> nwl9d
 
 set_grs:  ny 'ellipsoide': spheric 
 
-set_trc:  clenshaw rækkerne udvidet med 5. grad
+set_trc:  clenshaw rÃ¦kkerne udvidet med 5. grad
 
 tab_adm_f: udvidet med T3D_LAB og T2D_LAB
            forbedret fejlreaktion
