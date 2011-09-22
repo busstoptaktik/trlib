@@ -45,4 +45,3 @@ char                    *descr
 
 /* see allso geoid_d.h                                         */
 
-

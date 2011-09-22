@@ -9,7 +9,7 @@ import sys
 import time
 import tempfile
 IS_INIT=False
-STD_LIB="TrLib.dll"
+STD_LIB="TrLib"
 STD_DIRNAME=os.path.dirname(__file__)
 REQUIRED_FILES=["def_lab.txt","def_shp.txt"]
 class TransformationException(Exception):
@@ -23,10 +23,6 @@ class LabelException(Exception):
 	def __str__(self):
 		return self.msg
 		
-def Is3D(label):  #Used to see if a label corresponds to a 3d-system. or not....
-	if "N" in label or "H" in label or "E" in label or "crt" in label:
-		return True
-	return False
 ##################
 ##Call this initializtion FIRST!
 ##################
@@ -47,7 +43,7 @@ def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.GetVersion.restype=None
 		tr_lib.Transform.restype=ctypes.c_int
 		tr_lib.Transform.argtypes=[ctypes.c_char_p,ctypes.c_char_p,np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),
-		np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable')]
+		np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),ctypes.c_void_p,ctypes.c_int]
 		tr_lib.GetEsriText.restype=ctypes.c_int
 		tr_lib.GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
 	except:
@@ -85,17 +81,20 @@ def GetEsriText(label):
 		f=open(tmpname)
 		esri_txt=f.read()
 		f.close()
+		retval=esri_txt
+	else:
+		retval=""
+	try:
 		os.close(f_int)
 		os.remove(tmpname)
-		return esri_txt
-	else:
-		return ""
+	except:
+		pass
+	return retval
 
 def Transform(label_in,label_out,xyz_in):
 	if xyz_in.shape[1] not in [2,3]:
 		raise Exception("Array column dimension must be 2 or 3!")
 		return np.empty((0,2))
-	D3=Is3D(label_in)
 	X=np.copy(xyz_in[:,0]).astype(np.float64)
 	Y=np.copy(xyz_in[:,1]).astype(np.float64)
 	if label_in[0:3]=="geo": #convert2radians?
@@ -106,10 +105,10 @@ def Transform(label_in,label_out,xyz_in):
 	if npoints>0:
 		if xyz_in.shape[1]==3:  #3d
 			Z=np.copy(xyz_in[:,2]).astype(np.float64)
-			res=tr_lib.Transform(label_in,label_out,X,Y,ctypes.c_void_p(Z.ctypes._data),ctypes.c_int(npoints))
+			res=tr_lib.Transform(label_in,label_out,X,Y,Z.ctypes._data,npoints)
 			xyz_out=np.column_stack((X,Y,Z))
 		else:
-			res=tr_lib.Transform(label_in,label_out,X,Y,ctypes.c_void_p(0),ctypes.c_int(npoints))
+			res=tr_lib.Transform(label_in,label_out,X,Y,None,npoints)
 			xyz_out=np.column_stack((X,Y))
 		#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
 		if res==2:  
@@ -120,7 +119,6 @@ def Transform(label_in,label_out,xyz_in):
 	if label_out[0:3]=="geo": #convert2degrees?
 		xyz_out[:,0:2]*=180.0/np.pi
 	return xyz_out
-
 
 ##Files to be transformed must follow the format:
 ## #Label_in        -Remember the hashes in front 

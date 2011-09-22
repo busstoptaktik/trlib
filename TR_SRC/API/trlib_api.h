@@ -54,4 +54,3 @@ KMSTR_API  int trstream(TR *tr, FILE *f_in, FILE *f_out, int n);
 KMSTR_API void TerminateLibrary(void);
 
 
-

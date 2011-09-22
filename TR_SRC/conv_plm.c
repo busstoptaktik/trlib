@@ -362,4 +362,3 @@ extern THREAD_SAFE size_t              init_gps_pos;
 
 }
 
-

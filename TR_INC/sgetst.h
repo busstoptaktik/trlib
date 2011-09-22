@@ -78,4 +78,3 @@ element of the string.
 */
 
 /* Prog: Frands Steffensen 1992, 1994, 2009; */
-

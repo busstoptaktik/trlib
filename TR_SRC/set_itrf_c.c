@@ -977,4 +977,3 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
 
   return((nsz) ? -1000000 : yy);
 }
-

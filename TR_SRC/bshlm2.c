@@ -169,4 +169,3 @@ Prog: Knud Poder NOV 1990
   return(*S > a*1e-6 ? 0 : 1);
 }
 
-

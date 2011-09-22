@@ -53,4 +53,3 @@ size_t           *s_p,
 FILE             *n_f,
 size_t            n_p
 );
-

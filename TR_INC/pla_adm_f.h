@@ -71,4 +71,3 @@ char                *err_txt
 
 /* progr.:  Karsten Engsager, feb. 2003                       */
 
-

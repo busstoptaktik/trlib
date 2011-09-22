@@ -177,4 +177,3 @@ Note the operator & on Y and X.
 
 }
 
-

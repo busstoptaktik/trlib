@@ -97,4 +97,3 @@ Prog.: Knud Poder SEP 1991.
    return(bm);
 }
 
-

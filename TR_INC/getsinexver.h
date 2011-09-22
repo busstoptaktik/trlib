@@ -41,4 +41,3 @@ int               *version);
 /* *state       :: 1 :: at input                                */
 /* version      :: number ver*100+serial to be written on ftx   */
 
-

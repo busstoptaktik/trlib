@@ -90,4 +90,3 @@ Note the operator & on Y and X.
   C-version  KP 1989
 
 */
-

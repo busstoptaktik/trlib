@@ -392,4 +392,4 @@ int GetEsriText(char *label_in, char *file_name){
     
     free(plab_in);
     fclose(fp);
-    return label_check;}
+    return label_check;}

@@ -69,4 +69,3 @@ kmsshp_tr transforms the shape file <shpin_txt> from the coord sys
 
    *qTrn     Number of trf OK
 */
-

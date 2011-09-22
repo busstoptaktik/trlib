@@ -181,4 +181,3 @@ extern THREAD_SAFE size_t              init_tab_pos;
   return(tab_typ);
 }
 
-

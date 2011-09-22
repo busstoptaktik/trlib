@@ -39,4 +39,3 @@ double             val);
 /* *ftx         :: 1 :: SINEX HEADER                            */
 /* val          :: Value to be writtena FORTRAN 21.15E          */
 
-

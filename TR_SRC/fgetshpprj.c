@@ -314,4 +314,3 @@ union geo_lab   *g_lab)
 
   return(0);
 }
-

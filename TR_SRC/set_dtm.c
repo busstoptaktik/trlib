@@ -485,4 +485,3 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
   return(-1);
 }
 
-

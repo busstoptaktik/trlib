@@ -514,4 +514,3 @@ struct gde_lab          *t_lab,
 
   return(t_lab->lab_type);
 }
-

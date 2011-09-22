@@ -684,4 +684,3 @@ if (TU) (void) fprintf(stdout, "\n\n*ipl_move  res = %d;", res);
   return(res);
 
 }
-

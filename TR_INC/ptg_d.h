@@ -124,4 +124,3 @@ AUG 1994, calculating m and c in utm projection. KE.
 Karsten Engsager  12 Jan 2010. updated
 */
 
-

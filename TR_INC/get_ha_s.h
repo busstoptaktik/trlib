@@ -53,4 +53,3 @@ double             s_max
 /* j      is the number of points in fw                         */
 /* *i     is the number of points in fw1                        */
 /* s_max  id the max distance for insertion of new points       */
-

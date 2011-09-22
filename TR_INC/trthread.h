@@ -129,4 +129,3 @@ Ulrich Drepper (2005): ELF handling for thread-local storage
 #endif
 /* TRTHREAD_H */
 
-

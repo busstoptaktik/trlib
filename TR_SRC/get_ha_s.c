@@ -104,4 +104,3 @@ double               s_max)
   return(circum);
 }
 
-

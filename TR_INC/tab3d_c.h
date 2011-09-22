@@ -44,4 +44,3 @@ struct mtab3d_str       *tab_table
 /* PROG: Karsten Engsager, JUN 2004 */
 
 
-

@@ -437,4 +437,3 @@ char           kvartstg[20])
   return(retur);
 }
 
-

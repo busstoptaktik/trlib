@@ -668,4 +668,3 @@ state, clss,c,c, isupper(c), islower(c));
 #undef    DDDD
 
 
-

@@ -46,4 +46,3 @@ int                     *lab_typ,
 char                    *tab_typ_txt,
 long                    *pos
 );
-

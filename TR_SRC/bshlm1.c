@@ -103,4 +103,3 @@ double                   S
   return(S*PF > a*1e-6 ? 0 : 1);
  }
 
-

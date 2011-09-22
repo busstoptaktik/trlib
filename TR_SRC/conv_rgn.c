@@ -218,4 +218,3 @@ extern THREAD_SAFE size_t              init_prj_pos, init_rgn_pos;
   (void) strcpy(rgn_name, "undef National prefix");
   return(-1);
 }
-

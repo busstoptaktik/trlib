@@ -60,4 +60,3 @@ int               mode,
 FILE             *f_in
 );
 
-

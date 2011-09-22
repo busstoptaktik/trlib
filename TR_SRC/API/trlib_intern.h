@@ -26,4 +26,4 @@ struct TR {
 struct XYZ {
     double x, y, z;
     int err;
-}; 
+}; 

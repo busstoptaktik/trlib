@@ -87,4 +87,3 @@ shp->rx * MAS, shp->ry * MAS, shp->rz * MAS);
 }
 
 
-

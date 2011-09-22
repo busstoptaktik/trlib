@@ -281,4 +281,3 @@ g, *tab_max, t_lab->mlb);
     }
   }
 }
-

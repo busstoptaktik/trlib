@@ -51,4 +51,3 @@ char                    *layout
 }
 
 
-

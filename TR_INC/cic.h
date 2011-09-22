@@ -52,4 +52,3 @@ FILE                  *tr_error
 /* tr_error: file for usertxt on error                      */
 
 
-

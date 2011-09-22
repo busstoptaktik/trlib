@@ -49,4 +49,3 @@ double                *Zo
 /* (*Zo) = (Zi) + (T3) + (-R2  R1  D ) (Zi)             */
 
 
-

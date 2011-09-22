@@ -272,4 +272,3 @@ char                     *err_str
   return(TAB_C_ARE_);
 }
 
-

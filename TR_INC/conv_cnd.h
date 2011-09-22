@@ -50,4 +50,3 @@ struct obs_lab          *o_lab,
 ...
 );
 
-

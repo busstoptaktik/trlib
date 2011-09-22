@@ -57,4 +57,3 @@ double         *pol_base
 Programmed by: Karsten Engsager, 7. febr. 2005
 */
 
-

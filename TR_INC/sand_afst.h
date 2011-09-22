@@ -55,4 +55,3 @@ double         E_middel
 Programmed by: Karsten Engsager, 7. febr. 2005
 */
 
-

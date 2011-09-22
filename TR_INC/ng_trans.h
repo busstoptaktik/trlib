@@ -61,4 +61,3 @@ N, E, H             :  from coordinates
 Progr.: K.Engsager, Danish National Space Center, 2006
 */
 
-

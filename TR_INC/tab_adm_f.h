@@ -77,4 +77,3 @@ extern int           tab_adm_f(
 
 /* progr. K.Engsager, Dec, 2001, */
 
-

@@ -57,4 +57,3 @@ struct mtab3d_str        *tab_table
   return(res);
 }
 
-

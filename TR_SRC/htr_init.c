@@ -250,4 +250,3 @@ char                    *dh_tr_info
   return(tr_type);
 }
 
-

@@ -66,4 +66,3 @@ char             *name,
 int              *result,
 char             *dir_name
 );
-

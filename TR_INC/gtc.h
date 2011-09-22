@@ -93,4 +93,3 @@ is 0.5 micro arcsec, i.e. 15 microns on the earth.
 Algol version (ctg) by RF, august 1981.
 C-version KP JAN 1991.
 */
-

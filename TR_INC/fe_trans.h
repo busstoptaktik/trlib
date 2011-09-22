@@ -58,4 +58,3 @@ N, E, H      :  from coordinates
              :  tr_error == NULL: NO REPORT IS PRINTED
 
 */
-

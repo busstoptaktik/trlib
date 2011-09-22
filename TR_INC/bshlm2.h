@@ -76,4 +76,3 @@ S       the length of the geodesic between the stations in units
 Prog: Knud Poder NOV 1990
 */
 
-

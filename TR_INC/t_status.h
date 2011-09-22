@@ -77,4 +77,3 @@ double                   dN, dE, dH;
 /*  Prog: Knud Poder  30 SEP 1995                             */
 
  
-

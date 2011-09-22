@@ -51,4 +51,3 @@ FILE                  *tr_error
 /* usertxt:  to be printed on error                         */
 /* tr_error: file for usertxt on error                      */
 
-

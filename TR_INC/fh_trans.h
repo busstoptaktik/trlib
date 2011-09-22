@@ -61,4 +61,3 @@ N, E, H      :  from coordinates
 
 */
 
-

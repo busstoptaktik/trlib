@@ -62,4 +62,3 @@ example of call:
   if (res) fprintf(stdout, err_txt);
 
 */
-

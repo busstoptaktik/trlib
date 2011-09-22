@@ -216,4 +216,3 @@ char             *dir_name
   else *result = 0;
   return(*f_in);
 }
-

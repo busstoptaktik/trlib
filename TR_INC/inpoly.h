@@ -66,4 +66,3 @@ double                       *Ec
 #endif
 
 
-

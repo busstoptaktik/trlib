@@ -735,4 +735,3 @@ extern  THREAD_SAFE size_t              init_prj_pos;
 
   return(res);
 }
-

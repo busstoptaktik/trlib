@@ -63,4 +63,3 @@ union geo_lab   *g_lab);
       "radian" ? (.gf ==2 && .tf ==3) : (.gf ==2 && .tf ==1)
 
 */
-

@@ -158,4 +158,3 @@ FILE             *fh_in)
   }
   return qChars;
 }
-

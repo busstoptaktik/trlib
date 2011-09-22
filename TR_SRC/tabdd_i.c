@@ -110,4 +110,3 @@ char                    *err_str
   return(tabdd_table->tab_max);
 } /* end init */
 
-

@@ -52,4 +52,3 @@ and *rgx gives a number of newlines and/or
 */
 
 
-

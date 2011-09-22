@@ -36,4 +36,3 @@ double              jnsd
 
 /* writes the journal side number in a readable format on f_o */
 
-

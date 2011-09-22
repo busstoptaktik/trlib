@@ -234,4 +234,3 @@ SPECIAL::  c_unit == "non"  ==>>  SKIPS add params writing
   va_end(cp);
   return(err_type);
 }
-

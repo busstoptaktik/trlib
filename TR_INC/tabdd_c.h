@@ -45,4 +45,3 @@ struct mtabdd_str       *tab_table
 /* PROG: Karsten Engsager, JUL 2006 */
 
 
-

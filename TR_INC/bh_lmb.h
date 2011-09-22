@@ -61,4 +61,3 @@ s      the length of the great circle on the auxiliary sphere from
 
 */
 
-

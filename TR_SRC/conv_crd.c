@@ -1007,4 +1007,3 @@ struct coord_lab        *c_lab,
   return(c_lab->lab_type);
 }
 
-

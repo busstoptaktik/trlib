@@ -46,4 +46,3 @@ char                     *eer_txt
 /* grid_tab   label and buffer initiated to table */
 /* err_txt    return error report */
 
-

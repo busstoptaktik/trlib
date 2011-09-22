@@ -75,4 +75,3 @@ Given M the sum of the series is :
 
 Prog.: K. Engsager, MAY 1994 
 */
-

@@ -391,4 +391,3 @@ union  geo_lab          *u_lab,
   return(h_lab->lab_type);
 }
 
-

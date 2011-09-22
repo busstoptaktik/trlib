@@ -97,4 +97,3 @@ double                e,
 char                  kvartstg[20]
 );
 
-

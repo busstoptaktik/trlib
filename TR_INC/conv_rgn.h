@@ -78,4 +78,3 @@ char            *rgn_name
 /* Prog. Knud Poder, 16 NOV 1994, after ideas by K.E and F.S.       */
 /* Modified, KE SEP 2010                                            */
 
-

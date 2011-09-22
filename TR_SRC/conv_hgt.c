@@ -444,4 +444,3 @@ struct hgt_lab          *h_lab,
 
   return(h_lab->lab_type);
 }
-

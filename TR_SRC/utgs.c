@@ -237,4 +237,3 @@ in Sealand or Jutland. Note the & operator on N1, E1.
 #undef  GSTOLMS
 }
 
-

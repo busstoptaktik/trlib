@@ -202,4 +202,3 @@ extern THREAD_SAFE size_t              init_tab_pos;
   else return(s_status(err_str, "geoid_i", TAB_N_NAM_));
   return(geoid_table->tab_max);
 } /* end init */
-

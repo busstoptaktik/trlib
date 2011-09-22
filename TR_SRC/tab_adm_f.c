@@ -1553,4 +1553,3 @@ void reset_dir() {
   (void) i_tabdir_file(1, "", &i, in); // open saved GLOBALS
   return;
 }
-

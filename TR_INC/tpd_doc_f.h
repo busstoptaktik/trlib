@@ -48,4 +48,3 @@ char                        *tpd_txt
 /*
 Progr. Karsten Engsager jan 2010
 */
-

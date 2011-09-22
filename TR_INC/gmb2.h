@@ -90,4 +90,3 @@ Frede Madsen 1981 , where 5th order terms were included.
 5th order terms removed, as bshlm2 is used for long lines.
 
 */
-

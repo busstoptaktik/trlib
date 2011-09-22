@@ -151,4 +151,3 @@ struct SHPRMinMax
 };
 
 #endif /* ndef _ESRISHAPE_H_INCLUDED */
-

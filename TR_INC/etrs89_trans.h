@@ -78,4 +78,3 @@ char                     *err_txt
 
   Prog: Karsten Engsager 2009.
   */
-

@@ -111,4 +111,3 @@ double         scale, E0, N1, E1, min, max, elling = 0.0;
 }
 
 
-

@@ -630,4 +630,3 @@ int swop_int(int i) {
   *(pr ++) = *(pi --);
   return(res);
 }
-

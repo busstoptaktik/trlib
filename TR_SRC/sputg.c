@@ -284,4 +284,3 @@ i = sprintf(h, cstr, fw, dc, w_val, np);
   return((int) strlen(outstr));
 }
 
-

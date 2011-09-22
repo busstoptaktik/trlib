@@ -133,4 +133,3 @@ char                    *err_str
   and reverse  . . .
   */
   
-

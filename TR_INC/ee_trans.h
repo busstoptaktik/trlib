@@ -55,4 +55,3 @@ FILE               *tr_error
 
 /* PROG: Knud Poder, SEP 1995                                 */
 
-

@@ -771,4 +771,3 @@ union typ_uni {
 /* Q-version of PHNR             27 AUG 2004, KE */
 
 #endif
-

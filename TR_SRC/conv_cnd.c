@@ -443,4 +443,3 @@ struct obs_lab          *o_lab,
   } /* end switch(conv_mode) */
   return(o_lab->lab_type);
 }
-

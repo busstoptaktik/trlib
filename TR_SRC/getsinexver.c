@@ -59,4 +59,3 @@ int               *version)
   else *state = -9999;
   return;
 }
-

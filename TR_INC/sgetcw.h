@@ -65,4 +65,3 @@ char array must not hold 'spaces'.
 
 */
 
-

@@ -58,4 +58,3 @@ struct mtabdd_str        *tab_table
   return(res);
 }
 
-

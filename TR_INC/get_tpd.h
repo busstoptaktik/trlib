@@ -54,4 +54,3 @@ of the typ_dec *gtfd.
 PROG:  KP 1989
 
 */
-

@@ -92,4 +92,3 @@ produces os coordinates Y,X from the s34j coordinates y,x.
 Note the operator & on Y and X.
 */
 
-

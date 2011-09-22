@@ -86,4 +86,3 @@ double         scale, E0;
 }
 
 
-

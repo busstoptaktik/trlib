@@ -54,4 +54,3 @@ char                     *err_txt
 
 /* progr. K. Engsager. Feb. 2003, 2008 */
 
-

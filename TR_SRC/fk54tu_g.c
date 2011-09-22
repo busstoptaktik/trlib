@@ -186,4 +186,3 @@ static   double U29_FK54[] = {
 #undef   COORDLIM
 }
 
-

@@ -683,4 +683,3 @@ The constants for the trig series to calc 1/m and c.
 
   return(res);
 }
-

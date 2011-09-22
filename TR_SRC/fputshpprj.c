@@ -285,4 +285,3 @@ int get_val_str(char* val_str, double val) {
   return(dec);
 }
 
-
