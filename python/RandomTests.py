@@ -19,7 +19,8 @@ TEST_SYSTEMS_2D=[["geo_wgs84","geo_ed50",12.0,54.0,D2M],
 ["kp2000j","utm32_ed50",181078.422,6117383.291,1.0]]
 TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Hetrs89_h_dvr90","utm33Hetrs89_h_dnn",512200.0,6143200.0,100,1.0,],
-["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],]
+["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
+["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0]] 
 BASE_POINT=[512200.0,6143200.0] #Et sted i Jylland?
 LINE_SPLIT="*"*65
 def RandomTests_2D(N=10000,repeat=3,log_file=sys.stdout):

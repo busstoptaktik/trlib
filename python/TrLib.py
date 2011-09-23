@@ -29,6 +29,7 @@ class LabelException(Exception):
 def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 	global tr_lib
 	global IS_INIT
+	IS_INIT=False
 	if len(lib_dir)==0:
 		lib_dir="."
 	try:
@@ -36,9 +37,6 @@ def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		#Setup API, corresponds to header file of the API#
 		tr_lib.InitLibrary.restype=ctypes.c_int
 		tr_lib.InitLibrary.argtypes=[ctypes.c_char_p]
-		#tr_lib.Transform2D.restype=ctypes.c_int
-		#tr_lib.Transform2D.argtypes=[ctypes.c_char_p,ctypes.c_char_p,np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),
-		#np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),ctypes.c_int]
 		tr_lib.GetVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
 		tr_lib.GetVersion.restype=None
 		tr_lib.Transform.restype=ctypes.c_int
@@ -46,23 +44,26 @@ def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),ctypes.c_void_p,ctypes.c_int]
 		tr_lib.GetEsriText.restype=ctypes.c_int
 		tr_lib.GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.tropen.restype=ctypes.c_void_p
+		tr_lib.tropen.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.trclose.restype=None
+		tr_lib.trclose.argtypes=[ctypes.c_void_p]
+		tr_lib.tr.restype=ctypes.c_int
+		tr_lib.tr.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_int]
 	except:
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
-		IS_INIT=False
 		return False
 	if not os.path.exists(dir):
 		print("%s does not exist in the file system" %dir)
-		IS_INIT=False
 		return False
 	for fname in REQUIRED_FILES:
 		if not os.path.exists(os.path.join(dir,fname)):
 			print("Required file %s not found, failed to initialize library!" %fname)
-			IS_INIT=False
 			return False
 	sdir=dir
 	if sdir[-1] not in ["\\","/"]:
 		sdir+="/"
-	tr_lib.InitLibrary(sdir)
+	has_geoids=tr_lib.InitLibrary(sdir) #at some point use this info....
 	IS_INIT=True
 	return True
 
@@ -94,10 +95,9 @@ def GetEsriText(label):
 def Transform(label_in,label_out,xyz_in):
 	if xyz_in.shape[1] not in [2,3]:
 		raise Exception("Array column dimension must be 2 or 3!")
-		return np.empty((0,2))
 	X=np.copy(xyz_in[:,0]).astype(np.float64)
 	Y=np.copy(xyz_in[:,1]).astype(np.float64)
-	if label_in[0:3]=="geo": #convert2radians?
+	if "geo" in label_in[0:6]: #convert2radians?
 		if np.fabs(X).max()>2*np.pi:
 			X*=np.pi/180.0
 			Y*=np.pi/180.0
@@ -116,7 +116,7 @@ def Transform(label_in,label_out,xyz_in):
 		elif res==1:
 			raise LabelException("Input labels are not OK.")
 	#print xyz_out.shape
-	if label_out[0:3]=="geo": #convert2degrees?
+	if "geo" in label_out[0:6]: #convert2degrees?
 		xyz_out[:,0:2]*=180.0/np.pi
 	return xyz_out
 

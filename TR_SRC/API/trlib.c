@@ -106,6 +106,8 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "fputshpprj.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
+#define TRLIB_VERSION "beta 0.001 2011-09-23"
+#define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 /* We use a global geoid table. This could be made thread local if needed */
  struct mgde_str GeoidTable;
 /* Need to let KMSTrans parse the def-files, before any transformation
@@ -128,7 +130,7 @@ int IsGeoidTableInitialised(void) {
 
 
 void GetVersion(char *buffer,int BufSize) {
-    strncpy(buffer,"TrLib v. 0.1",BufSize);
+    strncpy(buffer,TRLIB_VERSION,BufSize);
 }
 	
 /* A simple wrapper for tr */
@@ -281,18 +283,26 @@ void trclose (TR *tr) {
 
 /* transform one or more xyz-tuples in place */
 int tr(TR *tr, double *X, double *Y, double *Z, int n) {
-    double x, y, z, GH = 0, z1 = 0, z2 = 0;
+    double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i;
     int use_geoids=(IsGeoidTableInitialised()?0:-1);
     if ((0==tr)||(0==X)||(0==Y))
         return TR_ERROR;
-        
+    if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE){
+        x_in=Y;
+        y_in=X;}
+    else{
+        x_in=X;
+        y_in=Y;}
+    if ((tr->plab_out->u_c_lab).cstm==CRT_SYS_CODE){
+        x_out=Y;
+        y_out=X;}
+   else{
+        x_out=X;
+        y_out=Y;}
     for (i = 0;  i < n;  i++) {
-        x = X[i];
-        y = Y[i];
-        z = Z? Z[i]: z1;
-
-        err = gd_trans(tr->plab_in, tr->plab_out,  y,x,z,  Y+i,X+i, (Z? Z+i: &z2), &GH, use_geoids, &GeoidTable, "", 0);
+	z = Z? Z[i]: z1;
+        err = gd_trans(tr->plab_in, tr->plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH, use_geoids, &GeoidTable, "", 0);
         /*err = gd_trans(tr->plab_in, tr->plab_out,  x,y,z,  X+i,Y+i, (Z? Z+i: &z2), &GH, -1, &GeoidTable, 0, 0);
          *   KE siger at arg 0 før GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
         if (err)
@@ -305,32 +315,33 @@ int tr(TR *tr, double *X, double *Y, double *Z, int n) {
 /* read xyz-tuples from f_in; stream transformed tuples to f_out */
 int trstream(TR *tr, FILE *f_in, FILE *f_out, int n) {
 
-    double X, Y, Z;
+    double XYZ[3];
     int ERR = 0;
     int use_geoids=(IsGeoidTableInitialised()?0:-1);
     int i = 0;
+    int swap_xy_in=0, swap_xy_out=0;
 
     enum {BUFSIZE = 16384};
     char buf[BUFSIZE];
 
     double GH; /* ignored, but needed in gd_trans call */
-    //extern struct mgde_str GeoidTable;  /* GeoidTable is now a global object.... */
-   // struct mgde_str GeoidTable;
-   // GeoidTable.init = 0;
     
     if ((0==tr) || (0==f_in) || (0==f_out))
         return TR_ERROR;
-        
-        
+    
+    if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE) swap_xy_in=1; /* If crt-coordinates we want to input x,y,z to gd_trans, otherwise y,x,z */
+    
+    if ((tr->plab_out->u_c_lab).cstm==CRT_SYS_CODE) swap_xy_out=1;
+          
     while (0 != fgets(buf, BUFSIZE, f_in)) {
         int    argc, err;
-        double x, y, z;
+        double xyz[3];
         
-        argc = sscanf(buf, "%lf %lf %lf", &x, &y, &z);
+        argc = sscanf(buf, "%lf %lf %lf", &xyz[swap_xy_in], &xyz[1-swap_xy_in], &xyz[2]);
         
         /* 2D transformation? */
         if (argc==2)
-            z = 0;
+            xyz[2] = 0;
             
         /* Uninterpretable line */
         if ((argc==1) || (argc==0)) {
@@ -342,7 +353,7 @@ int trstream(TR *tr, FILE *f_in, FILE *f_out, int n) {
                 continue;
         }
 
-        err = gd_trans(tr->plab_in, tr->plab_out,  y,x,z,  &Y,&X,&Z, &GH, use_geoids, &GeoidTable, "", 0);
+        err = gd_trans(tr->plab_in, tr->plab_out,  xyz[1], xyz[0], xyz[2],  &XYZ[1], &XYZ[0], &XYZ[2], &GH, use_geoids, &GeoidTable, "", 0);
         i++;
 
         /* buffer last error */
@@ -352,7 +363,7 @@ int trstream(TR *tr, FILE *f_in, FILE *f_out, int n) {
         if ((n==-1) && err)
             break;
         
-        fprintf(f_out, "%.10g %.10g %.10g\n", X, Y, Z);
+        fprintf(f_out, "%.10g %.10g %.10g\n", XYZ[swap_xy_out], XYZ[1-swap_xy_out], XYZ[2]);
 
         if (i==n)
             break;
