@@ -108,6 +108,7 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "trlib_api.h"
 #define TRLIB_VERSION "beta 0.001 2011-09-23"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
+
 /* We use a global geoid table. This could be made thread local if needed */
  struct mgde_str GeoidTable;
 /* Need to let KMSTrans parse the def-files, before any transformation
@@ -129,7 +130,7 @@ int IsGeoidTableInitialised(void) {
 }
 
 
-void GetVersion(char *buffer,int BufSize) {
+void GetTRVersion(char *buffer,int BufSize) {
     strncpy(buffer,TRLIB_VERSION,BufSize);
 }
 	
@@ -322,8 +323,9 @@ int trstream(TR *tr, FILE *f_in, FILE *f_out, int n) {
     int swap_xy_in=0, swap_xy_out=0;
 
     enum {BUFSIZE = 16384};
+    
     char buf[BUFSIZE];
-
+	
     double GH; /* ignored, but needed in gd_trans call */
     
     if ((0==tr) || (0==f_in) || (0==f_out))
@@ -332,14 +334,13 @@ int trstream(TR *tr, FILE *f_in, FILE *f_out, int n) {
     if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE) swap_xy_in=1; /* If crt-coordinates we want to input x,y,z to gd_trans, otherwise y,x,z */
     
     if ((tr->plab_out->u_c_lab).cstm==CRT_SYS_CODE) swap_xy_out=1;
-          
+    
     while (0 != fgets(buf, BUFSIZE, f_in)) {
         int    argc, err;
         double xyz[3];
         
         argc = sscanf(buf, "%lf %lf %lf", &xyz[swap_xy_in], &xyz[1-swap_xy_in], &xyz[2]);
-        
-        /* 2D transformation? */
+       /* 2D transformation? */
         if (argc==2)
             xyz[2] = 0;
             

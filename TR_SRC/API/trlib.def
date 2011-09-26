@@ -3,7 +3,7 @@ EXPORTS
 	Transform
 	IsGeoidTableInitialised
 	GetEsriText
-	GetVersion
+	GetTRVersion
 	tropen
 	trclose
 	tr

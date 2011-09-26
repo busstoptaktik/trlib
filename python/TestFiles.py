@@ -28,7 +28,6 @@ TESTS=[["Jylland_2d.txt","utm33_ed50",5],
 #Todo: Add more....
 def main(args):
 	progname=os.path.basename(args[0])
-	progname=os.path.basename(args[0])
 	if "-lib" in args: #In this case we assume that input is the library that we want to test....
 		lib=args[args.index("-lib")+1]
 		lib=os.path.splitext(os.path.basename(args[2]))[0]

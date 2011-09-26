@@ -43,7 +43,7 @@ enum KMSTR_Error
 #endif 
 KMSTR_API int Transform(char *label_in, char *label_out,double *X,double *Y,double *Z,int npoints);
 KMSTR_API int InitLibrary(char *path);
-KMSTR_API void GetVersion(char *buffer, int bufferlength);
+KMSTR_API void GetTRVersion(char *buffer, int bufferlength);
 KMSTR_API int IsGeoidTableInitialised(void);
 KMSTR_API int GetEsriText(char *label_in, char *file_name);
 typedef struct TR TR;

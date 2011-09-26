@@ -37,8 +37,8 @@ def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		#Setup API, corresponds to header file of the API#
 		tr_lib.InitLibrary.restype=ctypes.c_int
 		tr_lib.InitLibrary.argtypes=[ctypes.c_char_p]
-		tr_lib.GetVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
-		tr_lib.GetVersion.restype=None
+		tr_lib.GetTRVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
+		tr_lib.GetTRVersion.restype=None
 		tr_lib.Transform.restype=ctypes.c_int
 		tr_lib.Transform.argtypes=[ctypes.c_char_p,ctypes.c_char_p,np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),
 		np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),ctypes.c_void_p,ctypes.c_int]
@@ -50,7 +50,8 @@ def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.trclose.argtypes=[ctypes.c_void_p]
 		tr_lib.tr.restype=ctypes.c_int
 		tr_lib.tr.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_int]
-	except:
+	except Exception, msg:
+		print repr(msg)
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
 		return False
 	if not os.path.exists(dir):
@@ -69,7 +70,7 @@ def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 
 def GetVersion():
 	buf=" "*100;
-	tr_lib.GetVersion(buf,100)
+	tr_lib.GetTRVersion(buf,100)
 	ver=buf.replace("\0","").strip()
 	return ver
 
