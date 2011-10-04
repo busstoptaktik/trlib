@@ -19,7 +19,7 @@ import time
 #format for the test setup is [[filename_in,label_out,precision_out],...]
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #pointer to geoid directory
 TESTDIR_IN=os.path.dirname(__file__)  #modify as needed - directory should contain files mentioned below in TESTS.
-TESTDIR_OUT=os.path.join(os.path.dirname(__file__),"/test_output") 
+TESTDIR_OUT=os.path.join(os.path.dirname(__file__),"test_output") 
 TESTS=[["Jylland_2d.txt","utm33_ed50",5],
 ["Jylland_2d.txt","s34j",5],
 ["Fyn_2d.txt","dktm2",5],
