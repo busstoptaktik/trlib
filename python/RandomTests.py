@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #######################################
 ##Skeleton of a test suite for trlib using python 'bindings'
 ## This script performs some randomized tests....
