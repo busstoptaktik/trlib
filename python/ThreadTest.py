@@ -1,3 +1,9 @@
+#!/usr/bin/python
+###############################
+## Thread safety test using RandomTests.py
+## simlk, oct. 2011
+###############################
+
 import threading
 import RandomTests
 import TrLib
