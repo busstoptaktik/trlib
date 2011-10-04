@@ -25,14 +25,14 @@ namespace Kmstrlib.NET
 			double[] Z =new double[] {100,200};
 			for (i=0; i<X.Length; i++){
 				System.Console.WriteLine("in:  X: {0,8:f4}  Y: {1,8:f4} Z: {2,4:f4}", X[i], Y[i], Z[i]);}
-			System.Console.WriteLine("Transformation from utm32Eed50 to utm32Ewgs84:");
-			error=Interface.Transform("\nutm32Eed50","utm32Ewgs84\n",X,Y,Z);
+			System.Console.WriteLine("\nTransformation from utm32Eed50 to utm32Ewgs84:\n");
+			error=Interface.Transform("utm32Eed50","utm32Ewgs84",X,Y,Z);
 			if (error != Interface.KMSTR_Error.KMSTR_OK) 
 				throw new Exception(Interface.GetKMSErrorMessage(error));
 			for (i=0; i<X.Length; i++){
 				System.Console.WriteLine("out: X: {0,8:f4}  Y: {1,8:f4} Z: {2,4:f4} ret: {3:d}", X[i], Y[i], Z[i],error);}
-			System.Console.WriteLine("Transformation from utm32_wgs84 to utm32_ed50:");
-			error=Interface.Transform("\nutm32_wgs84","utm32_ed50\n",X,Y,null);
+			System.Console.WriteLine("\nTransformation from utm32_wgs84 to utm32_ed50:\n");
+			error=Interface.Transform("utm32_wgs84","utm32_ed50",X,Y,null);
 			if (error != Interface.KMSTR_Error.KMSTR_OK) 
 				throw new Exception(Interface.GetKMSErrorMessage(error));
 			for (i=0; i<X.Length; i++){
