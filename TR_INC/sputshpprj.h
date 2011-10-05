@@ -15,16 +15,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- /* 
-   fputshpprj now using sputshpprj, which in turn is based on previous version of fputshpprj by KE
-   
-   fputshpprj writes the .prj file to a shape file
+ 
+ /* sputshpprj writes the .prj Esri wkt
    from the geo_lab.
 
    The reference names for label recognition is found
    in the file def_shp.txt in the geoid catalouge.
 
-   fputshpprj returns::
+   sputshpprj returns::
    0    prj line written ok.
    -2   def_shp.txt  def file not found in geoid directory
    -3   def_shp.txt  is NOT a def_shp file
@@ -36,25 +34,12 @@
                    for:geo: "dg" or "rad"
    dependening geo_lab->u_c_lab.g_tpd
       (.gf ==2 && .tf ==3) ? "rad" : "dg"
+	
+   The caller must ensure that *wkt_out is long enough to hold the output!
 
 */
-
-#include <stdio.h>
-#include "sputshpprj.h"
-#define MAX_WKT_LEN 4096 /* this should be sufficient to hold all possible wkts */
-
-int              fputshpprj(
-/*______________________*/
-FILE            *fh_out,
-union geo_lab   *g_lab)
-{
-	int ret_val;
-	char esri_wkt[MAX_WKT_LEN]; 
-	ret_val=sputshpprj(esri_wkt,g_lab);
-	fputs(esri_wkt,fh_out);
-	return ret_val;
-}
-	
-
-
-
+ 
+#include "geo_lab.h"
+ 
+ int sputshpprj(char *wkt_out, union geo_lab *g_lab);
+ 

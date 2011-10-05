@@ -75,23 +75,13 @@ def GetVersion():
 	return ver
 
 def GetEsriText(label):
-	f_int,tmpname=tempfile.mkstemp()
-	ret_val=tr_lib.GetEsriText(label,tmpname)
-	#Should be improved with a version that does not depend on reading a file
-	#need to make a version of fputshpprj.c which writes to a string - not difficult...
-	if ret_val==0:
-		f=open(tmpname)
-		esri_txt=f.read()
-		f.close()
-		retval=esri_txt
+	wkt=" "*2048;
+	retval=tr_lib.GetEsriText(label,wkt)
+	if retval==0:
+		wkt=wkt.strip().replace("\0","")
 	else:
-		retval=""
-	try:
-		os.close(f_int)
-		os.remove(tmpname)
-	except:
-		pass
-	return retval
+		wkt=None
+	return wkt
 
 def Transform(label_in,label_out,xyz_in):
 	if xyz_in.shape[1] not in [2,3]:

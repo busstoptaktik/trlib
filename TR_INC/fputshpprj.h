@@ -18,22 +18,15 @@
  
 
 
-/* fputshpprj  ver 2008.01          # page 1     6 Jan 2009 11 57 */
-
-
-/* Copyright (c) 2009, National Space Institute, DTU, Denmark */
-/* All rights reserved.                                       */
-
-/* This is unpublished proprietary source code of DTU, Denmark */
-/* This copyright claim does not indicate an intention of      */
-/* publishing this code.                                       */
+/* fputshpprj  now based on sputshpprj, which is based on prev. verison of fputshpprj, simlk, oct 2011 */
 
 #include <stdio.h>
-#include <string.h>
 #include "geo_lab.h"
+/* 
+These includes have been deleted. Are they assumed in other programs?? simlk, oct. 2011.
 #include "geoid_d.h"
-
-#include              "conv_lab.h"
+#include "conv_lab.h"
+*/
 
 
 extern int       fputshpprj(
@@ -45,9 +38,9 @@ union geo_lab   *g_lab);
    from the geo_lab.
 
    The reference names for label recognition is found
-   in the file def_sjp.txt in the geoid catalouge.
+   in the file def_shp.txt in the geoid catalouge.
 
-   fgetshpprj returns::
+   fputshpprj returns::
    0    prj line written ok.
    -2   def_shp.txt  def file not found in geoid directory
    -3   def_shp.txt  is NOT a def_shp file

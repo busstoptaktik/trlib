@@ -103,10 +103,10 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "geoid_d.h"
 #include "geoid_c.h"
 #include "geoid_i.h"
-#include "fputshpprj.h"
+#include "sputshpprj.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
-#define TRLIB_VERSION "beta 0.001 2011-09-23"
+#define TRLIB_VERSION "beta 0.002 2011-10-05"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 
 /* We use a global geoid table. This could be made thread local if needed */
@@ -384,24 +384,15 @@ void TerminateLibrary(void) {
 
 
 /* This will work for now until we get a version of fputshpprj which writes to a string */
-int GetEsriText(char *label_in, char *file_name){
+int GetEsriText(char *label_in, char *wkt_out){
     union geo_lab *plab_in;
-    FILE *fp;
     int   label_check;
-
-    fp = fopen(file_name, "w");
-    if (0==fp)
-        return TR_ERROR;
     plab_in = malloc(sizeof(union geo_lab));
-    
     label_check = conv_lab(label_in,plab_in,"");
     if ((label_check==0) || (label_check==-1)){
         free(plab_in);
         return LABEL_ERROR;
     }
-    
-    label_check=fputshpprj(fp,plab_in); /* See fputshpprj.h for details on return value */
-    
+    label_check=sputshpprj(wkt_out,plab_in); /* See fputshpprj.h for details on return value */
     free(plab_in);
-    fclose(fp);
     return label_check;}
