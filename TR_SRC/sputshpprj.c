@@ -77,7 +77,7 @@ union geo_lab   *g_lab)
   char              ell_txt[MLBLNG], ell[MLBLNG], h_sys[MLBLNG];
   char              prj[MLBLNG], dtm[MLBLNG], h_dtm[MLBLNG];
   char              entry[128], val_str[24];
-  char              buf[256];  /*buffer to hold substrings, do not write substrings longer than this */
+  char              *wkt_start;
   short             region, sepch, p_no, mask;
   int               mode, used, i, k, params = 0;
   int               str_state = 0;
@@ -87,11 +87,10 @@ union geo_lab   *g_lab)
   union rgn_un      rgn_pref;
   FILE             *fp;
   
-  
-  wkt_out[0]='\0';
+  wkt_start=wkt_out; /*will allow us to keep track of the number of chars written *if needed* */
   fp = i_tabdir_file(5, "def_shp.txt", &i, prj_txt2);
   if (i) {
-    (void) sprintf(wkt_out, 
+    wkt_out+=sprintf(wkt_out, 
               "\n*** def_shp.txt: NOT FOUND;\n");
     return ((i == -1) ? -2 : -3);
   }
@@ -194,108 +193,95 @@ union geo_lab   *g_lab)
 
   // compose the .prj text -changes from previous fputshpprj are only here....
   if (mode == 3) {
-	  (void) sprintf(buf, "COMPDCS[\"%s_+_%s\",", prj_txt1, hdtm_txt1);
-	  strcat(wkt_out,buf);
+	  wkt_out+=sprintf(wkt_out, "COMPDCS[\"%s_+_%s\",", prj_txt1, hdtm_txt1);
 	  ++ str_state;
 	  }
   if (mode % 2 == 1) {
     if (c_lab->cstm != 2) {
-	    (void) sprintf(buf, "PROJCS[\"%s\",", prj_txt1);
-	    strcat(wkt_out,buf);
+	    wkt_out+=sprintf(wkt_out, "PROJCS[\"%s\",", prj_txt1);
 	    ++ str_state;
         }
-    (void) sprintf(buf,
+    wkt_out+=sprintf(wkt_out,
                    "GEOGCS[\"%s\",DATUM[\"%s\",", dtm_txt1, dtm_txt2);
-    strcat(wkt_out,buf);
     str_state += 2;
-    (void) sprintf(buf, "SPHEROID[\"%s\",", ell_txt);
-    strcat(wkt_out,buf);
+    wkt_out+=sprintf(wkt_out, "SPHEROID[\"%s\",", ell_txt);
+    
     ++ str_state;
     (void) get_val_str(val_str, c_lab->a);
-    (void) sprintf(buf, "%s,", val_str);
-    strcat(wkt_out,buf);
+    wkt_out+=sprintf(wkt_out, "%s,", val_str);
     (void) get_val_str(val_str, 1/c_lab->f);
-    (void) sprintf(buf, "%s]]", val_str);
-    strcat(wkt_out,buf);
+    wkt_out+=sprintf(wkt_out, "%s]]", val_str);
+    
     str_state -= 2;
-    (void) sprintf(buf, ",PRIMEM[\"Greenwich\",0.0]");
-    strcat(wkt_out,buf);
+    wkt_out+=sprintf(wkt_out, ",PRIMEM[\"Greenwich\",0.0]");
+    
     if (c_lab->cstm == 2){
-	    (void) sprintf(buf,
+	    wkt_out+=sprintf(wkt_out,
                         ",AXIS[\"lat\",NORTH],AXIS[\"lon\",EAST]");
-	    strcat(wkt_out,buf);
-        }
-    (void) sprintf(buf, ",UNIT[\"");
-    strcat(wkt_out,buf);
-    if (c_lab->cstm == 2 && c_lab->g_tpd.gf==2 && c_lab->g_tpd.tf==3){
-	(void) sprintf(buf, "Radian\",1.0]]");
-         strcat(wkt_out,buf);
 	}
+    wkt_out+=sprintf(wkt_out, ",UNIT[\"");
+    if (c_lab->cstm == 2 && c_lab->g_tpd.gf==2 && c_lab->g_tpd.tf==3){
+	wkt_out+=sprintf(wkt_out, "Radian\",1.0]]");
+         }
     else{
-	(void) sprintf(buf, "Degree\",0.0174532925199432955]]");
-	strcat(wkt_out,buf);
+	wkt_out+=sprintf(wkt_out, "Degree\",0.0174532925199432955]]");
 	}
     -- str_state;
     if (c_lab->cstm != 2) {
-      (void) sprintf(buf, ",PROJECTION[\"%s\"]", prj_txt2);
-       strcat(wkt_out,buf);
+      wkt_out+=sprintf(wkt_out, ",PROJECTION[\"%s\"]", prj_txt2);
+       
       (void) get_val_str(val_str, c_lab->L0 * 180 / M_PI);
-      (void) sprintf(buf,
+      wkt_out+=sprintf(wkt_out,
                      ",PARAMETER[\"central_meridian\",%s]", val_str);
-      strcat(wkt_out,buf);
+      
       (void) get_val_str(val_str, c_lab->B0 * 180 / M_PI);
-      (void) sprintf(buf,
+      wkt_out+=sprintf(wkt_out,
                      ",PARAMETER[\"latitude_of_origin\",%s]", val_str);
-       strcat(wkt_out,buf);
+       
       (void) get_val_str(val_str, c_lab->E0);
-      (void) sprintf(buf,
+      wkt_out+=sprintf(wkt_out,
                      ",PARAMETER[\"false_easting\",%s]", val_str);
-      strcat(wkt_out,buf);
+      
       (void) get_val_str(val_str, c_lab->N0);
-      (void) sprintf(buf,
+      wkt_out+=sprintf(wkt_out,
                      ",PARAMETER[\"false_northing\",%s]", val_str);
-       strcat(wkt_out,buf);
+       
       if (params == 5) {
 	      (void) get_val_str(val_str, c_lab->scale);
-	      (void) sprintf(buf,
+	      wkt_out+=sprintf(wkt_out,
                        ",PARAMETER[\"scale_factor\",%s]", val_str);
-	      strcat(wkt_out,buf);
+	      
       } else
       if (params == 6){
 	      (void) get_val_str(val_str, c_lab->B1 * 180 / M_PI);
-	      (void) sprintf(buf,
+	      wkt_out+=sprintf(wkt_out,
                ",PARAMETER[\"Standard_Parallel_1\",%s]", val_str);
-	      strcat(wkt_out,buf);
+	      
 	      (void) get_val_str(val_str, c_lab->B2 * 180 / M_PI);
-	      (void) sprintf(buf,
+	      wkt_out+=sprintf(wkt_out,
                ",PARAMETER[\"Standard_Parallel_2\",%s]", val_str);
-	      strcat(wkt_out,buf);
+	      
 	      }
 	      
-      // (void) sprintf(buf, ",AXIS[\"N\",NORTH],AXIS[\"E\",EAST]");
-      (void) sprintf(buf, ",UNIT[\"m\",1.0]]");
-      strcat(wkt_out,buf);
+      // wkt_out+=sprintf(wkt_out, ",AXIS[\"N\",NORTH],AXIS[\"E\",EAST]");
+      wkt_out+=sprintf(wkt_out, ",UNIT[\"m\",1.0]]");
       -- str_state;
     }
   }
   if (mode == 3) {
-	  (void) sprintf(buf, ",");
-	  strcat(wkt_out,buf);
+	  wkt_out+=sprintf(wkt_out, ",");
 	  }
 	  
   if (mode >= 2) {
-	  (void) sprintf(buf, "VERTCS[\"%s\",", hdtm_txt1);
-	  strcat(wkt_out,buf);
+	  wkt_out+=sprintf(wkt_out, "VERTCS[\"%s\",", hdtm_txt1);
 	  ++ str_state;
-	  (void) sprintf(buf,
+	  wkt_out+=sprintf(wkt_out,
                    ",VERT_DATUM[\"%s\",UNIT[\"m\",1.0]]", hdtm_txt2);
-	  strcat(wkt_out,buf);
 	  -- str_state;
 	  }
 	  
   if (mode == 3) {
-	  (void) sprintf(buf, "]");
-	  strcat(wkt_out,buf);
+	  wkt_out+=sprintf(wkt_out, "]");
 	  -- str_state;
 	  }
 
