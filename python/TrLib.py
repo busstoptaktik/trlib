@@ -7,7 +7,6 @@ import ctypes
 import os
 import sys
 import time
-import tempfile
 IS_INIT=False
 STD_LIB="TrLib"
 STD_DIRNAME=os.path.dirname(__file__)
@@ -86,26 +85,30 @@ def GetEsriText(label):
 def Transform(label_in,label_out,xyz_in):
 	if xyz_in.shape[1] not in [2,3]:
 		raise Exception("Array column dimension must be 2 or 3!")
+	npoints=xyz_in.shape[0]
+	if npoints==0:
+		return np.empty(xyz_in.shape)
 	X=np.copy(xyz_in[:,0]).astype(np.float64)
 	Y=np.copy(xyz_in[:,1]).astype(np.float64)
 	if "geo" in label_in[0:6]: #convert2radians?
-		if np.fabs(X).max()>2*np.pi:
+		if np.fabs(xyz_in[:10,0:2]).max()>2*np.pi: #test a few input coords...
 			X*=np.pi/180.0
 			Y*=np.pi/180.0
-	npoints=X.shape[0]
-	if npoints>0:
-		if xyz_in.shape[1]==3:  #3d
-			Z=np.copy(xyz_in[:,2]).astype(np.float64)
-			res=tr_lib.Transform(label_in,label_out,X,Y,Z.ctypes._data,npoints)
-			xyz_out=np.column_stack((X,Y,Z))
-		else:
-			res=tr_lib.Transform(label_in,label_out,X,Y,None,npoints)
-			xyz_out=np.column_stack((X,Y))
-		#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
+	if xyz_in.shape[1]==3:  #3d
+		Z=np.copy(xyz_in[:,2]).astype(np.float64)
+		res=tr_lib.Transform(label_in,label_out,X,Y,Z.ctypes._data,npoints)
+		xyz_out=np.column_stack((X,Y,Z))
+	else:
+		res=tr_lib.Transform(label_in,label_out,X,Y,None,npoints)
+		xyz_out=np.column_stack((X,Y))
+	#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
+	if res!=0:
 		if res==2:  
 			raise TransformationException("Error in transformation.")
 		elif res==1:
 			raise LabelException("Input labels are not OK.")
+		else:
+			raise Exception("Unknown return code from transformation library.")
 	#print xyz_out.shape
 	if "geo" in label_out[0:6]: #convert2degrees?
 		xyz_out[:,0:2]*=180.0/np.pi
