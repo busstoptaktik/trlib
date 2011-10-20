@@ -98,7 +98,7 @@ FILE                *tr_error
     char        *s_lab;
   } *pml;
 
-  static THREAD_SAFE  struct nr_mlb    mlab[] = {
+  static struct nr_mlb    mlab[] = {
     /*  0 */ { 0,  0,  10,   "geo_nad83g"},
     /*  1 */ { 0,  1,   8,   "geo_gr96"},
     /*  2 */ { 1,  2,   6,   "*nad83g"},
@@ -112,12 +112,12 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE  struct act_nst     *ptab;
-  static THREAD_SAFE  int                 in_nr;
-  static THREAD_SAFE  int                 ng_w;
+  static THREAD_SAFE  struct act_nst  *ptab;
+  static THREAD_SAFE  int              in_nr;
+  static int                           ng_w;
 
   /* Action/state table */
-  static THREAD_SAFE  struct act_nst ngtab[] = {
+  static struct act_nst ngtab[] = {
     /* nadg  = geo_nad83g: 0   */
     /* input   nadg    ggr96    *nadg    *gr96 */
     /* state :    0        1        2        3 */
@@ -155,8 +155,8 @@ FILE                *tr_error
       /* State/action table size and width */
       ng_z = sizeof(ngtab)/sizeof(struct act_nst);
       ng_w = (int) sqrt(1.0000001*ng_z);
-      init = (res > 0) && (ng_z == ng_w*ng_w);
       (void) conv_lab("geo_nad83g", &w_lab, "");
+      init = (res > 0) && (ng_z == ng_w*ng_w);
       if (!init)
         return(t_status(
                tr_error, "", "ng_trans(table)", res));

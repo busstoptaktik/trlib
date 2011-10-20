@@ -92,12 +92,12 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE  struct act_nst     *ptab;
-  static THREAD_SAFE  int                 in_nr;
-  static THREAD_SAFE  int                 fh_w;
+  static THREAD_SAFE  struct act_nst *ptab;
+  static THREAD_SAFE  int             in_nr;
+  static int                          fh_w;
 
   /* Action/state table */
-  static THREAD_SAFE  struct act_nst fhtab[] = {
+  static struct act_nst fhtab[] = {
     /*         input ::   crt     geo     prj*/
     /*         state ::    0       1       2 */
     /* OUTPUT::     */

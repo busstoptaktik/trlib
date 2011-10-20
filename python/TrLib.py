@@ -11,6 +11,12 @@ IS_INIT=False
 STD_LIB="TrLib"
 STD_DIRNAME=os.path.dirname(__file__)
 REQUIRED_FILES=["def_lab.txt","def_shp.txt"]
+#define return codes, really define in trlib_api.h
+TR_OK=0
+LABEL_ERROR=1
+TR_ERROR=2
+#special return code for this module
+TRLIB_NOT_INITIALIZED=-1
 class TransformationException(Exception):
 	def __init__(self,msg="Transformation Error"):
 		self.msg=msg
@@ -25,7 +31,7 @@ class LabelException(Exception):
 ##################
 ##Call this initializtion FIRST!
 ##################
-def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
+def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 	global tr_lib
 	global IS_INIT
 	IS_INIT=False
@@ -53,14 +59,14 @@ def InitLibrary(dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		print repr(msg)
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
 		return False
-	if not os.path.exists(dir):
+	if not os.path.exists(geoid_dir):
 		print("%s does not exist in the file system" %dir)
 		return False
 	for fname in REQUIRED_FILES:
-		if not os.path.exists(os.path.join(dir,fname)):
+		if not os.path.exists(os.path.join(geoid_dir,fname)):
 			print("Required file %s not found, failed to initialize library!" %fname)
 			return False
-	sdir=dir
+	sdir=geoid_dir
 	if sdir[-1] not in ["\\","/"]:
 		sdir+="/"
 	has_geoids=tr_lib.InitLibrary(sdir) #at some point use this info....
@@ -81,6 +87,63 @@ def GetEsriText(label):
 	else:
 		wkt=None
 	return wkt
+
+class CoordinateTransformation(object):
+	def __init__(self,mlb_in,mlb_out):
+		self.mlb_in=mlb_in
+		self.mlb_out=mlb_out
+		self.tr=None
+		if IS_INIT:
+			self.tr=tr_lib.tropen(mlb_in,mlb_out)
+			if self.tr is None:
+				raise LabelException()
+		else:
+			raise Exception("Initialise Library first!")
+	def Transform(self,x,y,z):
+		if self.tr is None:
+			raise LabelException()
+		x,y,z=map(ctypes.c_double,[x,y,z])
+		res=tr_lib.tr(self.tr,ctypes.byref(x),ctypes.byref(y),ctypes.byref(z),1)
+		if res==TR_ERROR:
+			raise TransformationException("Error in transformation.")
+		return x.value,y.value,z.value
+	def TransformArray(self,xyz_in):
+		if self.tr is None:
+			raise LabelException()
+		if xyz_in.shape[1] not in [2,3]:
+			raise Exception("Array column dimension must be 2 or 3!")
+		npoints=xyz_in.shape[0]
+		if npoints==0:
+			return np.empty(xyz_in.shape)
+		X=np.copy(xyz_in[:,0]).astype(np.float64)
+		Y=np.copy(xyz_in[:,1]).astype(np.float64)
+		if "geo" in label_in[0:6]: #convert2radians?
+			if np.fabs(xyz_in[:10,0:2]).max()>2*np.pi: #test a few input coords...
+				X*=np.pi/180.0
+				Y*=np.pi/180.0
+		if xyz_in.shape[1]==3:  #3d
+			Z=np.copy(xyz_in[:,2]).astype(np.float64)
+			res=tr_lib.tr(self.tr,X,Y,Z.ctypes._data,npoints)
+			xyz_out=np.column_stack((X,Y,Z))
+		else:
+			res=tr_lib.tr(self.tr,X,Y,None,npoints)
+			xyz_out=np.column_stack((X,Y))
+		#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
+		if res!=TR_OK:
+			if res==TR_ERROR:  
+				raise TransformationException("Error in transformation.")
+			else:
+				raise Exception("Unknown return code from transformation library.")
+		#print xyz_out.shape
+		if "geo" in label_out[0:6]: #convert2degrees?
+			xyz_out[:,0:2]*=180.0/np.pi
+		return xyz_out
+	def Close(self):
+		if self.tr is not None:
+			tr_lib.trclose(self.tr)
+		
+	
+		
 
 def Transform(label_in,label_out,xyz_in):
 	if xyz_in.shape[1] not in [2,3]:

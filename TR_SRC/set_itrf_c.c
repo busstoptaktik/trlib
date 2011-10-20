@@ -43,8 +43,8 @@
 extern THREAD_SAFE FILE               *man_gps_file;
 extern THREAD_SAFE size_t              init_gps_pos;
 
-int                   set_itrf_c(
-/*____________________________*/
+int                      set_itrf_c(
+/*________________________________*/
 struct coord_lab        *from_lb,
 struct coord_lab        *to_lb,
 double                  *i_JD,
@@ -168,7 +168,7 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
 
   union geo_lab           *geo_lb;
   struct gde_lab          *ipl_lb = &ipl_table->table_u;
-  union rgn_un             i_rgn, o_rgn;
+  union rgn_un             i_rgn, o_rgn, rgn_EU;
   char                     from_str[32], to___str[32], plm_nam[MLBLNG];
   char                     ipl_nam[MLBLNG];
   char                    *i_dtm, *o_dtm, pth_mlb[1024], *p_tp;
@@ -190,6 +190,7 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
 
   /* initialize */
   /*____________*/
+  (void) strcpy(rgn_EU.prfx, "EU");
   gps_table->seq[0]   = gps_table->seq[1] = 0;
   gps_table->seq[2]   = gps_table->seq[3] = 0;
   gps_table->i_ipl_dt = -10000000.0;
@@ -222,17 +223,19 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
   i_sys =  (!strncmp(i_dtm, "itrf", 4))    ? 1
         : ((!strncmp(i_dtm, "igs", 3))     ? 2
         : ((!strncmp(i_dtm, "etrf", 4))    ? 3
+        : ((!strncmp(i_dtm, "etrs", 4))    ? 3
         // 3 is national std or ITRFplate/StnVel:: To be changed
         : ((!strncmp(i_dtm, "euref89", 7)) ? 4  // 4 is euref std
         : ((!strncmp(i_dtm, "gr96", 4))    ? 5
-        : ((!strncmp(i_dtm, "wgs84", 5))   ? 6 : 9)))));
+        : ((!strncmp(i_dtm, "wgs84", 5))   ? 6 : 9))))));
 
   o_sys =  (!strncmp(o_dtm, "itrf", 4))    ? 1
         : ((!strncmp(o_dtm, "igs", 3))     ? 2
         : ((!strncmp(o_dtm, "etrf", 4))    ? 3
+        : ((!strncmp(i_dtm, "etrs", 4))    ? 3
         : ((!strncmp(o_dtm, "euref89", 7)) ? 4
         : ((!strncmp(o_dtm, "gr96", 4))    ? 5
-        : ((!strncmp(o_dtm, "wgs84", 5))   ? 6 : 9)))));
+        : ((!strncmp(o_dtm, "wgs84", 5))   ? 6 : 9))))));
   if (i_sys == 9 || o_sys == 9) return(
                     s_status(err_str, "set_itrf_c", ITRF_DTM_));
 
@@ -251,7 +254,7 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
   (void) strcpy(ipl_nam, tab_i);
   i_rgn.r_nr[0] = from_lb->region;
   if (i_sys == 3) {
-    if (!strcmp("EU", i_rgn.prfx)) {
+    if (rgn_EU.r_nr[0] == i_rgn.r_nr[0]) {
       ieur_ii = (int) i_rgn.r_nr[0];
       i_sys   = 4;
       (void) strcpy(plm_nam, "");
@@ -260,7 +263,7 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
   }
   o_rgn.r_nr[0] = to_lb->region;
   if (o_sys == 3) {
-    if (!strcmp("EU", o_rgn.prfx)) {
+    if (rgn_EU.r_nr[0] == o_rgn.r_nr[0]) {
       oeur_ii = (int) o_rgn.r_nr[0];
       o_sys   = 4;
       (void) strcpy(plm_nam, "");

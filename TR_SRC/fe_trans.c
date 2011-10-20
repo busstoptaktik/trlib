@@ -18,15 +18,15 @@
  
 
 
-/* fe_trans  ver 2010.1        # page 1    12 Jan 2010 13 55 */
+/* fe_trans  ver 2011.02        # page 1    9 Oct 2011 13 55 */
 
 
-/* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
+/* Copyright (c) 2011 SPACE Danish Technical University (DTU)  */
 /* All rights reserved.                                        */
 
-/* This is unpublished proprietary source code of Danish       */
-/* National Space Center  DTU  Denmark.  This copyright claim  */
-/* does not indicate an intention of publishing this code.     */
+/* This is unpublished proprietary source code of DTU SPACE    */
+/* This copyright claim does not indicate an intention of      */
+/* publishing this code.                                       */
 
 /*
 #define  DEBUGFETRANS
@@ -74,19 +74,17 @@ FILE                *tr_error
 {
 
 
-/* fe_trans  ver 2010.1        # page 2    12 Jan 2010 13 55 */
+/* fe_trans  ver 2011.02        # page 2    9 Oct 2011 13 55 */
 
 
 #include        "conv_lab.h"
 #include        "ptg.h"
-#include        "fu50tu_g.h"
-#include        "fk54tu_g.h"
-#include        "fk89tu_g.h"
+#include        "fo_g_tr.h"
 #include        "t_status.h"
 
-  static THREAD_SAFE  int               in_chsum = 0L;
-  static THREAD_SAFE  int               outchsum = 0L;
-  static THREAD_SAFE  int               init = 0;
+  static THREAD_SAFE int   in_chsum = 0L;
+  static THREAD_SAFE int   outchsum = 0L;
+  static int   init = 0;
 
   char                     in_cs[32], outcs[32];
   char                     p_dtm[32], *pl;
@@ -98,10 +96,10 @@ FILE                *tr_error
   struct coord_lab        *in_lab = &(in_lab_u->u_c_lab);
   struct coord_lab        *outlab = &(outlab_u->u_c_lab);
 
-  static THREAD_SAFE  union geo_lab     TC_u29;
-  static THREAD_SAFE  union geo_lab     TC_fke;
-  static THREAD_SAFE  union geo_lab     TC_u50;
-  static THREAD_SAFE  union geo_lab     TC_f54;
+  static union geo_lab     TC_u29;
+  static union geo_lab     TC_fke;
+  static union geo_lab     TC_u50;
+  static union geo_lab     TC_f54;
 
   /* minilabels */
 
@@ -111,20 +109,20 @@ FILE                *tr_error
     char         *s_lab;
   } *pml;
 
-  static THREAD_SAFE  struct nr_mlb    mlab[] = {
-    /*  0 */ { 0,  0,   "utm29"},   /* Datum checked later  */
-    /*  1 */ { 0,  1,   "geo"},     /* Datum checked later  */
-    /*  2 */ { 1,  2,   "fke"},     /* Region checked later */
-    /*  3 */ { 1,  3,   "fu50"},    /* Region checked later */
-    /*  4 */ { 1,  4,   "fg50"},    /* Region checked later */
-    /*  5 */ { 1,  5,   "fk54"},    /* Region checked later */
-    /*  6 */ { 1,  6,   "fg54"},    /* Region checked later */
-    /*  7 */ { 1,  7,   "fk89"},    /* Region checked later */
+  static struct nr_mlb    mlab[] = {
+    /*  0 */ { 0,  0,   "utm29"}, /* Datum checked later */
+    /*  1 */ { 0,  1,   "geo"},   /* Datum checked later */
+    /*  2 */ { 1,  2,   "fke"},   /* Region is FO */
+    /*  3 */ { 1,  3,   "fu50"},  /* Region is FO */
+    /*  4 */ { 1,  4,   "fg50"},  /* Region is FO */
+    /*  5 */ { 1,  5,   "fk54"},  /* Region is FO */
+    /*  6 */ { 1,  6,   "fg54"},  /* Region is FO */
+    /*  7 */ { 1,  7,   "fk89"},  /* Region is FO */
     /*stop*/ {-1, -1,   ""}
   };
 
 
-/* fe_trans  ver 2010.1        # page 3    12 Jan 2010 13 55 */
+/* fe_trans  ver 2011.02        # page 3    9 Oct 2011 13 55 */
 
 
   struct act_nst {
@@ -133,27 +131,27 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE  struct act_nst     *ptab;
-  static THREAD_SAFE  int                 in_nr;
-  static THREAD_SAFE  int                 fe_w;
+  static THREAD_SAFE struct act_nst  *ptab;
+  static THREAD_SAFE int              in_nr;
+  static int                          fe_w;
 
   /* Action/state table */
-  static THREAD_SAFE  struct act_nst fetab[] = {
+  static struct act_nst fetab[] = {
 
-    /* u29 = utm29_euref89: 0 */
+    /* u29 = utm29_etrs89: 0 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /* state : */
     /*   0       1       2       3       4       5       6       7*/
     {IDT,0},{GTU,0},{FTU,0},{U0U,0},{GU0,3},{KTU,0},{G4K,5},{K9U,0},
 
-    /* geo = geo_euref89: 1 */
+    /* geo = geo_etrs89: 1 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
     {UTG,1},{IDT,1},{FTU,0},{U0U,0},{GU0,3},{KTU,0},{G4K,5},{K9U,0},
 
-    /* fke(_euref89): 2 */
+    /* fke(_etrs89): 2 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
@@ -191,7 +189,7 @@ FILE                *tr_error
   };
 
 
-/* fe_trans  ver 2010.1        # page 4    12 Jan 2010 13 55 */
+/* fe_trans  ver 2011.02        # page 4    9 Oct 2011 13 55 */
 
 
   /* Test io-labels */
@@ -199,13 +197,13 @@ FILE                *tr_error
 
     if (init == 0) {
       /* Internal wrk-labels */
-      init = (conv_lab("utm29_euref89", &TC_u29, "") == CRD_LAB
-          &&  conv_lab("fke",           &TC_fke, "") == CRD_LAB
-          &&  conv_lab("fu50",          &TC_u50, "") == CRD_LAB
-          &&  conv_lab("fk54",          &TC_f54, "") == CRD_LAB);
+      init = (conv_lab("utm29_etrs89", &TC_u29, "") == CRD_LAB
+          &&  conv_lab("fke",          &TC_fke, "") == CRD_LAB
+          &&  conv_lab("fu50",         &TC_u50, "") == CRD_LAB
+          &&  conv_lab("fk54",         &TC_f54, "") == CRD_LAB);
       /* State/action table size and width */
-      fe_z    = sizeof(fetab)/sizeof(struct act_nst);
-      fe_w    = (int) sqrt(1.0000001*fe_z);
+      fe_z = sizeof(fetab)/sizeof(struct act_nst);
+      fe_w = (int) sqrt(1.0000001*fe_z);
       init = init && (fe_z == fe_w*fe_w);
       if (!init)
         return(t_status(
@@ -237,18 +235,19 @@ pml->trgr, pml->trnr, pml->s_lab);
         }
 
 
-/* fe_trans  ver 2010.1        # page 5    12 Jan 2010 13 55 */
+/* fe_trans  ver 2011.02        # page 5    9 Oct 2011 13 55 */
 
 
       /* Datum and region check */
       switch (outgr) {
       case 0: /* Datum check */
-        if (strcmp(p_dtm, "euref89")) res = TRF_ILLEG_;
+        if (outlab->datum != TC_u29.u_c_lab.datum) res = TRF_ILLEG_;
         break;
 
       case 1: /* Region check */
-        if (outlab->p_rgn != TC_fke.u_c_lab.p_rgn)
-           res = TRF_ILLEG_;
+        /* NOT needed: set in conv_lab 
+        if (outlab->p_rgn != TC_fke.p_rgn)
+           res = TRF_ILLEG_; */
         break;
 
       default: /* Unknown label */
@@ -285,12 +284,13 @@ pml->trgr, pml->trnr, pml->s_lab);
       /* Datum and region check */
       switch (in_gr) {
       case 0: /* Datum check */
-        if (strcmp(p_dtm, "euref89")) res = TRF_ILLEG_;
+        if (in_lab->datum != TC_u29.u_c_lab.datum) res = TRF_ILLEG_;
         break;
 
       case 1: /* Region check */
-        if (in_lab->p_rgn != TC_fke.u_c_lab.p_rgn)
-            res = TRF_ILLEG_;
+        /* NOT needed: set in conv_lab 
+        if (in_lab->p_rgn != TC_fke.p_rgn)
+           res = TRF_ILLEG_; */
         break;
 
       default: /* Unknown label */
@@ -299,7 +299,7 @@ pml->trgr, pml->trnr, pml->s_lab);
       } /* end in_-label check */
 
 
-/* fe_trans  ver 2010.1        # page 6    12 Jan 2010 13 55 */
+/* fe_trans  ver 2011.02        # page 6    9 Oct 2011 13 55 */
 
 
       if (res == TRF_ILLEG_)
@@ -337,35 +337,35 @@ act, gst, nst);
 
       switch(act) {
 
-      case GTU: /* geo_euref -> utm29_euref */
+      case GTU: /* geo_etrs89 -> utm29_etrs89 */
         ies = ptg(&TC_u29, -1, N, E, &N, &E, usertxt, tr_error);
         break;
-      case UTG: /* utm29_euref89 -> geo_euref89 */
+      case UTG: /* utm29_etrs89 -> geo_etrs89 */
         ies = ptg(&TC_u29, +1, N, E, &N, &E,  usertxt, tr_error);
         break;
 
 
-/* fe_trans  ver 2010.1        # page 7    12 Jan 2010 13 55 */
+/* fe_trans  ver 2011.02        # page 7    9 Oct 2011 13 55 */
 
 
-      case FTU: /* FO national system -> utm29_euref89 */
+      case FTU: /* FO national system -> utm29_etrs89 */
         ies = ptg(&TC_fke, +2, N, E, &N, &E, usertxt, tr_error);
         if (ies < res) res = ies;
         ies = ptg(&TC_u29, -2, N, E, &N, &E, usertxt, tr_error);
         break;
 
-      case UTF: /* utm29_euref89 -> FO national system */
+      case UTF: /* utm29_etrs89 -> FO national system */
         ies = ptg(&TC_u29, +2, N, E, &N, &E, usertxt, tr_error);
         if (ies < res) res = ies;
         ies = ptg(&TC_fke, -2, N, E, &N, &E, usertxt, tr_error);
         break;
 
-      case UU0: /* utm29_euref89 -> utm29_ed50 */
-        ies = fu50tu_g(-1, N, E, &N, &E, usertxt, tr_error);
+      case UU0: /* utm29_etrs89 -> utm29_ed50 */
+        ies = fo_g_tr(3, +1, N, E, &N, &E, usertxt, tr_error);
         break;
 
-      case U0U: /* utm29_ed50 -> utm29_euref89 */
-        ies = fu50tu_g(+1, N, E, &N, &E, usertxt, tr_error);
+      case U0U: /* utm29_ed50 -> utm29_etrs89 */
+        ies = fo_g_tr(3, -1, N, E, &N, &E, usertxt, tr_error);
         break;
 
       case G4K: /* fgeo(_fd54) -> fk(_fd54) */
@@ -384,20 +384,20 @@ act, gst, nst);
         ies = ptg(&TC_u50, -1, N, E, &N, &E, usertxt, tr_error);
         break;
 
-      case UTK: /* utm29_euref89 -> fk54 */
-        ies = fk54tu_g(-1, N, E, &N, &E, usertxt, tr_error);
+      case UTK: /* utm29_etrs89 -> fk54 */
+        ies = fo_g_tr(5, +1, N, E, &N, &E, usertxt, tr_error);
         break;
 
-      case KTU: /* fk54 -> utm29_euref89 */
-        ies = fk54tu_g(+1, N, E, &N, &E, usertxt, tr_error);
+      case KTU: /* fk54 -> utm29_etrs89 */
+        ies = fo_g_tr(5, -1, N, E, &N, &E, usertxt, tr_error);
         break;
 
-      case U9K: /* utm29_euref89 -> fk89 */
-        ies = fk89tu_g(-1, N, E, &N, &E, usertxt, tr_error);
+      case U9K: /* utm29_etrs89 -> fk89 */
+        ies = fo_g_tr(7, +1, N, E, &N, &E, usertxt, tr_error);
         break;
 
-      case K9U: /* fk89 -> utm29_euref89 */
-        ies = fk89tu_g(+1, N, E, &N, &E, usertxt, tr_error);
+      case K9U: /* fk89 -> utm29_etrs89 */
+        ies = fo_g_tr(7, -1, N, E, &N, &E, usertxt, tr_error);
         break;
 
       case IDT: /* ident, no action */
@@ -405,7 +405,7 @@ act, gst, nst);
 
 
 
-/* fe_trans  ver 2010.1        # page 8    12 Jan 2010 13 55 */
+/* fe_trans  ver 2011.02        # page 8    9 Oct 2011 13 55 */
 
       default: /* programme error */
         return(t_status(
@@ -444,5 +444,3 @@ act, gst, nst);
 #undef  U9K
 
 }
-
-

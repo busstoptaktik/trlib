@@ -107,10 +107,10 @@ FILE                *tr_error
 #include        "t_status.h"
 
   static THREAD_SAFE  int               in_chsum = 0;
-  static THREAD_SAFE  int               outchsum = 0;
-  static THREAD_SAFE  int               TC_init = 0, proj_proj = 0;
+  static THREAD_SAFE  int               outchsum = 0, proj_proj = 0;
+  static int               TC_init = 0;
 
-  char                     p_dtm[32], *pl;
+  char                    *pl;
 
   int                      in_gr, outgr, outnr = 0, ed_z;
   int                      nst, act, level;
@@ -123,11 +123,11 @@ FILE                *tr_error
   struct coord_lab        *in_lab = &(in_lab_a->u_c_lab);
   struct coord_lab        *outlab = &(outlab_a->u_c_lab);
 
-  static THREAD_SAFE  char              outcs[32], in_cs[32];
-  static THREAD_SAFE  union geo_lab     TC_u32, TC_u33, TC_tr2, TC__gs, TC_gsb;
+  static THREAD_SAFE char  outcs[32], in_cs[32];
+  static union geo_lab     TC_u32, TC_u33, TC_tr2, TC__gs, TC_gsb;
 
 #ifdef   DEBUGDKTRANS
-  static THREAD_SAFE  char          *ACTION[] = {
+  static char          *ACTION[] = {
     "idnt", "t32j", "j32t", "t32s", "st32", "t32b", "bt32",
     "u32g", "gu32", "p_tg", "g_tp", "ztzu", "ztzd", "u_gs", "gs_u",
     "ugsb", "gsbu", "j_os", "os_j", "s_kk", "kk_s", "u_sb", "sb_u",
@@ -147,7 +147,7 @@ FILE                *tr_error
   } *pml;
 
 
-  static THREAD_SAFE  struct nr_mlb    mlab[] = {
+  static struct nr_mlb    mlab[] = {
     /* GENERAL GLOBAL */
     /*  0 */ { 0,  0,   "tc32_ed50"},  /* tr system to/from EUREF */
     /*  1 */ { 0,  1,   "geo_ed50"},
@@ -204,11 +204,11 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE  struct act_nst     *ptab, *pt[2];
-  static THREAD_SAFE  int                 in_nr, stlev, levst, in[2];
-  static THREAD_SAFE  int                 ed_w, js_w, bo_w, gs_w, bs_w;
+  static THREAD_SAFE struct act_nst *ptab, *pt[2];
+  static THREAD_SAFE int             in_nr, stlev, levst, in[2];
+  static int                         ed_w, js_w, bo_w, gs_w, bs_w;
 
-  static THREAD_SAFE  struct act_nst edtab[] = {
+  static struct act_nst edtab[] = {
     /* i/o_sys :: TC 32: 0 */
     /* input    tc32     geo      u32      sb      proj     tcgeo */
     /* state no. 0        1        2        3        4        5   */
@@ -225,7 +225,7 @@ FILE                *tr_error
     /* tcge*/ {U32G,5},{GTTP,2},{U32T,0},{SB_U,2},{P_TG,1},{IDNT,5}
   };
 
-  static THREAD_SAFE  struct act_nst jstab[] = {
+  static struct act_nst jstab[] = {
     /* i/o_sys :: TC 32: 0 */
     /* input     : */
     /* tc32    s34j     s34s      os       kk       dks      s34  */
@@ -247,7 +247,7 @@ FILE                *tr_error
     {T32L,6},{IDNT,6},{IDNT,6},{ILLG,0},{ILLG,0},{ILLG,0},{IDNT,6}
   };
 
-  static THREAD_SAFE  struct act_nst botab[] = {
+  static struct act_nst botab[] = {
     /* i/o_sys :: TC 32: 0 */
     /* input    tc32    s45b      u32  */
     /* state no. 0        1        2   */
@@ -262,7 +262,7 @@ FILE                *tr_error
 /* dk_trans  ver 2003.01        # page 5   12 Jan 2003 13 55 */
 
 
-  static THREAD_SAFE  struct act_nst gstab[] = {
+  static struct act_nst gstab[] = {
     /* i/o_sys :: TC32: 0 */
     /* input   tc32       gs     u32      gsgeo  */
     /* state no. 0        1        2        3    */
@@ -275,7 +275,7 @@ FILE                *tr_error
     /*gsgeo*/ {T32U,2},{PTGS,3},{U_GS,1},{IDNT,3}
   };
 
-  static THREAD_SAFE  struct act_nst bstab[] = {
+  static struct act_nst bstab[] = {
     /* i/o_sys :: TC32: 0 */
     /* input   tc32      gsb      u32    gsbgeo    u33   */
     /* state no. 0        1        2        3        4   */
@@ -291,7 +291,7 @@ FILE                *tr_error
   };
 
   if (!TC_init) {
-    TC_init = conv_lab("DK_tc32_ed50",  &TC_tr2, "") == 1
+    act = conv_lab("DK_tc32_ed50",  &TC_tr2, "") == 1
         &&    conv_lab("DK_utm32_ed50", &TC_u32, "") == 1
         &&    conv_lab("DK_utm33_ed50", &TC_u33, "") == 1
         &&    conv_lab("DK_gs",         &TC__gs, "") == 1
@@ -299,19 +299,19 @@ FILE                *tr_error
 
     ed_z    = sizeof(edtab)/sizeof(struct act_nst);
     ed_w    = (int) sqrt(1.0000001*ed_z);
-    TC_init = TC_init && ed_z == ed_w*ed_w;
+    act = act && ed_z == ed_w*ed_w;
     ed_z    = sizeof(jstab)/sizeof(struct act_nst);
     js_w    = (int) sqrt(1.0000001*ed_z);
-    TC_init = TC_init && ed_z == js_w*js_w;
+    act = act && ed_z == js_w*js_w;
     ed_z    = sizeof(botab)/sizeof(struct act_nst);
     bo_w    = (int) sqrt(1.0000001*ed_z);
-    TC_init = TC_init && ed_z == bo_w*bo_w;
+    act = act && ed_z == bo_w*bo_w;
     ed_z    = sizeof(gstab)/sizeof(struct act_nst);
     gs_w    = (int) sqrt(1.0000001*ed_z);
-    TC_init = TC_init && ed_z == gs_w*gs_w;
+    act = act && ed_z == gs_w*gs_w;
     ed_z    = sizeof(bstab)/sizeof(struct act_nst);
     bs_w    = (int) sqrt(1.0000001*ed_z);
-    TC_init = TC_init && ed_z == bs_w*bs_w;
+    TC_init = act && ed_z == bs_w*bs_w;
 
     if (!TC_init)
       return(t_status(
@@ -359,10 +359,8 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
 
     /* Datum actions */
     if (outgr == -1) {
-      if (*pl != '\0') (void) strcpy(p_dtm, (pl+1));
-      else *p_dtm = '\0';
-      if (!strcmp(p_dtm, "ed50")) {
-        outgr = 0;
+      if (outlab->datum == TC_u32.u_c_lab.datum) {
+        outgr = 0;  // ed50
         outnr = 4;
 #ifdef DEBUGDKTRANS
 pml = mlab +8;
@@ -406,10 +404,8 @@ pml->trgr, pml->trnr, pml->s_lab, in_cs);
 
     /* Datum actions */
     if (in_gr == -1) {
-      if (*pl != '\0') (void) strcpy(p_dtm, (pl+1));
-      else *p_dtm = '\0';
-      if (!strcmp(p_dtm, "ed50")) {
-        in_gr = 0;
+      if (in_lab->datum == TC_u32.u_c_lab.datum) {
+        in_gr = 0;  // ed50
         in_nr = 4;
 #ifdef DEBUGDKTRANS
 pml = mlab +8;

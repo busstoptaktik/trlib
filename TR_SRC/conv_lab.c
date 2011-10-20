@@ -104,7 +104,7 @@ union geo_lab    *u_lab,
   struct obs_lab            *o_lab = &(u_lab->u_o_lab);
   struct idt_lab            *i_lab = &(u_lab->u_i_lab);
 
-  static THREAD_SAFE  int                 c_quest = 0, s_quest = 0, recurs = 0;
+  static THREAD_SAFE int     c_quest = 0, s_quest = 0, recurs = 0;
   int                        conv_mode;
   char                      *OTX;
 
@@ -131,7 +131,7 @@ union geo_lab    *u_lab,
     char       *text;
   };
 
-  static THREAD_SAFE  struct sep_str   sep[] = {
+  static struct sep_str   sep[] = {
     {'_',   CRD_LAB,   "NO Heights"},
     {'E',   CRD_LAB,   "Ellipsoidal heights"},
     {'N',   CRD_LAB,   "--> H _h_msl"},
@@ -141,10 +141,10 @@ union geo_lab    *u_lab,
     {'D',   OBS_LAB,   "Std obs_mean_error"},
     {'\0',  0,   ""}
   };
-  struct sep_str          *sp;
+  struct sep_str           *sp;
 
-  static THREAD_SAFE  struct sep_str   *spr;
-  int                      sep_ok = 0;
+  static THREAD_SAFE struct sep_str   *spr;
+  int                       sep_ok = 0;
 
 
 /* conv_lab  ver 2010.01            # page 3     5 Jan 2010 15 35 */
@@ -624,15 +624,15 @@ int srch_def(
 {
 #include      "i_tabdir_file.h"
 
-  static THREAD_SAFE  size_t              pos = 0;
+  static THREAD_SAFE size_t  pos = 0;
   char                       pth_mlb[512];
   char                       p_name[MLBLNG], *p_tp;
   int                        qr, res = 0, used, cha_str;
   int                        l_cstm, l_mode, l_type;
   union rgn_un               rgn_pref, dum_rgn;
 
-extern THREAD_SAFE FILE               *def_lab_file;
-extern  THREAD_SAFE size_t              init_prj_pos;
+extern THREAD_SAFE FILE     *def_lab_file;
+extern THREAD_SAFE size_t    init_prj_pos;
   (void) strcpy(dum_rgn.prfx, "ZZ");
 
   if (def_lab_file == NULL || init_prj_pos == 0) {

@@ -62,14 +62,12 @@
 
 #ifdef   DEBUGEETRANS
 
-static THREAD_SAFE  char          *ACTION[] = {
+static char          *ACTION[] = {
   "idt", "etg", "gte", "otg", "gto", "vtg", "gtv",
   "ttg", "gtt", "upe", "peu", "ope", "peo",
   "upv", "pvu", "ctg", "gtc"
 };
 
-#include "typ_dec.h"
-static THREAD_SAFE  struct typ_dec mtpd;
 #endif
 
 int                    ee_trans(
@@ -96,9 +94,9 @@ FILE                *tr_error
 /* ee_trans   version 2.0           # page 2   10 Sep 1998 11 36 */
 
 
-  static THREAD_SAFE  int               in_chsum = 0L;
-  static THREAD_SAFE  int               outchsum = 0L;
-  static THREAD_SAFE  int               init = 0;
+  static THREAD_SAFE  int  in_chsum = 0;
+  static THREAD_SAFE  int  outchsum = 0;
+  static THREAD_SAFE  int  init = 0;
 
   char                     in_cs[32], outcs[32];
   char                     p_dtm[32], *pl;
@@ -110,10 +108,10 @@ FILE                *tr_error
   struct coord_lab        *in_lab = &(in_lab_u->u_c_lab);
   struct coord_lab        *outlab = &(outlab_u->u_c_lab);
 
-  static THREAD_SAFE  union geo_lab     TC_u35;
-  static THREAD_SAFE  union geo_lab     TC_eetm;
-  static THREAD_SAFE  union geo_lab     TC_eold;
-  static THREAD_SAFE  union geo_lab     TC_elmn;
+  static union geo_lab     TC_u35;
+  static union geo_lab     TC_eetm;
+  static union geo_lab     TC_eold;
+  static union geo_lab     TC_elmn;
 
 
   /* minilabels */
@@ -124,7 +122,7 @@ FILE                *tr_error
     char         *s_lab;
   } *pml;
 
-  static THREAD_SAFE  struct nr_mlb    mlab[] = {
+  static struct nr_mlb    mlab[] = {
     /*  0 */ { 0,  0,   "utm35"},    /* Datum checked later  */
 
     /*  1 */ { 1,  0,   "eetm27"},   /*                      */
@@ -161,12 +159,12 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE  struct act_nst     *ptab, *pt[3];
-  static THREAD_SAFE  int                 in_nr, stlev, levst, in[3];
-  static THREAD_SAFE  int                 ee_w, ol_w, pv_w, gr_w;
+  static THREAD_SAFE  struct act_nst *ptab, *pt[3];
+  static THREAD_SAFE  int             in_nr, stlev, levst, in[3];
+  static int                          ee_w, ol_w, pv_w, gr_w;
 
   /* Action/state table :: inter group */
-  static THREAD_SAFE  struct act_nst gr_tab[] = {
+  static struct act_nst gr_tab[] = {
     /* utm35_euref89: 0 */
     /* input    u35      etm      tmo     eelmne  */
     /* state no. 0        1        2        3     */
@@ -180,7 +178,7 @@ FILE                *tr_error
   };
 
   /* Action/state table grp 1 : eesti42 */
-  static THREAD_SAFE  struct act_nst ee_tab[] = {
+  static struct act_nst ee_tab[] = {
     /* eetm27: 0 */
     /* input    etm      tmi      geo     */
     /* state no. 0        1        2      */
@@ -192,7 +190,7 @@ FILE                *tr_error
   };
 
   /* Action/state table grp 2 : eeold42 */
-  static THREAD_SAFE  struct act_nst ol_tab[] = {
+  static struct act_nst ol_tab[] = {
     /* tm27_eeold42: 0 */
     /* input    tmo      tmi      geo     */
     /* state no. 0        1        2      */
@@ -204,7 +202,7 @@ FILE                *tr_error
   };
 
   /* Action/state table grp 3 : eepv37 */
-  static THREAD_SAFE  struct act_nst pv_tab[] = {
+  static struct act_nst pv_tab[] = {
     /* eelmne: 0 */
     /* input    lmn      lms      geo     */
     /* state no. 0        1        2      */
@@ -222,24 +220,24 @@ FILE                *tr_error
 
   if (init == 0) {
     /* Internal wrk-labels */
-    init = (conv_lab("eetm27",        &TC_eetm, "") == CRD_LAB
-        &&  conv_lab("tm27_eeold42",  &TC_eold, "") == CRD_LAB
-        &&  conv_lab("eelmne",        &TC_elmn, "") == CRD_LAB
-        &&  conv_lab("utm35_euref89", &TC_u35,  "") == CRD_LAB);
+    act = (conv_lab("eetm27",        &TC_eetm, "") == CRD_LAB
+       &&  conv_lab("tm27_eeold42",  &TC_eold, "") == CRD_LAB
+       &&  conv_lab("eelmne",        &TC_elmn, "") == CRD_LAB
+       &&  conv_lab("utm35_euref89", &TC_u35,  "") == CRD_LAB);
 
     /* State/action table size and width */
     ee_z = sizeof(gr_tab)/sizeof(struct act_nst);
     gr_w = (int) sqrt(1.0000001*ee_z);
-    init = init && (ee_z == gr_w*gr_w);
+    act  = act && (ee_z == gr_w*gr_w);
     ee_z = sizeof(ee_tab)/sizeof(struct act_nst);
     ee_w = (int) sqrt(1.0000001*ee_z);
-    init = init && (ee_z == ee_w*ee_w);
+    act  = act && (ee_z == ee_w*ee_w);
     ee_z = sizeof(ol_tab)/sizeof(struct act_nst);
     ol_w = (int) sqrt(1.0000001*ee_z);
-    init = init && (ee_z == ol_w*ol_w);
+    act  = act && (ee_z == ol_w*ol_w);
     ee_z = sizeof(pv_tab)/sizeof(struct act_nst);
     pv_w = (int) sqrt(1.0000001*ee_z);
-    init = init && (ee_z == pv_w*pv_w);
+    init = act && (ee_z == pv_w*pv_w);
 
     if (!init) return(t_status(tr_error, usertxt,
                "ee_trans(init lab error)", TRF_ILLEG_));

@@ -106,7 +106,7 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "sputshpprj.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
-#define TRLIB_VERSION "beta 0.002 2011-10-05"
+#define TRLIB_VERSION "beta 0.002 2011-10-20"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 
 /* We use a global geoid table. This could be made thread local if needed */

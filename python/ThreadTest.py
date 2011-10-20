@@ -13,8 +13,8 @@ import os
 import sys
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #pointer to geoid directory
 OUTPUT_DIR=os.path.join(os.path.dirname(__file__),"THREAD_OUTPUT")
-NTHREADS_2D=2
-NTHREADS_3D=2
+NTHREADS_2D=10
+NTHREADS_3D=10
 NITERATIONS=3
 NPOINTS=10000
 class BadGuy(threading.Thread):
@@ -46,9 +46,9 @@ class BadGuy(threading.Thread):
 def main(args):
 	progname=os.path.basename(args[0])
 	if "-lib" in args: #In this case we assume that input is the library that we want to test....
-		lib=args[args.index("-lib")+1]
-		lib=os.path.splitext(os.path.basename(args[2]))[0]
-		dir=os.path.dirname(args[2])
+		libpath=args[args.index("-lib")+1]
+		lib=os.path.splitext(os.path.basename(libpath))[0]
+		dir=os.path.dirname(libpath)
 		IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
 	else:
 		print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)

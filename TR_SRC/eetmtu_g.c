@@ -71,7 +71,7 @@ FILE                    *tr_error
   OBS =    169
   */
 
-  static THREAD_SAFE  double TM27_U35[] = {
+  static double TM27_U35[] = {
     /*deg*/  5.0,
     /*Poly NORTH :: e-degree =  0  : n-degree =  5 */
     /*  0*/   6.5081549576e+06,   9.9959783377e-01,   2.7399605038e-11,
@@ -121,7 +121,7 @@ FILE                    *tr_error
   OBS =    169
   */
 
-  static THREAD_SAFE  double U35_TM27[] = {
+  static double U35_TM27[] = {
     /*deg*/  5.0,
     /*Poly NORTH :: e-degree =  0  : n-degree =  5 */
     /*  0*/   6.5108832527e+06,   1.0004023280e+00,  -2.7432817529e-11,
@@ -171,7 +171,7 @@ FILE                    *tr_error
   OBS =     21
   */
 
-  static THREAD_SAFE  double LMNE_U35[] = {
+  static double LMNE_U35[] = {
     /*deg*/  3.0,
     /*Poly NORTH :: e-degree =  0  : n-degree =  3 */
     /*  0*/   6.5149374332e+06,   9.9930675247e-01,   4.0618148602e-10,
@@ -211,7 +211,7 @@ FILE                    *tr_error
   OBS =     21
   */
 
-  static THREAD_SAFE  double U35_LMNE[] = {
+  static double U35_LMNE[] = {
     /*deg*/  3.0,
     /*Poly NORTH :: e-degree =  0  : n-degree =  3 */
     /*  0     1.6216392043e+05, */
@@ -251,7 +251,7 @@ FILE                    *tr_error
   OBS =     91
   */
 
-  static THREAD_SAFE  double OLD_TM27[] = {
+  static double OLD_TM27[] = {
     /*deg*/  4.0,
     /*Poly NORTH :: e-degree =  0  : n-degree =  4 */
     /*  0*/   6.5600346778e+06,   9.9999735500e-01,   1.4991190712e-11,
@@ -295,7 +295,7 @@ FILE                    *tr_error
   OBS =     91
   */
 
-  static THREAD_SAFE  double TM27_OLD[] = {
+  static double TM27_OLD[] = {
     /*deg*/  4.0,
     /*Poly NORTH :: e-degree =  0  : n-degree =  4 */
     /*  0*/   6.5600339911e+06,   1.0000026450e+00,  -1.4991185097e-11,

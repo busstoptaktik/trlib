@@ -31,7 +31,6 @@
 #include           <string.h>
 #include           <stdio.h>
 #include           <ctype.h>
-#include           <stddef.h>
 #include           "geo_lab.h"
 
 

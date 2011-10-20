@@ -243,12 +243,10 @@ FILE                     *tr_error
       h_grid_tab.init = 0;
       (void) fclose(h_grid_tab.table_u[0].fd);
     }
-    if (s_grid_tab != NULL) {
-      if (s_grid_tab->init != 0) (void) geoid_c(s_grid_tab, 0, NULL);
-    }
-    if (grid_tab != NULL) {
-      if (grid_tab->init != 0) (void) geoid_c(grid_tab, 0, NULL);
-    }
+    if (s_grid_tab != NULL)
+        if (s_grid_tab->init != 0) (void) geoid_c(s_grid_tab, 0, NULL);
+    if (grid_tab != NULL)
+        if (grid_tab->init != 0) (void) geoid_c(grid_tab, 0, NULL);
     return(0);
   }
 
@@ -548,7 +546,7 @@ i_clb->mlb, o_wclb->mlb, o_clb->mlb, R_N);
         break;
 
       case FEMASK: /* fe_trans */
-        init = (short) conv_lab("FO_utm29_euref89", &t_lab,"")==CRD_LAB;
+        init    = (short) conv_lab("FO_utm29_etrs89", &t_lab,"")==CRD_LAB;
         dfb_trf = fe_trans;
         break;
 

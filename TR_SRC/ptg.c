@@ -59,7 +59,7 @@ FILE                   *tr_error
 
   struct coord_lab  *TC = &(TC_u->u_c_lab);
   int               res = 0, i, s, h, cstm, mode, ell_trf, auth = 0;
-  int               mrc, lmb, ste, spl, non_p, neg;
+  int               mrc, lmb, ste, spl, non_p;
   double            Cn, Ce, dCn = 0.0, dCe = 0.0, Z, ZZ;
   double            sin_Cn, cos_Cn = 0.0, sin_Ce, cos_Ce;
   double            *GP, *utg, *gtu;
@@ -77,12 +77,11 @@ FILE                   *tr_error
     if (TC->init) {
 
       /* coord system params and addr */
-      cstm = TC->cstm;
-      mode = TC->mode;
-      GP   = TC->tcgg;
-      utg  = TC->utg;
-      gtu  = TC->gtu;
-      neg  = TC->W_crd == 1;
+      cstm  = TC->cstm;
+      mode  = TC->mode;
+      GP    = TC->tcgg;
+      utg   = TC->utg;
+      gtu   = TC->gtu;
 
       if (cstm > 0) {
 
@@ -113,7 +112,7 @@ FILE                   *tr_error
                   if (fabs(Ce) > 1.14691472225) 
                      res = (fabs(Ce) > 2.2938245694606)
                          ? TRF_AREA_ : TRF_INACC_;
-                  if (neg) Ce = -Ce;
+                  if (TC->W_crd) Ce = -Ce;
                   /* norm. N, E -> compl. sph. LAT, LNG */
                   Cn += clenshaw('S', utg, 5, 2.*Cn, 2.*Ce, &dCn, &dCe);
                   Ce += dCe;
@@ -140,7 +139,7 @@ FILE                   *tr_error
                 /* ell. LAT, LNG -> Gaussian LAT, LNG */
                 if (ell_trf) Cn = gatg(GP, -1, Cn);
                 Ce -= TC->L0;
-                if (neg) Ce = -Ce;
+                if (TC->W_crd) Ce = -Ce;
                 /* Gaussian LAT, LNG -> compl. sph. LAT */
                 sin_Cn = sin(Cn);
                 cos_Cn = cos(Cn);
@@ -185,17 +184,23 @@ FILE                   *tr_error
           case 5: /* Lambert  */
           case 9: /* GS conf. con. */
           case 6: /* Stereogr.*/
-            mrc   = cstm == 4;
-            lmb   = cstm == 5 || cstm == 9;
-            ste   = cstm == 6;
-            spl   = ste && (mode == -1 || mode == -2);
-            non_p = ste && (mode == 3 || mode == 4);
-            if (direct > 0 && mrc) {
-              Ce = M_PI * TC->Qn;
-              if (E - TC->E0 >  Ce) E -= 2.0 * Ce;
-              else
-              if (E - TC->E0 < -Ce) E += 2.0 * Ce;
-              Ce = E;
+            if (cstm == 4) {
+              lmb = ste = spl = non_p = 0;
+              mrc = 1;
+              if (direct > 0) {
+                Ce = M_PI * TC->Qn;
+                if (E - TC->E0 >  Ce) E -= 2.0 * Ce;
+                else
+                if (E - TC->E0 < -Ce) E += 2.0 * Ce;
+                Ce = E;
+              }
+              if (mode == 3) ell_trf = 0; /* webmrc */
+            } else {
+              mrc   = 0;
+              lmb   = cstm == 5 || cstm == 9;
+              ste   = cstm == 6;
+              spl   = ste && (mode == -1 || mode == -2);
+              non_p = ste && (mode == 3 || mode == 4);
             }
   
             for ( ; h - i; i += s) {
@@ -205,7 +210,7 @@ FILE                   *tr_error
                 Cn = (TC->Zb - Cn)/TC->Qn;
                 Ce = (Ce - TC->E0)/TC->Qn;
                 if (spl) Cn = -Cn;
-                if (neg) Ce = -Ce;
+                if (TC->W_crd) Ce = -Ce;
                 if (mrc) Z  = exp(Cn);
                 else { /* Lambert and stereographic */
                   /* Polar coord */
@@ -250,7 +255,7 @@ FILE                   *tr_error
                 if (spl)     Cn = -Cn;
                 Ce -= TC->L0;
                 Ce  = v_red(Ce);
-                if (neg) Ce = -Ce;
+                if (TC->W_crd) Ce = -Ce;
                 if (non_p) { /* Gaussian -> Soldner local geo */
                   Cn = 2.0*atan(tan(M_PI_4 - Cn*0.5)*TC->cP);
                   Cn = M_PI_2 - sftr(Ce, TC->B1, Cn, &Z, &Ce);

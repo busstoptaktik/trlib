@@ -99,7 +99,7 @@ struct coord_lab        *c_lab,
   char                       rgn_name[24];
   union rgn_un               rgn_EE, rgn_pref, dum_pref;
 
-  static THREAD_SAFE  char    *c_types[] = {
+  static char    *c_types[] = {
     /*  1 */ "3-d Cartesian",
     /*  2 */ "Geographic",
     /*  3 */ "Transversal Mercator",
@@ -219,6 +219,7 @@ struct coord_lab        *c_lab,
         (void) strcpy(p_lb->pr_dtm, p_eesti42);
         if (sepch == '_') sepch = '\0';
       }
+      if (c_lab->mode == 11) c_lab->ncoord = 2;
       break;
 
     case  2: /* geo */
@@ -536,7 +537,7 @@ struct coord_lab        *c_lab,
         c_lab->a = *(ell_p+0);
         c_lab->f = *(ell_p+1);
         /* datum shift params (from set_dtm) */
-        c_lab->p_dtm   = (short) par_dtm;
+        c_lab->p_dtm = (short) par_dtm;
 
         /* set trf. constants for completed systems */
         (void) set_trc(c_lab);
@@ -720,6 +721,11 @@ struct coord_lab        *c_lab,
           (void) fprintf(iofile, "\n  1/f     =       %12.5f", 1 / f);
         else
           (void) fprintf(iofile, "\n  f       =       %12.5f", f);
+        if (c_lab->cstm == 4 && c_lab->mode == 3) {
+          (void) fprintf(iofile, "\nCalcDatum: %9sgoogrs80", " ");
+          (void) fprintf(iofile, "\nCalcEllip: %9sspgrs80", " ");
+          (void) fprintf(iofile, "\n  f       =       %12.5f", 0.0);
+        }
       }
 
       if (*(c_lab->mlb + c_lab->sepix) == 'H') {
@@ -880,6 +886,11 @@ struct coord_lab        *c_lab,
           /* p_name from first call could be used */
           /* but then is the p_dtm number not checked */
         }
+      }
+      if (c_lab->cstm == 4 && c_lab->mode == 3) {
+        (void) fprintf(iofile, "\nCalcDatum: %9sgoogrs80", " ");
+        (void) fprintf(iofile, "\nCalcEllip: %9sspgrs80", " ");
+        (void) fprintf(iofile, "\n  f       =       %12.5f", 0.0);
       }
     }
     if (sepch == 'H') {

@@ -75,9 +75,9 @@ def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 def main(args):
 	progname=os.path.basename(args[0])
 	if "-lib" in args: #In this case we assume that input is the library that we want to test....
-		lib=args[args.index("-lib")+1]
-		lib=os.path.splitext(os.path.basename(args[2]))[0]
-		dir=os.path.dirname(args[2])
+		libpath=args[args.index("-lib")+1]
+		lib=os.path.splitext(os.path.basename(libpath))[0]
+		dir=os.path.dirname(libpath)
 		IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
 	else:
 		print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)

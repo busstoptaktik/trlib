@@ -61,13 +61,13 @@ FILE                  *tr_error
   struct coord_lab   *i_lab = &(i_lab_u->u_c_lab);
   struct coord_lab   *o_lab = &(o_lab_u->u_c_lab);
 
-  double             X, Y, Z;
-  int                act, nst, ost, result = 0, res;
-  short              p_no;
-  char               pn[24], *p_nm = pn;
-  char               en[24], *e_nm = en;
-  int                id, od, ci, co;
-  static THREAD_SAFE  int         init = 0;
+  double                   X, Y, Z;
+  int                      act, nst, ost, result = 0, res;
+  short                    p_no;
+  char                     pn[24], *p_nm = pn;
+  char                     en[24], *e_nm = en;
+  int                      id, od, ci, co;
+  static  int               init = 0;
 
   struct act_nst {
     short     action;
@@ -95,7 +95,7 @@ FILE                  *tr_error
   static struct dsh_str   ew_a, *ew = &ew_a; /* PERHAPS THESE NEED TO BE THREAD LOCAL? */
   static struct dsh_str   nw_a, *nw = &nw_a;
   static struct dsh_str   iw_a, *iw = &iw_a;
-  static struct dsh_str   *fc, *tc, *wc;
+  struct dsh_str   *fc, *tc, *wc;
 
   if (i_lab->lab_type != CRD_LAB) {
     return(t_status(tr_error, usertxt,
@@ -108,10 +108,10 @@ FILE                  *tr_error
   }
 
   if (!init) {
-    init = 1;
     (void) set_dtm(-1, "ed50",   &p_no, p_nm, e_nm, ew);
     (void) set_dtm(-1, "nwl9d",   &p_no, p_nm, e_nm, nw);
-    (void) set_dtm(-1, "euref89", &p_no, p_nm, e_nm, iw);
+    (void) set_dtm(-1, "etrs89", &p_no, p_nm, e_nm, iw);
+    init = 1;
   }
 
   ci = id = i_lab->datum;
