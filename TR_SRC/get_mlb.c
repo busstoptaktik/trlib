@@ -31,6 +31,7 @@
 #include           <string.h>
 #include           <stdio.h>
 #include           <ctype.h>
+#include           <stddef.h> /*included here to be able to build on linux and mac osx */
 #include           "geo_lab.h"
 
 
