@@ -2,13 +2,22 @@
 ## Python bindings for simple test api to KmsTrLib/KMSTrans
 ## simlk, may->sep 2011                
 #########################
-import numpy as np
+try:
+	import numpy as np
+except:
+	HAS_NUMPY=False
+else:
+	HAS_NUMPY=True
+import math
 import ctypes
 import os
 import sys
 import time
 IS_INIT=False
-STD_LIB="TrLib"
+if "win" in sys.platform:
+	STD_LIB="TrLib.dll"
+else:
+	STD_LIB="TrLib.so"
 STD_DIRNAME=os.path.dirname(__file__)
 REQUIRED_FILES=["def_lab.txt","def_shp.txt"]
 #define return codes, really define in trlib_api.h
@@ -17,6 +26,9 @@ LABEL_ERROR=1
 TR_ERROR=2
 #special return code for this module
 TRLIB_NOT_INITIALIZED=-1
+#conversions
+D2R=math.pi/180.0
+R2D=180.0/math.pi
 class TransformationException(Exception):
 	def __init__(self,msg="Transformation Error"):
 		self.msg=msg
@@ -38,15 +50,12 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 	if len(lib_dir)==0:
 		lib_dir="."
 	try:
-		tr_lib=np.ctypeslib.load_library(lib,lib_dir) #Loads the simple API exported on top of all KE's trlib code, see source file KMSTrLib_simle.c
+		tr_lib=ctypes.cdll.LoadLibrary(os.path.join(lib_dir,lib)) #Loads the simple API exported on top of the KMS transformation library.
 		#Setup API, corresponds to header file of the API#
 		tr_lib.InitLibrary.restype=ctypes.c_int
 		tr_lib.InitLibrary.argtypes=[ctypes.c_char_p]
 		tr_lib.GetTRVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
 		tr_lib.GetTRVersion.restype=None
-		tr_lib.Transform.restype=ctypes.c_int
-		tr_lib.Transform.argtypes=[ctypes.c_char_p,ctypes.c_char_p,np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),
-		np.ctypeslib.ndpointer(np.float64,ndim=1,flags='aligned, contiguous,writeable'),ctypes.c_void_p,ctypes.c_int]
 		tr_lib.GetEsriText.restype=ctypes.c_int
 		tr_lib.GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.tropen.restype=ctypes.c_void_p
@@ -60,7 +69,7 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
 		return False
 	if not os.path.exists(geoid_dir):
-		print("%s does not exist in the file system" %dir)
+		print("%s does not exist in the file system" %geoid_dir)
 		return False
 	for fname in REQUIRED_FILES:
 		if not os.path.exists(os.path.join(geoid_dir,fname)):
@@ -99,15 +108,26 @@ class CoordinateTransformation(object):
 				raise LabelException()
 		else:
 			raise Exception("Initialise Library first!")
-	def Transform(self,x,y,z):
+	def Transform(self,x,y,z=0.0):
 		if self.tr is None:
 			raise LabelException()
+		if "geo" in self.mlb_in[0:6]: #convert2radians?
+			x*=D2R
+			y*=D2R
 		x,y,z=map(ctypes.c_double,[x,y,z])
 		res=tr_lib.tr(self.tr,ctypes.byref(x),ctypes.byref(y),ctypes.byref(z),1)
+		x=x.value
+		y=y.value
+		z=z.value
 		if res==TR_ERROR:
 			raise TransformationException("Error in transformation.")
-		return x.value,y.value,z.value
+		if "geo" in self.mlb_out[0:6]:
+			x*=R2D
+			y*=R2D
+		return x,y,z
 	def TransformArray(self,xyz_in):
+		if not HAS_NUMPY:
+			raise Exception("This method needs numpy.")
 		if self.tr is None:
 			raise LabelException()
 		if xyz_in.shape[1] not in [2,3]:
@@ -115,18 +135,17 @@ class CoordinateTransformation(object):
 		npoints=xyz_in.shape[0]
 		if npoints==0:
 			return np.empty(xyz_in.shape)
-		X=np.copy(xyz_in[:,0]).astype(np.float64)
-		Y=np.copy(xyz_in[:,1]).astype(np.float64)
-		if "geo" in label_in[0:6]: #convert2radians?
-			if np.fabs(xyz_in[:10,0:2]).max()>2*np.pi: #test a few input coords...
-				X*=np.pi/180.0
-				Y*=np.pi/180.0
+		X=np.require(xyz_in[:,0],dtype=np.float64, requirements=['A', 'O', 'W', 'C'])
+		Y=np.require(xyz_in[:,1],dtype=np.float64, requirements=['A', 'O', 'W', 'C'])
+		if "geo" in self.mlb_in[0:6]: #convert2radians?
+			X*=D2R
+			Y*=D2R
 		if xyz_in.shape[1]==3:  #3d
-			Z=np.copy(xyz_in[:,2]).astype(np.float64)
-			res=tr_lib.tr(self.tr,X,Y,Z.ctypes._data,npoints)
+			Z=np.require(xyz_in[:,2],dtype=np.float64, requirements=['A', 'O', 'W', 'C'])
+			res=tr_lib.tr(self.tr,X.ctypes._data,Y.ctypes._data,Z.ctypes._data,npoints)
 			xyz_out=np.column_stack((X,Y,Z))
 		else:
-			res=tr_lib.tr(self.tr,X,Y,None,npoints)
+			res=tr_lib.tr(self.tr,X.ctypes._data,Y.ctypes._data,None,npoints)
 			xyz_out=np.column_stack((X,Y))
 		#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
 		if res!=TR_OK:
@@ -135,8 +154,8 @@ class CoordinateTransformation(object):
 			else:
 				raise Exception("Unknown return code from transformation library.")
 		#print xyz_out.shape
-		if "geo" in label_out[0:6]: #convert2degrees?
-			xyz_out[:,0:2]*=180.0/np.pi
+		if "geo" in self.mlb_out[0:6]: #convert2degrees?
+			xyz_out[:,0:2]*=R2D
 		return xyz_out
 	def Close(self):
 		if self.tr is not None:
@@ -146,37 +165,23 @@ class CoordinateTransformation(object):
 		
 
 def Transform(label_in,label_out,xyz_in):
-	if xyz_in.shape[1] not in [2,3]:
-		raise Exception("Array column dimension must be 2 or 3!")
-	npoints=xyz_in.shape[0]
-	if npoints==0:
-		return np.empty(xyz_in.shape)
-	X=np.copy(xyz_in[:,0]).astype(np.float64)
-	Y=np.copy(xyz_in[:,1]).astype(np.float64)
-	if "geo" in label_in[0:6]: #convert2radians?
-		if np.fabs(xyz_in[:10,0:2]).max()>2*np.pi: #test a few input coords...
-			X*=np.pi/180.0
-			Y*=np.pi/180.0
-	if xyz_in.shape[1]==3:  #3d
-		Z=np.copy(xyz_in[:,2]).astype(np.float64)
-		res=tr_lib.Transform(label_in,label_out,X,Y,Z.ctypes._data,npoints)
-		xyz_out=np.column_stack((X,Y,Z))
+	TR=CoordinateTransformation(label_in,label_out)
+	if HAS_NUMPY and isinstance(xyz_in,np.ndarray):
+		xyz_out=TR.TransformArray(xyz_in)
 	else:
-		res=tr_lib.Transform(label_in,label_out,X,Y,None,npoints)
-		xyz_out=np.column_stack((X,Y))
-	#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
-	if res!=0:
-		if res==2:  
-			raise TransformationException("Error in transformation.")
-		elif res==1:
-			raise LabelException("Input labels are not OK.")
-		else:
-			raise Exception("Unknown return code from transformation library.")
-	#print xyz_out.shape
-	if "geo" in label_out[0:6]: #convert2degrees?
-		xyz_out[:,0:2]*=180.0/np.pi
+		dim=len(xyz_in[0])
+		xyz_out=[]
+		for data in xyz_in:
+			if len(data)==2:
+				x,y=data
+				x,y,z=TR.Transform(x,y)
+				xyz_out.append([x,y])
+			else:
+				x,y,z=data
+				x,y,z=TR.Transform(x,y,z)
+				xyz_out.append([x,y,z])
+	TR.Close()
 	return xyz_out
-
 ##Files to be transformed must follow the format:
 ## #Label_in        -Remember the hashes in front 
 ## #Additional comments can be placed below, preceeded by a '#'
@@ -184,11 +189,46 @@ def Transform(label_in,label_out,xyz_in):
 ## .....
 def TransformFile(file_in,label_out,file_out,precision=8):
 	f=open(file_in,"r")
-	label_in=(f.readline().strip())[1:]  #skip hash in front
-	print("Reading file: %s, input label is: %s" %(file_in,label_in))
-	xyz=np.loadtxt(f,comments="#")
-	print("Loaded: %i points, dimension is: %i" %(xyz.shape[0],xyz.shape[1]))
+	print("Reading file: %s" %file_in)
+	xyz=[]
+	label_in=None
+	line=f.readline()
+	while len(line)>0:
+		sline=line.split()
+		if len(sline)==0:
+			line=f.readline()
+			continue
+		if sline[0][0]=="#" and label_in is None:
+			label_in=sline[0][1:]
+		elif len(sline)==2:
+			try:
+				x=float(sline[0])
+				y=float(sline[1])
+			except:
+				pass
+			else:
+				xyz.append([x,y])
+		elif len(sline)>2:
+			try:
+				x=float(sline[0])
+				y=float(sline[1])
+				z=float(sline[2])
+			except:
+				pass
+			else:
+				xyz.append([x,y,z])
+		line=f.readline()	
+	npoints=len(xyz)
+	dim=None
+	if npoints>0:
+		dim=len(xyz[0])
+	else:
+		print("No points!")
+		return -1
+	print("Loaded: %i points, dimension is: %i" %(npoints,dim))
 	f.close()
+	if HAS_NUMPY:
+		xyz=np.array(xyz,dtype=np.float64)
 	xyz=Transform(label_in,label_out,xyz)
 	print("Transformed to: %s" %label_out)
 	try:
@@ -196,9 +236,16 @@ def TransformFile(file_in,label_out,file_out,precision=8):
 	except:
 		print("Unable to create outfile: %s" %file_out)
 		return
+	print("Writing %s" %file_out)
 	f.write("#%s\n"%label_out)
 	fmt="%"+".%i"%precision+"f"
-	np.savetxt(f,xyz,fmt=fmt)
+	dim=len(xyz[0])
+	line_fmt=""
+	for i in range(dim):
+		line_fmt+="%s "%fmt
+	line_fmt=line_fmt[:-1]+"\n"
+	for row in xyz:
+		f.write(line_fmt %tuple(row))
 	f.close()
 
 #CALL this method AFTER initialization#
@@ -206,6 +253,10 @@ def TransformFile(file_in,label_out,file_out,precision=8):
 def Test(Npoints,repeat=1,f=sys.stdout):
 	if not IS_INIT:
 		print("Initialize library first!")
+		return -1
+	if not HAS_NUMPY:
+		print("Needs numpy!")
+		return -1
 	N=Npoints
 	f.write("Running benchmark test for %s at %s.\n" %(repr(tr_lib),time.asctime()))
 	f.write("Transforming %i points.\n" %N)

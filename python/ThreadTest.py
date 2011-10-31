@@ -3,20 +3,19 @@
 ## Thread safety test using RandomTests.py
 ## simlk, oct. 2011
 ###############################
-
 import threading
 import RandomTests
+import random
 import TrLib
-import numpy as np
 import time
 import os
 import sys
-GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #pointer to geoid directory
+GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
 OUTPUT_DIR=os.path.join(os.path.dirname(__file__),"THREAD_OUTPUT")
-NTHREADS_2D=10
-NTHREADS_3D=10
-NITERATIONS=3
-NPOINTS=10000
+NTHREADS_2D=3
+NTHREADS_3D=3
+NITERATIONS=5
+NPOINTS=1000
 class BadGuy(threading.Thread):
 	def __init__(self,id,n,iterations=3,is3d=False,log_file=None):
 		self.N=n
@@ -37,7 +36,7 @@ class BadGuy(threading.Thread):
 				RandomTests.RandomTests_3D(n,log_file=fp)
 			else:
 				RandomTests.RandomTests_2D(n,log_file=fp)
-			time.sleep(float(np.random.rand(1)[0]*0.1))
+			time.sleep(random.random()*0.1)
 			self.iterations-=1
 		fp.write("Thread finished\n")
 		if self.log_file is not None:
@@ -45,21 +44,23 @@ class BadGuy(threading.Thread):
 
 def main(args):
 	progname=os.path.basename(args[0])
-	if "-lib" in args: #In this case we assume that input is the library that we want to test....
-		libpath=args[args.index("-lib")+1]
-		lib=os.path.splitext(os.path.basename(libpath))[0]
-		dir=os.path.dirname(libpath)
-		IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
-	else:
-		print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)
-		IS_INIT=TrLib.InitLibrary(GEOIDS)
+	IS_INIT=TrLib.IS_INIT
+	if not IS_INIT:
+		if "-lib" in args: #In this case we assume that input is the library that we want to test....
+			libpath=args[args.index("-lib")+1]
+			lib=os.path.splitext(os.path.basename(libpath))[0]
+			dir=os.path.dirname(libpath)
+			IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
+		else:
+			print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)
+			IS_INIT=TrLib.InitLibrary(GEOIDS)
 	if not IS_INIT:
 		print("Could not initialize library...")
 		print("Find a proper shared library and geoid dir and try again!")
-		sys.exit()
+		return -1
 	print("Running %s at %s" %(progname,time.asctime()))
 	print("Using TrLib v. %s" %TrLib.GetVersion())
-	print("DLL is: %s" %repr(TrLib.tr_lib))
+	print("Shared library is: %s" %repr(TrLib.tr_lib))
 	if not os.path.exists(OUTPUT_DIR):
 		os.mkdir(OUTPUT_DIR)
 	threads=[]
@@ -72,10 +73,10 @@ def main(args):
 	while threading.activeCount()>1:
 		print("Active threads: %i" %threading.activeCount())
 		time.sleep(3)
-	sys.exit()
+	return 0
 
 if __name__=="__main__":
-	main(sys.argv)
+	sys.exit(main(sys.argv))
 	
 	
 	
