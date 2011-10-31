@@ -106,8 +106,9 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "sputshpprj.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
-#define TRLIB_VERSION "beta 0.002 2011-10-20"
+#define TRLIB_VERSION "beta 0.002 2011-10-31"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
+#define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 
 /* We use a global geoid table. This could be made thread local if needed */
  struct mgde_str GeoidTable;
@@ -115,13 +116,38 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
    We need to figure out a way of setting the tabdir to the directory of the running shared library (for people who don't want geoids)
 */
 int InitLibrary(char *path) {
-   int R=0;
-  GeoidTable.init = 0;
+    int R=0,rc;
+    double x=0,y=0,z=0;
+    TR* trf;
+    char *init_path=0;
+    GeoidTable.init = 0;
     /* Will only try to set tabdir to something if path has length >0 otherwise, we should really set tabdir to the path of the running library TODO */ 
-    if (strlen(path)>0){
-        settabdir(path);
-        R = geoid_i("STD", GDE_LAB, &GeoidTable,NULL);
-	printf("%s, %d, %d\n",path,R,GeoidTable.init); /*only for debugging */}
+    if (strlen(path)>0) 
+	    init_path=path;
+    else
+	    init_path=getenv(TR_TABDIR_ENV);
+    if (0!=init_path){
+	    settabdir(init_path);
+	    R = geoid_i("STD", GDE_LAB, &GeoidTable,NULL);
+	    //#ifdef DEBUG
+	    printf("%s, %d, %d\n",init_path,R,GeoidTable.init); /*only for debugging */
+	    //#endif
+        }
+    /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
+    trf=tropen("utm32_ed50","utm32_wgs84");
+    if (0!=trf){
+	    rc=tr(trf,&x,&y,&z,1);
+	    trclose(trf);
+	    }
+    trf=tropen("utm32_wgs84","fotm");
+    if (0!=trf){
+	    rc=tr(trf,&x,&y,&z,1);
+	    trclose(trf);}
+    trf=tropen("fotm","utm22_gr96");
+    if (0!=trf){
+	    rc=tr(trf,&x,&y,&z,1);
+	    trclose(trf);}
+   
     return ((R>0) && GeoidTable.init);
 }
 
