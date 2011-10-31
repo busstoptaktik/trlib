@@ -37,6 +37,12 @@ namespace Kmstrlib.NET
 				throw new Exception(Interface.GetKMSErrorMessage(error));
 			for (i=0; i<X.Length; i++){
 				System.Console.WriteLine("out: X: {0,8:f4}  Y: {1,8:f4} Z: {2,4:f4} ret: {3:d}", X[i], Y[i], Z[i],error);}
+			System.Console.WriteLine("\nTransformation from utm32Ewgs84 to utm33Eed50, using CoordinateTransformation class:\n");
+			CoordinateTransformation tr=new CoordinateTransformation("utm32Ewgs84","utm33Eed50");
+			Point pt_in=new Point(512200.1,6143200.2,100.0);
+			Point pt=tr.Transform(pt_in);
+			System.Console.WriteLine("out: X:{0:f6}  Y:{1:f6}  Z:{2:f6} ret:{3:d}",pt.x,pt.y,pt.z,pt.return_code);
+			tr.Close(); /*remember to close the transformation in order to free memory in shared library */
 		}
 	}
 }

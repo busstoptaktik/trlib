@@ -124,4 +124,50 @@ namespace Kmstrlib.NET
 		}
 		#endregion
 	}
+	
+	public struct Point 
+	{
+		public double x, y, z;
+		public Interface.KMSTR_Error return_code;
+		public Point(double p1, double p2, double p3) 
+		{
+			x = p1;
+			y = p2;
+			z = p3;
+			return_code=Interface.KMSTR_Error.KMSTR_OK;
+		}
+	}
+	
+	
+	public unsafe class CoordinateTransformation
+	{
+		public string mlb_in;
+		public string mlb_out;
+		public bool is_init=false;
+		private void* TR=null;
+		public CoordinateTransformation(string mlb1, string mlb2)
+		{
+			mlb_in=mlb1;
+			mlb_out=mlb2;
+		        TR=Interface.tropen(mlb1,mlb2);
+			is_init=(TR!=null);
+		}
+		public Point Transform(Point pt)
+		{
+			Interface.KMSTR_Error err;
+			if (!is_init){
+				pt.return_code=Interface.KMSTR_Error.KMSTR_LABELERROR;
+				return pt;
+			}
+			double* x=&pt.x, y=&pt.y, z=&pt.z;
+			err=Interface.tr(TR,x,y,z,1);
+			pt.return_code=err;
+			return pt;
+		}
+		public void Close()
+		{
+			Interface.trclose(TR);
+		}
+			
+        }
 }
