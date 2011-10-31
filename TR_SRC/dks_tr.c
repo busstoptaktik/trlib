@@ -82,7 +82,7 @@ FILE           *tr_error
   static THREAD_SAFE  int                  in_nr, outnr;
   static THREAD_SAFE  char                 c_outlab[32] = "UMBA # GUF";
   static THREAD_SAFE  char                 c_in_lab[32] = "UMBA # GUF";
-  static THREAD_SAFE  int                  TC_init, as_w, as_z;
+  static  int                  TC_init, as_w, as_z;
 
   int                         result = 0, res = 0, nst, act;
 
@@ -382,7 +382,7 @@ FILE           *tr_error
     short     action;
     short     nstate;
   };
-  static struct act_nst     *ptab;
+  static THREAD_SAFE struct act_nst     *ptab;
 
   static struct act_nst astab[] = {
 

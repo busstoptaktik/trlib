@@ -72,9 +72,9 @@ FILE                *tr_error
 
   static THREAD_SAFE  int                 in_chsum = 0L;
   static THREAD_SAFE  int                 outchsum = 0L;
-  static THREAD_SAFE  int                 init = 0;
-  static THREAD_SAFE  struct mtab3d_str   nadg_gr96_tab;
-  static THREAD_SAFE  union  geo_lab      w_lab;
+  static  int                 init = 0;
+  static struct mtab3d_str   nadg_gr96_tab;
+  static union  geo_lab      w_lab;
 
 
 /* ng_trans  ver 2006          # page 2    3 Oct 2006 13 55 */

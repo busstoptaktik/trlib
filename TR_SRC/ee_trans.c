@@ -96,7 +96,7 @@ FILE                *tr_error
 
   static THREAD_SAFE  int  in_chsum = 0;
   static THREAD_SAFE  int  outchsum = 0;
-  static THREAD_SAFE  int  init = 0;
+  static  int  init = 0;
 
   char                     in_cs[32], outcs[32];
   char                     p_dtm[32], *pl;
