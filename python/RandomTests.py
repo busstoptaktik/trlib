@@ -32,9 +32,24 @@ TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0],
 ["GR_geoEwgs84","GR_utm22Ngr96",-52.23,64.68,200.0,D2M],
-["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M]] #pretty close to bridge project.
+["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M], #pretty close to bridge project.
+["geoNwgs84","crt_wgs84",14.75,54.10,100,D2M]]
+#["utm32Nwgs84","geoEed50",512200.1,6143200.1,100.0,1.0]]
+THREAD_SAFE_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
+["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
+["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
+["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0],
+["GR_geoEwgs84","GR_utm22Ngr96",-52.23,64.68,200.0,D2M]] #since it is known that Fehmarn transf. are NOT thread safe! Well now they are!!
 BASE_POINT=[512200.0,6143200.0] #Et sted i Jylland?
 LINE_SPLIT="*"*65
+THREAD_TEST=False #Flag to force a break on error when running thread test
+
+def SetThreadMode(): #since  Fehmarn transformations are known NOT to be thread safe at the moment!
+	global THREAD_TEST
+	global TEST_SYSTEMS_3D
+	#TEST_SYSTEMS_3D=THREAD_SAFE_3D NOT NEEDED ANYMORE!
+	THREAD_TEST=True
+			
 def RandomPoints(N,dim,x,y,z=0,scale=1):
 	mult=[scale*10000.0,scale*10000.0,50.0]
 	if HAS_NUMPY:
@@ -67,17 +82,24 @@ def RandomTests_2D(N=10000,repeat=3,log_file=sys.stdout):
 			try:
 				xy_out=TrLib.Transform(label_in,label_out,xy)
 			except Exception,msg:
-				print(repr(msg))
+				log_file.write(repr(msg)+"\n")
+				log_file.write("Last error: %d\n" %TrLib.GetLastError())
 				nerr+=1
+				if THREAD_TEST:
+					return nerr
 			else:
 				log_file.write("Forward running time: %.5f s\n" %(time.clock()-tstart))
+		log_file.write("Running inverse...\n")
 		for i in range(repeat):
 			tstart=time.clock()
 			try:
 				xy_back=TrLib.Transform(label_out,label_in,xy_out)
 			except Exception,msg:
 				print(repr(msg))
+				log_file.write("Last error: %d\n" %TrLib.GetLastError())
 				nerr+=1
+				if THREAD_TEST:
+					return nerr
 			else:
 				log_file.write("Inverse running time: %.5f s\n" %(time.clock()-tstart))
 		if N<=10:
@@ -103,23 +125,45 @@ def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 			try:
 				xyz_out=TrLib.Transform(label_in,label_out,xyz)
 			except Exception,msg:
-				print(repr(msg))
+				log_file.write(repr(msg)+"\n")
+				log_file.write("Last error: %d\n" %TrLib.GetLastError())
 				nerr+=1
+				if THREAD_TEST:
+					return nerr
 			else:
 				log_file.write("Forward running time: %.5f s\n" %(time.clock()-tstart))
+		log_file.write("Running inverse...\n")
 		for i in range(repeat):
 			tstart=time.clock()
 			try:
 				xyz_back=TrLib.Transform(label_out,label_in,xyz_out)
 			except Exception,msg:
-				print(repr(msg))
+				log_file.write(repr(msg)+"\n")
+				log_file.write("Last error: %d\n" %TrLib.GetLastError())
 				nerr+=1
+				if THREAD_TEST:
+					return nerr
 			else:
 				log_file.write("Inverse running time: %.5f s\n" %(time.clock()-tstart))
+				if HAS_NUMPY and N<=10:
+					err_xy=np.fabs(xyz[:,0:2]-xyz_back[:,0:2]).max()
+					err_z=np.fabs(xyz[:,2]-xyz_back[:,2]).max()
+					if "geo" in label_in[0:6]:
+						err_xy/=D2M
+					if max(err_xy,err_z)>0.01:
+						log_file.write("Maximum tr-loop error: xy: %.10f m z: %.10f m\n" %(err_xy,err_z))
+						log_file.write("in: %s\n" %repr(xyz_out))
+						log_file.write("back: %s\n" %repr(xyz_back))
+						
+			
 		if N<=10:
 			log_file.write("out:\n%s\n" %repr(xyz_out))
 		if HAS_NUMPY:
-			log_file.write("Maximum tr-loop error: %.10f (m or deg)\n" %np.fabs(xyz-xyz_back).max())
+			err_xy=np.fabs(xyz[:,0:2]-xyz_back[:,0:2]).max()
+			err_z=np.fabs(xyz[:,2]-xyz_back[:,2]).max()
+			if "geo" in label_in[0:6]:
+				err_xy/=D2M
+			log_file.write("Maximum tr-loop error: xy: %.10f m z: %.10f m\n" %(err_xy,err_z))
 	return nerr
 	
 		

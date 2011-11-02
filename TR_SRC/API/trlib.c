@@ -106,37 +106,50 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "sputshpprj.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
-#define TRLIB_VERSION "beta 0.002 2011-10-31"
+#include "trthread.h"
+#define TRLIB_VERSION "beta 0.002 2011-11-02"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
-
-/* We use a global geoid table. This could be made thread local if needed */
- struct mgde_str GeoidTable;
+#define TR_DEF_FILE "def_lab.txt"
+/* We use a global geoid table. This could be made thread local if needed. Now thread local!!!! */
+ //struct mgde_str GeoidTable;
 /* Need to let KMSTrans parse the def-files, before any transformation
    We need to figure out a way of setting the tabdir to the directory of the running shared library (for people who don't want geoids)
 */
+
+THREAD_SAFE int tr_last_error=TR_OK; /*Last error msg (int) from gd_trans */
+
+int GetLastError(void){
+    return tr_last_error;
+}
+
 int InitLibrary(char *path) {
-    int R=0,rc;
-    double x=0,y=0,z=0;
+    int ok=0,rc;
+    double x=512200.0,y=6143200.0,z=0.0;
     TR* trf;
-    char *init_path=0;
-    GeoidTable.init = 0;
-    /* Will only try to set tabdir to something if path has length >0 otherwise, we should really set tabdir to the path of the running library TODO */ 
+    FILE *fp;
+    char buf[64],fname[1024],*init_path=0;
     if (strlen(path)>0) 
 	    init_path=path;
     else
 	    init_path=getenv(TR_TABDIR_ENV);
-    if (0!=init_path){
-	    settabdir(init_path);
-	    R = geoid_i("STD", GDE_LAB, &GeoidTable,NULL);
-	    //#ifdef DEBUG
-	    printf("%s, %d, %d\n",init_path,R,GeoidTable.init); /*only for debugging */
-	    //#endif
-        }
+    if (0==init_path){ 
+	    sprintf(buf,"./");
+	    init_path=buf;}
+    else if (init_path[strlen(init_path)-1]!='/' && init_path[strlen(init_path)-1]!='\\')
+	    strcat(init_path,"/");
+    strcpy(fname,init_path);
+    strcat(fname,TR_DEF_FILE);
+    printf("%s %s\n",init_path,fname);
+    fp=fopen(fname,"r");
+    if (0==fp)
+	    return 0;
+    fclose(fp);
+    settabdir(init_path);
     /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
     trf=tropen("utm32_ed50","utm32_wgs84");
     if (0!=trf){
-	    rc=tr(trf,&x,&y,&z,1);
+	    ok=tr(trf,&x,&y,&z,1);
 	    trclose(trf);
 	    }
     trf=tropen("utm32_wgs84","fotm");
@@ -147,12 +160,15 @@ int InitLibrary(char *path) {
     if (0!=trf){
 	    rc=tr(trf,&x,&y,&z,1);
 	    trclose(trf);}
-   
-    return ((R>0) && GeoidTable.init);
+    trf=tropen("utm32_wgs84","fcsH_h_fcsvr10");
+    if (0!=trf){
+	    rc=tr(trf,&x,&y,&z,1);
+	    trclose(trf);}
+    return (ok==TR_OK); 
 }
-
+/* Not used anymore, since geoid tables are thread local now and internat to tr */
 int IsGeoidTableInitialised(void) {
-    return (int) GeoidTable.init;
+    return 0;
 }
 
 
@@ -311,10 +327,17 @@ void trclose (TR *tr) {
 /* transform one or more xyz-tuples in place */
 int tr(TR *tr, double *X, double *Y, double *Z, int n) {
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
-    int err, ERR = 0, i;
-    int use_geoids=(IsGeoidTableInitialised()?0:-1);
-    if ((0==tr)||(0==X)||(0==Y))
-        return TR_ERROR;
+    int err, ERR = 0, i,use_geoids; 
+    struct mgde_str *geoid_pt;
+    static THREAD_SAFE struct mgde_str GeoidTable;
+    static THREAD_SAFE int init=0;
+    static THREAD_SAFE int has_geoids=0;
+    if (!init){
+	    GeoidTable.init=0;
+	     has_geoids = geoid_i("STD", GDE_LAB, &GeoidTable,NULL);
+	     init=1;}
+   if ((0==tr)||(0==X)||(0==Y))
+        return LABEL_ERROR;
     if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE){
         x_in=Y;
         y_in=X;}
@@ -327,48 +350,54 @@ int tr(TR *tr, double *X, double *Y, double *Z, int n) {
    else{
         x_out=X;
         y_out=Y;}
+    geoid_pt=&GeoidTable;
+    use_geoids=(has_geoids>0)?0:-1;
     for (i = 0;  i < n;  i++) {
 	z = Z? Z[i]: z1;
-        err = gd_trans(tr->plab_in, tr->plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH, use_geoids, &GeoidTable, "", 0);
+        err = gd_trans(tr->plab_in, tr->plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH, use_geoids, geoid_pt, "", 0);
         /*err = gd_trans(tr->plab_in, tr->plab_out,  x,y,z,  X+i,Y+i, (Z? Z+i: &z2), &GH, -1, &GeoidTable, 0, 0);
          *   KE siger at arg 0 før GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
         if (err)
            ERR = err;
-    }
-
-    return ERR? TR_ERROR: TR_OK;
+   }
+   tr_last_error=ERR;
+   return ERR? TR_ERROR: TR_OK;
+    
 }
 
 /* read xyz-tuples from f_in; stream transformed tuples to f_out */
-int trstream(TR *tr, FILE *f_in, FILE *f_out, int n) {
-
+int trstream(TR *trf, FILE *f_in, FILE *f_out, int n) {
+    /*struct mgde_str GeoidTable;
+    int has_geoids;
+    GeoidTable.init=0;
+    has_geoids = geoid_i("STD", GDE_LAB, &GeoidTable,NULL);
     double XYZ[3];
-    int ERR = 0;
-    int use_geoids=(IsGeoidTableInitialised()?0:-1);
+    int use_geoids=(has_geoids>0)?0:-1;
     int i = 0;
     int swap_xy_in=0, swap_xy_out=0;
-
+    */
+    int ERR = 0,i=0;
     enum {BUFSIZE = 16384};
     
     char buf[BUFSIZE];
 	
-    double GH; /* ignored, but needed in gd_trans call */
+    //double GH; /* ignored, but needed in gd_trans call */
     
-    if ((0==tr) || (0==f_in) || (0==f_out))
+    if ((0==trf) || (0==f_in) || (0==f_out))
         return TR_ERROR;
-    
-    if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE) swap_xy_in=1; /* If crt-coordinates we want to input x,y,z to gd_trans, otherwise y,x,z */
+    /*
+    if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE) swap_xy_in=1; If crt-coordinates we want to input x,y,z to gd_trans, otherwise y,x,z 
     
     if ((tr->plab_out->u_c_lab).cstm==CRT_SYS_CODE) swap_xy_out=1;
-    
+    */
     while (0 != fgets(buf, BUFSIZE, f_in)) {
         int    argc, err;
-        double xyz[3];
+        double x,y,z;
         
-        argc = sscanf(buf, "%lf %lf %lf", &xyz[swap_xy_in], &xyz[1-swap_xy_in], &xyz[2]);
+        argc = sscanf(buf, "%lf %lf %lf", &x, &y, &z);
        /* 2D transformation? */
         if (argc==2)
-            xyz[2] = 0;
+            z= 0;
             
         /* Uninterpretable line */
         if ((argc==1) || (argc==0)) {
@@ -380,7 +409,7 @@ int trstream(TR *tr, FILE *f_in, FILE *f_out, int n) {
                 continue;
         }
 
-        err = gd_trans(tr->plab_in, tr->plab_out,  xyz[1], xyz[0], xyz[2],  &XYZ[1], &XYZ[0], &XYZ[2], &GH, use_geoids, &GeoidTable, "", 0);
+        err = tr(trf,&x,&y,&z,1);
         i++;
 
         /* buffer last error */
@@ -390,19 +419,21 @@ int trstream(TR *tr, FILE *f_in, FILE *f_out, int n) {
         if ((n==-1) && err)
             break;
         
-        fprintf(f_out, "%.10g %.10g %.10g\n", XYZ[swap_xy_out], XYZ[1-swap_xy_out], XYZ[2]);
+        fprintf(f_out, "%.10g %.10g %.10g\n", x,y,z);
 
         if (i==n)
             break;
     }
 
-    trclose(tr);
+    trclose(trf);
+   
     return ERR? TR_ERROR: TR_OK;
 }
 
+/* What to do here, when geoid tables are thread local and internal to tr, perhaps call tr with lots of NULL? 
+Or have geoids tables as external statics, which should be initialized by each thread?? */
 void TerminateLibrary(void) {
-
-    geoid_c(&GeoidTable,0,NULL);
+    //geoid_c(&GeoidTable,0,NULL);
 }
 
 

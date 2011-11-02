@@ -29,6 +29,8 @@ TRLIB_NOT_INITIALIZED=-1
 #conversions
 D2R=math.pi/180.0
 R2D=180.0/math.pi
+#debug flag- turns on extra verbosity here and there
+DEBUG=False
 class TransformationException(Exception):
 	def __init__(self,msg="Transformation Error"):
 		self.msg=msg
@@ -54,6 +56,8 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		#Setup API, corresponds to header file of the API#
 		tr_lib.InitLibrary.restype=ctypes.c_int
 		tr_lib.InitLibrary.argtypes=[ctypes.c_char_p]
+		tr_lib.GetLastError.argtypes=None
+		tr_lib.GetLastError.restype=ctypes.c_int
 		tr_lib.GetTRVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
 		tr_lib.GetTRVersion.restype=None
 		tr_lib.GetEsriText.restype=ctypes.c_int
@@ -78,9 +82,12 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 	sdir=geoid_dir
 	if sdir[-1] not in ["\\","/"]:
 		sdir+="/"
-	has_geoids=tr_lib.InitLibrary(sdir) #at some point use this info....
-	IS_INIT=True
-	return True
+	IS_INIT=tr_lib.InitLibrary(sdir) #at some point use this info....
+	return IS_INIT
+
+def GetLastError():
+	return tr_lib.GetLastError()
+
 
 def GetVersion():
 	buf=" "*100;
@@ -102,6 +109,7 @@ class CoordinateTransformation(object):
 		self.mlb_in=mlb_in
 		self.mlb_out=mlb_out
 		self.tr=None
+		self.rc=None #return code object
 		if IS_INIT:
 			self.tr=tr_lib.tropen(mlb_in,mlb_out)
 			if self.tr is None:
@@ -119,6 +127,7 @@ class CoordinateTransformation(object):
 		x=x.value
 		y=y.value
 		z=z.value
+		self.rc=res
 		if res==TR_ERROR:
 			raise TransformationException("Error in transformation.")
 		if "geo" in self.mlb_out[0:6]:
@@ -147,16 +156,18 @@ class CoordinateTransformation(object):
 		else:
 			res=tr_lib.tr(self.tr,X.ctypes._data,Y.ctypes._data,None,npoints)
 			xyz_out=np.column_stack((X,Y))
+		self.rc=res
 		#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
-		if res!=TR_OK:
-			if res==TR_ERROR:  
+		if res!=TR_OK and not DEBUG:
+			if res==TR_ERROR:
 				raise TransformationException("Error in transformation.")
 			else:
 				raise Exception("Unknown return code from transformation library.")
-		#print xyz_out.shape
 		if "geo" in self.mlb_out[0:6]: #convert2degrees?
 			xyz_out[:,0:2]*=R2D
 		return xyz_out
+	def GetReturnCode(self):
+		return self.rc
 	def Close(self):
 		if self.tr is not None:
 			tr_lib.trclose(self.tr)
@@ -180,6 +191,9 @@ def Transform(label_in,label_out,xyz_in):
 				x,y,z=data
 				x,y,z=TR.Transform(x,y,z)
 				xyz_out.append([x,y,z])
+	if DEBUG:
+		rc=TR.GetReturnCode()
+		print("rc: %d" %rc)
 	TR.Close()
 	return xyz_out
 ##Files to be transformed must follow the format:

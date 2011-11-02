@@ -5,6 +5,7 @@
 ###############################
 import threading
 import RandomTests
+RandomTests.SetThreadMode()
 import random
 import TrLib
 import time
@@ -12,10 +13,10 @@ import os
 import sys
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
 OUTPUT_DIR=os.path.join(os.path.dirname(__file__),"THREAD_OUTPUT")
-NTHREADS_2D=3
-NTHREADS_3D=3
+NTHREADS_2D=4
+NTHREADS_3D=4
 NITERATIONS=5
-NPOINTS=1000
+NPOINTS=8
 class BadGuy(threading.Thread):
 	def __init__(self,id,n,iterations=3,is3d=False,log_file=None):
 		self.N=n
@@ -33,9 +34,11 @@ class BadGuy(threading.Thread):
 		while self.iterations>0:
 			fp.write("This is thread %i\n" %self.id)
 			if self.is3d:
-				RandomTests.RandomTests_3D(n,log_file=fp)
+				nerr=RandomTests.RandomTests_3D(n,log_file=fp)
 			else:
-				RandomTests.RandomTests_2D(n,log_file=fp)
+				nerr=RandomTests.RandomTests_2D(n,log_file=fp)
+			if nerr>0:
+				fp.write("Encountered %i errors!\n" %nerr)
 			time.sleep(random.random()*0.1)
 			self.iterations-=1
 		fp.write("Thread finished\n")
