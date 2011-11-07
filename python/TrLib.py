@@ -56,8 +56,8 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		#Setup API, corresponds to header file of the API#
 		tr_lib.InitLibrary.restype=ctypes.c_int
 		tr_lib.InitLibrary.argtypes=[ctypes.c_char_p]
-		tr_lib.GetLastError.argtypes=None
-		tr_lib.GetLastError.restype=ctypes.c_int
+		tr_lib.TR_GetLastError.argtypes=None
+		tr_lib.TR_GetLastError.restype=ctypes.c_int
 		tr_lib.GetTRVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
 		tr_lib.GetTRVersion.restype=None
 		tr_lib.GetEsriText.restype=ctypes.c_int
@@ -86,7 +86,7 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 	return IS_INIT
 
 def GetLastError():
-	return tr_lib.GetLastError()
+	return tr_lib.TR_GetLastError()
 
 
 def GetVersion():
