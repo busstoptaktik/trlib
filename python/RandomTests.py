@@ -4,7 +4,6 @@
 ## This script performs some randomized tests....
 ## simlk, may 2011
 #######################################
-GEOIDS="./Geoids/" #default pointer to geoid directory
 import TrLib
 try:
 	import numpy as np
@@ -17,7 +16,7 @@ import os
 import sys
 import time #should really use timeit-module....
 import threading
-GEOIDS=os.path.dirname(__file__)+"/Geoids/" #pointer to geoid directory
+GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids") #pointer to geoid directory
 D2M=9.3349049354951814e-06
 TEST_SYSTEMS_2D=[["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,1.0],
 ["dktm1","utm32_wgs84",112928.119,1117545.350,1.0],
