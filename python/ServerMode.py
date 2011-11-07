@@ -94,7 +94,7 @@ def main(args):
 	if not IS_INIT:
 		if "-lib" in args: #In this case we assume that input is the library that we want to test....
 			libpath=args[args.index("-lib")+1]
-			lib=os.path.splitext(os.path.basename(libpath))[0]
+			lib=os.path.basename(libpath)
 			dir=os.path.dirname(libpath)
 			IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
 		else:
