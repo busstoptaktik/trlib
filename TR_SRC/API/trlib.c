@@ -97,6 +97,7 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <windows.h>
 #include "conv_lab.h"
 #include "gd_trans.h"
 #include "gettabdir.h"
@@ -104,10 +105,11 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "geoid_c.h"
 #include "geoid_i.h"
 #include "sputshpprj.h"
+#include "c_tabdir_file.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "trthread.h"
-#define TRLIB_VERSION "beta 0.002 2011-11-02"
+#define TRLIB_VERSION "beta 0.002 2011-11-07"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
@@ -119,7 +121,7 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 
 THREAD_SAFE int tr_last_error=TR_OK; /*Last error msg (int) from gd_trans */
 
-int GetLastError(void){
+int TR_GetLastError(void){
     return tr_last_error;
 }
 
@@ -140,7 +142,7 @@ int InitLibrary(char *path) {
 	    strcat(init_path,"/");
     strcpy(fname,init_path);
     strcat(fname,TR_DEF_FILE);
-    printf("%s %s\n",init_path,fname);
+    printf("%s %s\n",init_path,fname); /*just debugging */
     fp=fopen(fname,"r");
     if (0==fp)
 	    return 0;
@@ -336,6 +338,9 @@ int tr(TR *tr, double *X, double *Y, double *Z, int n) {
 	    GeoidTable.init=0;
 	     has_geoids = geoid_i("STD", GDE_LAB, &GeoidTable,NULL);
 	     init=1;}
+   else if (n==0 && 0==tr) {
+	   geoid_c(&GeoidTable,0,NULL);
+	   return TR_OK;}
    if ((0==tr)||(0==X)||(0==Y))
         return LABEL_ERROR;
     if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE){
@@ -430,11 +435,40 @@ int trstream(TR *trf, FILE *f_in, FILE *f_out, int n) {
     return ERR? TR_ERROR: TR_OK;
 }
 
-/* What to do here, when geoid tables are thread local and internal to tr, perhaps call tr with lots of NULL? 
-Or have geoids tables as external statics, which should be initialized by each thread?? */
+/* We need to close file pointers! Other ressources *should* be freed automatically! */
 void TerminateLibrary(void) {
-    //geoid_c(&GeoidTable,0,NULL);
+    c_tabdir_file(0,NULL);
+    tr(NULL,NULL,NULL,NULL,0);
 }
+
+/*
+BOOL WINAPI
+DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
+{
+    switch (dwReason)
+    {
+        case DLL_PROCESS_ATTACH:
+            // Code to run when the DLL is loaded
+            break;
+
+        case DLL_PROCESS_DETACH:
+            // Code to run when the DLL is freed
+            break;
+
+        case DLL_THREAD_ATTACH:
+            // Code to run when a thread is created during the DLL's lifetime
+            break;
+
+        case DLL_THREAD_DETACH:
+		printf("Thread detaching!\n");
+	        TerminateLibrary();
+            // Code to run when a thread ends normally.
+            break;
+    }
+    return TRUE;
+}
+*/
+
 
 
 
