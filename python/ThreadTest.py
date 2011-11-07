@@ -13,9 +13,9 @@ import os
 import sys
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
 OUTPUT_DIR=os.path.join(os.path.dirname(__file__),"THREAD_OUTPUT")
-NTHREADS_2D=4
-NTHREADS_3D=4
-NITERATIONS=5
+NTHREADS_2D=15
+NTHREADS_3D=15
+NITERATIONS=200
 NPOINTS=8
 class BadGuy(threading.Thread):
 	def __init__(self,id,n,iterations=3,is3d=False,log_file=None):
@@ -44,6 +44,7 @@ class BadGuy(threading.Thread):
 		fp.write("Thread finished\n")
 		if self.log_file is not None:
 			fp.close()
+		
 
 def main(args):
 	progname=os.path.basename(args[0])

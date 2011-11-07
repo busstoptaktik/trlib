@@ -16,17 +16,21 @@ else:
 import os
 import sys
 import time #should really use timeit-module....
+import threading
 GEOIDS=os.path.dirname(__file__)+"/Geoids/" #pointer to geoid directory
 D2M=9.3349049354951814e-06
-TEST_SYSTEMS_2D=[["geo_wgs84","geo_ed50",12.0,54.0,D2M],
+TEST_SYSTEMS_2D=[["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,1.0],
+["dktm1","utm32_wgs84",112928.119,1117545.350,1.0],
+["geo_wgs84","geo_ed50",12.0,54.0,D2M],
 ["utm32_ed50","utm32_etrs89",512200.0,6143200.0,1.0,],
 ["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,1.0],
 ["dktm1","utm32_wgs84",112928.119,1117545.350,1.0],
 ["s34j","dktm1",284686.705,84120.484,1.0],
 ["geo_wgs84","s34s",11.18,54.65,D2M],
-["kp2000j","utm32_ed50",181078.422,6117383.291,1.0],
-["geo_wgs84","GR_utm22_gr96",-52.23,64.68,D2M],
-["geo_wgs84","FO_fotm",-6.8,62.0,D2M]]
+["kp2000j","utm32_ed50",181078.422,6117383.291,1.0]]
+
+#["geo_wgs84","GR_utm22_gr96",-52.23,64.68,D2M],
+#["geo_wgs84","FO_fotm",-6.8,62.0,D2M]]
 TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
@@ -38,8 +42,8 @@ TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 THREAD_SAFE_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
-["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0],
-["GR_geoEwgs84","GR_utm22Ngr96",-52.23,64.68,200.0,D2M]] #since it is known that Fehmarn transf. are NOT thread safe! Well now they are!!
+["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0]] #,
+#["GR_geoEwgs84","GR_utm22Ngr96",-52.23,64.68,200.0,D2M]] #since it is known that Fehmarn transf. are NOT thread safe! Well now they are!!
 BASE_POINT=[512200.0,6143200.0] #Et sted i Jylland?
 LINE_SPLIT="*"*65
 THREAD_TEST=False #Flag to force a break on error when running thread test
@@ -47,7 +51,7 @@ THREAD_TEST=False #Flag to force a break on error when running thread test
 def SetThreadMode(): #since  Fehmarn transformations are known NOT to be thread safe at the moment!
 	global THREAD_TEST
 	global TEST_SYSTEMS_3D
-	#TEST_SYSTEMS_3D=THREAD_SAFE_3D NOT NEEDED ANYMORE!
+	TEST_SYSTEMS_3D=THREAD_SAFE_3D #NOT NEEDED ANYMORE!
 	THREAD_TEST=True
 			
 def RandomPoints(N,dim,x,y,z=0,scale=1):
@@ -110,11 +114,15 @@ def RandomTests_2D(N=10000,repeat=3,log_file=sys.stdout):
 
 def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 	nerr=0
+	if THREAD_TEST:
+		id=str(threading.current_thread().id)
+	else:
+		id="main"
 	log_file.write("%s\n" %LINE_SPLIT)
-	log_file.write("Transforming %i 3d-points...\n" %N)
+	log_file.write("Thread: %s, Transforming %i 3d-points...\n" %(id,N))
 	for label_in,label_out,x,y,z,scale in TEST_SYSTEMS_3D:
 		log_file.write("%s\n" %LINE_SPLIT)
-		log_file.write("Label_in: %s, Label_out: %s\n" %(label_in,label_out))
+		log_file.write("Thread: %s, Label_in: %s, Label_out: %s\n" %(id,label_in,label_out))
 		xyz=RandomPoints(N,3,x,y,z,scale)
 		if N<=10:
 			log_file.write("in:\n%s\n" %repr(xyz))

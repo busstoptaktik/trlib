@@ -88,6 +88,8 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 def GetLastError():
 	return tr_lib.TR_GetLastError()
 
+def TerminateLibrary():
+	tr_lib.TerminateLibrary()
 
 def GetVersion():
 	buf=" "*100;
