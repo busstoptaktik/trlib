@@ -97,7 +97,7 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
+//#include <windows.h>
 #include "conv_lab.h"
 #include "gd_trans.h"
 #include "gettabdir.h"
