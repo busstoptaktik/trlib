@@ -18,18 +18,18 @@ import time #should really use timeit-module....
 import threading
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids") #pointer to geoid directory
 D2M=9.3349049354951814e-06
-TEST_SYSTEMS_2D=[["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,1.0],
-["dktm1","utm32_wgs84",112928.119,1117545.350,1.0],
-["geo_wgs84","geo_ed50",12.0,54.0,D2M],
-["utm32_ed50","utm32_etrs89",512200.0,6143200.0,1.0,],
-["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,1.0],
-["dktm1","utm32_wgs84",112928.119,1117545.350,1.0],
-["s34j","dktm1",284686.705,84120.484,1.0],
-["geo_wgs84","s34s",11.18,54.65,D2M],
-["kp2000j","utm32_ed50",181078.422,6117383.291,1.0]]
-
-#["geo_wgs84","GR_utm22_gr96",-52.23,64.68,D2M],
-#["geo_wgs84","FO_fotm",-6.8,62.0,D2M]]
+TEST_SYSTEMS_2D=[["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,0,1.0],
+["dktm1","utm32_wgs84",112928.119,1117545.350,0,1.0],
+["geo_wgs84","geo_ed50",12.0,54.0,0,D2M],
+["utm32_ed50","utm32_etrs89",512200.0,6143200.0,0,1.0,],
+["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,0,1.0],
+["dktm1","utm32_wgs84",112928.119,1117545.350,0,1.0],
+["s34j","dktm1",284686.705,84120.484,0,1.0],
+["geo_wgs84","s34s",11.18,54.65,0,D2M],
+["kp2000j","utm32_ed50",181078.422,6117383.291,0,1.0],
+["geo_wgs84","GR_utm22_gr96",-52.23,64.68,0,D2M],
+["geo_wgs84","FO_fotm",-6.8,62.0,0,D2M],
+["utm32_wgs84","webmrc",512200.0,6143200.0,0,1.0]]
 TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
@@ -50,7 +50,7 @@ THREAD_TEST=False #Flag to force a break on error when running thread test
 def SetThreadMode(): #since  Fehmarn transformations are known NOT to be thread safe at the moment!
 	global THREAD_TEST
 	global TEST_SYSTEMS_3D
-	TEST_SYSTEMS_3D=THREAD_SAFE_3D #NOT NEEDED ANYMORE!
+	#TEST_SYSTEMS_3D=THREAD_SAFE_3D #NOT NEEDED ANYMORE!
 	THREAD_TEST=True
 			
 def RandomPoints(N,dim,x,y,z=0,scale=1):
@@ -69,69 +69,35 @@ def RandomPoints(N,dim,x,y,z=0,scale=1):
 	return xyz
 		
 def RandomTests_2D(N=10000,repeat=3,log_file=sys.stdout):
-	nerr=0
-	id=str(threading.current_thread().name)
-	log_file.write("%s\n" %LINE_SPLIT)
-	log_file.write("Thread: %s, Transforming %i 2d-points...\n" %(id,N))
-	for label_in,label_out,x,y,scale in TEST_SYSTEMS_2D:
-		log_file.write("%s\n" %LINE_SPLIT)
-		log_file.write("Label_in: %s, Label_out: %s\n" %(label_in,label_out))
-		xy=RandomPoints(N,2,x,y,scale=scale)
-		if N<=10:
-			log_file.write("in:\n%s\n" %repr(xy))
-		elif HAS_NUMPY:
-			log_file.write("Center of mass: %.2f %.2f\n" %tuple(xy.mean(axis=0).tolist()))
-		for i in range(repeat):
-			tstart=time.clock()
-			try:
-				xy_out=TrLib.Transform(label_in,label_out,xy)
-			except Exception,msg:
-				log_file.write(repr(msg)+"\n")
-				log_file.write("Last error: %d\n" %TrLib.GetLastError())
-				nerr+=1
-				if THREAD_TEST:
-					return nerr
-			else:
-				log_file.write("Forward running time: %.5f s\n" %(time.clock()-tstart))
-		log_file.write("Running inverse...\n")
-		for i in range(repeat):
-			tstart=time.clock()
-			try:
-				xy_back=TrLib.Transform(label_out,label_in,xy_out)
-			except Exception,msg:
-				print(repr(msg))
-				log_file.write("Last error: %d\n" %TrLib.GetLastError())
-				nerr+=1
-				if THREAD_TEST:
-					return nerr
-			else:
-				log_file.write("Inverse running time: %.5f s\n" %(time.clock()-tstart))
-		if N<=10:
-			log_file.write("out:\n%s\n" %repr(xy_out))
-		if HAS_NUMPY:
-			log_file.write("Maximum tr-loop error: %.10f (m or deg)\n" %np.fabs(xy-xy_back).max())
+	nerr=RandomTests(TEST_SYSTEMS_2D,2,N,repeat,log_file)
 	return nerr
 
 def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
+	nerr=RandomTests(TEST_SYSTEMS_3D,3,N,repeat,log_file)
+	return nerr
+
+
+def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 	nerr=0
 	id=str(threading.current_thread().name)
 	log_file.write("%s\n" %LINE_SPLIT)
-	log_file.write("Thread: %s, Transforming %i 3d-points...\n" %(id,N))
-	for label_in,label_out,x,y,z,scale in TEST_SYSTEMS_3D:
+	log_file.write("Thread: %s, Transforming %d %dd-points...\n" %(id,N,dim))
+	for label_in,label_out,x,y,z,scale in TESTS:
 		log_file.write("%s\n" %LINE_SPLIT)
 		log_file.write("Label_in: %s, Label_out: %s\n" %(label_in,label_out))
-		xyz=RandomPoints(N,3,x,y,z,scale)
+		xyz=RandomPoints(N,dim,x,y,z,scale)
 		if N<=10:
 			log_file.write("in:\n%s\n" %repr(xyz))
 		elif HAS_NUMPY:
-			log_file.write("Center of mass: %.2f %.2f %.2f\n" %tuple(xyz.mean(axis=0).tolist()))
+			log_file.write("Center of mass: %s\n" %xyz.mean(axis=0).tolist())
 		for i in range(repeat):
 			tstart=time.clock()
 			try:
 				xyz_out=TrLib.Transform(label_in,label_out,xyz)
 			except Exception,msg:
 				log_file.write(repr(msg)+"\n")
-				log_file.write("Last error: %d\n" %TrLib.GetLastError())
+				sys.stderr.write(repr(msg)+"\n")
+				log_file.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
 				nerr+=1
 				if THREAD_TEST:
 					return nerr
@@ -144,7 +110,8 @@ def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 				xyz_back=TrLib.Transform(label_out,label_in,xyz_out)
 			except Exception,msg:
 				log_file.write(repr(msg)+"\n")
-				log_file.write("Last error: %d\n" %TrLib.GetLastError())
+				sys.stderr.write(repr(msg)+"\n")
+				log_file.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
 				nerr+=1
 				if THREAD_TEST:
 					return nerr
@@ -152,7 +119,10 @@ def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 				log_file.write("Inverse running time: %.5f s\n" %(time.clock()-tstart))
 				if HAS_NUMPY and N<=10:
 					err_xy=np.fabs(xyz[:,0:2]-xyz_back[:,0:2]).max()
-					err_z=np.fabs(xyz[:,2]-xyz_back[:,2]).max()
+					if dim==3:
+						err_z=np.fabs(xyz[:,2]-xyz_back[:,2]).max()
+					else:
+						err_z=0
 					if "geo" in label_in[0:6]:
 						err_xy/=D2M
 					if max(err_xy,err_z)>0.01:
@@ -163,9 +133,14 @@ def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 			
 		if N<=10:
 			log_file.write("out:\n%s\n" %repr(xyz_out))
+		elif HAS_NUMPY:
+			log_file.write("Center of mass: %s\n" %xyz_out.mean(axis=0).tolist())
 		if HAS_NUMPY:
 			err_xy=np.fabs(xyz[:,0:2]-xyz_back[:,0:2]).max()
-			err_z=np.fabs(xyz[:,2]-xyz_back[:,2]).max()
+			if dim==3:
+				err_z=np.fabs(xyz[:,2]-xyz_back[:,2]).max()
+			else:
+				err_z=0
 			if "geo" in label_in[0:6]:
 				err_xy/=D2M
 			log_file.write("Maximum tr-loop error: xy: %.10f m z: %.10f m\n" %(err_xy,err_z))
@@ -203,8 +178,8 @@ def main(args):
 		if HAS_NUMPY:
 			N=10000
 	nerr=0
-	nerr+=RandomTests_2D(N,log_file=sys.stdout)
-	nerr+=RandomTests_3D(N,log_file=sys.stdout)
+	nerr+=RandomTests(TEST_SYSTEMS_2D,2,N,log_file=sys.stdout)
+	nerr+=RandomTests(TEST_SYSTEMS_3D,3,N,log_file=sys.stdout)
 	return nerr
 
 if __name__=="__main__":

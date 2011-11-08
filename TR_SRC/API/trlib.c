@@ -439,6 +439,7 @@ int trstream(TR *trf, FILE *f_in, FILE *f_out, int n) {
 void TerminateLibrary(void) {
     c_tabdir_file(0,NULL);
     tr(NULL,NULL,NULL,NULL,0);
+    gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);
 }
 
 /*

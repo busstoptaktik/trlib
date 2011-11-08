@@ -5,18 +5,18 @@
 ###############################
 import threading
 import RandomTests
-RandomTests.SetThreadMode()
 import random
 import TrLib
 import time
 import os
 import sys
 import gc
+import random
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
 KEEP_ALIVE=8
 NRUNS=5800 #crashes at some point. Something to do with tls (open file pointers!)
 NITERATIONS=1
-NPOINTS=2
+NPOINTS=500
 LOG_FILE="server_mode"
 if "-win32" in sys.argv:
 	import ctypes
@@ -72,20 +72,21 @@ class BadGuy(threading.Thread):
 		else:
 			fp=open(self.log_file,"w")
 		while self.iterations>0:
-			fp.write("This is thread %i\n" %self.id)
+			fp.write("This is thread %d. I perform %dD-tests.\n" %(self.id,int(self.is3d)+2))
 			if self.is3d:
 				nerr=RandomTests.RandomTests_3D(n,log_file=NoOut())
 			else:
 				nerr=RandomTests.RandomTests_2D(n,log_file=NoOut())
 			if nerr>0:
-				fp.write("Encountered %i errors!\n" %nerr)
-				fp.write("Last error: %d\n" %TrLib.GetLastError())
+				fp.write("Thread: %d encountered %d errors!\n" %(self.id,nerr))
+				fp.write("Last error: %d, is_3d: %s\n" %(TrLib.GetLastError(),self.is3d))
 			time.sleep(random.random()*0.1)
 			self.iterations-=1
 		fp.write("Thread %i finished\n" %self.id)
 		if self.log_file is not None:
 			fp.close()
 		TrLib.tr_lib.TerminateLibrary()
+		return 
 		
 		
 
@@ -105,6 +106,7 @@ def main(args):
 		print("Could not initialize library...")
 		print("Find a proper shared library and geoid dir and try again!")
 		return -1
+	RandomTests.SetThreadMode()
 	now=time.asctime()
 	nows=now.replace(" ","_").replace(":","_")
 	log_name=LOG_FILE+"_"+nows+".log"
@@ -119,7 +121,8 @@ def main(args):
 		if threading.activeCount()<KEEP_ALIVE:
 			print("Active threads: %i" %threading.activeCount())
 			finished_threads+=1
-			new_thread=BadGuy(finished_threads,NPOINTS,NITERATIONS,False,None)
+			is_3d=random.random()>0.5
+			new_thread=BadGuy(finished_threads,NPOINTS,NITERATIONS,is_3d,None)
 			new_thread.start()
 			#new_thread.join()
 			if WIN32:
