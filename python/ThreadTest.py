@@ -5,7 +5,6 @@
 ###############################
 import threading
 import RandomTests
-RandomTests.SetThreadMode()
 import random
 import TrLib
 import time
@@ -32,7 +31,7 @@ class BadGuy(threading.Thread):
 		else:
 			fp=open(self.log_file,"w")
 		while self.iterations>0:
-			fp.write("This is thread %i\n" %self.id)
+			fp.write("This is thread %i\n" %(self.id+1))
 			if self.is3d:
 				nerr=RandomTests.RandomTests_3D(n,log_file=fp)
 			else:
@@ -68,6 +67,7 @@ def main(args):
 	if not os.path.exists(OUTPUT_DIR):
 		os.mkdir(OUTPUT_DIR)
 	threads=[]
+	RandomTests.SetThreadMode()
 	for i in range(NTHREADS_2D):
 		threads.append(BadGuy(i,NPOINTS,NITERATIONS,False,os.path.join(OUTPUT_DIR,"2dthread_%i.txt"%i)))
 	for i in range(NTHREADS_3D):

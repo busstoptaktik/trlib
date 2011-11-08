@@ -70,8 +70,9 @@ def RandomPoints(N,dim,x,y,z=0,scale=1):
 		
 def RandomTests_2D(N=10000,repeat=3,log_file=sys.stdout):
 	nerr=0
+	id=str(threading.current_thread().name)
 	log_file.write("%s\n" %LINE_SPLIT)
-	log_file.write("Transforming %i 2d-points...\n" %N)
+	log_file.write("Thread: %s, Transforming %i 2d-points...\n" %(id,N))
 	for label_in,label_out,x,y,scale in TEST_SYSTEMS_2D:
 		log_file.write("%s\n" %LINE_SPLIT)
 		log_file.write("Label_in: %s, Label_out: %s\n" %(label_in,label_out))
@@ -113,15 +114,12 @@ def RandomTests_2D(N=10000,repeat=3,log_file=sys.stdout):
 
 def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 	nerr=0
-	if THREAD_TEST:
-		id=str(threading.current_thread().id)
-	else:
-		id="main"
+	id=str(threading.current_thread().name)
 	log_file.write("%s\n" %LINE_SPLIT)
 	log_file.write("Thread: %s, Transforming %i 3d-points...\n" %(id,N))
 	for label_in,label_out,x,y,z,scale in TEST_SYSTEMS_3D:
 		log_file.write("%s\n" %LINE_SPLIT)
-		log_file.write("Thread: %s, Label_in: %s, Label_out: %s\n" %(id,label_in,label_out))
+		log_file.write("Label_in: %s, Label_out: %s\n" %(label_in,label_out))
 		xyz=RandomPoints(N,3,x,y,z,scale)
 		if N<=10:
 			log_file.write("in:\n%s\n" %repr(xyz))

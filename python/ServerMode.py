@@ -13,10 +13,10 @@ import os
 import sys
 import gc
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
-KEEP_ALIVE=4
-NRUNS=2500 #crashes at some point. Something to do with tls (open file pointers!)
-NITERATIONS=2
-NPOINTS=1500
+KEEP_ALIVE=8
+NRUNS=5800 #crashes at some point. Something to do with tls (open file pointers!)
+NITERATIONS=1
+NPOINTS=2
 LOG_FILE="server_mode"
 if "-win32" in sys.argv:
 	import ctypes
@@ -87,6 +87,7 @@ class BadGuy(threading.Thread):
 			fp.close()
 		TrLib.tr_lib.TerminateLibrary()
 		
+		
 
 def main(args):
 	progname=os.path.basename(args[0])
@@ -120,12 +121,12 @@ def main(args):
 			finished_threads+=1
 			new_thread=BadGuy(finished_threads,NPOINTS,NITERATIONS,False,None)
 			new_thread.start()
-			new_thread.join()
+			#new_thread.join()
 			if WIN32:
 				stat = MEMORYSTATUSEX()
 				ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat))
 				print "Avail. mem:",stat.ullAvailPhys
-				del new_thread
+			#gc.collect()
 	while threading.activeCount()>1:
 		print("Active threads: %i" %threading.activeCount())
 		time.sleep(2)

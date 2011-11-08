@@ -50,6 +50,7 @@ def main(args): #progname, test_lib
 	nerr=0
 	print("Running test suite %s for the KMS transformation library at %s" %(PROG,now))
 	print("System is: %s, architecture: %s" %(sys.platform,platform.architecture()))
+	print("Python version: %s" %repr(sys.version))
 	print("Initialising library with geoid-dir: %s and shared-library: %s" %(geoids,lib))
 	print("Files in geoid-dir: %s" %repr(os.listdir(geoids)))
 	TrLib.InitLibrary(geoids,lib_obj,lib_dir)
