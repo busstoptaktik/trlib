@@ -14,8 +14,8 @@ GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geo
 OUTPUT_DIR=os.path.join(os.path.dirname(__file__),"THREAD_OUTPUT")
 NTHREADS_2D=5
 NTHREADS_3D=5
-NITERATIONS=5
-NPOINTS=8
+NITERATIONS=3
+NPOINTS=1000
 class BadGuy(threading.Thread):
 	def __init__(self,id,n,iterations=3,is3d=False,log_file=None):
 		self.N=n

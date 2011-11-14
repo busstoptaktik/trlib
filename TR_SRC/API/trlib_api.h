@@ -48,7 +48,7 @@ KMSTR_API void GetTRVersion(char *buffer, int bufferlength);
 KMSTR_API int IsGeoidTableInitialised(void);
 KMSTR_API int GetEsriText(char *label_in, char *wkt_out);
 typedef struct TR TR;
-KMSTR_API TR *tropen (char *label_in, char *label_out);
+KMSTR_API TR *tropen (char *label_in, char *label_out, char *geoid_name);
 KMSTR_API  int tr(TR *tr, double *X, double *Y, double *Z, int n);
 KMSTR_API void trclose (TR *tr);
 KMSTR_API  int trstream(TR *tr, FILE *f_in, FILE *f_out, int n);

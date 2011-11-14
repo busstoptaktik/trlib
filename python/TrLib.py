@@ -63,7 +63,7 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.GetEsriText.restype=ctypes.c_int
 		tr_lib.GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.tropen.restype=ctypes.c_void_p
-		tr_lib.tropen.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.tropen.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.trclose.restype=None
 		tr_lib.trclose.argtypes=[ctypes.c_void_p]
 		tr_lib.tr.restype=ctypes.c_int
@@ -107,13 +107,14 @@ def GetEsriText(label):
 	return wkt
 
 class CoordinateTransformation(object):
-	def __init__(self,mlb_in,mlb_out):
+	def __init__(self,mlb_in,mlb_out,geoid_name=""):
 		self.mlb_in=mlb_in
 		self.mlb_out=mlb_out
+		self.geoid_name=geoid_name
 		self.tr=None
 		self.rc=None #return code object
 		if IS_INIT:
-			self.tr=tr_lib.tropen(mlb_in,mlb_out)
+			self.tr=tr_lib.tropen(mlb_in,mlb_out,geoid_name)
 			if self.tr is None:
 				raise LabelException()
 		else:
@@ -177,8 +178,8 @@ class CoordinateTransformation(object):
 	
 		
 
-def Transform(label_in,label_out,xyz_in):
-	TR=CoordinateTransformation(label_in,label_out)
+def Transform(label_in,label_out,xyz_in,geoid=""):
+	TR=CoordinateTransformation(label_in,label_out,geoid)
 	if HAS_NUMPY and isinstance(xyz_in,np.ndarray):
 		xyz_out=TR.TransformArray(xyz_in)
 	else:

@@ -13,10 +13,10 @@ import sys
 import gc
 import random
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
-KEEP_ALIVE=8
+KEEP_ALIVE=4
 NRUNS=5800 #crashes at some point. Something to do with tls (open file pointers!)
-NITERATIONS=1
-NPOINTS=500
+NITERATIONS=3
+NPOINTS=100
 LOG_FILE="server_mode"
 if "-win32" in sys.argv:
 	import ctypes
@@ -58,34 +58,40 @@ class NoOut(object):
 		pass
 		
 class BadGuy(threading.Thread):
-	def __init__(self,id,n,iterations=3,is3d=False,log_file=None):
+	def __init__(self,id,n,iterations=3,mode=0,log_file=None,flag=None):
 		self.N=n
 		self.id=id
-		self.is3d=is3d
+		self.mode=mode
 		self.iterations=iterations
 		self.log_file=log_file
+		self.flag=flag
 		threading.Thread.__init__(self)
 	def run(self):
+		if self.flag is not None:
+			self.flag.clear()
 		n=self.N #+something random??
 		if self.log_file is None:
 			fp=sys.stdout
 		else:
 			fp=open(self.log_file,"w")
 		while self.iterations>0:
-			fp.write("This is thread %d. I perform %dD-tests.\n" %(self.id,int(self.is3d)+2))
-			if self.is3d:
+			fp.write("This is thread %d. I perform %dD-tests. Mode is: %d\n" %(self.id,int(self.mode>0)+2,self.mode))
+			if self.mode==0:
 				nerr=RandomTests.RandomTests_3D(n,log_file=NoOut())
-			else:
+			elif self.mode==1:
 				nerr=RandomTests.RandomTests_2D(n,log_file=NoOut())
+			else:
+				nerr=RandomTests.RandomTests(RandomTests.FH_TEST,3,n,log_file=NoOut())
 			if nerr>0:
-				fp.write("Thread: %d encountered %d errors!\n" %(self.id,nerr))
-				fp.write("Last error: %d, is_3d: %s\n" %(TrLib.GetLastError(),self.is3d))
+				fp.write("Thread %d, mode %d, encountered %d errors!\n" %(self.id,self.mode,nerr))
 			time.sleep(random.random()*0.1)
 			self.iterations-=1
 		fp.write("Thread %i finished\n" %self.id)
 		if self.log_file is not None:
 			fp.close()
 		TrLib.tr_lib.TerminateLibrary()
+		if self.flag is not None:
+			self.flag.set()
 		return 
 		
 		
@@ -117,12 +123,23 @@ def main(args):
 	print("Using TrLib v. %s" %TrLib.GetVersion())
 	print("Shared library is: %s" %repr(TrLib.tr_lib))
 	finished_threads=0
+	FH_flag=threading.Event()
+	FH_flag.set()
 	while finished_threads<NRUNS:
 		if threading.activeCount()<KEEP_ALIVE:
 			print("Active threads: %i" %threading.activeCount())
 			finished_threads+=1
-			is_3d=random.random()>0.5
-			new_thread=BadGuy(finished_threads,NPOINTS,NITERATIONS,is_3d,None)
+			rn=random.random()
+			flag=None
+			if rn<0.3:
+				mode=0
+			elif rn<2:
+				mode=1
+			else:
+				FH_flag.wait()
+				mode=3
+				flag=FH_flag
+			new_thread=BadGuy(finished_threads,NPOINTS,NITERATIONS,mode,None,flag)
 			new_thread.start()
 			#new_thread.join()
 			if WIN32:

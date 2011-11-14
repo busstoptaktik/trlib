@@ -35,13 +35,15 @@ TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0],
 ["GR_geoEwgs84","GR_utm22Ngr96",-52.23,64.68,200.0,D2M],
-["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M], #pretty close to bridge project.
+["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M*0.4], #pretty close to bridge project.
 ["geoNwgs84","crt_wgs84",14.75,54.10,100,D2M]]
 #["utm32Nwgs84","geoEed50",512200.1,6143200.1,100.0,1.0]]
 THREAD_SAFE_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0]] #,
+
+FH_TEST=[["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M*0.4,"fehmarngeoid10.bin"]] #pretty close to bridge project.
 #["GR_geoEwgs84","GR_utm22Ngr96",-52.23,64.68,200.0,D2M]] #since it is known that Fehmarn transf. are NOT thread safe! Well now they are!!
 BASE_POINT=[512200.0,6143200.0] #Et sted i Jylland?
 LINE_SPLIT="*"*65
@@ -50,7 +52,7 @@ THREAD_TEST=False #Flag to force a break on error when running thread test
 def SetThreadMode(): #since  Fehmarn transformations are known NOT to be thread safe at the moment!
 	global THREAD_TEST
 	global TEST_SYSTEMS_3D
-	#TEST_SYSTEMS_3D=THREAD_SAFE_3D #NOT NEEDED ANYMORE!
+	TEST_SYSTEMS_3D=THREAD_SAFE_3D #NOT NEEDED ANYMORE!
 	THREAD_TEST=True
 			
 def RandomPoints(N,dim,x,y,z=0,scale=1):
@@ -82,7 +84,13 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 	id=str(threading.current_thread().name)
 	log_file.write("%s\n" %LINE_SPLIT)
 	log_file.write("Thread: %s, Transforming %d %dd-points...\n" %(id,N,dim))
-	for label_in,label_out,x,y,z,scale in TESTS:
+	for test in TESTS:
+		if len(test)==6:
+			label_in,label_out,x,y,z,scale=test
+			geoid=""
+		else:
+			label_in,label_out,x,y,z,scale,geoid=test
+			
 		log_file.write("%s\n" %LINE_SPLIT)
 		log_file.write("Label_in: %s, Label_out: %s\n" %(label_in,label_out))
 		xyz=RandomPoints(N,dim,x,y,z,scale)
@@ -90,6 +98,7 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 			log_file.write("in:\n%s\n" %repr(xyz))
 		elif HAS_NUMPY:
 			log_file.write("Center of mass: %s\n" %xyz.mean(axis=0).tolist())
+		nok=0
 		for i in range(repeat):
 			tstart=time.clock()
 			try:
@@ -98,20 +107,29 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 				log_file.write(repr(msg)+"\n")
 				sys.stderr.write(repr(msg)+"\n")
 				log_file.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
+				sys.stderr.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
+				if N<10:
+					sys.stderr.write("Input: %s\n" %repr(xyz))
 				nerr+=1
 				if THREAD_TEST:
 					return nerr
 			else:
+				nok+=1
 				log_file.write("Forward running time: %.5f s\n" %(time.clock()-tstart))
+		if nok==0:
+			continue
 		log_file.write("Running inverse...\n")
 		for i in range(repeat):
 			tstart=time.clock()
 			try:
-				xyz_back=TrLib.Transform(label_out,label_in,xyz_out)
+				xyz_back=TrLib.Transform(label_out,label_in,xyz_out,geoid)
 			except Exception,msg:
 				log_file.write(repr(msg)+"\n")
 				sys.stderr.write(repr(msg)+"\n")
 				log_file.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
+				sys.stderr.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
+				if N<10:
+					sys.stderr.write("Input: %s\n" %repr(xyz_out))
 				nerr+=1
 				if THREAD_TEST:
 					return nerr
@@ -180,6 +198,10 @@ def main(args):
 	nerr=0
 	nerr+=RandomTests(TEST_SYSTEMS_2D,2,N,log_file=sys.stdout)
 	nerr+=RandomTests(TEST_SYSTEMS_3D,3,N,log_file=sys.stdout)
+	for i in range(50):
+		nerr+=RandomTests(FH_TEST,3,N,log_file=sys.stdout)
+		#TrLib.tr_lib.IsGeoidTableInitialised()
+	print("Errors: %d" %nerr)
 	return nerr
 
 if __name__=="__main__":
