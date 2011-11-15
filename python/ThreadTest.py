@@ -43,6 +43,7 @@ class BadGuy(threading.Thread):
 		fp.write("Thread finished\n")
 		if self.log_file is not None:
 			fp.close()
+		TrLib.TerminateLibrary()
 		
 
 def main(args):

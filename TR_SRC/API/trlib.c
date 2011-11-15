@@ -110,7 +110,7 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "trthread.h"
-#define TRLIB_VERSION "TLS GeoidTable in internal func 2011-11-14"
+#define TRLIB_VERSION "TLS GeoidTable in internal func and poss. to open special in tropen ...2011-11-15"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
@@ -122,12 +122,12 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 */
 
 THREAD_SAFE int tr_last_error=TR_OK; /*Last error msg (int) from gd_trans */
-
+FILE *ERR_LOG=0;
 int TR_GetLastError(void){
     return tr_last_error;
 }
 
-int InitLibrary(char *path) {
+int TR_InitLibrary(char *path) {
     int ok=0,rc,has_geoids;
     double x=512200.0,y=6143200.0,z=0.0;
     TR* trf;
@@ -150,6 +150,9 @@ int InitLibrary(char *path) {
 	    return 0;
     fclose(fp);
     settabdir(init_path);
+    #ifdef _ROUT
+    ERR_LOG=fopen("TR_errlog.log","wt");
+    #endif
     /*
     GeoidTable.init=0;
     has_geoids= geoid_i("STD", GDE_LAB, &GeoidTable,NULL);
@@ -174,19 +177,18 @@ int InitLibrary(char *path) {
 	    trclose(trf);}
     return (ok==TR_OK); 
 }
-/* Not used anymore, since geoid tables are thread local now and internat to tr */
-int IsGeoidTableInitialised(void) {
-    tab_doc_f("?",stdout);
-    return 0;
-}
+/* Mock up. Look in kmstr5 for better ideas */
+void TR_GeoidInfo(TR *tr) {
+    tab_doc_f(tr->geoid_name,stdout);
+    }
 
 
-void GetTRVersion(char *buffer,int BufSize) {
+void TR_GetVersion(char *buffer,int BufSize) {
     strncpy(buffer,TRLIB_VERSION,BufSize);
 }
 	
 /* A simple wrapper for tr */
-int Transform(char *label_in, char *label_out, double *X, double *Y, double *Z, int npoints) {
+int TR_Transform(char *label_in, char *label_out, double *X, double *Y, double *Z, int npoints) {
     int err_msg;
     TR *trf=tropen(label_in,label_out,"");
     if (trf==0){
@@ -280,36 +282,35 @@ int main (int argc, char *argv[]) {
 ------------------------------------------------
  
 ----------------------------------------------------------------------*/
-
-struct mgde_str *TR_GeoidTable(int mode, char *name){
+/* Function which inserts a standard geoid pointer into a TR object */
+int TR_GeoidTable(TR *tr){
 	static THREAD_SAFE struct mgde_str *GeoidTable=NULL;
 	static THREAD_SAFE int init=0;
-	static THREAD_SAFE char last_call[512]="\0";
-	int has_geoids=0;
-	switch (mode){
-		case -1:
+	static THREAD_SAFE int ngeoids=0;
+	/*if called with NULL close evrything down */
+	if (0==tr){
 			if (init)
 			    geoid_c(GeoidTable,0,NULL);
 			free(GeoidTable);
 			GeoidTable=NULL;
-			break;
-		default:
-			if (!init){
-			GeoidTable=malloc(sizeof(struct mgde_str));
-			if (0==GeoidTable)
-				return NULL;
-			GeoidTable->init=0;}
-			if (!init||(strcmp(last_call,name)!=0)){
-			if (strlen(name)>0)
-				has_geoids= geoid_i(name,GDE_LAB, GeoidTable,NULL);
-			else
-				has_geoids= geoid_i("STD", GDE_LAB, GeoidTable,NULL);
-			HAS_GEOIDS=(has_geoids>0);
-			strcpy(last_call,name);}
-			init=1;
-			break;
-			}
-	return GeoidTable;
+			return TR_OK;
+		}
+	/*Initialise on first call, makes geoid table thread local */
+	if (!init){
+		GeoidTable=malloc(sizeof(struct mgde_str));
+		if (0==GeoidTable)
+			return TR_ALLOCATION_ERROR;
+		GeoidTable->init=0;
+		ngeoids= geoid_i("STD", GDE_LAB, GeoidTable,NULL);
+		HAS_GEOIDS=(ngeoids>0);
+		init=1;
+		}
+	/*insert stuff into the TR object */
+	tr->ngeoids=ngeoids;
+	strcpy(tr->geoid_name,"STD");
+	tr->geoid_pt=GeoidTable;
+	tr->close_table=0;
+	return TR_OK;
 }
 		
 		
@@ -318,11 +319,12 @@ struct mgde_str *TR_GeoidTable(int mode, char *name){
 
 
 TR *tropen (char *label_in, char *label_out, char *geoid_name) {
-    int label_check;
+    int label_check,err;
     union geo_lab *plab_in, *plab_out;
+    struct mgde_str *special_geoid_table=NULL;
+    int has_geoids=0;
     TR *tr;
-    
-    /* make room for the TR object proper */
+   /* make room for the TR object proper */
     tr = malloc(sizeof(TR));
     if (0==tr)
         return 0;
@@ -345,13 +347,28 @@ TR *tropen (char *label_in, char *label_out, char *geoid_name) {
         free(plab_out);
         return 0;
     }
+    /*Set geoid info */
+    if (strlen(geoid_name)>0){
+	   special_geoid_table=malloc(sizeof(struct mgde_str));
+	   special_geoid_table->init=0;
+	   has_geoids= geoid_i(geoid_name, GDE_LAB, special_geoid_table,NULL);
+	   printf("has geoids: %d, name: %s\n",has_geoids,geoid_name);
+	   tr->geoid_pt=special_geoid_table;
+	   tr->close_table=1;
+	   tr->ngeoids=has_geoids;
+	   tr->use_geoids=(has_geoids>0)?0:-1;
+	   strncpy(tr->geoid_name,geoid_name,FILENAME_MAX);
+	    }
+    else {  /*insert standard geoids */
+	   err =TR_GeoidTable(tr);
+	   tr->use_geoids=(HAS_GEOIDS)?0:-1;
+	   /* TODO: check error! */
+	    }
     
     /* transfer everything into the TR object */
     tr->plab_in   = plab_in;
     tr->plab_out  = plab_out;
-    tr->err = 0;
-    tr->geoid_pt=TR_GeoidTable(0,geoid_name);
-    tr->use_geoids=(HAS_GEOIDS)?0:-1;
+   
     return tr;
 
 }
@@ -361,6 +378,12 @@ void trclose (TR *tr) {
         return;    
     free (tr->plab_in);
     free (tr->plab_out);
+    /*if using special geoid, close it down */
+    if (tr->close_table){
+	    printf("Closing special geoid!\n");
+	    geoid_c(tr->geoid_pt,0,NULL);
+	    free(tr->geoid_pt);}
+    gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0); /*might not be needed! WANT TO close hgrid static in gd_trans */
     free (tr);
     return;
 }
@@ -369,6 +392,7 @@ void trclose (TR *tr) {
 
 /* transform one or more xyz-tuples in place */
 int tr(TR *tr, double *X, double *Y, double *Z, int n) {
+   
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i; //use_geoids; 
     /*struct mgde_str *geoid_pt;
@@ -400,7 +424,7 @@ int tr(TR *tr, double *X, double *Y, double *Z, int n) {
     use_geoids=(has_geoids)?0:-1;*/
     for (i = 0;  i < n;  i++) {
 	z = Z? Z[i]: z1;
-        err = gd_trans(tr->plab_in, tr->plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH,tr->use_geoids,tr->geoid_pt, "", 0);
+        err = gd_trans(tr->plab_in, tr->plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH,tr->use_geoids,tr->geoid_pt, "", ERR_LOG);
         /*err = gd_trans(tr->plab_in, tr->plab_out,  x,y,z,  X+i,Y+i, (Z? Z+i: &z2), &GH, -1, &GeoidTable, 0, 0);
          *   KE siger at arg 0 før GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
         if (err)
@@ -477,9 +501,9 @@ int trstream(TR *trf, FILE *f_in, FILE *f_out, int n) {
 }
 
 /* We need to close file pointers! Other ressources *should* be freed automatically! */
-void TerminateLibrary(void) {
+void TR_TerminateLibrary(void) {
      gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);
-     TR_GeoidTable(-1,"");
+     TR_GeoidTable(NULL);
      c_tabdir_file(0,NULL);
 }
 
@@ -517,7 +541,7 @@ DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
 
 
 /* This will work for now until we get a version of fputshpprj which writes to a string */
-int GetEsriText(char *label_in, char *wkt_out){
+int TR_GetEsriText(char *label_in, char *wkt_out){
     union geo_lab *plab_in;
     int   label_check;
     plab_in = malloc(sizeof(union geo_lab));

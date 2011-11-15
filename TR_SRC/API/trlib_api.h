@@ -33,7 +33,7 @@ enum KMSTR_Error
 #define TR_OK 0
 #define LABEL_ERROR 1
 #define TR_ERROR 2
-#define TR_ALLOCATION_EXCEPTION 3
+#define TR_ALLOCATION_ERROR 3
 
 #pragma once
 #if defined __cplusplus
@@ -41,17 +41,18 @@ enum KMSTR_Error
 #else 
 #define KMSTR_API
 #endif 
-KMSTR_API int Transform(char *label_in, char *label_out,double *X,double *Y,double *Z,int npoints);
-KMSTR_API int InitLibrary(char *path);
+KMSTR_API int TR_Transform(char *label_in, char *label_out,double *X,double *Y,double *Z,int npoints);
+KMSTR_API int TR_InitLibrary(char *path);
 KMSTR_API int TR_GetLastError(void);
-KMSTR_API void GetTRVersion(char *buffer, int bufferlength);
-KMSTR_API int IsGeoidTableInitialised(void);
-KMSTR_API int GetEsriText(char *label_in, char *wkt_out);
+KMSTR_API void TR_GetVersion(char *buffer, int bufferlength);
+KMSTR_API int TR_GetEsriText(char *label_in, char *wkt_out);
+KMSTR_API void TR_TerminateLibrary(void);
 typedef struct TR TR;
+KMSTR_API void TR_GeoidInfo(TR *tr);
 KMSTR_API TR *tropen (char *label_in, char *label_out, char *geoid_name);
 KMSTR_API  int tr(TR *tr, double *X, double *Y, double *Z, int n);
 KMSTR_API void trclose (TR *tr);
 KMSTR_API  int trstream(TR *tr, FILE *f_in, FILE *f_out, int n);
-KMSTR_API void TerminateLibrary(void);
+
 
 

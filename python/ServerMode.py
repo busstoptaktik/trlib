@@ -16,7 +16,7 @@ GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geo
 KEEP_ALIVE=4
 NRUNS=5800 #crashes at some point. Something to do with tls (open file pointers!)
 NITERATIONS=3
-NPOINTS=100
+NPOINTS=1
 LOG_FILE="server_mode"
 if "-win32" in sys.argv:
 	import ctypes
@@ -89,7 +89,7 @@ class BadGuy(threading.Thread):
 		fp.write("Thread %i finished\n" %self.id)
 		if self.log_file is not None:
 			fp.close()
-		TrLib.tr_lib.TerminateLibrary()
+		TrLib.TerminateLibrary()
 		if self.flag is not None:
 			self.flag.set()
 		return 
@@ -131,7 +131,7 @@ def main(args):
 			finished_threads+=1
 			rn=random.random()
 			flag=None
-			if rn<0.3:
+			if rn<0.1:
 				mode=0
 			elif rn<2:
 				mode=1

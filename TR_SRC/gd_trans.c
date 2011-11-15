@@ -243,8 +243,8 @@ FILE                     *tr_error
       h_grid_tab.init = 0;
       (void) fclose(h_grid_tab.table_u[0].fd);
     }
-    if (s_grid_tab != NULL)
-        if (s_grid_tab->init != 0) (void) geoid_c(s_grid_tab, 0, NULL);
+    /*if (s_grid_tab != NULL)
+        if (s_grid_tab->init != 0) (void) geoid_c(s_grid_tab, 0, NULL); */
     if (grid_tab != NULL)
         if (grid_tab->init != 0) (void) geoid_c(grid_tab, 0, NULL);
     return(0);

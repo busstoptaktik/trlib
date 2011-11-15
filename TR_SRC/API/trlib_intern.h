@@ -17,11 +17,15 @@
  */
  
 /* Intern API header som definerer TR-objektet, thokn, simlk, sep. 2011 */
+#include <stdio.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
 struct TR {
     union geo_lab *plab_in, *plab_out;
     struct mgde_str *geoid_pt;
+    char geoid_name[FILENAME_MAX];
+    int ngeoids;
+    int close_table;
     int use_geoids;
     int   err;
 };
@@ -31,4 +35,4 @@ struct XYZ {
     int err;
 }; 
 
-struct mgde_str *TR_GeoidTable(int mode, char* name); 
+int TR_GeoidTable(struct TR*); 

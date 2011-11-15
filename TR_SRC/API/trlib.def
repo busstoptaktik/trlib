@@ -1,12 +1,13 @@
 EXPORTS
-	InitLibrary
-	Transform
-	IsGeoidTableInitialised
-	GetEsriText
-	GetTRVersion
+	TR_InitLibrary
+	TR_Transform
+	TR_GeoidInfo
+	TR_GetEsriText
+	TR_GetVersion
+	TR_TerminateLibrary
+	TR_GetLastError
 	tropen
 	trclose
 	tr
 	trstream
-	TerminateLibrary
-	TR_GetLastError
+	

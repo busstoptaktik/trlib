@@ -54,14 +54,16 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 	try:
 		tr_lib=ctypes.cdll.LoadLibrary(os.path.join(lib_dir,lib)) #Loads the simple API exported on top of the KMS transformation library.
 		#Setup API, corresponds to header file of the API#
-		tr_lib.InitLibrary.restype=ctypes.c_int
-		tr_lib.InitLibrary.argtypes=[ctypes.c_char_p]
+		tr_lib.TR_InitLibrary.restype=ctypes.c_int
+		tr_lib.TR_InitLibrary.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_GetLastError.argtypes=None
 		tr_lib.TR_GetLastError.restype=ctypes.c_int
-		tr_lib.GetTRVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
-		tr_lib.GetTRVersion.restype=None
-		tr_lib.GetEsriText.restype=ctypes.c_int
-		tr_lib.GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_GetVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
+		tr_lib.TR_GetVersion.restype=None
+		tr_lib.TR_GetEsriText.restype=ctypes.c_int
+		tr_lib.TR_GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_GeoidInfo.argtypes=[ctypes.c_void_p]
+		tr_lib.TR_GeoidInfo.restype=None
 		tr_lib.tropen.restype=ctypes.c_void_p
 		tr_lib.tropen.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.trclose.restype=None
@@ -82,24 +84,24 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 	sdir=geoid_dir
 	if sdir[-1] not in ["\\","/"]:
 		sdir+="/"
-	IS_INIT=tr_lib.InitLibrary(sdir) #at some point use this info....
+	IS_INIT=tr_lib.TR_InitLibrary(sdir) #at some point use this info....
 	return IS_INIT
 
 def GetLastError():
 	return tr_lib.TR_GetLastError()
 
 def TerminateLibrary():
-	tr_lib.TerminateLibrary()
+	tr_lib.TR_TerminateLibrary()
 
 def GetVersion():
 	buf=" "*100;
-	tr_lib.GetTRVersion(buf,100)
+	tr_lib.TR_GetVersion(buf,100)
 	ver=buf.replace("\0","").strip()
 	return ver
 
 def GetEsriText(label):
 	wkt=" "*2048;
-	retval=tr_lib.GetEsriText(label,wkt)
+	retval=tr_lib.TR_GetEsriText(label,wkt)
 	if retval==0:
 		wkt=wkt.strip().replace("\0","")
 	else:
@@ -171,9 +173,13 @@ class CoordinateTransformation(object):
 		return xyz_out
 	def GetReturnCode(self):
 		return self.rc
+	def GetGeoidInfo(self):
+		if self.tr is not None:
+			tr_lib.TR_GetGeoidInfo(self.tr)
 	def Close(self):
 		if self.tr is not None:
 			tr_lib.trclose(self.tr)
+			self.tr=None
 		
 	
 		
