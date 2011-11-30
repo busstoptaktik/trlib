@@ -44,14 +44,11 @@ fgetlhtx
 fgetln
 fgetshpprj
 fh_trans
-fk54tu_g
-fk89tu_g
+fo_g_tr
 fputcw
 fputg
-fputjnsd
 fputshpprj
 fputst
-fu50tu_g
 gatg
 gd_t_val
 gd_trans
@@ -69,6 +66,7 @@ getsinexlin
 getsinexver
 gettabdir
 gmb1
+gmb2
 grid_val
 gtc
 h_trans
@@ -107,6 +105,7 @@ sgetg
 sgetst
 sputcw
 sputg
+sputshpprj
 sputst
 srch_plate
 srch_tab_typ
