@@ -162,9 +162,9 @@ extern "C" {
 }
 
 #ifdef _DEBUG
-#pragma comment(lib, "D:/DotNetProjects/KmsFncs/Debug/KmsFncsD.lib")
+#pragma comment(lib, "C:/D_DREV/DotNetProjects/KmsFncs/Debug/KmsFncsD.lib")
 #else
-#pragma comment(lib, "D:/DotNetProjects/KmsFncs/Release/KmsFncs.lib")
+#pragma comment(lib, "C:/D_DREV/DotNetProjects/KmsFncs/Release/KmsFncs.lib")
 #endif
 
 #endif
