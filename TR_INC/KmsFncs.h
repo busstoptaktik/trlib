@@ -138,6 +138,7 @@ extern "C" {
 #include "sgetst.h"
 #include "sputcw.h"
 #include "sputg.h"
+#include "sputshpprj.h"
 #include "sputst.h"
 #include "srch_plate.h"
 #include "srch_tab_typ.h"
