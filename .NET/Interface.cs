@@ -49,13 +49,23 @@ namespace Kmstrlib.NET
 		// same folder as this __file__ (or in a folder on the system search path)
 
 		[DllImport(TRLIB)]
-		public static extern int InitLibrary(string folder);
+		public static extern int TR_InitLibrary(string folder);
+		
+		public static int InitLibrary(string folder)
+		{
+			return TR_InitLibrary(folder);
+		}
 
 		[DllImport(TRLIB)]
-		public static extern void TerminateLibrary();
+		public static extern void TR_TerminateLibrary();
+		
+		public static void TerminateLibrary()
+		{
+			TR_TerminateLibrary();
+		}
 
 		[DllImport(TRLIB)]
-		unsafe public static extern void* tropen(string mlb1,string mlb2);
+		unsafe public static extern void* tropen(string mlb1,string mlb2, string geoid_name);
 
 		[DllImport(TRLIB)]
 		unsafe public static extern void trclose( void* tr);
@@ -71,7 +81,7 @@ namespace Kmstrlib.NET
 		
 		
 		[DllImport(TRLIB)]
-		unsafe public static extern KMSTR_Error Transform(
+		unsafe public static extern KMSTR_Error TR_Transform(
 		
 			string mlb1,
 			string mlb2,
@@ -81,13 +91,13 @@ namespace Kmstrlib.NET
 			int npoints);
 		
 		[DllImport(TRLIB)]
-		unsafe public static extern void GetTRVersion(byte* buf, int buf_length);
+		unsafe public static extern void TR_GetVersion(byte* buf, int buf_length);
 		
 		unsafe public static string GetVersion()
 		{
 			byte[] buf= new byte[128];
 			fixed (byte* bufp=buf){
-			GetTRVersion(bufp,buf.Length);}
+			TR_GetVersion(bufp,buf.Length);}
 			return System.Text.ASCIIEncoding.ASCII.GetString(buf).Trim().Replace("\0",""); //should go right as long as version is more less 'ascii' encoded....
 		}
 		
@@ -103,7 +113,7 @@ namespace Kmstrlib.NET
 			if ((X.Length!=Y.Length)||((Z!=null) && (Z.Length!=X.Length))){
 				throw new ArgumentException("Sizes of input arrays must agree!");}
 			fixed (double* x=X,y=Y,z=Z){
-				error=Transform(mlb1,mlb2,x,y,z,X.Length);}
+				error=TR_Transform(mlb1,mlb2,x,y,z,X.Length);}
 			return error;
 		}
 		/// <summary>
@@ -149,7 +159,7 @@ namespace Kmstrlib.NET
 		{
 			mlb_in=mlb1;
 			mlb_out=mlb2;
-		        TR=Interface.tropen(mlb1,mlb2);
+		        TR=Interface.tropen(mlb1,mlb2,"");
 			is_init=(TR!=null);
 		}
 		public Point Transform(Point pt)
