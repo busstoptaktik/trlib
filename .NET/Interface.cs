@@ -34,6 +34,7 @@ namespace Kmstrlib.NET
 		/// KMSTRLIB return values:
 		/// </summary>
 		public const string TRLIB="TrLib.dll"; //should really be defined at compile time....
+		public const string VERSION="WE should figure out how to get the version out of the dll in a safe way...";
 		
 		public enum KMSTR_Error
 		{
@@ -49,7 +50,7 @@ namespace Kmstrlib.NET
 		// same folder as this __file__ (or in a folder on the system search path)
 
 		[DllImport(TRLIB)]
-		public static extern int TR_InitLibrary(string folder);
+		private static extern int TR_InitLibrary(string folder);
 		
 		public static int InitLibrary(string folder)
 		{
@@ -57,7 +58,7 @@ namespace Kmstrlib.NET
 		}
 
 		[DllImport(TRLIB)]
-		public static extern void TR_TerminateLibrary();
+		private static extern void TR_TerminateLibrary();
 		
 		public static void TerminateLibrary()
 		{
@@ -65,58 +66,35 @@ namespace Kmstrlib.NET
 		}
 
 		[DllImport(TRLIB)]
-		unsafe public static extern void* tropen(string mlb1,string mlb2, string geoid_name);
+		public static extern IntPtr tropen(string mlb1,string mlb2, string geoid_name);
 
 		[DllImport(TRLIB)]
-		unsafe public static extern void trclose( void* tr);
+		public static extern void trclose( IntPtr tr);
 
 		[DllImport(TRLIB)]
-		unsafe public static extern KMSTR_Error tr(
+		public static extern KMSTR_Error tr(
 			
-			void* TR,
-			double* X,
-			double* Y,
-			double* Z,
+			IntPtr TR,
+			out double X,
+			out double Y,
+			out double Z,
 			int npoints);
 		
+		/*[DllImport(TRLIB)]
+		unsafe public static extern void TR_GetVersion(byte* buf, int buf_length);*/
 		
-		[DllImport(TRLIB)]
-		unsafe public static extern KMSTR_Error TR_Transform(
 		
-			string mlb1,
-			string mlb2,
-			double* X,
-			double* Y,
-			double* Z,
-			int npoints);
 		
-		[DllImport(TRLIB)]
-		unsafe public static extern void TR_GetVersion(byte* buf, int buf_length);
-		
-		unsafe public static string GetVersion()
+		public static string GetVersion()
 		{
-			byte[] buf= new byte[128];
+			/*byte[] buf= new byte[128];
 			fixed (byte* bufp=buf){
 			TR_GetVersion(bufp,buf.Length);}
-			return System.Text.ASCIIEncoding.ASCII.GetString(buf).Trim().Replace("\0",""); //should go right as long as version is more less 'ascii' encoded....
+			return System.Text.ASCIIEncoding.ASCII.GetString(buf).Trim().Replace("\0",""); //should go right as long as version is more less 'ascii' encoded....*/
+			return Interface.VERSION;
 		}
 		
-                unsafe public static KMSTR_Error Transform(
-			
-			string mlb1, 
-			string mlb2, 
-			double[] X, 
-			double[] Y, 
-			double[] Z)
-		{
-			KMSTR_Error  error;
-			if ((X.Length!=Y.Length)||((Z!=null) && (Z.Length!=X.Length))){
-				throw new ArgumentException("Sizes of input arrays must agree!");}
-			fixed (double* x=X,y=Y,z=Z){
-				error=TR_Transform(mlb1,mlb2,x,y,z,X.Length);}
-			return error;
-		}
-		/// <summary>
+              
 		/// String representation of error messages
 		/// </summary>
 		public static string GetKMSErrorMessage(KMSTR_Error e)
@@ -149,18 +127,20 @@ namespace Kmstrlib.NET
 	}
 	
 	
-	public unsafe class CoordinateTransformation
+	public class CoordinateTransformation
 	{
 		public string mlb_in;
 		public string mlb_out;
 		public bool is_init=false;
-		private void* TR=null;
+		private IntPtr TR=IntPtr.Zero;
 		public CoordinateTransformation(string mlb1, string mlb2)
 		{
 			mlb_in=mlb1;
 			mlb_out=mlb2;
 		        TR=Interface.tropen(mlb1,mlb2,"");
-			is_init=(TR!=null);
+			is_init=(TR!=IntPtr.Zero);
+			if (!is_init){  //can discuss if we should throw an exception here.....
+				throw new ArgumentException("Invalid input labels!");}
 		}
 		public Point Transform(Point pt)
 		{
@@ -169,11 +149,19 @@ namespace Kmstrlib.NET
 				pt.return_code=Interface.KMSTR_Error.KMSTR_LABELERROR;
 				return pt;
 			}
-			double* x=&pt.x, y=&pt.y, z=&pt.z;
-			err=Interface.tr(TR,x,y,z,1);
+			err=Interface.tr(TR,out pt.x,out pt.y,out pt.z,1);
 			pt.return_code=err;
 			return pt;
 		}
+		public Interface.KMSTR_Error TransformArray(double[] X, double[] Y, double[] Z)
+		{
+			Interface.KMSTR_Error err=Interface.KMSTR_Error.KMSTR_OK;
+			if ((X.Length!=Y.Length)||((Z!=null) && (Z.Length!=X.Length))){
+				throw new ArgumentException("Sizes of input arrays must agree!");}
+			for (int i=0; i<X.Length ; i++)
+				err=Interface.tr(TR,out X[i],out Y[i], out Z[i], 1);
+			return err;
+		}	
 		public void Close()
 		{
 			Interface.trclose(TR);
