@@ -116,7 +116,8 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #define TR_DEF_FILE "def_lab.txt"
 /* We use a global geoid table. This could be made thread local if needed. Now thread local!!!! */
  //static struct mgde_str GeoidTable;
- static int HAS_GEOIDS=0;
+ 
+static int HAS_GEOIDS=0;
 /* Need to let KMSTrans parse the def-files, before any transformation
    We need to figure out a way of setting the tabdir to the directory of the running shared library (for people who don't want geoids)
 */
@@ -348,11 +349,20 @@ TR *tropen (char *label_in, char *label_out, char *geoid_name) {
         return 0;
     }
     /*Set geoid info */
-    if (strlen(geoid_name)>0){
+    if (0!=geoid_name && strlen(geoid_name)>0){
 	   special_geoid_table=malloc(sizeof(struct mgde_str));
 	   special_geoid_table->init=0;
 	   has_geoids= geoid_i(geoid_name, GDE_LAB, special_geoid_table,NULL);
+	   #ifdef _ROUT
 	   printf("has geoids: %d, name: %s\n",has_geoids,geoid_name);
+	   #endif
+	   if (has_geoids<0){  /*on error return null */
+		   free(plab_in);
+		   free(plab_out);
+		   geoid_c(special_geoid_table,0,NULL);
+		   free(special_geoid_table);
+		   return 0;
+	   }
 	   tr->geoid_pt=special_geoid_table;
 	   tr->close_table=1;
 	   tr->ngeoids=has_geoids;

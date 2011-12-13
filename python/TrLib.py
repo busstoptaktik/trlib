@@ -175,7 +175,7 @@ class CoordinateTransformation(object):
 		return self.rc
 	def GetGeoidInfo(self):
 		if self.tr is not None:
-			tr_lib.TR_GetGeoidInfo(self.tr)
+			tr_lib.TR_GeoidInfo(self.tr)
 	def Close(self):
 		if self.tr is not None:
 			tr_lib.trclose(self.tr)
