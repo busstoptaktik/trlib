@@ -34,7 +34,7 @@ namespace Kmstrlib.NET
 		/// KMSTRLIB return values:
 		/// </summary>
 		public const string TRLIB="TrLib.dll"; //should really be defined at compile time....
-		public const string VERSION="WE should figure out how to get the version out of the dll in a safe way...";
+		
 		
 		public enum KMSTR_Error
 		{
@@ -80,18 +80,17 @@ namespace Kmstrlib.NET
 			out double Z,
 			int npoints);
 		
-		/*[DllImport(TRLIB)]
-		unsafe public static extern void TR_GetVersion(byte* buf, int buf_length);*/
+		[DllImport(TRLIB)]
+		public static extern void TR_GetVersion(StringBuilder buf, int buf_length);
 		
 		
 		
 		public static string GetVersion()
 		{
-			/*byte[] buf= new byte[128];
-			fixed (byte* bufp=buf){
-			TR_GetVersion(bufp,buf.Length);}
-			return System.Text.ASCIIEncoding.ASCII.GetString(buf).Trim().Replace("\0",""); //should go right as long as version is more less 'ascii' encoded....*/
-			return Interface.VERSION;
+			StringBuilder cb = new StringBuilder(256);
+			TR_GetVersion(cb,cb.Capacity);
+			return cb.ToString().Trim().Replace("\0",""); 
+			
 		}
 		
               
