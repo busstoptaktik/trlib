@@ -31,6 +31,7 @@ TEST_SYSTEMS_2D=[["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,0,1.0],
 ["geo_wgs84","FO_fotm",-6.8,62.0,0,D2M],
 ["utm32_wgs84","webmrc",512200.0,6143200.0,0,1.0]]
 TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
+["utm32Ewgs84","utm33Eed50",512200.0,6143200.0,100.0,1.0],
 ["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0],
@@ -198,7 +199,7 @@ def main(args):
 	nerr=0
 	nerr+=RandomTests(TEST_SYSTEMS_2D,2,N,log_file=sys.stdout)
 	nerr+=RandomTests(TEST_SYSTEMS_3D,3,N,log_file=sys.stdout)
-	for i in range(20):
+	for i in range(3):
 		nerr+=RandomTests(FH_TEST,3,N,log_file=sys.stdout)
 		#TrLib.tr_lib.IsGeoidTableInitialised()
 	print("Errors: %d" %nerr)

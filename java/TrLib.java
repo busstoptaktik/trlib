@@ -49,7 +49,15 @@ public class TrLib {
 			throw new Exception("Not properly initialised");}
 		rc=TrLib.tr(trf,x,y,z,x.length);
 		return rc;
-	}			
+	}
+	public int Transform_java(double x[], double y[], double z[])
+	{
+		int rc;
+		int i;
+		for (i=0; i<x.length; i++){
+			rc=TrLib.tr(trf,x[i],y[i],z[i],1);}
+		return rc;
+		}
 	public void Close()
 	{
 		TrLib.trclose(trf);

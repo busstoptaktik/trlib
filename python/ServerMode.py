@@ -131,9 +131,9 @@ def main(args):
 			finished_threads+=1
 			rn=random.random()
 			flag=None
-			if rn<0.1:
+			if rn<0.4:
 				mode=0
-			elif rn<2:
+			elif rn<0.85:
 				mode=1
 			else:
 				FH_flag.wait()
