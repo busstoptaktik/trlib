@@ -19,12 +19,11 @@ import threading
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids") #pointer to geoid directory
 D2M=9.3349049354951814e-06
 TEST_SYSTEMS_2D=[["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,0,1.0],
-["dktm1","utm32_wgs84",112928.119,1117545.350,0,1.0],
-["geo_wgs84","geo_ed50",12.0,54.0,0,D2M],
+["geo_wgs84","geo_ed50",12.0,55.0,0,D2M],
 ["utm32_ed50","utm32_etrs89",512200.0,6143200.0,0,1.0,],
 ["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,0,1.0],
-["dktm1","utm32_wgs84",112928.119,1117545.350,0,1.0],
-["s34j","dktm1",284686.705,84120.484,0,1.0],
+["utm32_wgs84","s34j",512200.0,6143200.0,0,1.0],
+["utm32_wgs84","dktm1",512200.0,6143200.0,0,1.0],
 ["geo_wgs84","s34s",11.18,54.65,0,D2M],
 ["kp2000j","utm32_ed50",181078.422,6117383.291,0,1.0],
 ["geo_wgs84","GR_utm22_gr96",-52.23,64.68,0,D2M],
@@ -39,7 +38,7 @@ TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M*0.4], #pretty close to bridge project.
 ["geoNwgs84","crt_wgs84",14.75,54.10,100,D2M]]
 #["utm32Nwgs84","geoEed50",512200.1,6143200.1,100.0,1.0]]
-THREAD_SAFE_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
+THREAD_SAFE_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,55.0,100.0,D2M],
 ["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0]] #,
@@ -107,8 +106,9 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 			except Exception,msg:
 				log_file.write(repr(msg)+"\n")
 				sys.stderr.write(repr(msg)+"\n")
-				log_file.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
-				sys.stderr.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
+				msg="From: %s To: %s, Last error: %d\n" %(label_in,label_out,TrLib.GetLastError())
+				log_file.write(msg)
+				sys.stderr.write(msg)
 				if N<10:
 					sys.stderr.write("Input: %s\n" %repr(xyz))
 				nerr+=1
@@ -127,8 +127,9 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 			except Exception,msg:
 				log_file.write(repr(msg)+"\n")
 				sys.stderr.write(repr(msg)+"\n")
-				log_file.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
-				sys.stderr.write("From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError()))
+				msg="From: %s To: %s, Last error: %d\n" %(label_out,label_in,TrLib.GetLastError())
+				log_file.write(msg)
+				sys.stderr.write(msg)
 				if N<10:
 					sys.stderr.write("Input: %s\n" %repr(xyz_out))
 				nerr+=1

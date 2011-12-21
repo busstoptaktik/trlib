@@ -14,7 +14,7 @@ import gc
 import random
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
 KEEP_ALIVE=4
-NRUNS=5800 #crashes at some point. Something to do with tls (open file pointers!)
+NRUNS=4000 #crashes at some point. Something to do with tls (open file pointers!)
 NITERATIONS=3
 NPOINTS=1
 LOG_FILE="server_mode"
@@ -133,20 +133,21 @@ def main(args):
 			flag=None
 			if rn<0.4:
 				mode=0
-			elif rn<0.85:
-				mode=1
+			elif "-fehmarn" in args:
+				if rn<0.85:
+					mode=1
+				else: #then start Fehmarn thread - which is problematic!
+					FH_flag.wait()
+					mode=3
+					flag=FH_flag
 			else:
-				FH_flag.wait()
-				mode=3
-				flag=FH_flag
+				mode=1
 			new_thread=BadGuy(finished_threads,NPOINTS,NITERATIONS,mode,None,flag)
 			new_thread.start()
-			#new_thread.join()
 			if WIN32:
 				stat = MEMORYSTATUSEX()
 				ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat))
 				print "Avail. mem:",stat.ullAvailPhys
-			#gc.collect()
 	while threading.activeCount()>1:
 		print("Active threads: %i" %threading.activeCount())
 		time.sleep(2)

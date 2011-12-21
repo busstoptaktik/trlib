@@ -110,7 +110,7 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "trthread.h"
-#define TRLIB_VERSION "TLS GeoidTable in internal func and poss. to open special in tropen ...2011-11-15"
+#define TRLIB_VERSION "Added more init stuff...2011-12-21"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
@@ -129,7 +129,7 @@ int TR_GetLastError(void){
 }
 
 int TR_InitLibrary(char *path) {
-    int ok=0,rc,has_geoids;
+    int ok=0,rc;
     double x=512200.0,y=6143200.0,z=0.0;
     TR* trf;
     FILE *fp;
@@ -168,7 +168,11 @@ int TR_InitLibrary(char *path) {
     if (0!=trf){
 	    rc=tr(trf,&x,&y,&z,1);
 	    trclose(trf);}
-    trf=tropen("fotm","utm22_gr96","");
+    trf=tropen("utm32_wgs84","s34j","");
+	    if (0!=trf){
+	    rc=tr(trf,&x,&y,&z,1);
+	    trclose(trf);}
+    trf=tropen("FO_fotm","GR_utm22_gr96","");
     if (0!=trf){
 	    rc=tr(trf,&x,&y,&z,1);
 	    trclose(trf);}
