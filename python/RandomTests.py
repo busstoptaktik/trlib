@@ -35,11 +35,12 @@ TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0],
 ["GR_geoEwgs84","GR_utm22Ngr96",-52.23,64.68,200.0,D2M],
-["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M*0.4], #pretty close to bridge project.
+#["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M*0.4], #pretty close to bridge project.
 ["geoNwgs84","crt_wgs84",14.75,54.10,100,D2M]]
 #["utm32Nwgs84","geoEed50",512200.1,6143200.1,100.0,1.0]]
 THREAD_SAFE_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,55.0,100.0,D2M],
 ["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
+["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0]] #,
 
@@ -52,7 +53,7 @@ THREAD_TEST=False #Flag to force a break on error when running thread test
 def SetThreadMode(): #since  Fehmarn transformations are known NOT to be thread safe at the moment!
 	global THREAD_TEST
 	global TEST_SYSTEMS_3D
-	TEST_SYSTEMS_3D=THREAD_SAFE_3D #NOT NEEDED ANYMORE!
+	#TEST_SYSTEMS_3D=THREAD_SAFE_3D #NOT NEEDED ANYMORE!
 	THREAD_TEST=True
 			
 def RandomPoints(N,dim,x,y,z=0,scale=1):
@@ -79,7 +80,7 @@ def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 	return nerr
 
 
-def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
+def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout,sleep=0):
 	nerr=0
 	id=str(threading.current_thread().name)
 	log_file.write("%s\n" %LINE_SPLIT)
@@ -117,6 +118,9 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 			else:
 				nok+=1
 				log_file.write("Forward running time: %.5f s\n" %(time.clock()-tstart))
+			if sleep>0:
+				time.sleep(sleep)
+		
 		if nok==0:
 			continue
 		log_file.write("Running inverse...\n")
@@ -149,6 +153,8 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 						log_file.write("Maximum tr-loop error: xy: %.10f m z: %.10f m\n" %(err_xy,err_z))
 						log_file.write("in: %s\n" %repr(xyz_out))
 						log_file.write("back: %s\n" %repr(xyz_back))
+			if sleep>0:
+				time.sleep(sleep)
 						
 			
 		if N<=10:

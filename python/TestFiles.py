@@ -4,6 +4,8 @@
 ## Test definition file must follow the format:
 ##     input_file output_file minilabel_out precision_out 
 ##     .....
+## File paths are relative to the test definition file! (Makes portability easier).
+##
 ##Transform some standard files to compare output against prev. versions.
 ## Files must follow the format:
 ## #minilabel
@@ -26,8 +28,8 @@ def main(args): #progname, test_def, -lib libname (optional)
 	if not IS_INIT:
 		if "-lib" in args: #In this case we assume that input is the library that we want to test....
 			lib=args[args.index("-lib")+1]
-			lib=os.path.splitext(os.path.basename(args[2]))[0]
-			dir=os.path.dirname(args[2])
+			lib=os.path.basename(lib)
+			dir=os.path.dirname(lib)
 			IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
 		else:
 			print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)
@@ -44,6 +46,7 @@ def main(args): #progname, test_def, -lib libname (optional)
 	except:
 		print("Test definition must be specified as first argument!")
 		return -1
+	job_dir=os.path.dirname(args[1])
 	print("Using job definition in file %s" %args[1])
 	for line in f:
 		sline=line.split()
@@ -57,6 +60,8 @@ def main(args): #progname, test_def, -lib libname (optional)
 		except:
 			print("Wrong definition:\n%s" %line)
 			continue
+		file_in=os.path.join(job_dir,file_in)
+		file_out=os.path.join(job_dir,file_out)
 		if os.path.exists(file_in):
 			TrLib.TransformFile(file_in,label_out,file_out,precision)
 		else:

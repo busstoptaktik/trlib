@@ -180,6 +180,8 @@ int TR_InitLibrary(char *path) {
     if (0!=trf){
 	    rc=tr(trf,&x,&y,&z,1);
 	    trclose(trf);}
+    if (0!=ERR_LOG)
+	    fprintf(ERR_LOG,"************ end initialisation **************\n");
     return (ok==TR_OK); 
 }
 /* Mock up. Look in kmstr5 for better ideas */
@@ -397,7 +399,7 @@ void trclose (TR *tr) {
 	    printf("Closing special geoid!\n");
 	    geoid_c(tr->geoid_pt,0,NULL);
 	    free(tr->geoid_pt);}
-    gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0); /*might not be needed! WANT TO close hgrid static in gd_trans */
+    //gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0); /*might not be needed! WANT TO close hgrid static in gd_trans */
     free (tr);
     return;
 }
@@ -439,12 +441,17 @@ int tr(TR *tr, double *X, double *Y, double *Z, int n) {
     for (i = 0;  i < n;  i++) {
 	z = Z? Z[i]: z1;
         err = gd_trans(tr->plab_in, tr->plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH,tr->use_geoids,tr->geoid_pt, "", ERR_LOG);
+	#ifdef _ROUT
+	if (err)
+		fprintf(ERR_LOG,"\nProj: %s->%s, last err: %d, in: %.3f %.3f %.3f\n",(tr->plab_in->u_c_lab).mlb,(tr->plab_out->u_c_lab).mlb,err,x_in[i],y_in[i],z);
+	#endif
         /*err = gd_trans(tr->plab_in, tr->plab_out,  x,y,z,  X+i,Y+i, (Z? Z+i: &z2), &GH, -1, &GeoidTable, 0, 0);
          *   KE siger at arg 0 før GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
         if (err)
            ERR = err;
    }
    tr_last_error=ERR;
+   
    return ERR? TR_ERROR: TR_OK;
     
 }

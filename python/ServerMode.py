@@ -14,7 +14,7 @@ import gc
 import random
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
 KEEP_ALIVE=4
-NRUNS=4000 #crashes at some point. Something to do with tls (open file pointers!)
+NRUNS=3000 #crashes at some point. Something to do with tls (open file pointers!)
 NITERATIONS=3
 NPOINTS=1
 LOG_FILE="server_mode"
@@ -69,6 +69,9 @@ class BadGuy(threading.Thread):
 	def run(self):
 		if self.flag is not None:
 			self.flag.clear()
+		if self.mode!=3: #turn up the heat! Test having an open transformation in between lots of other stuff
+			ct=TrLib.CoordinateTransformation("utm32Hwgs84_h_dvr90","geoHed50_h_msl")
+			x,y,z=ct.Transform(512200.1,6143200.1,100.0)
 		n=self.N #+something random??
 		if self.log_file is None:
 			fp=sys.stdout
@@ -81,15 +84,22 @@ class BadGuy(threading.Thread):
 			elif self.mode==1:
 				nerr=RandomTests.RandomTests_2D(n,log_file=NoOut())
 			else:
-				nerr=RandomTests.RandomTests(RandomTests.FH_TEST,3,n,log_file=NoOut())
+				nerr=RandomTests.RandomTests(RandomTests.FH_TEST,3,n,log_file=NoOut(),sleep=0.01)
 			if nerr>0:
 				fp.write("Thread %d, mode %d, encountered %d errors!\n" %(self.id,self.mode,nerr))
 			time.sleep(random.random()*0.1)
 			self.iterations-=1
+		if self.mode!=3:
+			x,y,z=ct.Transform(512200.1,6143200.1,100.0)
+			ct.Close()
 		fp.write("Thread %i finished\n" %self.id)
+		if self.mode==3:
+			time.sleep(0.01)
 		if self.log_file is not None:
 			fp.close()
 		TrLib.TerminateLibrary()
+		if self.mode==3:
+			time.sleep(0.01)
 		if self.flag is not None:
 			self.flag.set()
 		return 
@@ -119,13 +129,22 @@ def main(args):
 	log_fp=open(log_name,"w")
 	sys.stdout=RedirectStdout(log_fp)
 	sys.stderr=sys.stdout
+	if "-nruns" in args:
+		nruns=int(args[args.index("-nruns")+1])
+	else:
+		nruns=NRUNS
+	if "-npoints" in args:
+		npoints=int(args[args.index("-npoints")+1])
+	else:
+		npoints=NPOINTS
 	print("Running %s at %s" %(progname,time.asctime()))
 	print("Using TrLib v. %s" %TrLib.GetVersion())
 	print("Shared library is: %s" %repr(TrLib.tr_lib))
 	finished_threads=0
+	nfemern=0
 	FH_flag=threading.Event()
 	FH_flag.set()
-	while finished_threads<NRUNS:
+	while finished_threads<nruns:
 		if threading.activeCount()<KEEP_ALIVE:
 			print("Active threads: %i" %threading.activeCount())
 			finished_threads+=1
@@ -134,16 +153,19 @@ def main(args):
 			if rn<0.4:
 				mode=0
 			elif "-fehmarn" in args:
-				if rn<0.85:
+				if rn<0.75:
 					mode=1
 				else: #then start Fehmarn thread - which is problematic!
 					FH_flag.wait()
 					mode=3
 					flag=FH_flag
+					nfemern+=1
 			else:
 				mode=1
-			new_thread=BadGuy(finished_threads,NPOINTS,NITERATIONS,mode,None,flag)
+			new_thread=BadGuy(finished_threads,npoints,NITERATIONS,mode,None,flag)
 			new_thread.start()
+			if nfemern>0 and nfemern%10==0:
+				print("%d Fehmarn threads started." %nfemern)
 			if WIN32:
 				stat = MEMORYSTATUSEX()
 				ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat))
