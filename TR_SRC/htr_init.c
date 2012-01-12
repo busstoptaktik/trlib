@@ -128,14 +128,21 @@ char                    *dh_tr_info
   i_hdtm = i_clb->h_dtm;
   o_hdtm = o_clb->h_dtm;
   /* Ellipsoidal h or CRT search parent */
+  rgn = i_clb->p_rgn;
+  if (rgn == 0) {
+    rgn = o_clb->p_rgn;
+    if (rgn == 0) {
+      rgn = i_clb->region;
+      if (rgn == 0) rgn = o_clb->region;
+    }
+  }
   if (i_hdtm == 200 && o_hdtm != 200) {
-    rgn = i_clb->p_rgn;
-    if (rgn == 0) rgn = o_clb->p_rgn;
-    if (i_clb->imit == FHMASK || o_clb->imit == FHMASK) i_hdtm = 213 /*fcsvr10*/;
+    if (i_clb->imit == FHMASK || o_clb->imit == FHMASK)
+        i_hdtm = 213 /*fcsvr10*/;
     else
-    if (rgn == DK_rgn.r_nr[0]) i_hdtm = 208/*dvr90*/;
+    if (rgn == DK_rgn.r_nr[0]) i_hdtm = 208 /*dvr90*/;
     else
-    if (rgn == DE_rgn.r_nr[0]) i_hdtm = 215/*dhhn92*/;
+    if (rgn == DE_rgn.r_nr[0]) i_hdtm = 215 /*dhhn92*/;
     else  /* FO_MSL before 2009 is named:: foldmsl (== 216) */
     if (rgn == FO_rgn.r_nr[0]) i_hdtm = 211; /*fvr09*/
     else
@@ -147,14 +154,21 @@ char                    *dh_tr_info
     else
     if (o_hdtm == 211 || rgn == FO_rgn.r_nr[0]) i_hdtm = 211;
   }
+  rgn = o_clb->p_rgn;
+  if (rgn == 0) {
+    rgn = i_clb->p_rgn;
+    if (rgn == 0) {
+      rgn = o_clb->region;
+      if (rgn == 0) rgn = i_clb->region;
+    }
+  }
   if (o_hdtm == 200 && i_hdtm != 200) {
-    rgn = o_clb->p_rgn;
-    if (rgn == 0) rgn = i_clb->p_rgn;
-    if (i_clb->imit == FHMASK || o_clb->imit == FHMASK) o_hdtm = 213 /*fcsvr10*/;
+    if (i_clb->imit == FHMASK || o_clb->imit == FHMASK)
+        o_hdtm = 213 /*fcsvr10*/;
     else
-    if (rgn == DK_rgn.r_nr[0]) o_hdtm = 208/*dvr90*/;
+    if (rgn == DK_rgn.r_nr[0]) o_hdtm = 208 /*dvr90*/;
     else
-    if (rgn == DE_rgn.r_nr[0]) o_hdtm = 215/*dhhn92*/;
+    if (rgn == DE_rgn.r_nr[0]) o_hdtm = 215 /*dhhn92*/;
     else
     if (rgn == FO_rgn.r_nr[0]) o_hdtm = 211; /*fvr09*/
     else
@@ -166,6 +180,9 @@ char                    *dh_tr_info
     else
     if (i_hdtm == 211 || rgn == FO_rgn.r_nr[0]) o_hdtm = 211;
   }
+  /* idt for DK h_dtms */
+  if (i_hdtm == 203 || i_hdtm == 204 || i_hdtm == 206) i_hdtm = 209;
+  if (o_hdtm == 203 || o_hdtm == 204 || o_hdtm == 206) o_hdtm = 209;
 
   if (i_hdtm == o_hdtm) tr_type = 0;
   else {
@@ -187,12 +204,12 @@ char                    *dh_tr_info
             (void) sscanf(pth_mlb, "%s%n", c_mlb, &used); // to_dtm
             if (!strcmp((l_inv) ? i_nm : o_nm, c_mlb)) { // FOUND
               // The grid_val accepts NO height label part::
-              p_tp = test_lab.u_c_lab.mlb + test_lab.u_c_lab.sepix;
-              if (test_lab.u_c_lab.sepix + 2 == test_lab.u_c_lab.h_ix)
-                *(test_lab.u_c_lab.mlb + test_lab.u_c_lab.sepix)   = '\0';
+              p_tp = test_lab.u_c_lab.mlb+test_lab.u_c_lab.sepix;
+              if (test_lab.u_c_lab.sepix+2 == test_lab.u_c_lab.h_ix)
+                *(test_lab.u_c_lab.mlb+test_lab.u_c_lab.sepix)   = '\0';
               else {
-                *(test_lab.u_c_lab.mlb + test_lab.u_c_lab.sepix)   = '_';
-                *(test_lab.u_c_lab.mlb + test_lab.u_c_lab.h_ix -1) = '\0';
+                *(test_lab.u_c_lab.mlb+test_lab.u_c_lab.sepix)   = '_';
+                *(test_lab.u_c_lab.mlb+test_lab.u_c_lab.h_ix -1) = '\0';
               }
               htr_const->inv   = l_inv;
               *htr_lab         = test_lab;
@@ -203,7 +220,8 @@ char                    *dh_tr_info
               htr_const->LAT0  = sgetg(p_tp, &g_tpd, &used, "nt");
               p_tp            += used;
               htr_const->LON0  = sgetg(p_tp, &g_tpd, &used, "nt");
-              qr               = fgetln(pth_mlb, &used, def_lab_file); // params
+              // params ::
+              qr               = fgetln(pth_mlb, &used, def_lab_file);
               if (qr != EOF) {
                 switch (tr_type) {
                 case 1: // dh_table

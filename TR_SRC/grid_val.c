@@ -119,9 +119,11 @@ g, *tab_max, t_lab->mlb);
           if (t_lab->datum == crd_lab->datum) i = 0;
           else
           /* NEED Backloop as EE WGS84 != euref89 || WGS84 != GR96  */
-          /*              WGS84           EUREF89              GR96 */
-          i = ((  t_lab->datum == 1 ||   t_lab->datum == 4 ||   t_lab->datum == 5)
-            && (crd_lab->datum == 1 || crd_lab->datum == 4 || crd_lab->datum == 5))
+          /*              WGS84           EUREF89                   */
+          i = ((  t_lab->datum == 1 ||   t_lab->datum == 4 ||
+                  t_lab->datum == 5) /* GR96 */
+            && (crd_lab->datum == 1 || crd_lab->datum == 4 || 
+                crd_lab->datum == 5))
             ? 0 : TAB_C_PRJ_;
         } else
         i = (strcmp(t_lab->clb, crd_lab->mlb)) ? TAB_C_PRJ_ : 0;

@@ -51,7 +51,7 @@ FILE                    *tr_error
 
 #include         "t_status.h"
 
-  double           N, E, n, e, u, v, tol = 0.001;
+  double           N, E, n, e, u, v, tol = 0.080; /*m*/
   double          *cb = NULL, *cw = NULL;
   double          *tcy, *tcx;
   int              res = 0, i, g, r, c, sz;
@@ -561,8 +561,7 @@ FILE                    *tr_error
     if (res >= TRF_TOLLE_) {
       if (fabs(N - N_in) < tol && fabs(E - E_in) < tol) return (0);
       else
-      res = (fabs(N - N_in) < 10.0 && fabs(E - E_in) < 10.0)
-          ? TRF_INACC_ : TRF_TOLLE_;
+      res = TRF_TOLLE_;
     }
   }
   else res = TRF_PROGR_;  /* UNDEFINED DIRECTION */
