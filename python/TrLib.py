@@ -84,6 +84,7 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 	sdir=geoid_dir
 	if sdir[-1] not in ["\\","/"]:
 		sdir+="/"
+	sdir=str(sdir.replace("\\","/"))
 	IS_INIT=tr_lib.TR_InitLibrary(sdir) #at some point use this info....
 	return IS_INIT
 
