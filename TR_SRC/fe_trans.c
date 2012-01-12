@@ -138,54 +138,126 @@ FILE                *tr_error
   /* Action/state table */
   static struct act_nst fetab[] = {
 
-    /* u29 = utm29_etrs89: 0 */
+    /* output: u29 = utm29_etrs89: 0 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /* state : */
     /*   0       1       2       3       4       5       6       7*/
     {IDT,0},{GTU,0},{FTU,0},{U0U,0},{GU0,3},{KTU,0},{G4K,5},{K9U,0},
+    /* read above line::                                          */
+    /* input :: 0 :: IDT                                          */
+    /* input :: 1 :: GTU -> IDT                                   */
+    /* input :: 2 :: FTU -> IDT                                   */
+    /* input :: 3 :: U0U -> IDT                                   */
+    /* input :: 4 :: GU0 -> U0U -> IDT                            */
+    /* input :: 5 :: KTU -> IDT                                   */
+    /* input :: 6 :: G4K -> KTU -> IDT                            */
+    /* input :: 7 :: K9U -> IDT                                   */
 
-    /* geo = geo_etrs89: 1 */
+    /* output: geo = geo_etrs89: 1 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
     {UTG,1},{IDT,1},{FTU,0},{U0U,0},{GU0,3},{KTU,0},{G4K,5},{K9U,0},
+    /* read above line::                                          */
+    /* input :: 0 :: UTG -> IDT                                   */
+    /* input :: 1 :: IDT                                          */
+    /* input :: 2 :: FTU -> UTG -> IDT                            */
+    /* input :: 3 :: U0U -> UTG -> IDT                            */
+    /* input :: 4 :: GU0 -> U0U -> UTG -> IDT                     */
+    /* input :: 5 :: KTU -> UTG -> IDT                            */
+    /* input :: 6 :: G4K -> KTU -> UTG -> IDT                     */
+    /* input :: 7 :: K9U -> UTG -> IDT                            */
 
-    /* fke(_etrs89): 2 */
+    /* output: fke(_etrs89): 2 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
     {UTF,2},{GTU,0},{IDT,2},{U0U,0},{GU0,3},{KTU,0},{G4K,5},{K9U,0},
+    /* read above line::                                          */
+    /* input :: 0 :: UTF -> IDT                                   */
+    /* input :: 1 :: GTU -> UTF -> IDT                            */
+    /* input :: 2 :: IDT                                          */
+    /* input :: 3 :: U0U -> UTF -> IDT                            */
+    /* input :: 4 :: GU0 -> U0U -> UTF -> IDT                     */
+    /* input :: 5 :: KTU -> UTF -> IDT                            */
+    /* input :: 6 :: G4K -> KTU -> UTF -> IDT                     */
+    /* input :: 7 :: K9U -> UTF -> IDT                            */
 
-    /* u50 = utm29_ed50: 3 */
+    /* output: u50 = utm29_ed50: 3 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
     {UU0,3},{GTU,0},{FTU,0},{IDT,3},{GU0,3},{KTU,0},{G4K,5},{K9U,0},
+    /* read above line::                                          */
+    /* input :: 0 :: UU0 -> IDT                                   */
+    /* input :: 1 :: GTU -> UU0 -> IDT                            */
+    /* input :: 2 :: FTU -> UU0 -> IDT                            */
+    /* input :: 3 :: IDT                                          */
+    /* input :: 4 :: GU0 -> IDT                                   */
+    /* input :: 5 :: KTU -> UU0 -> IDT                            */
+    /* input :: 6 :: G4K -> KTU -> UU0 -> IDT                     */
+    /* input :: 7 :: K9U -> UU0 -> IDT                            */
 
-    /* g50 = geo_ed50:  4 */
+    /* output: g50 = geo_ed50:  4 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
     {UU0,3},{GTU,0},{FTU,0},{U0G,4},{IDT,4},{KTU,0},{G4K,5},{K9U,0},
+    /* read above line::                                          */
+    /* input :: 0 :: UU0 -> U0G -> IDT                            */
+    /* input :: 1 :: GTU -> UU0 -> U0G -> IDT                     */
+    /* input :: 2 :: FTU -> UU0 -> U0G -> IDT                     */
+    /* input :: 3 :: U0G -> IDT                                   */
+    /* input :: 4 :: IDT                                          */
+    /* input :: 5 :: KTU -> UU0 -> U0G -> IDT                     */
+    /* input :: 6 :: G4K -> KTU -> UU0 -> U0G -> IDT              */
+    /* input :: 7 :: K9U -> UU0 -> U0G -> IDT                     */
 
-    /* k54 = fk54(_fd54): 5 */
+    /* output: k54 = fk54(_fd54): 5 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
     {UTK,5},{GTU,0},{FTU,0},{U0U,0},{GU0,3},{IDT,5},{G4K,5},{K9U,0},
+    /* read above line::                                          */
+    /* input :: 0 :: UTK -> IDT                                   */
+    /* input :: 1 :: GTU -> UTK -> IDT                            */
+    /* input :: 2 :: FTU -> UTK -> IDT                            */
+    /* input :: 3 :: U0U -> UTK -> IDT                            */
+    /* input :: 4 :: GU0 -> UU0 -> UTK -> IDT                     */
+    /* input :: 5 :: IDT                                          */
+    /* input :: 6 :: G4K -> IDT                                   */
+    /* input :: 7 :: K9U -> UTK -> IDT                            */
 
-    /* g54 = geo_fd54: 6 */
+    /* output: g54 = geo_fd54: 6 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
     {UTK,5},{GTU,0},{FTU,0},{U0U,0},{GU0,3},{KG4,6},{IDT,6},{K9U,0},
+    /* read above line::                                          */
+    /* input :: 0 :: UTK -> KG4 -> IDT                            */
+    /* input :: 1 :: GTU -> UTK -> KG4 -> IDT                     */
+    /* input :: 2 :: FTU -> UTK -> KG4 -> IDT                     */
+    /* input :: 3 :: U0U -> UTK -> KG4 -> IDT                     */
+    /* input :: 4 :: GU0 -> UU0 -> UTK -> IDT                     */
+    /* input :: 5 :: G4K -> IDT                                   */
+    /* input :: 6 :: IDT                                          */
+    /* input :: 7 :: K9U -> UTK -> KG4 -> IDT                     */
 
-    /* k89 = fk89(_fd54a): 7 */
+    /* output: k89 = fk89(_fd54a): 7 */
     /* input ::                                                   */
     /* u29     geo     fke     u50     g50     k54     g54     k89*/
     /*   0       1       2       3       4       5       6       7*/
     {U9K,7},{GTU,0},{FTU,0},{U0U,0},{GU0,3},{KTU,0},{G4K,5},{IDT,7}
+    /* read above line::                                          */
+    /* input :: 0 :: U9K -> IDT                                   */
+    /* input :: 1 :: GTU -> U9K -> IDT                            */
+    /* input :: 2 :: FTU -> U9K -> IDT                            */
+    /* input :: 3 :: U0U -> U9K -> IDT                            */
+    /* input :: 4 :: GU0 -> UU0 -> U9K -> IDT                     */
+    /* input :: 5 :: KTU -> U9K -> IDT                            */
+    /* input :: 6 :: G4K -> KTU -> U9K -> IDT                     */
+    /* input :: 7 :: IDT                                          */
   };
 
 
@@ -229,7 +301,7 @@ FILE                *tr_error
           outnr = pml->trnr;
 #ifdef DEBUGFETRANS
 (void) printf("\n*OUT  grp = %4d    nr = %4d   navn = %s;",
-pml->trgr, pml->trnr, pml->s_lab);
+outgr, outnr, pml->s_lab);
 #endif
           break;
         }
@@ -241,7 +313,26 @@ pml->trgr, pml->trnr, pml->s_lab);
       /* Datum and region check */
       switch (outgr) {
       case 0: /* Datum check */
-        if (outlab->datum != TC_u29.u_c_lab.datum) res = TRF_ILLEG_;
+        if (outlab->datum != TC_u29.u_c_lab.datum) {
+          switch(outlab->datum) {
+          case  13: /* fd54 */
+          case 142: /* fg54 */
+          case 144: /* fk54 */
+            outnr = 6;
+            break;
+          case 143: /* fg50 */
+          case 145: /* fu50 */
+            outnr = 4;
+            break;
+          case 146: /* fk89 */
+            outnr = 4;
+            break;
+          default:
+            res = TRF_ILLEG_;
+            break;
+          }
+          outgr = 1;
+        }
         break;
 
       case 1: /* Region check */
@@ -254,6 +345,9 @@ pml->trgr, pml->trnr, pml->s_lab);
         res = TRF_ILLEG_;
         break;
       } /* end out-label check */
+#ifdef DEBUGFETRANS
+(void) printf("\n*OUT  grp = %4d    nr = %4d;", pml->trgr, pml->trnr);
+#endif
 
       if (res == TRF_ILLEG_)
         return(t_status(
@@ -276,7 +370,7 @@ pml->trgr, pml->trnr, pml->s_lab);
           in_nr = pml->trnr;
 #ifdef DEBUGFETRANS
 (void) printf("\n*IN   grp = %4d    nr = %4d   navn = %s;",
-pml->trgr, pml->trnr, pml->s_lab);
+in_gr, in_nr, pml->s_lab);
 #endif
           break;
         }
@@ -284,7 +378,26 @@ pml->trgr, pml->trnr, pml->s_lab);
       /* Datum and region check */
       switch (in_gr) {
       case 0: /* Datum check */
-        if (in_lab->datum != TC_u29.u_c_lab.datum) res = TRF_ILLEG_;
+        if (in_lab->datum != TC_u29.u_c_lab.datum) {
+          switch(in_lab->datum) {
+          case  13: /* fd54 */
+          case 142: /* fg54 */
+          case 144: /* fk54 */
+            in_nr = 6;
+            break;
+          case 143: /* fg50 */
+          case 145: /* fu50 */
+            in_nr = 4;
+            break;
+          case 146: /* fk89 */
+            in_nr = 4;
+            break;
+          default:
+            res = TRF_ILLEG_;
+            break;
+          }
+          in_gr = 1;
+        }
         break;
 
       case 1: /* Region check */
@@ -297,6 +410,9 @@ pml->trgr, pml->trnr, pml->s_lab);
         res = TRF_ILLEG_;
         break;
       } /* end in_-label check */
+#ifdef DEBUGFETRANS
+(void) printf("\n*IN   grp = %4d    nr = %4d;", in_gr, in_nr);
+#endif
 
 
 /* fe_trans  ver 2011.02        # page 6    9 Oct 2011 13 55 */

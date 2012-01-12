@@ -49,9 +49,15 @@ char                     *err_str
 
 The label be initialized by call of           grid_i.
 
+Up to MAXGEOIDS geoid tables are initialized automatically.
 Only one table may be open at a time.
 
-g_v      is the interpolated table value to the point N, E
+The grid_val return value is::
+    == 0  tab_val found.
+     > 0  (no of wanted datum)
+          recall the function with other euref89 datum (e.g. EE_)
+     < 0  error
+g_v       is the interpolated table value to the point N, E
 
 The coordinates system c_lab_u must be the same as the table.
 The system may be checked by the call ::

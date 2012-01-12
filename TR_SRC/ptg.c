@@ -59,7 +59,7 @@ FILE                   *tr_error
 
   struct coord_lab  *TC = &(TC_u->u_c_lab);
   int               res = 0, i, s, h, cstm, mode, ell_trf, auth = 0;
-  int               mrc, lmb, ste, spl, non_p;
+  int               mrc, lmb, ste, spl, non_p, neg;
   double            Cn, Ce, dCn = 0.0, dCe = 0.0, Z, ZZ;
   double            sin_Cn, cos_Cn = 0.0, sin_Ce, cos_Ce;
   double            *GP, *utg, *gtu;
@@ -82,6 +82,7 @@ FILE                   *tr_error
       GP    = TC->tcgg;
       utg   = TC->utg;
       gtu   = TC->gtu;
+      neg   = TC->W_crd == 1;
 
       if (cstm > 0) {
 
@@ -112,7 +113,7 @@ FILE                   *tr_error
                   if (fabs(Ce) > 1.14691472225) 
                      res = (fabs(Ce) > 2.2938245694606)
                          ? TRF_AREA_ : TRF_INACC_;
-                  if (TC->W_crd) Ce = -Ce;
+                  if (neg) Ce = -Ce;
                   /* norm. N, E -> compl. sph. LAT, LNG */
                   Cn += clenshaw('S', utg, 5, 2.*Cn, 2.*Ce, &dCn, &dCe);
                   Ce += dCe;
@@ -139,7 +140,7 @@ FILE                   *tr_error
                 /* ell. LAT, LNG -> Gaussian LAT, LNG */
                 if (ell_trf) Cn = gatg(GP, -1, Cn);
                 Ce -= TC->L0;
-                if (TC->W_crd) Ce = -Ce;
+                if (neg) Ce = -Ce;
                 /* Gaussian LAT, LNG -> compl. sph. LAT */
                 sin_Cn = sin(Cn);
                 cos_Cn = cos(Cn);
@@ -210,7 +211,7 @@ FILE                   *tr_error
                 Cn = (TC->Zb - Cn)/TC->Qn;
                 Ce = (Ce - TC->E0)/TC->Qn;
                 if (spl) Cn = -Cn;
-                if (TC->W_crd) Ce = -Ce;
+                if (neg) Ce = -Ce;
                 if (mrc) Z  = exp(Cn);
                 else { /* Lambert and stereographic */
                   /* Polar coord */
@@ -255,7 +256,7 @@ FILE                   *tr_error
                 if (spl)     Cn = -Cn;
                 Ce -= TC->L0;
                 Ce  = v_red(Ce);
-                if (TC->W_crd) Ce = -Ce;
+                if (neg) Ce = -Ce;
                 if (non_p) { /* Gaussian -> Soldner local geo */
                   Cn = 2.0*atan(tan(M_PI_4 - Cn*0.5)*TC->cP);
                   Cn = M_PI_2 - sftr(Ce, TC->B1, Cn, &Z, &Ce);
@@ -273,7 +274,7 @@ FILE                   *tr_error
                     Ce *= TC->cP;
                   }
                   /* Polar coord -> rectangular N, E */
-                  Z  = TC->Qn*Z;
+                  Z *= TC->Qn;
                   Cn = -Z*cos(Ce);
                   if (spl) Cn = -Cn;
                   Cn = TC->Zb + Cn;
