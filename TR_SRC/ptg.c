@@ -82,7 +82,7 @@ FILE                   *tr_error
       GP    = TC->tcgg;
       utg   = TC->utg;
       gtu   = TC->gtu;
-      neg   = TC->W_crd == 1 || TC->W_crd == 2;
+      neg   = TC->W_crd == 1;
 
       if (cstm > 0) {
 
