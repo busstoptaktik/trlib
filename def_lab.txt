@@ -1627,8 +1627,7 @@ Decca  London.  Publication Reference S27.  Page 1."
 TOPEX Ellipsoid  Sea surface height is above TOPEX Ell.
 Sea surface topografy plus mean sea surface is ssh
 http://podaac.jpl.nasa.gov/altimeter_ocean_pathfinder
-      html/history.html¨ers2_v5.4" 
-*      # must replace  ¨                                     ;
+
 
 #GS
   7   4          57010.0    300.0          KM     OMEGA 
