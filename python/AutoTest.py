@@ -10,7 +10,7 @@ import TestFiles
 import RandomTests
 import ThreadTest
 import time,os,sys,platform
-TEST_DATA=os.path.join("..","testdata")
+TEST_DATA=os.path.join(os.path.dirname(__file__),os.path.join("..","testdata"))
 JOB_DEF=os.path.join(TEST_DATA,"job_new.txt")
 GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids")
 LOG_FILE="auto_test"
