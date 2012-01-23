@@ -60,9 +60,17 @@ namespace Kmstrlib.NET
 		[DllImport(TRLIB)]
 		private static extern void TR_TerminateLibrary();
 		
+		[DllImport(TRLIB)]
+		private static extern void TR_TerminateThread();
+		
 		public static void TerminateLibrary()
 		{
 			TR_TerminateLibrary();
+		}
+		
+		public static void TerminateThread()
+		{
+			TR_TerminateThread();
 		}
 
 		[DllImport(TRLIB)]

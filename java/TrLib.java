@@ -5,6 +5,7 @@ public class TrLib {
 	public static native String GetVersion();
 	public static native int InitLibrary(String folder);
 	public static native void TerminateLibrary();
+	public static native void TerminateThread();
 	private static native long tropen(String mlb1, String mlb2);
 	private static native void trclose(long addr);
 	protected static native int tr(long addr, double x[], double y[], double z[], int n);
@@ -42,22 +43,15 @@ public class TrLib {
 	{
 		return (trf!=0);
 	}
-	public int Transform(double x[], double y[], double z[]) throws Exception
+	public int Transform(double x[], double y[], double z[])
 	{
+		if (trf==0)
+			return 1;
 		int rc;
-		if (trf==0){
-			throw new Exception("Not properly initialised");}
 		rc=TrLib.tr(trf,x,y,z,x.length);
 		return rc;
 	}
-	public int Transform_java(double x[], double y[], double z[])
-	{
-		int rc;
-		int i;
-		for (i=0; i<x.length; i++){
-			rc=TrLib.tr(trf,x[i],y[i],z[i],1);}
-		return rc;
-		}
+	
 	public void Close()
 	{
 		TrLib.trclose(trf);

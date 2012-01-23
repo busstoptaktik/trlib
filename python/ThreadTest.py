@@ -10,8 +10,7 @@ import TrLib
 import time
 import os
 import sys
-GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
-OUTPUT_DIR=os.path.join(os.path.dirname(__file__),"THREAD_OUTPUT")
+OUTPUT_DIR="THREAD_OUTPUT"
 NTHREADS_2D=5
 NTHREADS_3D=5
 NITERATIONS=3
@@ -43,7 +42,7 @@ class BadGuy(threading.Thread):
 		fp.write("Thread finished\n")
 		if self.log_file is not None:
 			fp.close()
-		TrLib.TerminateLibrary()
+		TrLib.TerminateThread()
 		
 
 def main(args):
@@ -54,10 +53,10 @@ def main(args):
 			libpath=args[args.index("-lib")+1]
 			lib=os.path.basename(libpath)
 			dir=os.path.dirname(libpath)
-			IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
+			IS_INIT=TrLib.InitLibrary("",lib,dir)
 		else:
 			print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)
-			IS_INIT=TrLib.InitLibrary(GEOIDS)
+			IS_INIT=TrLib.InitLibrary()
 	if not IS_INIT:
 		print("Could not initialize library...")
 		print("Find a proper shared library and geoid dir and try again!")

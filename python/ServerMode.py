@@ -12,36 +12,18 @@ import os
 import sys
 import gc
 import random
-GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
-KEEP_ALIVE=4
-NRUNS=3000 #crashes at some point. Something to do with tls (open file pointers!)
-NITERATIONS=3
-NPOINTS=1
+#This is the minimal test to pass!#
+KEEP_ALIVE=8
+NRUNS=500 
+NITERATIONS=30
+NPOINTS=30
 LOG_FILE="server_mode"
-if "-win32" in sys.argv:
-	import ctypes
-	class MEMORYSTATUSEX(ctypes.Structure):
-		fields_ = [("dwLength", ctypes.c_uint),
-		("dwMemoryLoad", ctypes.c_uint)
-		("ullTotalPhys", ctypes.c_ulonglong),
-		("ullAvailPhys", ctypes.c_ulonglong),
-		("ullTotalPageFile", ctypes.c_ulonglong),
-		("ullAvailPageFile", ctypes.c_ulonglong),
-		("ullTotalVirtual", ctypes.c_ulonglong),
-		("ullAvailVirtual", ctypes.c_ulonglong),
-		("sullAvailExtendedVirtual", ctypes.c_ulonglong),]
-		def __init__(self):
-			# have to initialize this to the size of MEMORYSTATUSE
-			self.dwLength = 2*4 + 7*8     # size = 2 ints, 7 longs
-			return super(MEMORYSTATUSEX, self).__init__()
-	WIN32=True
-else:
-	WIN32=False
-
-
-
-
-
+def tracer(frame,event,arg):
+	if event=="call":
+		print "call",frame.f_lineno,frame.f_code
+	if event=="line":
+		print "line",frame.f_lineno,frame.f_code
+	
 class RedirectStdout(object):
 	def __init__(self,fp=None):
 		self.fp=fp
@@ -66,42 +48,48 @@ class BadGuy(threading.Thread):
 		self.log_file=log_file
 		self.flag=flag
 		threading.Thread.__init__(self)
+		self.name="Thread %d" %id
 	def run(self):
-		if self.flag is not None:
-			self.flag.clear()
-		if self.mode!=3: #turn up the heat! Test having an open transformation in between lots of other stuff
-			ct=TrLib.CoordinateTransformation("utm32Hwgs84_h_dvr90","geoHed50_h_msl")
-			x,y,z=ct.Transform(512200.1,6143200.1,100.0)
-		n=self.N #+something random??
+		tstart=time.clock()
 		if self.log_file is None:
 			fp=sys.stdout
 		else:
 			fp=open(self.log_file,"w")
+		if self.flag is not None:
+			self.flag.clear()
+		fp.write("Hello world! This is thread %d. I perform %dD-tests. Mode is: %d" %(self.id,int(self.mode>0)+2,self.mode))
+		if self.mode!=3: #turn up the heat! Test having an open transformation in between lots of other stuff
+			ct=TrLib.CoordinateTransformation("utm32Hwgs84_h_dvr90","geoHed50_h_dvr90")
+			fp.write(" *** %d ***" %self.id)
+			x,y,z=ct.Transform(512200.1,6143200.1,100.0)
+			fp.write(" %d: 1st done ***\n" %self.id)
+		n=self.N #+something random??
 		while self.iterations>0:
-			fp.write("This is thread %d. I perform %dD-tests. Mode is: %d\n" %(self.id,int(self.mode>0)+2,self.mode))
+			fp.write("This is thread %d, todo: %d. I perform %dD-tests. Mode is: %d\n" %(self.id,self.iterations,int(self.mode>0)+2,self.mode))
 			if self.mode==0:
 				nerr=RandomTests.RandomTests_3D(n,log_file=NoOut())
 			elif self.mode==1:
 				nerr=RandomTests.RandomTests_2D(n,log_file=NoOut())
 			else:
-				nerr=RandomTests.RandomTests(RandomTests.FH_TEST,3,n,log_file=NoOut(),sleep=0.01)
+				nerr=RandomTests.RandomTests(RandomTests.FH_TEST,3,n,log_file=NoOut())
 			if nerr>0:
 				fp.write("Thread %d, mode %d, encountered %d errors!\n" %(self.id,self.mode,nerr))
-			time.sleep(random.random()*0.1)
+			time.sleep(0.01)
 			self.iterations-=1
 		if self.mode!=3:
 			x,y,z=ct.Transform(512200.1,6143200.1,100.0)
 			ct.Close()
-		fp.write("Thread %i finished\n" %self.id)
 		if self.mode==3:
 			time.sleep(0.01)
-		if self.log_file is not None:
-			fp.close()
-		TrLib.TerminateLibrary()
+		TrLib.TerminateThread()
 		if self.mode==3:
 			time.sleep(0.01)
 		if self.flag is not None:
 			self.flag.set()
+		tend=time.clock()
+		fp.write("Thread %i finished. Running time %.2f s\n" %(self.id,tend-tstart))
+		if self.log_file is not None:
+			fp.close()
 		return 
 		
 		
@@ -114,14 +102,16 @@ def main(args):
 			libpath=args[args.index("-lib")+1]
 			lib=os.path.basename(libpath)
 			dir=os.path.dirname(libpath)
-			IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
+			IS_INIT=TrLib.InitLibrary("",lib,dir)
 		else:
 			print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)
-			IS_INIT=TrLib.InitLibrary(GEOIDS)
+			IS_INIT=TrLib.InitLibrary()
 	if not IS_INIT:
 		print("Could not initialize library...")
 		print("Find a proper shared library and geoid dir and try again!")
 		return -1
+	if "-trace" in args:
+		threading.settrace(tracer)
 	RandomTests.SetThreadMode()
 	now=time.asctime()
 	nows=now.replace(" ","_").replace(":","_")
@@ -166,13 +156,14 @@ def main(args):
 			new_thread.start()
 			if nfemern>0 and nfemern%10==0:
 				print("%d Fehmarn threads started." %nfemern)
-			if WIN32:
-				stat = MEMORYSTATUSEX()
-				ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat))
-				print "Avail. mem:",stat.ullAvailPhys
+	slept=0
 	while threading.activeCount()>1:
-		print("Active threads: %i" %threading.activeCount())
+		print("\nActive threads: %i\n" %threading.activeCount())
+		if slept>4:
+			for thread in threading.enumerate():
+				print("%s might be a zombie!" %thread.name)
 		time.sleep(2)
+		slept+=2
 	return 0
 
 

@@ -12,7 +12,6 @@ import ThreadTest
 import time,os,sys,platform
 TEST_DATA=os.path.join(os.path.dirname(__file__),os.path.join("..","testdata"))
 JOB_DEF=os.path.join(TEST_DATA,"job_new.txt")
-GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids")
 LOG_FILE="auto_test"
 PROG=os.path.basename(sys.argv[0])
 LS="*"*80+"\n"
@@ -28,7 +27,8 @@ class RedirectStdout(object):
 				pass
 
 def Usage():
-	print("To run:\n%s <shared_library> <geoid_dir>\nLast parameter is optional, will default to: %s" %(PROG,GEOIDS))
+	print("To run:\n%s <shared_library> <geoid_dir>" %(PROG))
+	print("Last parameter is optional, will default to current working dir or dir set in: %s" %TrLib.TABDIR_ENV)
 	print("Will read the job definition file: %s" %JOB_DEF)
 	sys.exit()
 
@@ -41,7 +41,7 @@ def main(args): #progname, test_lib
 	if len(args)>2:
 		geoids=args[2]
 	else:
-		geoids=GEOIDS
+		geoids=""
 	now=time.asctime()
 	nows=now.replace(" ","_").replace(":","_")
 	log_name=LOG_FILE+"_"+nows+".log"
@@ -52,24 +52,26 @@ def main(args): #progname, test_lib
 	print("Running test suite %s for the KMS transformation library at %s" %(PROG,now))
 	print("System is: %s, architecture: %s" %(sys.platform,platform.architecture()))
 	print("Python version: %s" %repr(sys.version))
-	print("Initialising library with geoid-dir: %s and shared-library: %s" %(geoids,lib))
-	print("Files in geoid-dir: %s" %repr(os.listdir(geoids)))
-	TrLib.InitLibrary(geoids,lib_obj,lib_dir)
+	print("Initialising with shared-library: %s" %(lib))
+	ok=TrLib.InitLibrary(geoids,lib_obj,lib_dir)
+	if not ok:
+		return
+	print("Files in geoid-dir %s:\n%s" %(TrLib.GEOIDS,repr(os.listdir(TrLib.GEOIDS))))
 	print LS
 	try:
-		nerr+=RandomTests.main(["RandomTests.py","-lib",lib,"-N",10000])
+		nerr+=RandomTests.main(["RandomTests.py","-N",10000])
 	except Exception,msg:
 		print("Error:\n%s" %repr(msg))
 		nerr+=1
 	print LS
 	try:
-		TestFiles.main(["TestFiles.py",JOB_DEF,"-lib",lib])
+		TestFiles.main(["TestFiles.py",JOB_DEF])
 	except Exception,msg:
 		nerr+=1
 		print("Error:\n%s" %repr(msg))
 	print LS
 	try:
-		ThreadTest.main(["ThreadTest.py","-lib",lib])
+		ThreadTest.main(["ThreadTest.py"])
 	except Exception,msg:
 		nerr+=1
 		print("Error:\n%s" %repr(msg))

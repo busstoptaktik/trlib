@@ -16,7 +16,6 @@ import os
 import sys
 import time #should really use timeit-module....
 import threading
-GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids") #pointer to geoid directory
 D2M=9.3349049354951814e-06
 TEST_SYSTEMS_2D=[["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,0,1.0],
 ["geo_wgs84","geo_ed50",12.0,55.0,0,D2M],
@@ -80,7 +79,7 @@ def RandomTests_3D(N=10000,repeat=3,log_file=sys.stdout):
 	return nerr
 
 
-def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout,sleep=0):
+def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 	nerr=0
 	id=str(threading.current_thread().name)
 	log_file.write("%s\n" %LINE_SPLIT)
@@ -118,8 +117,6 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout,sleep=0):
 			else:
 				nok+=1
 				log_file.write("Forward running time: %.5f s\n" %(time.clock()-tstart))
-			if sleep>0:
-				time.sleep(sleep)
 		
 		if nok==0:
 			continue
@@ -153,9 +150,6 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout,sleep=0):
 						log_file.write("Maximum tr-loop error: xy: %.10f m z: %.10f m\n" %(err_xy,err_z))
 						log_file.write("in: %s\n" %repr(xyz_out))
 						log_file.write("back: %s\n" %repr(xyz_back))
-			if sleep>0:
-				time.sleep(sleep)
-						
 			
 		if N<=10:
 			log_file.write("out:\n%s\n" %repr(xyz_out))
@@ -181,10 +175,10 @@ def main(args):
 			libpath=args[args.index("-lib")+1]
 			lib=os.path.basename(libpath)
 			dir=os.path.dirname(libpath)
-			IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
+			IS_INIT=TrLib.InitLibrary("",lib,dir)
 		else:
 			print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)
-			IS_INIT=TrLib.InitLibrary(GEOIDS)
+			IS_INIT=TrLib.InitLibrary("")
 	if not IS_INIT:
 		print("Could not initialize library...")
 		print("Find a proper shared library and geoid dir and try again!")

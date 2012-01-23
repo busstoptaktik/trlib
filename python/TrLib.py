@@ -26,6 +26,9 @@ LABEL_ERROR=1
 TR_ERROR=2
 #special return code for this module
 TRLIB_NOT_INITIALIZED=-1
+#TABDIR env var
+TABDIR_ENV="TR_TABDIR"
+GEOIDS=None
 #conversions
 D2R=math.pi/180.0
 R2D=180.0/math.pi
@@ -45,9 +48,10 @@ class LabelException(Exception):
 ##################
 ##Call this initializtion FIRST!
 ##################
-def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
+def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	global tr_lib
 	global IS_INIT
+	global GEOIDS
 	IS_INIT=False
 	if len(lib_dir)==0:
 		lib_dir="."
@@ -56,6 +60,8 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		#Setup API, corresponds to header file of the API#
 		tr_lib.TR_InitLibrary.restype=ctypes.c_int
 		tr_lib.TR_InitLibrary.argtypes=[ctypes.c_char_p]
+		tr_lib.TR_TerminateThread.restype=None
+		tr_lib.TR_TerminateLibrary.restype=None
 		tr_lib.TR_GetLastError.argtypes=None
 		tr_lib.TR_GetLastError.restype=ctypes.c_int
 		tr_lib.TR_GetVersion.argtypes=[ctypes.c_char_p,ctypes.c_int]
@@ -70,21 +76,27 @@ def InitLibrary(geoid_dir,lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.trclose.argtypes=[ctypes.c_void_p]
 		tr_lib.tr.restype=ctypes.c_int
 		tr_lib.tr.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_int]
+		
 	except Exception, msg:
 		print repr(msg)
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
 		return False
-	if not os.path.exists(geoid_dir):
-		print("%s does not exist in the file system" %geoid_dir)
-		return False
+	if len(geoid_dir)==0:
+		if os.environ.has_key(TABDIR_ENV):
+			geoid_dir=os.environ[TABDIR_ENV]
+		else:
+			geoid_dir=os.getcwd()
+		sdir=""
+	else:
+		sdir=geoid_dir
 	for fname in REQUIRED_FILES:
 		if not os.path.exists(os.path.join(geoid_dir,fname)):
+			print("Tabdir: %s" %sdir)
 			print("Required file %s not found, failed to initialize library!" %fname)
 			return False
-	sdir=geoid_dir
-	if sdir[-1] not in ["\\","/"]:
+	if len(sdir)>0 and sdir[-1] not in ["\\","/"]:
 		sdir+="/"
-	sdir=str(sdir.replace("\\","/"))
+	GEOIDS=geoid_dir
 	IS_INIT=tr_lib.TR_InitLibrary(sdir) #at some point use this info....
 	return IS_INIT
 
@@ -93,6 +105,9 @@ def GetLastError():
 
 def TerminateLibrary():
 	tr_lib.TR_TerminateLibrary()
+
+def TerminateThread():
+	tr_lib.TR_TerminateThread()
 
 def GetVersion():
 	buf=" "*100;

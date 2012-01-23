@@ -33,6 +33,14 @@ JNIEXPORT void JNICALL Java_TrLib_TerminateLibrary
 
 /*
  * Class:     TrLib
+ * Method:    TerminateThread
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_TrLib_TerminateThread
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     TrLib
  * Method:    tropen
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
