@@ -5,6 +5,7 @@ EXPORTS
 	TR_GetEsriText
 	TR_GetVersion
 	TR_TerminateLibrary
+	TR_TerminateThread
 	TR_GetLastError
 	tropen
 	trclose

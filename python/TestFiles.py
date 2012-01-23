@@ -21,7 +21,6 @@ import os
 import sys
 import time
 #format for the test setup is [[filename_in,label_out,precision_out],...]
-GEOIDS=os.path.join(os.path.dirname(__file__),"Geoids/") #default pointer to geoid directory
 def main(args): #progname, test_def, -lib libname (optional)
 	progname=os.path.basename(args[0])
 	IS_INIT=TrLib.IS_INIT
@@ -30,10 +29,10 @@ def main(args): #progname, test_def, -lib libname (optional)
 			lib=args[args.index("-lib")+1]
 			lib=os.path.basename(lib)
 			dir=os.path.dirname(lib)
-			IS_INIT=TrLib.InitLibrary(GEOIDS,lib,dir)
+			IS_INIT=TrLib.InitLibrary("",lib,dir)
 		else:
 			print("You can specify the TrLib-library to use by %s -lib <lib_path>" %progname)
-			IS_INIT=TrLib.InitLibrary(GEOIDS)
+			IS_INIT=TrLib.InitLibrary()
 	if not IS_INIT:
 		print("Could not initialize library...")
 		print("Find a proper shared library and geoid dir and try again!")

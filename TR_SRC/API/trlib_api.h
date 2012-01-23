@@ -31,7 +31,7 @@ enum KMSTR_Error
 	KMSTR_GEOIDSALREADYINITIALISED = 6, // Geoid library has already been initialized 
 }; */
 #define TR_OK 0
-#define LABEL_ERROR 1
+#define TR_LABEL_ERROR 1
 #define TR_ERROR 2
 #define TR_ALLOCATION_ERROR 3
 
@@ -47,6 +47,7 @@ KMSTR_API int TR_GetLastError(void);
 KMSTR_API void TR_GetVersion(char *buffer, int bufferlength);
 KMSTR_API int TR_GetEsriText(char *label_in, char *wkt_out);
 KMSTR_API void TR_TerminateLibrary(void);
+KMSTR_API void TR_TerminateThread(void);
 typedef struct TR TR;
 KMSTR_API void TR_GeoidInfo(TR *tr);
 KMSTR_API TR *tropen (char *label_in, char *label_out, char *geoid_name);

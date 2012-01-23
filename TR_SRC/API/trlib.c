@@ -110,7 +110,7 @@ Jeg ville foretrække tre arrays ind og tre ud. Eventuelt kunne de være de samm
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "trthread.h"
-#define TRLIB_VERSION "Added more init stuff...2011-12-21"
+#define TRLIB_VERSION "Added TR_TerminateThread...2012-01-23"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
@@ -199,7 +199,7 @@ int TR_Transform(char *label_in, char *label_out, double *X, double *Y, double *
     int err_msg;
     TR *trf=tropen(label_in,label_out,"");
     if (trf==0){
-    return LABEL_ERROR;} /* No need to close anything! */
+    return TR_LABEL_ERROR;} /* No need to close anything! */
     err_msg=tr(trf,X,Y,Z,npoints);
     trclose(trf);
     return err_msg;
@@ -423,7 +423,7 @@ int tr(TR *tr, double *X, double *Y, double *Z, int n) {
 	   geoid_c(&GeoidTable,0,NULL);
 	   return TR_OK;}*/
    if ((0==tr)||(0==X)||(0==Y))
-        return LABEL_ERROR;
+        return TR_LABEL_ERROR;
     if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE){
         x_in=Y;
         y_in=X;}
@@ -528,6 +528,10 @@ void TR_TerminateLibrary(void) {
      c_tabdir_file(0,NULL);
 }
 
+void TR_TerminateThread(void){
+    TR_TerminateLibrary();
+}
+
 /*
 BOOL WINAPI
 DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
@@ -569,7 +573,7 @@ int TR_GetEsriText(char *label_in, char *wkt_out){
     label_check = conv_lab(label_in,plab_in,"");
     if ((label_check==0) || (label_check==-1)){
         free(plab_in);
-        return LABEL_ERROR;
+        return TR_LABEL_ERROR;
     }
     label_check=sputshpprj(wkt_out,plab_in); /* See fputshpprj.h for details on return value */
     free(plab_in);
