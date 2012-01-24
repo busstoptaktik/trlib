@@ -57,7 +57,7 @@ long                    *pos
 )
 {
 
-#include              "fgetln.h"
+#include              "fgetln_kms.h"
 #include              "fgetlhtx.h"
 extern THREAD_SAFE FILE               *man_tab_file;
 extern THREAD_SAFE size_t              init_tab_pos;
@@ -74,7 +74,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
   // to enshure 2 sp between entities
   *pos  = ftell(man_tab_file) - (long) strlen(pth_mlb);
   (void) fseek(man_tab_file, *pos, SEEK_SET);
-  if (qr != EOF) qr = fgetln(pth_mlb, &used, man_tab_file);
+  if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, man_tab_file);
 
 
 /* srch_tab_typ     ver 2010.1        # page 2   18 Feb 2010 10 19 */
@@ -84,7 +84,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
     for (f777 = 777 ; f777 >= LAST_TP && stype == STP_LAB; f777 --) {
       switch (f777) {
       case 777:
-        /* fgetln gives items with 2<sp> between them */
+        /* fgetln_kms gives items with 2<sp> between them */
         if (!strncmp(pth_mlb, "geoid  manager  777", 19)) {
           (void) strcpy(tab_typ_txt, "geoid");
           stype    = GDE_LAB;
@@ -172,7 +172,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
   if (stype == STP_LAB) *pos = (long) init_tab_pos;
   else {  /* pos to REC_TABLE */
     do {
-      qr   = fgetln(pth_mlb, &used, man_tab_file);
+      qr   = fgetln_kms(pth_mlb, &used, man_tab_file);
       used = !strncmp(pth_mlb, "REC_TABLE", 9);
     } while (qr > 0 && (used == 0));
   }

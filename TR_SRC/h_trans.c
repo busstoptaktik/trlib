@@ -52,7 +52,7 @@ char                    *tr_str
 */
 #include              "conv_lab.h"
 #include              "fgetlhtx.h"
-#include              "fgetln.h"
+#include              "fgetln_kms.h"
 #include              "i_tabdir_file.h"
 #include              "s_status.h"
 #include              "set_dtm.h"
@@ -151,14 +151,14 @@ char                    *tr_str
       qr  = conv_lab("input", &h_trc.ref_lab, def_lab_file, "");
       if (qr == 1) {
         (void) fseek(def_lab_file, (long) pos, SEEK_SET);
-        (void) fgetln(pth_mlb, &used, def_lab_file); //now:skip lab line
+        (void) fgetln_kms(pth_mlb, &used, def_lab_file); //now:skip lab line
 
         inv = rc_lab->h_dtm == oh_dtm;
         if (rc_lab->p_rgn == ic_lab->p_rgn &&
             rc_lab->cstm  == ic_lab->cstm &&
             rc_lab->datum == ic_lab->datum &&
            (rc_lab->h_dtm == ic_lab->h_dtm || inv)) {
-          qr = fgetln(pth_mlb, &used, def_lab_file);
+          qr = fgetln_kms(pth_mlb, &used, def_lab_file);
           if (qr != EOF) {
             (void) sscanf(pth_mlb, "%s%n", c_mlb, &used); // to_dtm
             if (!strcmp((inv) ? i_nm : o_nm, c_mlb)) { // FOUND
@@ -169,7 +169,7 @@ char                    *tr_str
               h_trc.LAT0  = sgetg(p_tp, &g_tpd, &used, "nt");
               p_tp       += used;
               h_trc.LON0  = sgetg(p_tp, &g_tpd, &used, "nt");
-              qr          = fgetln(pth_mlb, &used, def_lab_file); // params
+              qr          = fgetln_kms(pth_mlb, &used, def_lab_file); // params
               if (qr != EOF) {
                 h_trc.M0     = sgetg(pth_mlb, &g_tpd, &used, "m");
                 p_tp         = pth_mlb + used;
@@ -183,9 +183,9 @@ char                    *tr_str
                 h_trc.oh_dtm = (inv) ? ic_lab->h_dtm : oh_dtm;
               }
             } else {
-              used = fgetln(pth_mlb, &used, def_lab_file); // params
+              used = fgetln_kms(pth_mlb, &used, def_lab_file); // params
             }
-            used = fgetln(pth_mlb, &used, def_lab_file); // reference
+            used = fgetln_kms(pth_mlb, &used, def_lab_file); // reference
           }
         }
       }

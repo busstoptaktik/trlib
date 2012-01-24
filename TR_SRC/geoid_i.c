@@ -50,7 +50,7 @@ char                    *err_str
 {
 
 #include     "conv_tab.h"
-#include     "fgetln.h"
+#include     "fgetln_kms.h"
 #include     "geoid_c.h"
 #include     "i_tabdir_file.h"
 #include     "s_status.h"
@@ -124,7 +124,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
     /* initialize the grid's */
     /*________________________*/
     /* Test for identification of a man_tab_file.tab file */
-    qr    = fgetln(ftx, &used, man_tab_file);
+    qr    = fgetln_kms(ftx, &used, man_tab_file);
     size  = !strncmp(ftx, "#geoid  manager  777", 19);
 
 
@@ -135,7 +135,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
     if (size != 0L) {
       /* look for information in manager : STD */
       do {
-        qr   = fgetln(ftx, &used, man_tab_file);
+        qr   = fgetln_kms(ftx, &used, man_tab_file);
         size = (size_t) !strncmp(ftx, "STD", 3);
       } while (qr > 0 && (size == 0));
     }
@@ -158,7 +158,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
     if (size != 0L) {
       /* look for information in manager : wrk */
       do {
-        qr   = fgetln(ftx, &used, man_tab_file);
+        qr   = fgetln_kms(ftx, &used, man_tab_file);
         size = (size_t) !strncmp(ftx, wrk, 2);
       } while (qr > 0 && (size == 0));
 
@@ -168,7 +168,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
 
       /* get geoid_names from the list : wrk */
       do {
-        used = fgetln(ftx, &qr, man_tab_file);
+        used = fgetln_kms(ftx, &qr, man_tab_file);
         (void) sscanf(ftx, "%s%n", p_lb->name, &used); 
         qr   = (used > 0) ? strncmp(p_lb->name, "stop", 4) : 1;
         if (qr && geoid_table->tab_max < MAXGEOIDS) {

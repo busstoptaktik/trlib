@@ -84,7 +84,7 @@ struct plm_lab          *p_lab,
 /* conv_plm    ver 2010.01          # page 2     7 jan 2010 10 19 */
 
 
-#include     "fgetln.h"
+#include     "fgetln_kms.h"
 #include     "fgetlhtx.h"
 #include     "gettabdir.h"
 #include     "i_tabdir_file.h"
@@ -177,14 +177,14 @@ extern THREAD_SAFE size_t              init_gps_pos;
         qr    = fgetlhtx(man_gps_file, pth_mlb);
         pos   = ftell(man_gps_file) - (long) strlen(pth_mlb);
         (void) fseek(man_gps_file, pos, SEEK_SET);
-        if (qr != EOF) qr = fgetln(pth_mlb, &used, man_gps_file);
+        if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, man_gps_file);
         if (qr != EOF) {
           ant = 0;
           for (lab_tp = 874; lab_tp >= 873 && ant == 0; lab_tp --) {
             run_ii = 0;
             switch (lab_tp) {
             case 874:
-              /* fgetln gives items with 2<sp> between them */
+              /* fgetln_kms gives items with 2<sp> between them */
               if (nnr_std && !strncmp(pth_mlb, info, 4))
                    p_tp = strchr(pth_mlb, ' ');
               else p_tp = pth_mlb;
@@ -215,21 +215,21 @@ extern THREAD_SAFE size_t              init_gps_pos;
             if (run_ii) {
               /* look for information in REC_TABLE */
               do {
-                qr   = fgetln(pth_mlb, &used, man_gps_file);
+                qr   = fgetln_kms(pth_mlb, &used, man_gps_file);
                 size = (size_t) !strncmp(pth_mlb, "REC_TABLE", 9);
               } while (qr > 0 && (size == 0));
 
               if (size != 0) {
                 /* take the entries in REC_TABLE */
                 do {
-                  used  = fgetln(pth_mlb, &qr, man_gps_file);
+                  used  = fgetln_kms(pth_mlb, &qr, man_gps_file);
                   if (ant < MAX_ENT_PLM) {
                     p_tp = pth_mlb;
                     size = (size_t) strncmp(pth_mlb, "stop", 4);
                     if (size) {
                       *(p_tp + strlen(p_tp) -1) = '\0';
                       (void) strcpy(p_plm->datum, p_tp);
-                      (void) fgetln(pth_mlb, &used, man_gps_file);
+                      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
                       /* skip from and to dates * /
                       p_tp = strchr(pth_mlb, ',');
                       if (p_tp != NULL) {
@@ -241,10 +241,10 @@ extern THREAD_SAFE size_t              init_gps_pos;
                       }
                       / * skip from and to dates */
                       /* skip for 1 textline */
-                      (void) fgetln(pth_mlb, &qr, man_gps_file);
+                      (void) fgetln_kms(pth_mlb, &qr, man_gps_file);
 
                       p_tp  = pth_mlb;
-                      (void) fgetln(pth_mlb, &qr, man_gps_file);
+                      (void) fgetln_kms(pth_mlb, &qr, man_gps_file);
                       p_plm->drx = sgetg(p_tp, &tpd, &used, "prad");
                       p_tp       += used;
                       p_plm->dry = sgetg(p_tp, &tpd, &used, "prad");

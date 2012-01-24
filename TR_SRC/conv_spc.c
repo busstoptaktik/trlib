@@ -54,7 +54,7 @@ union  geo_lab          *u_lab,
 
 #include              "conv_lab.h"
 #include              "conv_rgn.h"
-#include              "fgetln.h"
+#include              "fgetln_kms.h"
 #include              "f_nxt.h"
 #include              "fputcw.h"
 #include              "sgetg.h"
@@ -152,10 +152,10 @@ union  geo_lab          *u_lab,
         (void) strcpy(h_lab->c_mlb, c_lab->mlb);
 
         /* you can't use f_nxt with sgetcw FS AUG 20105      */
-        /* so work with fgetln until adj_date has been read */
+        /* so work with fgetln_kms until adj_date has been read */
         do {
           p_tp = in_str;
-          iq   = fgetln(in_str, &i, iofile);
+          iq   = fgetln_kms(in_str, &i, iofile);
         } while (iq < (/*int) (p_tp -in_str*/ +2));
 
         (void) sscanf(p_tp, "%s%n", w_str, &used);

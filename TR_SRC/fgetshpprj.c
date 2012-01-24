@@ -62,7 +62,7 @@ union geo_lab   *g_lab)
 #include   "c_tabdir_file.h"
 #include   "conv_lab.h"
 #include   "fgetlhtx.h"
-#include   "fgetln.h"
+#include   "fgetln_kms.h"
 #include   "i_tabdir_file.h"
 #include   "set_tpd.h"
 
@@ -110,7 +110,7 @@ union geo_lab   *g_lab)
     k      = (int)((ptrdiff_t)p_txt1 - (ptrdiff_t)p_txt);
     (void) fgetlhtx(fp, entry);
     for (j = 0; go_on && state == 0; j++) {
-      (void) fgetln(entry, &i, fp);
+      (void) fgetln_kms(entry, &i, fp);
       if (strncmp(p_txt, entry, k) == 0) {
         switch (j) {
         case 0:  // COMPDCS
@@ -139,7 +139,7 @@ union geo_lab   *g_lab)
           p_txt2 = strchr(p_txt1, '"');
           (void) fgetlhtx(fp, entry);
           do {
-            (void) fgetln(entry, &i, fp);
+            (void) fgetln_kms(entry, &i, fp);
             (void) sscanf(entry, "%s%n", temp, &used);
             j      = used;
             p_txt3 = strstr(p_txt1, temp);
@@ -288,7 +288,7 @@ union geo_lab   *g_lab)
       if (!completed) { // read datum
         (void) fgetlhtx(fp, entry);
         do {
-          (void) fgetln(entry, &i, fp);
+          (void) fgetln_kms(entry, &i, fp);
           (void) sscanf(entry, "%s%n", temp, &used);
           // search in PROJCS or GEOCS
           p_txt3 = strstr(p_txt1, temp);

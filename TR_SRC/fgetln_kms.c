@@ -18,7 +18,7 @@
  
 
 
-/* fgetln version 1.0               # page 1   18 Sep 1998 09 39 */
+/* fgetln_kms version 1.0               # page 1   18 Sep 1998 09 39 */
 
 
 /* Copyright (c) 1989 U/32, Kort-og Matrikelstyrelsen, Denmark */
@@ -30,7 +30,7 @@
 
 #include <stdio.h>
 
-int                 fgetln(
+int                 fgetln_kms(
 /*_______________________*/
 char               *outstr,
 int                *n_item,
@@ -80,7 +80,7 @@ FILE               *fp
   /*        = 9  return  dummy      */
 
 
-/* fgetln version 1.0               # page 2   18 Sep 1998 09 39 */
+/* fgetln_kms version 1.0               # page 2   18 Sep 1998 09 39 */
 
 
   *outstr   = '\0';
@@ -149,7 +149,7 @@ FILE               *fp
     }
 
 
-/* fgetln version 1.0               # page 3   18 Sep 1998 09 39 */
+/* fgetln_kms version 1.0               # page 3   18 Sep 1998 09 39 */
 
 
     if (klasse == 5 && mode_ap)
@@ -210,7 +210,7 @@ FILE               *fp
       break;
 
     default:
-      (void) fprintf(stderr, "\n*** fgetln programfejl");
+      (void) fprintf(stderr, "\n*** fgetln_kms programfejl");
       return(-1);
     }
   } while (nst < 9);

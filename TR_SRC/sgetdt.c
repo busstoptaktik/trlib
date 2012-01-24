@@ -65,7 +65,7 @@ ISO         1992 04 17
 Upon error the function returns -2.0.
 
 Due to the use of 'sscanf', and the way the cw is read, the
-char array must not hold 'spaces'. Use fgetln to this end.
+char array must not hold 'spaces'. Use fgetln_kms to this end.
 
 */
 

@@ -18,7 +18,7 @@
  
 
 
-/* fgetln version 1.0               # page 1   06 Sep 1994 16 42 */
+/* fgetln_kms version 1.0               # page 1   06 Sep 1994 16 42 */
 
 
 /* Copyright (c) 1989 U/32, Kort-og Matrikelstyrelsen, Denmark */
@@ -28,7 +28,7 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-extern int                  fgetln(
+extern int                  fgetln_kms(
 /*_______________________________*/
 char                        *outstr,
 int                         *n_item,
@@ -37,7 +37,7 @@ FILE                        *fp
 
 /*
 
-fgetln       (return)          int function
+fgetln_kms       (return)          int function
 _            Number of characters pointed to by *outstr or EOF
 
 outstr       (return)          char *

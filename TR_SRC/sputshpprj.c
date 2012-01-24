@@ -61,7 +61,7 @@ union geo_lab   *g_lab)
 
 #include   "c_tabdir_file.h"
 #include   "fgetlhtx.h"
-#include   "fgetln.h"
+#include   "fgetln_kms.h"
 #include   "get_mlb.h"
 #include   "i_tabdir_file.h"
 #include   "set_dtm_1.h"
@@ -105,7 +105,7 @@ union geo_lab   *g_lab)
     } while (i != 0 && strcmp(entry, "stop"));
     // search proj
     do {
-      (void) fgetln(entry, &i, fp);
+      (void) fgetln_kms(entry, &i, fp);
       (void) sscanf(entry, "%s%n", prj_txt1, &used);
       p_txt = entry + used;
       (void) sscanf(p_txt, "%d%n", &k, &used);
@@ -134,7 +134,7 @@ union geo_lab   *g_lab)
     (void) fgetlhtx(fp, entry);
     // i = strcmp(entry, "kms_dtm");
     do {
-      (void) fgetln(entry, &i, fp);
+      (void) fgetln_kms(entry, &i, fp);
       (void) sscanf(entry, "%s%n", dtm_txt1, &used);
       i = strcmp(dtm_txt1, dtm);
       if (i == 0) {
@@ -151,7 +151,7 @@ union geo_lab   *g_lab)
     (void) fgetlhtx(fp, entry);
     // i = strcmp(entry, "kms_ell");
     do {
-      (void) fgetln(entry, &i, fp);
+      (void) fgetln_kms(entry, &i, fp);
       (void) sscanf(entry, "%s%n", ell_txt, &used);
       i = strcmp(ell_txt, ell);
       if (i == 0) {
@@ -176,7 +176,7 @@ union geo_lab   *g_lab)
       (void) fgetlhtx(fp, entry);
       // i = strcmp(entry, "kms_hdtm");
       do {
-        (void) fgetln(entry, &i, fp);
+        (void) fgetln_kms(entry, &i, fp);
         (void) sscanf(entry, "%s%n", hdtm_txt1, &used);
         i = strcmp(hdtm_txt1, h_dtm);
         if (i == 0) {

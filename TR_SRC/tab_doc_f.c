@@ -77,7 +77,7 @@ FILE                    *fh_out
 
 
 #include              "conv_lab.h"
-#include              "fgetln.h"
+#include              "fgetln_kms.h"
 #include              "fgetlhtx.h"
 #include              "s_status.h"
 #include              "i_tabdir_file.h"
@@ -189,7 +189,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
     if (r != 0) {
       /* look for grid name in REC_TABLE */
       do {
-        used = fgetln(pth_mlb, &qr, man_tab_file);
+        used = fgetln_kms(pth_mlb, &qr, man_tab_file);
         if (((!strncmp(pth_mlb, p_nm, b_t)) || 
              type_quest) && qr >= 7) {
           // collect name, coord_sys, beskr, possibly params

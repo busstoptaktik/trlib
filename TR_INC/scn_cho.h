@@ -50,7 +50,7 @@ double                  *old_cmt
   /* scn_cho reads (from the string *p_in) a line of */
   /* coordinates of the type determined by the label *u_lab. */
 
-  /* p_in:          input string (from fgetln) */
+  /* p_in:          input string (from fgetln_kms) */
   /* u_lab:         the actual input label     */
   /* crd:           pointer to coordinates     */
   /* tpd:           pointer to typedecimal     */

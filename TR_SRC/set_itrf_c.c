@@ -36,7 +36,7 @@
 #include        <sys/stat.h>
 #include        "geo_lab.h"
 #include        "geoid_d.h"
-#include        "fgetln.h"
+#include        "fgetln_kms.h"
 #include        "sgetdt.h"
 #include        "s_status.h"
 #include        "trthread.h"
@@ -758,8 +758,8 @@ long get_tab_part(int type, char *pth_mlb)
     qr    = fgetlhtx(man_gps_file, pth_mlb);
     pos   = ftell(man_gps_file) - (long) strlen(pth_mlb);
     (void) fseek(man_gps_file, pos, SEEK_SET);
-    /* fgetln gives items with 2<sp> between them */
-    if (qr != EOF) qr = fgetln(pth_mlb, &used, man_gps_file);
+    /* fgetln_kms gives items with 2<sp> between them */
+    if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, man_gps_file);
     if (qr != EOF) {
       switch (type) {
       case 878: /* LINKTAB */
@@ -773,7 +773,7 @@ long get_tab_part(int type, char *pth_mlb)
       }
       if (qr) {
         do {
-          qr   = fgetln(pth_mlb, &used, man_gps_file);
+          qr   = fgetln_kms(pth_mlb, &used, man_gps_file);
           size = (size_t) !strncmp(pth_mlb, "REC_TABLE", 9);
         } while (qr > 0 && (size == 0));
         pos   = (size) ? ftell(man_gps_file) : 0;
@@ -823,7 +823,7 @@ void get_molodensky(int req_D, double dd,
 
   /* read Dtranslations */
   p_tp        = pth_mlb;
-  (void) fgetln(pth_mlb, &qr, man_gps_file);
+  (void) fgetln_kms(pth_mlb, &qr, man_gps_file);
 
 
 /* set_itrf_c  ver 2007.02      # page 13   12 aug 2009 17 23 */
@@ -888,7 +888,7 @@ int get_tab_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
   ant  = 0;
   size = 0;
   do { /* look for: from_str */
-    qr  = fgetln(pth_mlb, &qr, man_gps_file);
+    qr  = fgetln_kms(pth_mlb, &qr, man_gps_file);
     if (ant || (!strncmp(pth_mlb, from_str, fr_ch))) {
       p_tp  = pth_mlb + fr_ch +1;
       if (ant == 0) {
@@ -906,11 +906,11 @@ int get_tab_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
       }
 
       if (size) {
-        (void) fgetln(pth_mlb, &used, man_gps_file);
+        (void) fgetln_kms(pth_mlb, &used, man_gps_file);
         /* skip dates and 1 textline */
-        (void) fgetln(pth_mlb, &qr, man_gps_file);
+        (void) fgetln_kms(pth_mlb, &qr, man_gps_file);
         p_tp  = pth_mlb; /* read ref_epoch */
-        (void) fgetln(pth_mlb, &qr, man_gps_file);
+        (void) fgetln_kms(pth_mlb, &qr, man_gps_file);
         (void) sgetdt(p_tp, &ref_epoch, &used, &qr);
         p_tp += used;
         /* 365.25 ONLY VALID for dd < 100 years */
@@ -921,10 +921,10 @@ int get_tab_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
       } /* size */
     } /* first ITRF test */
     else {
-      (void) fgetln(pth_mlb, &used, man_gps_file);
-      (void) fgetln(pth_mlb, &used, man_gps_file);
-      (void) fgetln(pth_mlb, &used, man_gps_file);
-      (void) fgetln(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
     } /* skip lines of entry */
   } while (nsz && strncmp(pth_mlb, "stop", 4));
   return((ant == 0 || nsz) ? -100 : ant);
@@ -943,7 +943,7 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
   int     qr, used, yy=-1000000;
 
   do { /* look for "from_str" */
-    qr = fgetln(pth_mlb, &qr, man_gps_file);
+    qr = fgetln_kms(pth_mlb, &qr, man_gps_file);
     if (!strncmp(pth_mlb, from_str, fr_ch)) {
       nsz   = 0;
       qr    = ((req_D != 2) ? 3 : 5) + fr_ch + to_ch;
@@ -952,17 +952,17 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
       *(p_gps->datum + qr) = '\0';
       /* get yy */
       (void) sscanf(p_tp, "%d", &yy);
-      (void) fgetln(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
       /* get realisation_epoch == ipl_gate_epoch */
       p_tp = strchr(pth_mlb, ','); /* after , */
       if (p_tp != NULL) (void) sgetdt(p_tp+1, d1, &used, &qr);
 
       /* skip for 1 textline */
-      (void) fgetln(pth_mlb, &qr, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &qr, man_gps_file);
 
       /* read plm_gate_epoch */
       p_tp  = pth_mlb;
-      (void) fgetln(pth_mlb, &qr, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &qr, man_gps_file);
       (void) sgetdt(p_tp, d2, &used, &qr);
       p_tp += used;
 
@@ -970,10 +970,10 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
 
     } /* first ITRF test */
     else {
-      (void) fgetln(pth_mlb, &used, man_gps_file);
-      (void) fgetln(pth_mlb, &used, man_gps_file);
-      (void) fgetln(pth_mlb, &used, man_gps_file);
-      (void) fgetln(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
+      (void) fgetln_kms(pth_mlb, &used, man_gps_file);
     } /* skip lines of entry */
 
   } while (nsz && strncmp(pth_mlb, "stop", 4));

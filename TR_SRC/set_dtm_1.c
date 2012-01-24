@@ -56,7 +56,7 @@ struct dsh_str     *trp
 )
 
 {
-#include              "fgetln.h"
+#include              "fgetln_kms.h"
 #include              "fgetlhtx.h"
 #include              "i_tabdir_file.h"
 #include              "sgetg.h"
@@ -253,7 +253,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
     d_quest = 0;
     do {
       qr = fgetlhtx(def_lab_file, d_name);
-      if (qr != EOF) qr = fgetln(pth_mlb, &used, def_lab_file);
+      if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
       if (qr != EOF) {
         (void) sscanf(pth_mlb, "%hd%n", &d_nmb, &used);
         if (d_nmb == d_no) {
@@ -278,7 +278,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
           qr = fgetlhtx(def_lab_file, d_name);
           if (qr != EOF) {
             if (!strcmp(d_name, w_name)) {
-              qr = fgetln(pth_mlb, &used, def_lab_file);
+              qr = fgetln_kms(pth_mlb, &used, def_lab_file);
               (void) sscanf(pth_mlb, "%hd%n", &d_nmb, &used);
               p_tp = pth_mlb + used;
               /* collect datum no */
@@ -302,7 +302,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
 
               /* collect datum shift params */
               /*____________________________*/
-              if (qr != EOF) qr = fgetln(pth_mlb, &used, def_lab_file);
+              if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
 
               /* transformation type */
               (void) sscanf(pth_mlb, "%d%n", &(trp->tp), &used);
@@ -317,7 +317,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
               p_tp   += used;
 
               /* scale and rotations */
-              if (qr != EOF) qr = fgetln(pth_mlb, &used, def_lab_file);
+              if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
               scale   = sgetg(pth_mlb, &g_tpd, &used, "ppm");
               p_tp    = pth_mlb + used;
               cos_rx  = sgetg(p_tp, &g_tpd, &used, "sx");
@@ -365,7 +365,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
                   qr = fgetlhtx(def_lab_file, pth_mlb);
                   if (qr != EOF) {
                     if (!strcmp(p_name, pth_mlb)) {
-                      qr = fgetln(pth_mlb, &used, def_lab_file);
+                      qr = fgetln_kms(pth_mlb, &used, def_lab_file);
                       (void) sscanf(pth_mlb, "%hd%n", p_no, &used);
                     }
                   }
@@ -410,7 +410,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
         do {
           qr = fgetlhtx(def_lab_file, d_name);
           if (qr != EOF) {
-            qr = fgetln(pth_mlb, &used, def_lab_file);
+            qr = fgetln_kms(pth_mlb, &used, def_lab_file);
             /* collect datum no */
             (void) sscanf(pth_mlb, "%hd%n", &d_nmb, &used);
             if (all == 0 || (all == 1 && d_no == d_nmb) ||
@@ -423,7 +423,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
               (void) sscanf(p_tp, "%s%n", e_name, &used);
               p_tp += used;
               (void) strcpy(e_nm, e_name);
-              qr = fgetln(pth_mlb, &used, def_lab_file);
+              qr = fgetln_kms(pth_mlb, &used, def_lab_file);
               if (*d_nm == '*') {
                 /* transformation type */
                 (void) sscanf(pth_mlb, "%d%n", &(trp->tp), &used);
@@ -438,7 +438,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
                 p_tp    += used;
                 /* scale and rotations */
                 r_tpd = (struct typ_dec *) (&trp->r32);
-                if (qr != EOF) qr = fgetln(pth_mlb, &used, def_lab_file);
+                if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
                 trp->scale = sgetg(pth_mlb, r_tpd, &used, "ppm");
                 r_tpd      = (struct typ_dec *) (&trp->r33);
                 p_tp       = pth_mlb + used;
@@ -448,7 +448,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
                 p_tp      += used;
                 trp->r13   = sgetg(p_tp, r_tpd, &used, "sx");
               }
-              else qr = fgetln(pth_mlb, &used, def_lab_file);
+              else qr = fgetln_kms(pth_mlb, &used, def_lab_file);
               (void) fgets(pth_mlb, 72, def_lab_file);
               qr = (int) strlen(pth_mlb) -1;
               if (*(pth_mlb +qr) == '\n') *(pth_mlb +qr) = '\0';

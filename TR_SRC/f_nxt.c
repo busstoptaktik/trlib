@@ -38,12 +38,12 @@ int                 used
 )
 
 {
-#include         "fgetln.h"
+#include         "fgetln_kms.h"
 
   static THREAD_SAFE  char      *cp;
 
   if (*items == 0) {
-    (void) fgetln(str, items, infile);
+    (void) fgetln_kms(str, items, infile);
     cp = str;
   }
   else {

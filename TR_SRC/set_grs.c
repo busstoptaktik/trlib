@@ -57,7 +57,7 @@ double      *e,
 )
 
 {
-#include   "fgetln.h"
+#include   "fgetln_kms.h"
 #include   "fgetlhtx.h"
 #include   "i_tabdir_file.h"
 
@@ -300,7 +300,7 @@ double      *e,
     do {
       qr = fgetlhtx(def_lab_file, e_name);
       if (qr != EOF) {
-        qr = fgetln(pth_mlb, &used, def_lab_file);
+        qr = fgetln_kms(pth_mlb, &used, def_lab_file);
         (void) sscanf(pth_mlb, "%d%n", &e_no, &used);
         if (e_no == ell_nmb) {
           empty = 0;

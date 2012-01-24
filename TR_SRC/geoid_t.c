@@ -60,7 +60,7 @@ char                    *descr
 
 {
 
-#include              "fgetln.h"
+#include              "fgetln_kms.h"
 #include              "i_tabdir_file.h"
 #include              "s_status.h"
 #include              "srch_tab_typ.h"
@@ -99,7 +99,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
         b_t = strlen(hlp_mlb);
         /* look for grid name in REC_TABLE */
         do {
-          used = fgetln(pth_mlb, &qr, man_tab_file);
+          used = fgetln_kms(pth_mlb, &qr, man_tab_file);
           if (!strncmp(pth_mlb, hlp_mlb, b_t) && qr >= 8) {
             t_lab->lab_type = (short) stype;
             t_lab->f777     = (short) f777;

@@ -110,7 +110,7 @@ int                  tab_adm_f(
 
 #include         "conv_lab.h"
 #include         "fgetlhtx.h"
-#include         "fgetln.h"
+#include         "fgetln_kms.h"
 #include         "fputg.h"
 #include         "geoid_t.h"
 #include         "get_zone.h"
@@ -576,13 +576,13 @@ prst = gettabdir();
 
           if (header && mode) {
             if (dim3 > 1) {
-              (void) fgetln(ptx, &qr, in_2d);
-              if (dim3 > 2) (void) fgetln(ptx, &qr, in_3d);
+              (void) fgetln_kms(ptx, &qr, in_2d);
+              if (dim3 > 2) (void) fgetln_kms(ptx, &qr, in_3d);
             }
             (void) fprintf(fo, "\n");
             ptx  = in;
             used = 0;
-            (void) fgetln(ptx, &qr, fi);
+            (void) fgetln_kms(ptx, &qr, fi);
             B1 = sgetg(ptx, &g_tpd, &used, "m");
             ptx += used;
             L1 = sgetg(ptx, &g_tpd, &used, "m");

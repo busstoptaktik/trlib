@@ -50,7 +50,7 @@ char                    *err_str
 {
 
 #include     "conv_tab.h"
-#include     "fgetln.h"
+#include     "fgetln_kms.h"
 #include     "tabdd_c.h"
 #include     "s_status.h"
 

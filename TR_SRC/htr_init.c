@@ -52,7 +52,7 @@ char                    *dh_tr_info
 */
 #include              "conv_lab.h"
 #include              "fgetlhtx.h"
-#include              "fgetln.h"
+#include              "fgetln_kms.h"
 #include              "i_tabdir_file.h"
 #include              "set_dtm.h"
 #include              "sgetg.h"
@@ -196,10 +196,10 @@ char                    *dh_tr_info
       (void) conv_lab("input", &test_lab, def_lab_file, "");
       if (test_lab.u_c_lab.lab_type == 1) {
         (void) fseek(def_lab_file, (long) pos, SEEK_SET);
-        (void) fgetln(pth_mlb, &used, def_lab_file); //now:skip lab line
+        (void) fgetln_kms(pth_mlb, &used, def_lab_file); //now:skip lab line
         l_inv = test_lab.u_c_lab.h_dtm == o_hdtm;
         if (test_lab.u_c_lab.h_dtm == i_hdtm || l_inv) {
-          qr = fgetln(pth_mlb, &used, def_lab_file);
+          qr = fgetln_kms(pth_mlb, &used, def_lab_file);
           if (qr != EOF) {
             (void) sscanf(pth_mlb, "%s%n", c_mlb, &used); // to_dtm
             if (!strcmp((l_inv) ? i_nm : o_nm, c_mlb)) { // FOUND
@@ -221,7 +221,7 @@ char                    *dh_tr_info
               p_tp            += used;
               htr_const->LON0  = sgetg(p_tp, &g_tpd, &used, "nt");
               // params ::
-              qr               = fgetln(pth_mlb, &used, def_lab_file);
+              qr               = fgetln_kms(pth_mlb, &used, def_lab_file);
               if (qr != EOF) {
                 switch (tr_type) {
                 case 1: // dh_table
@@ -244,7 +244,7 @@ char                    *dh_tr_info
                 }
               }
             } else {
-              used = fgetln(pth_mlb, &used, def_lab_file); // params
+              used = fgetln_kms(pth_mlb, &used, def_lab_file); // params
             }
             if (tr_type > 0) // reference
              (void) fgets(dh_tr_info, 127, def_lab_file);
@@ -252,8 +252,8 @@ char                    *dh_tr_info
              (void) fgets(pth_mlb, 127, def_lab_file);
           }
         } else {
-          qr = fgetln(pth_mlb, &used, def_lab_file);
-          used = fgetln(pth_mlb, &used, def_lab_file); // params
+          qr = fgetln_kms(pth_mlb, &used, def_lab_file);
+          used = fgetln_kms(pth_mlb, &used, def_lab_file); // params
           (void) fgets(dh_tr_info, 127, def_lab_file); // info
         }
       } else test_lab.u_c_lab.lab_type = STP_LAB;

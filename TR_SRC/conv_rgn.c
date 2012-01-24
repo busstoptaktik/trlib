@@ -85,7 +85,7 @@ char            *rgn_name
 /*   rgn_old.r_nr[1] = 0;                                            */
 /*   rgn_old.r_nr[0] = conv_rgn(-1, rgn_new.prfx, name);             */
 
-#include              "fgetln.h"
+#include              "fgetln_kms.h"
 #include              "fgetlhtx.h"
 #include              "i_tabdir_file.h"
 
@@ -164,7 +164,7 @@ extern THREAD_SAFE size_t              init_prj_pos, init_rgn_pos;
 
     /* search for region prefix */
     do {
-      if (qr != EOF) qr = fgetln(pth_mlb, &used, def_lab_file);
+      if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
       if (qr != EOF) {
         (void) sscanf(pth_mlb, "%s%n", r_rgn.prfx, &used);
         if (!strcmp(rgn_prfx, r_rgn.prfx) || doc == 2) {
@@ -197,7 +197,7 @@ extern THREAD_SAFE size_t              init_prj_pos, init_rgn_pos;
     /* search for region number */
     r_rgn.r_nr[0] = 0;
     do {
-      if (qr != EOF) qr = fgetln(pth_mlb, &used, def_lab_file);
+      if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
       if (qr != EOF) {
         (void) sscanf(pth_mlb, "%s%n", r_rgn.prfx, &used);
         if (rgn_nr == r_rgn.r_nr[0]) {

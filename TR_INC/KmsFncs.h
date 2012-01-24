@@ -75,7 +75,7 @@ extern "C" {
 #include "fgetdt.h"
 #include "fgetg.h"
 #include "fgetlhtx.h"
-#include "fgetln.h"
+#include "fgetln_kms.h"
 #include "fgetshpprj.h"
 #include "fh_trans.h"
 #include "fo_g_tr.h"

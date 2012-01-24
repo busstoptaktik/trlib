@@ -38,13 +38,13 @@ int                 used
 );
 
 /*
-*f_nxt : next item of a line of character strings from fgetln
-*str   : the array of characters used by fgetln
-*items : the number of items remaining after call by fgetln
+*f_nxt : next item of a line of character strings from fgetln_kms
+*str   : the array of characters used by fgetln_kms
+*items : the number of items remaining after call by fgetln_kms
 *infile: the stream connect to the file
 used   : the number of characters used in the previous call
 
-The function utilises the filtering facilities of fgetln.
+The function utilises the filtering facilities of fgetln_kms.
 
 A typical call for sgetg would be
 

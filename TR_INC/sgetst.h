@@ -49,7 +49,7 @@ digit, capital letter or - (the sign minus). All other leading
 characters are skipped. The input stops after double space or
 first occurring lower case letter after input has started.
 Single spaces are blind. Reading brackets are assumed removed
-by the function producing the string (fgetln). Syntax errors
+by the function producing the string (fgetln_kms). Syntax errors
 or other input troubles causes the input to be stored as a
 string of at most 10 characters.
 */

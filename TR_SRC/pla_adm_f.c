@@ -86,7 +86,7 @@ char                *err_txt
 
 {
 #include    "conv_lab.h"
-#include    "fgetln.h"
+#include    "fgetln_kms.h"
 #include    "sgetg.h"
 #include    "fputg.h"
 #include    "set_tpd.h"
@@ -120,7 +120,7 @@ char                *err_txt
       (void) sprintf(err_txt, "\n+++ mangler label\n");
       return(-1);
     }
-    (void) fgetln(txt, &qr, i_fd);
+    (void) fgetln_kms(txt, &qr, i_fd);
     do {
       (void) sscanf(txt, "%d%n", &plate, &used);
       if (plate > 0) {
@@ -150,7 +150,7 @@ char                *err_txt
           return(-1);
         }
         ++ pol_ant;
-        (void) fgetln(txt, &qr, i_fd);
+        (void) fgetln_kms(txt, &qr, i_fd);
       }
     } while (plate > 0);
 
@@ -177,7 +177,7 @@ char                *err_txt
     /* read poly_a, update info */
     pol_ant = 0;
     p_pos   = ftell(o_fd);
-    (void) fgetln(txt, &qr, i_fd);
+    (void) fgetln_kms(txt, &qr, i_fd);
     do {
       (void) sscanf(txt, "%d", &plate);
       if (plate > 0) {
@@ -204,7 +204,7 @@ char                *err_txt
         /* read poly_a */
         p_B     = Bp +1;
         pkt_ant = 0;
-        (void) fgetln(txt, &qr, i_fd);
+        (void) fgetln_kms(txt, &qr, i_fd);
         do {
           (void) sscanf(txt, "%d%n", &lb_nr, &used);
           if (lb_nr > 0) {
@@ -215,7 +215,7 @@ char                *err_txt
             /* Pacific translation to around zero Longitude */
             if (plus) *(p_B-1) = v_red(*(p_B -1) + M_PI);
             ++ pkt_ant;
-            (void) fgetln(txt, &qr, i_fd);
+            (void) fgetln_kms(txt, &qr, i_fd);
           }
         } while (lb_nr > 0);
         j   = 2 * pkt_ant +1;
@@ -245,14 +245,14 @@ char                *err_txt
         }
         ++ pol_ant;
         p_pos = ftell(o_fd);
-        (void) fgetln(txt, &qr, i_fd);
+        (void) fgetln_kms(txt, &qr, i_fd);
       }
     } while (plate > 0);
 
     /* read poly_b, update info */
     pol_ant = 0;
     p_pos   = ftell(o_fd);
-    (void) fgetln(txt, &qr, i_fd);
+    (void) fgetln_kms(txt, &qr, i_fd);
     do {
       (void) sscanf(txt, "%d", &plate);
       if (plate > 0) {
@@ -279,7 +279,7 @@ char                *err_txt
         /* read poly_b */
         p_B     = Bp +1;
         pkt_ant = 0;
-        (void) fgetln(txt, &qr, i_fd);
+        (void) fgetln_kms(txt, &qr, i_fd);
         do {
           (void) sscanf(txt, "%d%n", &lb_nr, &used);
           if (lb_nr > 0) {
@@ -290,7 +290,7 @@ char                *err_txt
             /* Pacific translation to around zero Longitude */
             if (plus) *(p_B-1) = v_red(*(p_B -1) + M_PI);
             ++ pkt_ant;
-            (void) fgetln(txt, &qr, i_fd);
+            (void) fgetln_kms(txt, &qr, i_fd);
           }
         } while (lb_nr > 0);
         j   = 2 * pkt_ant +1;
@@ -320,7 +320,7 @@ char                *err_txt
         }
         ++ pol_ant;
         p_pos = ftell(o_fd);
-        (void) fgetln(txt, &qr, i_fd);
+        (void) fgetln_kms(txt, &qr, i_fd);
       }
     } while (plate > 0);
 
@@ -464,11 +464,11 @@ char                *err_txt
   case 'a': /* arc_pol */
             /* _______ */
 
-    (void) fgetln(txt, &qr, i_fd);
+    (void) fgetln_kms(txt, &qr, i_fd);
     do {
       (void) sscanf(txt, "%d", &lb_nr);
       lb_nr *= 1000;
-      (void) fgetln(txt, &qr, i_fd);
+      (void) fgetln_kms(txt, &qr, i_fd);
       while (strncmp(txt, "end", 3)) {
         (void) sscanf(txt, "%lf,%lf", &L, &B);
 
@@ -481,11 +481,11 @@ char                *err_txt
         } else (void) fprintf(o_fd, "\n%8d   %9.5f dg   %9.5f dg",
                               ++lb_nr, B, L);
         ++ pkt_ant;
-        (void) fgetln(txt, &qr, i_fd);
+        (void) fgetln_kms(txt, &qr, i_fd);
       }
       if (!first) (void) fprintf(o_fd,"\n-1z\n");
       first = 1;
-      (void) fgetln(txt, &qr, i_fd);
+      (void) fgetln_kms(txt, &qr, i_fd);
     } while (strncmp(txt, "end", 3));
     (void) fprintf(o_fd, "\n\nloops    : %6d", pol_ant);
     (void) fprintf(o_fd, "\n\npoints   : %6d", pkt_ant);
@@ -499,7 +499,7 @@ char                *err_txt
     while (conv_lab("input", &lab_a, i_fd) == CRD_LAB) {
       first   = 1;
       *pi_ant = 0;
-      (void) fgetln(txt, &qr, i_fd);
+      (void) fgetln_kms(txt, &qr, i_fd);
       do {
         (void) sscanf(txt, "%d%n", &lb_nr, &used);
         if (lb_nr > 0) {
@@ -515,7 +515,7 @@ char                *err_txt
           (void) sscanf(p_tx, "%lf", p_B ++);
           ++ *pi_ant;
           ++ pkt_ant;
-          (void) fgetln(txt, &qr, i_fd);
+          (void) fgetln_kms(txt, &qr, i_fd);
         }
       } while (lb_nr > 0);
       ++ pi_ant;
@@ -528,7 +528,7 @@ char                *err_txt
     pkt_ant = 0;
 
     /* read polygon number */
-    (void) fgetln(txt, &qr, d_fd);
+    (void) fgetln_kms(txt, &qr, d_fd);
     do {
       (void) sscanf(txt, "%d%n", &plus, &used);
       if (plus > 0) {
@@ -537,7 +537,7 @@ char                *err_txt
         ++ pol_out;
 
         /* read polygon selections */
-        (void) fgetln(txt, &qr, d_fd);
+        (void) fgetln_kms(txt, &qr, d_fd);
         do {
           (void) sscanf(txt, "%d%n", &lb_nr, &used);
           if (lb_nr > 0) {
@@ -583,11 +583,11 @@ char                *err_txt
             }
             (void) fprintf(o_fd, "\n");
 
-            (void) fgetln(txt, &qr, d_fd);
+            (void) fgetln_kms(txt, &qr, d_fd);
           }
         } while (lb_nr > 0);
         (void) fprintf(o_fd, "\n-1z\n");
-        (void) fgetln(txt, &qr, d_fd);
+        (void) fgetln_kms(txt, &qr, d_fd);
       }
     } while (plus > 0);
 

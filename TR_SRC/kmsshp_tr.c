@@ -64,7 +64,7 @@ char            *err_txt)
 */
 
 #include   "fgetlhtx.h"
-#include   "fgetln.h"
+#include   "fgetln_kms.h"
 #include   "fputshpprj.h"
 #include   "gd_trans.h"
 #include   "s_status.h"
