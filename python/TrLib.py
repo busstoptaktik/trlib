@@ -34,6 +34,8 @@ D2R=math.pi/180.0
 R2D=180.0/math.pi
 #debug flag- turns on extra verbosity here and there
 DEBUG=False
+#ctypes pointer to double#
+LP_c_double=ctypes.POINTER(ctypes.c_double)
 class TransformationException(Exception):
 	def __init__(self,msg="Transformation Error"):
 		self.msg=msg
@@ -52,6 +54,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	global tr_lib
 	global IS_INIT
 	global GEOIDS
+	
 	IS_INIT=False
 	if len(lib_dir)==0:
 		lib_dir="."
@@ -75,7 +78,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.trclose.restype=None
 		tr_lib.trclose.argtypes=[ctypes.c_void_p]
 		tr_lib.tr.restype=ctypes.c_int
-		tr_lib.tr.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_void_p,ctypes.c_int]
+		tr_lib.tr.argtypes=[ctypes.c_void_p,LP_c_double,LP_c_double,LP_c_double,ctypes.c_int]
 		
 	except Exception, msg:
 		print repr(msg)
@@ -172,10 +175,10 @@ class CoordinateTransformation(object):
 			Y*=D2R
 		if xyz_in.shape[1]==3:  #3d
 			Z=np.require(xyz_in[:,2],dtype=np.float64, requirements=['A', 'O', 'W', 'C'])
-			res=tr_lib.tr(self.tr,X.ctypes._data,Y.ctypes._data,Z.ctypes._data,npoints)
+			res=tr_lib.tr(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),Z.ctypes.data_as(LP_c_double),npoints)
 			xyz_out=np.column_stack((X,Y,Z))
 		else:
-			res=tr_lib.tr(self.tr,X.ctypes._data,Y.ctypes._data,None,npoints)
+			res=tr_lib.tr(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),None,npoints)
 			xyz_out=np.column_stack((X,Y))
 		self.rc=res
 		#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#

@@ -36,11 +36,12 @@ namespace Kmstrlib.NET
 		public const string TRLIB="TrLib.dll"; //should really be defined at compile time....
 		
 		
-		public enum KMSTR_Error
+		public enum TR_Error
 		{
-			KMSTR_OK = 0,  // No Error
-			KMSTR_LABELERROR = 1, // Invalid input or output label
-			KMSTR_TRANSFORMATIONERROR = 2,  // Transformation failed
+			TR_OK = 0,  // No Error
+			TR_LABEL_ERROR = 1, // Invalid input or output label
+			TR_TRANSFORMATION_ERROR = 2,  // Transformation failed
+			TR_ALLOCATION_ERROR=3 //Memory allocation failed
 			
 			
 		};
@@ -55,6 +56,13 @@ namespace Kmstrlib.NET
 		public static int InitLibrary(string folder)
 		{
 			return TR_InitLibrary(folder);
+		}
+		[DllImport(TRLIB)]
+		private static extern int TR_GetLastError();
+		
+		public static int GetLastError()
+		{
+			return TR_GetLastError();
 		}
 
 		[DllImport(TRLIB)]
@@ -80,7 +88,7 @@ namespace Kmstrlib.NET
 		public static extern void trclose( IntPtr tr);
 
 		[DllImport(TRLIB)]
-		public static extern KMSTR_Error tr(
+		public static extern TR_Error tr(
 			
 			IntPtr TR,
 			out double X,
@@ -104,13 +112,14 @@ namespace Kmstrlib.NET
               
 		/// String representation of error messages
 		/// </summary>
-		public static string GetKMSErrorMessage(KMSTR_Error e)
+		public static string GetKMSErrorMessage(TR_Error e)
 		{
 			switch (e)
 			{
-				case KMSTR_Error.KMSTR_OK: return "No Error";
-				case KMSTR_Error.KMSTR_LABELERROR: return "Invalid input or output label";
-				case KMSTR_Error.KMSTR_TRANSFORMATIONERROR: return "Transformation failed";
+				case TR_Error.TR_OK: return "No Error";
+				case TR_Error.TR_LABEL_ERROR: return "Invalid input or output label";
+				case TR_Error.TR_TRANSFORMATION_ERROR: return "Transformation failed";
+				case TR_Error.TR_ALLOCATION_ERROR: return "Allocation failed";
 				
 			}
 
@@ -123,13 +132,13 @@ namespace Kmstrlib.NET
 	public struct Point 
 	{
 		public double x, y, z;
-		public Interface.KMSTR_Error return_code;
+		public Interface.TR_Error return_code;
 		public Point(double p1, double p2, double p3) 
 		{
 			x = p1;
 			y = p2;
 			z = p3;
-			return_code=Interface.KMSTR_Error.KMSTR_OK;
+			return_code=Interface.TR_Error.TR_OK;
 		}
 	}
 	
@@ -151,23 +160,23 @@ namespace Kmstrlib.NET
 		}
 		public Point Transform(Point pt)
 		{
-			Interface.KMSTR_Error err;
+			Interface.TR_Error err;
 			if (!is_init){
-				pt.return_code=Interface.KMSTR_Error.KMSTR_LABELERROR;
+				pt.return_code=Interface.TR_Error.TR_LABEL_ERROR;
 				return pt;
 			}
 			err=Interface.tr(TR,out pt.x,out pt.y,out pt.z,1);
 			pt.return_code=err;
 			return pt;
 		}
-		public Interface.KMSTR_Error TransformArray(double[] X, double[] Y, double[] Z)
+		public Interface.TR_Error TransformArray(double[] X, double[] Y, double[] Z)
 		{
-			Interface.KMSTR_Error err=Interface.KMSTR_Error.KMSTR_OK;
+			Interface.TR_Error err=Interface.TR_Error.TR_OK;
 			if ((X.Length!=Y.Length)||((Z!=null) && (Z.Length!=X.Length))){
 				throw new ArgumentException("Sizes of input arrays must agree!");}
 			for (int i=0; i<X.Length ; i++)
 				err=Interface.tr(TR,out X[i],out Y[i], out Z[i], 1);
-			return err;
+			return (Interface.TR_Error) err;
 		}	
 		public void Close()
 		{

@@ -25,6 +25,14 @@ JNIEXPORT jint JNICALL Java_TrLib_InitLibrary
 
 /*
  * Class:     TrLib
+ * Method:    GetLastError
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_TrLib_GetLastError
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     TrLib
  * Method:    TerminateLibrary
  * Signature: ()V
  */

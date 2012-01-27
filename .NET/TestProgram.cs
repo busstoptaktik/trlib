@@ -9,7 +9,7 @@ namespace Kmstrlib.NET
 	{
 		static void Main(string[] args)
 		{
-			Interface.KMSTR_Error  error;
+			Interface.TR_Error  error;
 			int i,err;
 			if (args.Length>0){
 				System.Console.WriteLine("Initialising library.");

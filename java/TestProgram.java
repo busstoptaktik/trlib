@@ -1,28 +1,31 @@
 public class TestProgram{
 	public static void main(String args[]){
 		String version=TrLib.GetVersion();
-		System.out.println(version);
-		TrLib.InitLibrary("..\\python\\Geoids\\");
+		System.out.println("TrLib version is: "+version);
+		TrLib.InitLibrary("");
+		TrLib.TR_Error err;
 		TrLib.CoordinateTransformation ct;
 		try {
-		ct=new TrLib.CoordinateTransformation("utm32_wgs84","utm32_ed50");}
+		ct=new TrLib.CoordinateTransformation("utm32Ewgs84","utm32Eed50");}
 		catch (Exception e){
 			System.out.println("oh no!");
 			return;}
 		double X[]={5143200.1,450200.1};
 		double Y[]={6143200.1,6200000.1};
-		double Z[]={0,0};
+		double Z[]={100,200};
 		System.out.println("And here we go!");
-		try {
-		ct.Transform(X,Y,Z);}
-		catch (Exception e){
-			System.out.println("Oh no again!");}
+		err=ct.Transform(X,Y,Z);
 		for (int i=0; i<X.length; i++){
 			System.out.format("%.4f %.4f %.4f%n",X[i],Y[i],Z[i]);}
+		System.out.println("And we can call overloaded method with just two args (X,Y):");
+		X=new double[]{5143200.1,450200.1};
+		Y=new double[]{6143200.1,6200000.1};
+		err=ct.Transform(X,Y);
+		for (int i=0; i<X.length; i++){
+			System.out.format("%.4f %.4f %n",X[i],Y[i]);}
 		ct.Close();
 		int n=50000;	
 		System.out.format("Speed test (utm32Ewgs84 to utm33Eed50) with %d points:%n",n);
-		
 		X=new double[n];
 		Y=new double[n];
 		Z=new double[n];
@@ -37,10 +40,7 @@ public class TestProgram{
 			System.out.println("oh no!");
 			return;}
 		long start=System.currentTimeMillis();
-		try {
-		ct.Transform(X,Y,Z);}
-		catch (Exception e){
-			System.out.println("Oh no again!");}
+		ct.Transform(X,Y,Z);
 		long elapsed=System.currentTimeMillis()-start;
 		System.out.format("Running time: %.4f s", ((double) elapsed)/1000.0);
 		ct.Close();

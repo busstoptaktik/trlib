@@ -202,7 +202,6 @@ def main(args):
 	nerr+=RandomTests(TEST_SYSTEMS_3D,3,N,log_file=sys.stdout)
 	for i in range(3):
 		nerr+=RandomTests(FH_TEST,3,N,log_file=sys.stdout)
-		#TrLib.tr_lib.IsGeoidTableInitialised()
 	print("Errors: %d" %nerr)
 	return nerr
 

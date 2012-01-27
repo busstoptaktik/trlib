@@ -27,6 +27,10 @@ JNIEXPORT void JNICALL Java_TrLib_TerminateThread(JNIEnv *env, jclass jc){
 	TR_TerminateThread();
 }
 
+JNIEXPORT jint JNICALL Java_TrLib_GetLastError(JNIEnv *env, jclass jc){
+	return (jint) TR_GetLastError();
+}
+
 JNIEXPORT jlong JNICALL Java_TrLib_tropen(JNIEnv *env, jclass jc, jstring mlb1, jstring mlb2){
 	const jbyte *str1,*str2;
 	TR *trf;

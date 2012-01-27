@@ -61,6 +61,10 @@ def main(args): #progname, test_def, -lib libname (optional)
 			continue
 		file_in=os.path.join(job_dir,file_in)
 		file_out=os.path.join(job_dir,file_out)
+		dir_out=os.path.dirname(file_out)
+		if not os.path.exists(dir_out):
+			print("Generating %s" %dir_out)
+			os.mkdir(dir_out)
 		if os.path.exists(file_in):
 			TrLib.TransformFile(file_in,label_out,file_out,precision)
 		else:
