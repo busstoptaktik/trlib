@@ -1776,8 +1776,8 @@ dhfvroldmsl.09
 FVR90 to MSL (old Fo Heeight System)
 
 #DK_geoHfeh10_h_dvr90
-               fcsvr10   1  54 30 nt  11 20 nt
-dhdvrfcsvr.10
+               fcsvr10   2  54 30 nt  11 20 nt
+  -0.034 m
 DVR90 to Fehmarn Bridge Project Height
 
 #DE_geoHfeh10_h_dhhn92
