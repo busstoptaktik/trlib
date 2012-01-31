@@ -162,11 +162,5 @@ extern "C" {
 #include "v_std.h"
 }
 
-#ifdef _DEBUG
-#pragma comment(lib, "C:/D_DREV/DotNetProjects/KmsFncs/Debug/KmsFncsD.lib")
-#else
-#pragma comment(lib, "C:/D_DREV/DotNetProjects/KmsFncs/Release/KmsFncs.lib")
-#endif
-
 #endif
 
