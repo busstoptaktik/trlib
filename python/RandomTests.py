@@ -43,7 +43,7 @@ THREAD_SAFE_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,55.0,100.0,D2M],
 ["utm32Hwgs84_h_dnn","utm33Hwgs84_h_dvr90",512200.0,6143200.0,100,1.0],
 ["crt_etrs89","geoEwgs84",3436572.0354,562338.0079,5325761.9520,1.0]] #,
 
-FH_TEST=[["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.18,54.65,100,D2M*0.4]] #pretty close to bridge project.
+FH_TEST=[["DK_geoHwgs84_h_dvr90","fcsH_h_fcsvr10",11.132,54.47,10,D2M*0.2]] #pretty close to bridge project.
 #["GR_geoEwgs84","GR_utm22Ngr96",-52.23,64.68,200.0,D2M]] #since it is known that Fehmarn transf. are NOT thread safe! Well now they are!!
 BASE_POINT=[512200.0,6143200.0] #Et sted i Jylland?
 LINE_SPLIT="*"*65

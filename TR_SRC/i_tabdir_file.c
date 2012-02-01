@@ -96,7 +96,7 @@ char             *dir_name
   struct stat         buf;
   FILE              **f_in, *f_in_a = NULL;
 
-  (void) strcpy(r_mode, "r");
+  (void) strcpy(r_mode, "rb"); //Binary mode used to support uniform line endings \n across platforms!
   (void) strcpy(p_name, name);
 
   switch (mode) {
