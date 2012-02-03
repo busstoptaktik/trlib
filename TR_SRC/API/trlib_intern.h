@@ -35,4 +35,6 @@ struct XYZ {
     int err;
 }; 
 
-int TR_GeoidTable(struct TR*); 
+int TR_GeoidTable(struct TR*);
+int TR_IsMainThread(void);
+int TR_IsFehmarn(union geo_lab*, union geo_lab*);

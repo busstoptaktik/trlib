@@ -32,30 +32,30 @@
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "trthread.h"
-#define TRLIB_VERSION "RC0 v1.0 2012-02-02"
+#define TRLIB_VERSION "RC0 v1.0 2012-02-03"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
-/* We use a global geoid table. This could be made thread local if needed. Now thread local!!!! */
- //static struct mgde_str GeoidTable;
- 
-static int HAS_GEOIDS=0;
-/* Need to let KMSTrans parse the def-files, before any transformation
-   We need to figure out a way of setting the tabdir to the directory of the running shared library (for people who don't want geoids)
-*/
-
-THREAD_SAFE int TR_LAST_ERROR=TR_OK; /*Last error msg (int) from gd_trans */
+static int HAS_GEOIDS=0; //global flag which signals if we have geoids available 
+static THREAD_SAFE int THREAD_ID=0; //used to distinguish the thread that initialised the library from other threads.
+static int *MAIN_THREAD_ID=0; // same as above - also signals whether the library has been succesfully initialised.
+THREAD_SAFE int TR_LAST_ERROR=TR_OK; /*Last error msg (int) from gd_trans - also set in tropen and TR_GeoidTable on allocation errors.*/
 FILE *ERR_LOG=0;
 int TR_GetLastError(void){
     return TR_LAST_ERROR;
 }
-
+int TR_IsMainThread(void){
+	return ((MAIN_THREAD_ID==&THREAD_ID) || (!MAIN_THREAD_ID));
+}
+/* Need to let KMSTrans parse the def-files, before any transformation */
 int TR_InitLibrary(char *path) {
     int ok=0,rc;
     double x=512200.0,y=6143200.0,z=0.0;
     TR* trf;
     FILE *fp;
     char buf[64],fname[1024],*init_path=0;
+    if (!TR_IsMainThread()) //Only one thread can succesfully initialise the library
+	    return 0;
     if (strlen(path)>0) 
 	    init_path=path;
     else
@@ -67,7 +67,9 @@ int TR_InitLibrary(char *path) {
 	    strcat(init_path,"/");
     strcpy(fname,init_path);
     strcat(fname,TR_DEF_FILE);
-    printf("%s %s\n",init_path,fname); /*just debugging */
+    #ifdef _ROUT
+    fprintf(stdout,"%s %s\n",init_path,fname); /*just debugging */
+    #endif
     fp=fopen(fname,"r");
     if (0==fp)
 	    return 0;
@@ -99,7 +101,10 @@ int TR_InitLibrary(char *path) {
 	    rc=tr(trf,&x,&y,&z,1);
 	    trclose(trf);}
     if (0!=ERR_LOG)
-	    fprintf(ERR_LOG,"************ end initialisation **************\n");
+	    fprintf(ERR_LOG,"Is init: %d\n************ end initialisation **************\n",(ok==TR_OK));
+    /* Set the main thread id */
+    if (ok==TR_OK)
+	    MAIN_THREAD_ID=&THREAD_ID;
     return (ok==TR_OK); 
 }
 /* Mock up. Look in kmstr5 for better ideas */
@@ -242,7 +247,9 @@ int TR_GeoidTable(TR *tr){
 		
 		
        
-
+int TR_IsFehmarn(union geo_lab *plab_in, union geo_lab *plab_out){
+	 return (((plab_in->u_c_lab).imit == FHMASK) || ((plab_out->u_c_lab).imit == FHMASK));
+}
 
 
 TR *tropen (char *label_in, char *label_out, char *geoid_name) {
@@ -276,6 +283,15 @@ TR *tropen (char *label_in, char *label_out, char *geoid_name) {
         free(plab_in);
         free(plab_out);
 	TR_LAST_ERROR=TR_LABEL_ERROR;
+        return 0;
+    }
+    if (TR_IsFehmarn(plab_in,plab_out) && !TR_IsMainThread()){
+	free(plab_in);
+        free(plab_out);
+	TR_LAST_ERROR=TR_LABEL_ERROR;
+	#ifdef _ROUT
+	fprintf(ERR_LOG,"Fehmarn transformations not allowed in multihreaded mode!\n");
+	#endif
         return 0;
     }
     /*Set geoid info */
@@ -416,8 +432,6 @@ int trstream(TR *trf, FILE *f_in, FILE *f_out, int n) {
             break;
     }
 
-    trclose(trf);
-   
     return ERR? TR_ERROR: TR_OK;
 }
 

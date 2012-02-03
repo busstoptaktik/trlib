@@ -36,13 +36,12 @@ public class TrLib {
 		public String mlb_in="";
 		public String mlb_out="";
 		private long trf=0;
-		public CoordinateTransformation(String mlb1, String mlb2) throws Exception
+		public CoordinateTransformation(String mlb1, String mlb2) 
 		{
 			mlb_in=mlb1;
 			mlb_out=mlb2;
 			trf=TrLib.tropen(mlb1,mlb2);
-			if (trf==0){
-				throw new Exception("Input labels not ok.");}
+			
 		}
 		public boolean IsInitialised()
 		{
