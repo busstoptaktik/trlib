@@ -125,7 +125,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
     /*________________________*/
     /* Test for identification of a man_tab_file.tab file */
     qr    = fgetln_kms(ftx, &used, man_tab_file);
-    size  = !strncmp(ftx, "#geoid  manager  777", 19);
+    size  = !strncmp(ftx, "#geoid  manager  777", 20);
 
 
 /* geoid_i   ver 2003.1           # page 3    4 Jul 2003 17 23 */
