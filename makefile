@@ -26,7 +26,7 @@ all: lib so
 lib: pre $(ALLOBJ)
 
 so:
-	gcc $(LDFLAGS) -o $(BUILDDIR)/libtr.so $(BUILDDIR)/*.o
+	$(CC) $(LDFLAGS) -o $(BUILDDIR)/libtr.so $(BUILDDIR)/*.o
 
 pre:
 	-rm ../BUILD/trlib/compile.err
