@@ -41,19 +41,21 @@ enum KMSTR_Error
 #else 
 #define KMSTR_API
 #endif 
-KMSTR_API int TR_Transform(char *label_in, char *label_out,double *X,double *Y,double *Z,int npoints);
-KMSTR_API int TR_InitLibrary(char *path);
-KMSTR_API int TR_GetLastError(void);
+KMSTR_API int   TR_InitLibrary(char *path);
+KMSTR_API int   TR_GetLastError(void);
 KMSTR_API void TR_GetVersion(char *buffer, int bufferlength);
-KMSTR_API int TR_GetEsriText(char *label_in, char *wkt_out);
+KMSTR_API int   TR_GetEsriText(char *label_in, char *wkt_out);
 KMSTR_API void TR_TerminateLibrary(void);
 KMSTR_API void TR_TerminateThread(void);
-typedef struct TR TR;
+KMSTR_API void TR_AllowUnsafeTransformations(void);
+KMSTR_API void TR_ForbidUnsafeTransformations(void);
+typedef struct  TR TR;
 KMSTR_API void TR_GeoidInfo(TR *tr);
-KMSTR_API TR *tropen (char *label_in, char *label_out, char *geoid_name);
-KMSTR_API  int tr(TR *tr, double *X, double *Y, double *Z, int n);
-KMSTR_API void trclose (TR *tr);
-KMSTR_API  int trstream(TR *tr, FILE *f_in, FILE *f_out, int n);
+KMSTR_API TR  *TR_Open (char *label_in, char *label_out, char *geoid_name);
+KMSTR_API  int  TR_Transform(TR *tr, double *X, double *Y, double *Z, int n);
+KMSTR_API int   TR_InverseTransform(TR *tr, double *X, double *Y, double *Z, int n);
+KMSTR_API void TR_Close (TR *tr);
+KMSTR_API  int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
 
 
 

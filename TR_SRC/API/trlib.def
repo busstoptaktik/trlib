@@ -7,9 +7,12 @@ EXPORTS
 	TR_TerminateLibrary
 	TR_TerminateThread
 	TR_GetLastError
-	tropen
-	trclose
-	tr
-	trstream
+	TR_Open
+	TR_Close
+	TR_Transform
+	TR_InverseTransform
+	TR_Stream
+	TR_AllowUnsafeTransformations
+	TR_ForbidUnsafeTransformations
 	
 	

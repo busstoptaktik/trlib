@@ -3,13 +3,10 @@ public class TestProgram{
 		String version=TrLib.GetVersion();
 		System.out.println("TrLib version is: "+version);
 		TrLib.InitLibrary("");
+		TrLib.SetThreadMode(false);
 		TrLib.TR_Error err;
 		TrLib.CoordinateTransformation ct;
-		try {
-		ct=new TrLib.CoordinateTransformation("utm32Ewgs84","utm32Eed50");}
-		catch (Exception e){
-			System.out.println("oh no!");
-			return;}
+		ct=new TrLib.CoordinateTransformation("utm32Ewgs84","utm32Eed50");
 		double X[]={5143200.1,450200.1};
 		double Y[]={6143200.1,6200000.1};
 		double Z[]={100,200};

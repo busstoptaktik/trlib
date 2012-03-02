@@ -9,7 +9,7 @@ JNIEXPORT jstring JNICALL Java_TrLib_GetVersion(JNIEnv *env, jclass jc){
 }
 
 JNIEXPORT jint JNICALL Java_TrLib_InitLibrary(JNIEnv *env, jclass jc, jstring folder){
-	const jbyte *str;
+	const char *str;
 	int ok;
 	str = (*env)->GetStringUTFChars(env, folder, NULL);
 	if (str == NULL) 
@@ -27,14 +27,21 @@ JNIEXPORT void JNICALL Java_TrLib_TerminateThread(JNIEnv *env, jclass jc){
 	TR_TerminateThread();
 }
 
+JNIEXPORT void JNICALL Java_TrLib_AllowUnsafeTransformations(JNIEnv *env, jclass jc){
+	TR_AllowUnsafeTransformations();
+}
+
+JNIEXPORT void JNICALL Java_TrLib_ForbidUnsafeTransformations(JNIEnv *env, jclass jc){
+	TR_ForbidUnsafeTransformations();
+}
+
 JNIEXPORT jint JNICALL Java_TrLib_GetLastError(JNIEnv *env, jclass jc){
 	return (jint) TR_GetLastError();
 }
 
-JNIEXPORT jlong JNICALL Java_TrLib_tropen(JNIEnv *env, jclass jc, jstring mlb1, jstring mlb2){
-	const jbyte *str1,*str2;
+JNIEXPORT jlong JNICALL Java_TrLib_Tropen(JNIEnv *env, jclass jc, jstring mlb1, jstring mlb2){
+	const char *str1,*str2;
 	TR *trf;
-	int ok;
 	str1 = (*env)->GetStringUTFChars(env, mlb1, NULL);
 	if (str1 == NULL)
 		return TR_ALLOCATION_ERROR;
@@ -42,7 +49,7 @@ JNIEXPORT jlong JNICALL Java_TrLib_tropen(JNIEnv *env, jclass jc, jstring mlb1, 
 	if (str2 == NULL){
 		(*env)->ReleaseStringUTFChars(env, mlb1, str1);
 		return TR_ALLOCATION_ERROR;}
-	trf=tropen((char *) str1, (char *) str2, "");
+	trf=TR_Open((char *) str1, (char *) str2, "");
 	if (trf == NULL){
 		(*env)->ReleaseStringUTFChars(env, mlb1, str1);
 		(*env)->ReleaseStringUTFChars(env, mlb2, str2);
@@ -50,13 +57,13 @@ JNIEXPORT jlong JNICALL Java_TrLib_tropen(JNIEnv *env, jclass jc, jstring mlb1, 
 	return (jlong) (intptr_t) trf;
 }
 
-JNIEXPORT void JNICALL Java_TrLib_trclose(JNIEnv *env, jclass jc, jlong addr){
+JNIEXPORT void JNICALL Java_TrLib_Trclose(JNIEnv *env, jclass jc, jlong addr){
 	if (addr == 0)
 		return;
-	trclose( (TR*) (intptr_t) addr);
+	TR_Close( (TR*) (intptr_t) addr);
 }
 
-JNIEXPORT jint JNICALL Java_TrLib_tr(JNIEnv *env, jclass jc, jlong addr, jdoubleArray X, jdoubleArray Y, jdoubleArray Z, jint n){
+JNIEXPORT jint JNICALL Java_TrLib_Transform(JNIEnv *env, jclass jc, jlong addr, jdoubleArray X, jdoubleArray Y, jdoubleArray Z, jint n){
 	jdouble *x,*y,*z;
 	int rc;
 	x=(*env)->GetDoubleArrayElements(env,X,NULL);
@@ -76,7 +83,7 @@ JNIEXPORT jint JNICALL Java_TrLib_tr(JNIEnv *env, jclass jc, jlong addr, jdouble
 		}}
 	else
 		z=NULL;
-	rc= tr((TR*) (intptr_t) addr, (double *) x, (double *) y, (double*) z, (int) n);
+	rc= TR_Transform((TR*) (intptr_t) addr, (double *) x, (double *) y, (double*) z, (int) n);
 	(*env)->SetDoubleArrayRegion(env,X,0,n,x);
 	(*env)->SetDoubleArrayRegion(env,Y,0,n,y);
 	if (Z!=NULL){

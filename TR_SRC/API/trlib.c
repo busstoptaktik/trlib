@@ -32,21 +32,54 @@
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "trthread.h"
-#define TRLIB_VERSION "RC0 v1.0 2012-02-03"
+#define TRLIB_VERSION "RC1 v1.0 2012-03-02"
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
+
+/*various global state variables */
+
+static int ALLOW_UNSAFE=0; //do we allow transformations which are not thread safe?
+static int UNSAFE[]={FHMASK}; //list of imit-attrs of transformations deemed unsafe.
 static int HAS_GEOIDS=0; //global flag which signals if we have geoids available 
 static THREAD_SAFE int THREAD_ID=0; //used to distinguish the thread that initialised the library from other threads.
 static int *MAIN_THREAD_ID=0; // same as above - also signals whether the library has been succesfully initialised.
-THREAD_SAFE int TR_LAST_ERROR=TR_OK; /*Last error msg (int) from gd_trans - also set in tropen and TR_GeoidTable on allocation errors.*/
+
+THREAD_SAFE int TR_LAST_ERROR=TR_OK; /*Last error msg (int) from gd_trans - also set in TR_Open and TR_GeoidTable on allocation errors.*/
 FILE *ERR_LOG=0;
+
+/*return last buffered error code from gd_trans */
 int TR_GetLastError(void){
     return TR_LAST_ERROR;
 }
+
+/* not used at the moment- but could be useful */
 int TR_IsMainThread(void){
 	return ((MAIN_THREAD_ID==&THREAD_ID) || (!MAIN_THREAD_ID));
 }
+
+/* A function  which checks whether input is in list of transformations deemed thread unsafe */
+
+int TR_IsThreadSafe(union geo_lab *plab_in, union geo_lab *plab_out){
+	int i;
+	int n=sizeof(UNSAFE)/sizeof(int);
+	for (i=0;i<n;i++){
+		if (UNSAFE[i]==(plab_in->u_c_lab).imit || UNSAFE[i]==(plab_out->u_c_lab).imit)
+			return 0;
+	}
+	return 1;
+}
+
+/* set state to allow unsafe transformations */
+void TR_AllowUnsafeTransformations(void){
+	ALLOW_UNSAFE=1;
+}
+
+/*set state to forbid unsafe transformations */
+void TR_ForbidUnsafeTransformations(void){
+	ALLOW_UNSAFE=0;
+}
+
 /* Need to let KMSTrans parse the def-files, before any transformation */
 int TR_InitLibrary(char *path) {
     int ok=0,rc;
@@ -79,27 +112,27 @@ int TR_InitLibrary(char *path) {
     ERR_LOG=fopen("TR_errlog.log","wt");
     #endif
     /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
-    trf=tropen("utm32_ed50","utm32_wgs84","");
+    trf=TR_Open("utm32_ed50","utm32_wgs84","");
     if (0!=trf){
-	    ok=tr(trf,&x,&y,&z,1);
-	    trclose(trf);
+	    ok=TR_Transform(trf,&x,&y,&z,1);
+	    TR_Close(trf);
 	    }
-    trf=tropen("utm32_wgs84","fotm","");
+    trf=TR_Open("utm32_wgs84","fotm","");
     if (0!=trf){
-	    rc=tr(trf,&x,&y,&z,1);
-	    trclose(trf);}
-    trf=tropen("utm32_wgs84","s34j","");
+	    rc=TR_Transform(trf,&x,&y,&z,1);
+	    TR_Close(trf);}
+    trf=TR_Open("utm32_wgs84","s34j","");
 	    if (0!=trf){
-	    rc=tr(trf,&x,&y,&z,1);
-	    trclose(trf);}
-    trf=tropen("FO_fotm","GR_utm22_gr96","");
+	    rc=TR_Transform(trf,&x,&y,&z,1);
+	    TR_Close(trf);}
+    trf=TR_Open("FO_fotm","GR_utm22_gr96","");
     if (0!=trf){
-	    rc=tr(trf,&x,&y,&z,1);
-	    trclose(trf);}
-    trf=tropen("utm32_wgs84","fcsH_h_fcsvr10","");
+	    rc=TR_Transform(trf,&x,&y,&z,1);
+	    TR_Close(trf);}
+    trf=TR_Open("utm32_wgs84","fcsH_h_fcsvr10","");
     if (0!=trf){
-	    rc=tr(trf,&x,&y,&z,1);
-	    trclose(trf);}
+	    rc=TR_Transform(trf,&x,&y,&z,1);
+	    TR_Close(trf);}
     if (0!=ERR_LOG)
 	    fprintf(ERR_LOG,"Is init: %d\n************ end initialisation **************\n",(ok==TR_OK));
     /* Set the main thread id */
@@ -107,9 +140,18 @@ int TR_InitLibrary(char *path) {
 	    MAIN_THREAD_ID=&THREAD_ID;
     return (ok==TR_OK); 
 }
-/* Mock up. Look in kmstr5 for better ideas */
+
+
+/* Mock up - not fully implemented! */
 void TR_GeoidInfo(TR *tr) {
-    tab_doc_f(tr->geoid_name,stdout);
+    char req[256];
+    int res;
+    strcpy(req,"*");
+    strcat(req,tr->geoid_name);
+    res=tab_doc_f(req,stdout);
+    #ifdef _ROUT
+    printf("Request: %s, res: %d\n",req,res);
+    #endif
     }
 
 
@@ -117,112 +159,30 @@ void TR_GetVersion(char *buffer,int BufSize) {
     strncpy(buffer,TRLIB_VERSION,BufSize);
 }
 	
-/* A simple wrapper for tr */
-int TR_Transform(char *label_in, char *label_out, double *X, double *Y, double *Z, int npoints) {
+/* A simple wrapper for tr - deprecated!*/
+int TR_Transform2(char *label_in, char *label_out, double *X, double *Y, double *Z, int npoints) {
     int err_msg;
-    TR *trf=tropen(label_in,label_out,"");
+    TR *trf=TR_Open(label_in,label_out,"");
     if (trf==0){
     return TR_LABEL_ERROR;} /* No need to close anything! */
-    err_msg=tr(trf,X,Y,Z,npoints);
-    trclose(trf);
+    err_msg=TR_Transform(trf,X,Y,Z,npoints);
+    TR_Close(trf);
     return err_msg;
 }
 
-/*--------------------------------------------------------------------------
-fopen() / fclose() / FILE * style interface to the transformation system 
-makes trlib resemble "proj"s calling convention:
 
-EXAMPLE 1:
-
-minitrans.c
-    transform data from file argv[3], write to file argv[4]
-    input  data reference system is described by minilabel in argv[1],
-    output data reference system is described by minilabel in argv[2].
-
-------------------------------------------------
-#include <stdio.h>
-#include <trlib.h>
-
-int main (int argc, char *argv[]) {
-    TR *tr;
-    FILE *in, *out;
-    int err;
-     
-    tr  = tropen (argv[1], argv[2]);
-
-    in  = fopen (argv[3], "rt");
-    out = fopen (argv[4], "wt");
-    
-    err = trstream (tr, in, out, 0);
-     
-    fclose (out);
-    fclose (in);
-
-    trclose (tr);
-    return err;
-}
-------------------------------------------------
-
-21 lines of code - including 5 blanks.
-
-This interface is compact, and in my humble opinion much more in line
-with common C-programming idioms, than either of the two existing
-interfaces.
-
-Note, however, that this interface is still a sketch - we need to
-decide how to handle the setup part pertaining to settabdir.
-
-It could be handled by a 3rd argument to tropen, which could be a
-path name or a 0, the latter meaning "use system default".
- 
- 
------------------------------------------------------------------------- 
- 
- 
-EXAMPLE 2:
-
-nanotrans.c
-    transform one data point from command line
-    input  data reference system is described by minilabel in argv[1],
-    output data reference system is described by minilabel in argv[2].
-    x, y, (z) are in argv[3..5]
-
-------------------------------------------------
-#include <stdio.h>
-#include <trlib.h>
-
-int main (int argc, char *argv[]) {
-    TR *tr;
-    double x, y, z = 0;
-    int err;
-     
-    tr  = tropen (argv[1], argv[2]);
-
-    x = atof(argv[3]);
-    y = atof(argv[4]);
-    if (argc > 5)
-        z = atof(argv[5])
-    
-    err = tr (tr, &x, &y, &z, 1);
-    printf("%.10g %.10g %.10g\n", x, y, z);
-     
-    trclose (tr);
-    return err;
-}
-------------------------------------------------
- 
-----------------------------------------------------------------------*/
 /* Function which inserts a standard geoid pointer into a TR object */
 int TR_GeoidTable(TR *tr){
 	static THREAD_SAFE struct mgde_str *GeoidTable=NULL;
 	static THREAD_SAFE int init=0;
 	static THREAD_SAFE int ngeoids=0;
 	/*if called with NULL close evrything down */
-	if (0==tr){
-			if (init)
-			    geoid_c(GeoidTable,0,NULL);
-			free(GeoidTable);
+	if (0==tr && init){
+			geoid_c(GeoidTable,0,NULL);
+		        if (GeoidTable)
+				free(GeoidTable);
 			GeoidTable=NULL;
+			init=0;
 			return TR_OK;
 		}
 	/*Initialise on first call, makes geoid table thread local */
@@ -247,12 +207,10 @@ int TR_GeoidTable(TR *tr){
 		
 		
        
-int TR_IsFehmarn(union geo_lab *plab_in, union geo_lab *plab_out){
-	 return (((plab_in->u_c_lab).imit == FHMASK) || ((plab_out->u_c_lab).imit == FHMASK));
-}
 
 
-TR *tropen (char *label_in, char *label_out, char *geoid_name) {
+
+TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     int label_check,err;
     union geo_lab *plab_in, *plab_out;
     struct mgde_str *special_geoid_table=NULL;
@@ -285,13 +243,14 @@ TR *tropen (char *label_in, char *label_out, char *geoid_name) {
 	TR_LAST_ERROR=TR_LABEL_ERROR;
         return 0;
     }
-    if (TR_IsFehmarn(plab_in,plab_out) && !TR_IsMainThread()){
+    if (!TR_IsThreadSafe(plab_in,plab_out) && !ALLOW_UNSAFE){
+	#ifdef _ROUT
+	fprintf(ERR_LOG,"%s-> %s not allowed in multithreaded mode!\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb);
+	#endif
 	free(plab_in);
         free(plab_out);
 	TR_LAST_ERROR=TR_LABEL_ERROR;
-	#ifdef _ROUT
-	fprintf(ERR_LOG,"Fehmarn transformations not allowed in multihreaded mode!\n");
-	#endif
+	
         return 0;
     }
     /*Set geoid info */
@@ -330,7 +289,7 @@ TR *tropen (char *label_in, char *label_out, char *geoid_name) {
 
 }
 
-void trclose (TR *tr) {
+void TR_Close (TR *tr) {
     if (0==tr)
         return;    
     free (tr->plab_in);
@@ -348,34 +307,48 @@ void trclose (TR *tr) {
 }
 /*--------------------------------------------------------------------------*/
 
+int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
+	 if ((0==tr)||(0==X)||(0==Y))
+		 return TR_LABEL_ERROR;
+	 int err;
+	 err=TR_tr(tr->plab_in,tr->plab_out, X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 return err;
+ }
+ 
+ int TR_InverseTransform(TR *tr, double *X, double *Y, double *Z, int n) {
+	 if ((0==tr)||(0==X)||(0==Y))
+		 return TR_LABEL_ERROR;
+	 int err;
+	 err=TR_tr(tr->plab_out,tr->plab_in, X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 return err;
+ }
+
 
 /* transform one or more xyz-tuples in place */
-int tr(TR *tr, double *X, double *Y, double *Z, int n) {
+int TR_tr(union geo_lab *plab_in,union geo_lab *plab_out, double *X, double *Y, double *Z, int n, int use_geoids, struct mgde_str *geoid_pt ) {
    
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i; //use_geoids; 
-    if ((0==tr)||(0==X)||(0==Y))
-        return TR_LABEL_ERROR;
-    if ((tr->plab_in->u_c_lab).cstm==CRT_SYS_CODE){
+   
+    if ((plab_in->u_c_lab).cstm==CRT_SYS_CODE){
         x_in=Y;
         y_in=X;}
     else{
         x_in=X;
         y_in=Y;}
-    if ((tr->plab_out->u_c_lab).cstm==CRT_SYS_CODE){
+    if ((plab_out->u_c_lab).cstm==CRT_SYS_CODE){
         x_out=Y;
         y_out=X;}
    else{
         x_out=X;
         y_out=Y;}
-    /*geoid_pt=&GeoidTable;
-    use_geoids=(has_geoids)?0:-1;*/
+  
     for (i = 0;  i < n;  i++) {
 	z = Z? Z[i]: z1;
-        err = gd_trans(tr->plab_in, tr->plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH,tr->use_geoids,tr->geoid_pt, "", ERR_LOG);
+        err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH,use_geoids,geoid_pt, "", ERR_LOG);
 	#ifdef _ROUT
 	if (err)
-		fprintf(ERR_LOG,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",(tr->plab_in->u_c_lab).mlb,(tr->plab_out->u_c_lab).mlb,err,x_in[i],y_in[i],z);
+		fprintf(ERR_LOG,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,x_in[i],y_in[i],z);
 	#endif
         /*err = gd_trans(tr->plab_in, tr->plab_out,  x,y,z,  X+i,Y+i, (Z? Z+i: &z2), &GH, -1, &GeoidTable, 0, 0);
          *   KE siger at arg 0 før GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
@@ -389,7 +362,7 @@ int tr(TR *tr, double *X, double *Y, double *Z, int n) {
 }
 
 /* read xyz-tuples from f_in; stream transformed tuples to f_out */
-int trstream(TR *trf, FILE *f_in, FILE *f_out, int n) {
+int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
    
     int ERR = 0,i=0;
     enum {BUFSIZE = 16384};
@@ -416,7 +389,7 @@ int trstream(TR *trf, FILE *f_in, FILE *f_out, int n) {
                 continue;
         }
 
-        err = tr(trf,&x,&y,&z,1);
+        err = TR_Transform(trf,&x,&y,&z,1);
         i++;
 
         /* buffer last error */

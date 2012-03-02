@@ -27,7 +27,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 namespace Kmstrlib.NET
 {
-	public static class Interface
+	public static class TrLib
 	{
 		#region Interface to TrLib.DLL
 		/// <summary>
@@ -71,6 +71,27 @@ namespace Kmstrlib.NET
 		[DllImport(TRLIB)]
 		private static extern void TR_TerminateThread();
 		
+		[DllImport(TRLIB)]
+		private static extern void TR_AllowUnsafeTransformations();
+		
+		[DllImport(TRLIB)]
+		private static extern void TR_ForbidUnsafeTransformations();
+		
+		public static void AllowUnsafeTransformations(){
+			TR_AllowUnsafeTransformations();
+		}
+		
+		public static void ForbidUnsafeTransformations(){
+			TR_ForbidUnsafeTransformations();
+		}
+		
+		public static void SetThreadMode(bool on){
+			if (on)
+				ForbidUnsafeTransformations();
+			else
+				AllowUnsafeTransformations();
+		}
+		
 		public static void TerminateLibrary()
 		{
 			TR_TerminateLibrary();
@@ -82,13 +103,13 @@ namespace Kmstrlib.NET
 		}
 
 		[DllImport(TRLIB)]
-		public static extern IntPtr tropen(string mlb1,string mlb2, string geoid_name);
+		public static extern IntPtr TR_Open(string mlb1,string mlb2, string geoid_name);
 
 		[DllImport(TRLIB)]
-		public static extern void trclose( IntPtr tr);
+		public static extern void TR_Close( IntPtr tr);
 
 		[DllImport(TRLIB)]
-		public static extern TR_Error tr(
+		public static extern TR_Error TR_Transform(
 			
 			IntPtr TR,
 			out double X,
@@ -129,16 +150,16 @@ namespace Kmstrlib.NET
 		#endregion
 	}
 	
-	public struct Point 
+	public class Point 
 	{
 		public double x, y, z;
-		public Interface.TR_Error return_code;
+		public TrLib.TR_Error return_code;
 		public Point(double p1, double p2, double p3) 
 		{
 			x = p1;
 			y = p2;
 			z = p3;
-			return_code=Interface.TR_Error.TR_OK;
+			return_code=TrLib.TR_Error.TR_OK;
 		}
 	}
 	
@@ -153,34 +174,53 @@ namespace Kmstrlib.NET
 		{
 			mlb_in=mlb1;
 			mlb_out=mlb2;
-		        TR=Interface.tropen(mlb1,mlb2,"");
+		        TR=TrLib.TR_Open(mlb1,mlb2,"");
 			is_init=(TR!=IntPtr.Zero);
 			if (!is_init){  //can discuss if we should throw an exception here.....
 				throw new ArgumentException("Invalid input labels!");}
 		}
-		public Point Transform(Point pt)
+		/* versions of overloaded transformation method defined here */
+		public TrLib.TR_Error Transform(Point pt)
 		{
-			Interface.TR_Error err;
+			TrLib.TR_Error err;
 			if (!is_init){
-				pt.return_code=Interface.TR_Error.TR_LABEL_ERROR;
-				return pt;
+				pt.return_code=TrLib.TR_Error.TR_LABEL_ERROR;
+				return TrLib.TR_Error.TR_LABEL_ERROR;
 			}
-			err=Interface.tr(TR,out pt.x,out pt.y,out pt.z,1);
+			err=TrLib.TR_Transform(TR,out pt.x,out pt.y,out pt.z,1);
 			pt.return_code=err;
-			return pt;
+			return (TrLib.TR_Error) err;
 		}
-		public Interface.TR_Error TransformArray(double[] X, double[] Y, double[] Z)
+		public TrLib.TR_Error Transform(double[] X, double[] Y, double[] Z)
 		{
-			Interface.TR_Error err=Interface.TR_Error.TR_OK;
-			if ((X.Length!=Y.Length)||((Z!=null) && (Z.Length!=X.Length))){
+			TrLib.TR_Error err=TrLib.TR_Error.TR_OK;
+			if ((X.Length!=Y.Length)||(Z.Length!=X.Length)){
 				throw new ArgumentException("Sizes of input arrays must agree!");}
-			for (int i=0; i<X.Length ; i++)
-				err=Interface.tr(TR,out X[i],out Y[i], out Z[i], 1);
-			return (Interface.TR_Error) err;
-		}	
+			for (int i=0; i<X.Length ; i++){
+				err=TrLib.TR_Transform(TR,out X[i],out Y[i], out Z[i], 1);
+			}
+			return (TrLib.TR_Error) err;
+		}
+		public TrLib.TR_Error Transform(double[] X, double[] Y)
+		{
+			TrLib.TR_Error err=TrLib.TR_Error.TR_OK;
+			double z;
+			if (X.Length!=Y.Length)
+				throw new ArgumentException("Sizes of input arrays must agree!");
+			for (int i=0; i<X.Length ; i++){
+				z=0;
+				err=TrLib.TR_Transform(TR,out X[i],out Y[i], out z, 1);
+			}
+			return (TrLib.TR_Error) err;
+		}
+      		public TrLib.TR_Error Transform(ref double x, ref double y, ref double z){
+			TrLib.TR_Error err=TrLib.TR_Error.TR_OK;
+			err=TrLib.TR_Transform(TR, out x, out y, out z,1);
+			return (TrLib.TR_Error) err;
+		}
 		public void Close()
 		{
-			Interface.trclose(TR);
+			TrLib.TR_Close(TR);
 		}
 			
         }

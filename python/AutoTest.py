@@ -58,6 +58,8 @@ def main(args): #progname, test_lib
 		return
 	print("Files in geoid-dir %s:\n%s" %(TrLib.GEOIDS,repr(os.listdir(TrLib.GEOIDS))))
 	print LS
+	#allow unsafe transformations#
+	TrLib.SetThreadMode(False) 
 	try:
 		nerr+=RandomTests.main(["RandomTests.py","-N",10000])
 	except Exception,msg:
@@ -70,6 +72,8 @@ def main(args): #progname, test_lib
 		nerr+=1
 		print("Error:\n%s" %repr(msg))
 	print LS
+	#forbid unsafe transformations#
+	TrLib.SetThreadMode(True)
 	try:
 		ThreadTest.main(["ThreadTest.py"])
 	except Exception,msg:

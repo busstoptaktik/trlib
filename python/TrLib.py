@@ -42,6 +42,7 @@ REQUIRED_FILES=["def_lab.txt","def_shp.txt"]
 TR_OK=0
 LABEL_ERROR=1
 TR_ERROR=2
+TR_ALLOCATION_ERROR=3
 #special return code for this module
 TRLIB_NOT_INITIALIZED=-1
 #TABDIR env var
@@ -91,13 +92,18 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.TR_GeoidInfo.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_GeoidInfo.restype=None
-		tr_lib.tropen.restype=ctypes.c_void_p
-		tr_lib.tropen.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
-		tr_lib.trclose.restype=None
-		tr_lib.trclose.argtypes=[ctypes.c_void_p]
-		tr_lib.tr.restype=ctypes.c_int
-		tr_lib.tr.argtypes=[ctypes.c_void_p,LP_c_double,LP_c_double,LP_c_double,ctypes.c_int]
-		
+		tr_lib.TR_Open.restype=ctypes.c_void_p
+		tr_lib.TR_Open.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_Close.restype=None
+		tr_lib.TR_Close.argtypes=[ctypes.c_void_p]
+		tr_lib.TR_Transform.restype=ctypes.c_int
+		tr_lib.TR_Transform.argtypes=[ctypes.c_void_p,LP_c_double,LP_c_double,LP_c_double,ctypes.c_int]
+		tr_lib.TR_InverseTransform.argtypes=[ctypes.c_void_p,LP_c_double,LP_c_double,LP_c_double,ctypes.c_int]
+		tr_lib.TR_InverseTransform.restype=ctypes.c_int
+		tr_lib.TR_AllowUnsafeTransformations.argtypes=None
+		tr_lib.TR_AllowUnsafeTransformations.restype=None
+		tr_lib.TR_ForbidUnsafeTransformations.argtypes=None
+		tr_lib.TR_ForbidUnsafeTransformations.restype=None
 	except Exception, msg:
 		print repr(msg)
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
@@ -130,6 +136,21 @@ def TerminateLibrary():
 def TerminateThread():
 	tr_lib.TR_TerminateThread()
 
+#Must be called if we want to perform transformations which are potentially not thread safe. 
+def AllowUnsafeTransformations():
+	tr_lib.TR_AllowUnsafeTransformations()
+
+def ForbidUnsafeTransformations():
+	tr_lib.TR_ForbidUnsafeTransformations()
+
+#Set multithread mode on/off here,,,
+def SetThreadMode(on=True):
+	if on:
+		ForbidUnsafeTransformations()
+	else:
+		AllowUnsafeTransformations()
+
+
 def GetVersion():
 	buf=" "*100;
 	tr_lib.TR_GetVersion(buf,100)
@@ -153,7 +174,7 @@ class CoordinateTransformation(object):
 		self.tr=None
 		self.rc=None #return code object
 		if IS_INIT:
-			self.tr=tr_lib.tropen(mlb_in,mlb_out,geoid_name)
+			self.tr=tr_lib.TR_Open(mlb_in,mlb_out,geoid_name)
 			if self.tr is None:
 				raise LabelException()
 		else:
@@ -165,17 +186,18 @@ class CoordinateTransformation(object):
 			x*=D2R
 			y*=D2R
 		x,y,z=map(ctypes.c_double,[x,y,z])
-		res=tr_lib.tr(self.tr,ctypes.byref(x),ctypes.byref(y),ctypes.byref(z),1)
+		res=tr_lib.TR_Transform(self.tr,ctypes.byref(x),ctypes.byref(y),ctypes.byref(z),1)
 		x=x.value
 		y=y.value
 		z=z.value
 		self.rc=res
-		if res==TR_ERROR:
+		if res!=TR_OK:
 			raise TransformationException("Error in transformation.")
 		if "geo" in self.mlb_out[0:6]:
 			x*=R2D
 			y*=R2D
 		return x,y,z
+	#Some copying required here - but overhead *small* compared to transformation
 	def TransformArray(self,xyz_in):
 		if not HAS_NUMPY:
 			raise Exception("This method needs numpy.")
@@ -193,10 +215,10 @@ class CoordinateTransformation(object):
 			Y*=D2R
 		if xyz_in.shape[1]==3:  #3d
 			Z=np.require(xyz_in[:,2],dtype=np.float64, requirements=['A', 'O', 'W', 'C'])
-			res=tr_lib.tr(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),Z.ctypes.data_as(LP_c_double),npoints)
+			res=tr_lib.TR_Transform(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),Z.ctypes.data_as(LP_c_double),npoints)
 			xyz_out=np.column_stack((X,Y,Z))
 		else:
-			res=tr_lib.tr(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),None,npoints)
+			res=tr_lib.TR_Transform(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),None,npoints)
 			xyz_out=np.column_stack((X,Y))
 		self.rc=res
 		#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
@@ -204,7 +226,7 @@ class CoordinateTransformation(object):
 			if res==TR_ERROR:
 				raise TransformationException("Error in transformation.")
 			else:
-				raise Exception("Unknown return code from transformation library.")
+				raise Exception("Allocation/other-error in transformation library.")
 		if "geo" in self.mlb_out[0:6]: #convert2degrees?
 			xyz_out[:,0:2]*=R2D
 		return xyz_out
@@ -215,12 +237,12 @@ class CoordinateTransformation(object):
 			tr_lib.TR_GeoidInfo(self.tr)
 	def Close(self):
 		if self.tr is not None:
-			tr_lib.trclose(self.tr)
+			tr_lib.TR_Close(self.tr)
 			self.tr=None
 		
 	
 		
-
+#Transforms a numpy array or a list of coordinates [(x,y,z),.....]
 def Transform(label_in,label_out,xyz_in,geoid=""):
 	TR=CoordinateTransformation(label_in,label_out,geoid)
 	if HAS_NUMPY and isinstance(xyz_in,np.ndarray):

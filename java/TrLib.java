@@ -7,9 +7,12 @@ public class TrLib {
 	public static native int GetLastError();
 	public static native void TerminateLibrary();
 	public static native void TerminateThread();
-	private static native long tropen(String mlb1, String mlb2);
-	private static native void trclose(long addr);
-	private static native int tr(long addr, double x[], double y[], double z[], int n);
+	public static native void AllowUnsafeTransformations();
+	public static native void ForbidUnsafeTransformations();
+	private static native long Tropen(String mlb1, String mlb2);
+	private static native void Trclose(long addr);
+	private static native int Transform(long addr, double x[], double y[], double z[], int n);
+	
 	public static final String JNI_wrap="TrLib_java";
 	//Load the library
 	static{
@@ -32,6 +35,12 @@ public class TrLib {
 				return TR_Error.TR_UNKNOWN_ERROR;
 		}
 		}
+	public static void SetThreadMode(boolean on){
+			if (on)
+				ForbidUnsafeTransformations();
+			else
+				AllowUnsafeTransformations();
+		}
 	public static class CoordinateTransformation{
 		public String mlb_in="";
 		public String mlb_out="";
@@ -40,7 +49,7 @@ public class TrLib {
 		{
 			mlb_in=mlb1;
 			mlb_out=mlb2;
-			trf=TrLib.tropen(mlb1,mlb2);
+			trf=TrLib.Tropen(mlb1,mlb2);
 			
 		}
 		public boolean IsInitialised()
@@ -52,7 +61,7 @@ public class TrLib {
 			if (trf==0)
 				return TR_Error.TR_LABEL_ERROR;
 			int rc;
-			rc=TrLib.tr(trf,x,y,z,x.length);
+			rc=TrLib.Transform(trf,x,y,z,x.length);
 			return TrLib.GetError(rc);
 		}
 		public TR_Error Transform(double x[], double y[])
@@ -60,12 +69,12 @@ public class TrLib {
 			if (trf==0)
 				return TR_Error.TR_LABEL_ERROR;
 			int rc;
-			rc=TrLib.tr(trf,x,y,null,x.length);
+			rc=TrLib.Transform(trf,x,y,null,x.length);
 			return TrLib.GetError(rc);
 		}	
 		public void Close()
 		{
-			TrLib.trclose(trf);
+			TrLib.Trclose(trf);
 	}
 }
   

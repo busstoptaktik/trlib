@@ -49,26 +49,42 @@ JNIEXPORT void JNICALL Java_TrLib_TerminateThread
 
 /*
  * Class:     TrLib
- * Method:    tropen
+ * Method:    AllowUnsafeTransformations
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_TrLib_AllowUnsafeTransformations
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     TrLib
+ * Method:    ForbidUnsafeTransformations
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_TrLib_ForbidUnsafeTransformations
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     TrLib
+ * Method:    Tropen
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_TrLib_tropen
+JNIEXPORT jlong JNICALL Java_TrLib_Tropen
   (JNIEnv *, jclass, jstring, jstring);
 
 /*
  * Class:     TrLib
- * Method:    trclose
+ * Method:    Trclose
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_TrLib_trclose
+JNIEXPORT void JNICALL Java_TrLib_Trclose
   (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     TrLib
- * Method:    tr
+ * Method:    Transform
  * Signature: (J[D[D[DI)I
  */
-JNIEXPORT jint JNICALL Java_TrLib_tr
+JNIEXPORT jint JNICALL Java_TrLib_Transform
   (JNIEnv *, jclass, jlong, jdoubleArray, jdoubleArray, jdoubleArray, jint);
 
 #ifdef __cplusplus

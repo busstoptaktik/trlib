@@ -34,7 +34,8 @@ struct XYZ {
     double x, y, z;
     int err;
 }; 
-
+/* 'Internal' functions not meant to be exposed in API */
 int TR_GeoidTable(struct TR*);
 int TR_IsMainThread(void);
-int TR_IsFehmarn(union geo_lab*, union geo_lab*);
+int TR_IsThreadSafe(union geo_lab*, union geo_lab*);
+int TR_tr(union geo_lab *plab_in,union geo_lab *plab_out, double *X, double *Y, double *Z, int n, int use_geoids, struct mgde_str *geoid_pt ); 

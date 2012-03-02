@@ -52,7 +52,7 @@ THREAD_TEST=False #Flag to force a break on error when running thread test
 def SetThreadMode(): #since  Fehmarn transformations are known NOT to be thread safe at the moment!
 	global THREAD_TEST
 	global TEST_SYSTEMS_3D
-	#TEST_SYSTEMS_3D=THREAD_SAFE_3D #NOT NEEDED ANYMORE!
+	TrLib.SetThreadMode()
 	THREAD_TEST=True
 			
 def RandomPoints(N,dim,x,y,z=0,scale=1):
