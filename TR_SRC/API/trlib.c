@@ -33,6 +33,9 @@
 #include "trlib_api.h"
 #include "trthread.h"
 #define TRLIB_VERSION "RC1 v1.0 2012-03-02"
+#ifndef TRLIB_REVISION
+#define TRLIB_REVISION "hg revison not specified"
+#endif
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
@@ -156,7 +159,11 @@ void TR_GeoidInfo(TR *tr) {
 
 
 void TR_GetVersion(char *buffer,int BufSize) {
-    strncpy(buffer,TRLIB_VERSION,BufSize);
+    char version[256];
+    strcpy(version,TRLIB_VERSION);
+    strcat(version," rev: ");
+    strcat(version,TRLIB_REVISION);
+    strncpy(buffer,version,BufSize);
 }
 	
 /* A simple wrapper for tr - deprecated!*/
