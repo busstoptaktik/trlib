@@ -315,17 +315,17 @@ void TR_Close (TR *tr) {
 /*--------------------------------------------------------------------------*/
 
 int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
+	int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 int err;
 	 err=TR_tr(tr->plab_in,tr->plab_out, X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
  
  int TR_InverseTransform(TR *tr, double *X, double *Y, double *Z, int n) {
+	 int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 int err;
 	 err=TR_tr(tr->plab_out,tr->plab_in, X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }

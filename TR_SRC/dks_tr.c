@@ -413,10 +413,10 @@ FILE           *tr_error
   };
 
   static struct act_nst      iltab[] = {
-    ILLG, 0
+    {ILLG, 0}
   };
 
-
+
 /* dks_tr   ver 1999.01           # page 10   12 Jan 1999 13 41 */
 
 

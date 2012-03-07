@@ -64,14 +64,14 @@
 #include "trthread.h"
 
 
-FILE     THREAD_SAFE          *def_lab_file = (FILE *) NULL;
-FILE     THREAD_SAFE           *man_tab_file = (FILE *) NULL;
-FILE     THREAD_SAFE           *man_gps_file = (FILE *) NULL;
-size_t   THREAD_SAFE            init_lab_pos = 0;
-size_t   THREAD_SAFE            init_prj_pos = 0, init_rgn_pos = 0;
-size_t    THREAD_SAFE           init_dtm_pos = 0, init_grs_pos = 0;
-size_t    THREAD_SAFE           init_hth_pos = 0;
-size_t    THREAD_SAFE           init_tab_pos = 0, init_gps_pos = 0;
+THREAD_SAFE    FILE               *def_lab_file = (FILE *) NULL;
+THREAD_SAFE    FILE               *man_tab_file = (FILE *) NULL;
+THREAD_SAFE    FILE               *man_gps_file = (FILE *) NULL;
+THREAD_SAFE    size_t             init_lab_pos = 0;
+THREAD_SAFE    size_t             init_prj_pos = 0, init_rgn_pos = 0;
+THREAD_SAFE    size_t             init_dtm_pos = 0, init_grs_pos = 0;
+THREAD_SAFE    size_t             init_hth_pos = 0;
+THREAD_SAFE    size_t             init_tab_pos = 0, init_gps_pos = 0;
 
 
 /* i_tabdir_file  ver 2010.01            # page 2     5 feb 2010 15 35 */
