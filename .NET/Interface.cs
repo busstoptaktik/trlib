@@ -33,8 +33,7 @@ namespace Kmstrlib.NET
 		/// <summary>
 		/// KMSTRLIB return values:
 		/// </summary>
-		public const string TRLIB="TrLib.dll"; //should really be defined at compile time....
-		
+		public const string TRLIB="KMSTRLIB.dll"; //should really be defined at compile time....
 		
 		public enum TR_Error
 		{
@@ -51,11 +50,12 @@ namespace Kmstrlib.NET
 		// same folder as this __file__ (or in a folder on the system search path)
 
 		[DllImport(TRLIB)]
-		private static extern int TR_InitLibrary(string folder);
+		private static extern TR_Error TR_InitLibrary(string folder);
 		
-		public static int InitLibrary(string folder)
+		public static TR_Error InitLibrary(string folder)
 		{
-			return TR_InitLibrary(folder);
+			TR_Error err=TR_InitLibrary(folder);
+			return err;
 		}
 		[DllImport(TRLIB)]
 		private static extern int TR_GetLastError();
@@ -116,6 +116,19 @@ namespace Kmstrlib.NET
 			out double Y,
 			out double Z,
 			int npoints);
+		
+		[DllImport(TRLIB)]
+		public static extern TR_Error TR_TransformPoint(
+		
+		        IntPtr TR,
+			double x,
+			double y,
+			double z,
+			out double x_o,
+			out double y_o,
+			out double z_o);
+			
+		
 		
 		[DllImport(TRLIB)]
 		public static extern void TR_GetVersion(StringBuilder buf, int buf_length);
@@ -193,31 +206,42 @@ namespace Kmstrlib.NET
 		}
 		public TrLib.TR_Error Transform(double[] X, double[] Y, double[] Z)
 		{
-			TrLib.TR_Error err=TrLib.TR_Error.TR_OK;
+			TrLib.TR_Error ERR=TrLib.TR_Error.TR_OK,err;
 			if ((X.Length!=Y.Length)||(Z.Length!=X.Length)){
 				throw new ArgumentException("Sizes of input arrays must agree!");}
 			for (int i=0; i<X.Length ; i++){
 				err=TrLib.TR_Transform(TR,out X[i],out Y[i], out Z[i], 1);
+				if (err!=TrLib.TR_Error.TR_OK)
+					ERR=err;
 			}
-			return (TrLib.TR_Error) err;
+			return ERR;
 		}
 		public TrLib.TR_Error Transform(double[] X, double[] Y)
 		{
-			TrLib.TR_Error err=TrLib.TR_Error.TR_OK;
+			TrLib.TR_Error ERR=TrLib.TR_Error.TR_OK,err;
 			double z;
 			if (X.Length!=Y.Length)
 				throw new ArgumentException("Sizes of input arrays must agree!");
 			for (int i=0; i<X.Length ; i++){
 				z=0;
 				err=TrLib.TR_Transform(TR,out X[i],out Y[i], out z, 1);
+				if (err!=TrLib.TR_Error.TR_OK)
+					ERR=err;
 			}
-			return (TrLib.TR_Error) err;
+			return  ERR;
 		}
       		public TrLib.TR_Error Transform(ref double x, ref double y, ref double z){
-			TrLib.TR_Error err=TrLib.TR_Error.TR_OK;
+			TrLib.TR_Error err;
 			err=TrLib.TR_Transform(TR, out x, out y, out z,1);
-			return (TrLib.TR_Error) err;
+			return err;
 		}
+		
+		public TrLib.TR_Error Transform(double x, double y, double z, out double x_o, out double y_o, out double z_o){
+			TrLib.TR_Error err;
+			err=TrLib.TR_TransformPoint(TR, x, y, z, out x_o, out y_o, out z_o);
+			return err;
+		}
+		
 		public void Close()
 		{
 			TrLib.TR_Close(TR);

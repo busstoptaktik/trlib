@@ -58,6 +58,18 @@ def main(args): #progname, test_lib
 		return
 	print("Files in geoid-dir %s:\n%s" %(TrLib.GEOIDS,repr(os.listdir(TrLib.GEOIDS))))
 	print LS
+	mlb="utm32_ed50"
+	print("Test if we can translate a minilabel:")
+	try:
+		wkt=TrLib.GetEsriText(mlb)
+	except:
+		nerr+=1
+	else:
+		if wkt is None or len(wkt)==0:
+			print("No recognisable output.")
+		else:
+			print("%s translates to:\n%s" %(mlb,wkt))
+	print LS
 	#allow unsafe transformations#
 	TrLib.SetThreadMode(False) 
 	try:

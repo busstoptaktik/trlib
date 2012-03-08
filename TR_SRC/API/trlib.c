@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-//#include <windows.h>
+/*#include <windows.h>* enable if we want to define our dllMain under windows */
 #include "conv_lab.h"
 #include "gd_trans.h"
 #include "gettabdir.h"
@@ -85,13 +85,13 @@ void TR_ForbidUnsafeTransformations(void){
 
 /* Need to let KMSTrans parse the def-files, before any transformation */
 int TR_InitLibrary(char *path) {
-    int ok=0,rc;
+    int ok=-1,rc;
     double x=512200.0,y=6143200.0,z=0.0;
     TR* trf;
     FILE *fp;
     char buf[64],fname[1024],*init_path=0;
     if (!TR_IsMainThread()) //Only one thread can succesfully initialise the library
-	    return 0;
+	    return TR_ERROR;
     if (strlen(path)>0) 
 	    init_path=path;
     else
@@ -141,7 +141,7 @@ int TR_InitLibrary(char *path) {
     /* Set the main thread id */
     if (ok==TR_OK)
 	    MAIN_THREAD_ID=&THREAD_ID;
-    return (ok==TR_OK); 
+    return (ok==TR_OK)?TR_OK:TR_ERROR; 
 }
 
 
@@ -167,14 +167,14 @@ void TR_GetVersion(char *buffer,int BufSize) {
 }
 	
 /* A simple wrapper for tr - deprecated!*/
-int TR_Transform2(char *label_in, char *label_out, double *X, double *Y, double *Z, int npoints) {
-    int err_msg;
+int TR_TransformSimple(char *label_in, char *label_out, double *X, double *Y, double *Z, int npoints) {
+    int err;
     TR *trf=TR_Open(label_in,label_out,"");
-    if (trf==0){
-    return TR_LABEL_ERROR;} /* No need to close anything! */
-    err_msg=TR_Transform(trf,X,Y,Z,npoints);
+    if (trf==0)
+	    return TR_LABEL_ERROR; /* No need to close anything! */
+    err=TR_Transform(trf,X,Y,Z,npoints);
     TR_Close(trf);
-    return err_msg;
+    return err;
 }
 
 
@@ -308,17 +308,18 @@ void TR_Close (TR *tr) {
 	    #endif
 	    geoid_c(tr->geoid_pt,0,NULL);
 	    free(tr->geoid_pt);}
-    //gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0); /*might not be needed! WANT TO close hgrid static in gd_trans */
+    //gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);  might not be needed! WANT TO close hgrid static in gd_trans 
     free (tr);
     return;
 }
 /*--------------------------------------------------------------------------*/
+/* Wrappers of TR_tr */
 
 int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
 	int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_in,tr->plab_out, X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->plab_in,tr->plab_out, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
  
@@ -326,33 +327,74 @@ int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
 	 int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_out,tr->plab_in, X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->plab_out,tr->plab_in, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
 
+int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_out, double *Y_out, double *Z_out, int n) {
+	 int err;
+	 if ((0==tr)||(0==X_in)||(0==Y_in)||(0==X_out)||(0==Y_out))
+		 return TR_LABEL_ERROR;
+	 err=TR_tr(tr->plab_in,tr->plab_out, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
+	 return err;
+ }
+ 
+ int TR_InverseTransform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_out, double *Y_out, double *Z_out, int n) {
+	 int err;
+	 if ((0==tr)||(0==X_in)||(0==Y_in)||(0==X_out)||(0==Y_out))
+		 return TR_LABEL_ERROR;
+	 err=TR_tr(tr->plab_out,tr->plab_in, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
+	 return err;
+ }
 
-/* transform one or more xyz-tuples in place */
-int TR_tr(union geo_lab *plab_in,union geo_lab *plab_out, double *X, double *Y, double *Z, int n, int use_geoids, struct mgde_str *geoid_pt ) {
+ int TR_TransformPoint(TR *tr, double X_in, double Y_in, double Z_in, double *X_out, double *Y_out, double *Z_out) {
+	 int err;
+	 err=TR_Transform2(tr, &X_in, &Y_in, &Z_in, X_out, Y_out, Z_out,1);
+	 return err;
+ }	 
+ 
+ int TR_InverseTransformPoint(TR *tr, double X_in, double Y_in, double Z_in, double *X_out, double *Y_out, double *Z_out) {
+	 int err;
+	 err=TR_InverseTransform2(tr, &X_in, &Y_in, &Z_in, X_out, Y_out, Z_out,1);
+	 return err;
+ }
+ 
+/* transform one or more xyz-tuples */
+int TR_tr(
+   union geo_lab *plab_in,
+   union geo_lab *plab_out, 
+   double *X_in, 
+   double *Y_in, 
+   double *Z_in,
+   double *X_out,
+   double *Y_out,
+   double *Z_out,
+   int n, 
+   int use_geoids, 
+   struct mgde_str *geoid_pt
+   ) 
+ {
+	 
    
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i; //use_geoids; 
    
     if ((plab_in->u_c_lab).cstm==CRT_SYS_CODE){
-        x_in=Y;
-        y_in=X;}
+        x_in=Y_in;
+        y_in=X_in;}
     else{
-        x_in=X;
-        y_in=Y;}
+        x_in=X_in;
+        y_in=Y_in;}
     if ((plab_out->u_c_lab).cstm==CRT_SYS_CODE){
-        x_out=Y;
-        y_out=X;}
+        x_out=Y_out;
+        y_out=X_out;}
    else{
-        x_out=X;
-        y_out=Y;}
+        x_out=X_out;
+        y_out=Y_out;}
   
     for (i = 0;  i < n;  i++) {
-	z = Z? Z[i]: z1;
-        err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z? Z+i: &z2), &GH,use_geoids,geoid_pt, "", ERR_LOG);
+	z = Z_in? Z_in[i]: z1;
+        err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z_out? Z_out+i: &z2), &GH,use_geoids,geoid_pt, "", ERR_LOG);
 	#ifdef _ROUT
 	if (err)
 		fprintf(ERR_LOG,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,x_in[i],y_in[i],z);

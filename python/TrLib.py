@@ -33,9 +33,9 @@ import sys
 import time
 IS_INIT=False
 if "win" in sys.platform:
-	STD_LIB="TrLib.dll"
+	STD_LIB="KMSTRLIB.dll"
 else:
-	STD_LIB="TrLib.so"
+	STD_LIB="KMSTRLIB.so"
 STD_DIRNAME=os.path.dirname(__file__)
 REQUIRED_FILES=["def_lab.txt","def_shp.txt"]
 #define return codes, really define in trlib_api.h
@@ -100,6 +100,14 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_Transform.argtypes=[ctypes.c_void_p,LP_c_double,LP_c_double,LP_c_double,ctypes.c_int]
 		tr_lib.TR_InverseTransform.argtypes=[ctypes.c_void_p,LP_c_double,LP_c_double,LP_c_double,ctypes.c_int]
 		tr_lib.TR_InverseTransform.restype=ctypes.c_int
+		tr_lib.TR_Transform2.restype=ctypes.c_int
+		tr_lib.TR_Transform2.argtypes=[ctypes.c_void_p,LP_c_double,LP_c_double,LP_c_double,LP_c_double,LP_c_double,LP_c_double,ctypes.c_int]
+		tr_lib.TR_InverseTransform2.restype=ctypes.c_int
+		tr_lib.TR_InverseTransform2.argtypes=[ctypes.c_void_p,LP_c_double,LP_c_double,LP_c_double,LP_c_double,LP_c_double,LP_c_double,ctypes.c_int]
+		tr_lib.TR_TransformPoint.restype=ctypes.c_int
+		tr_lib.TR_TransformPoint.argtypes=[ctypes.c_void_p,ctypes.c_double,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double,LP_c_double]
+		tr_lib.TR_InverseTransformPoint.restype=ctypes.c_int
+		tr_lib.TR_InverseTransformPoint.argtypes=[ctypes.c_void_p,ctypes.c_double,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double,LP_c_double]
 		tr_lib.TR_AllowUnsafeTransformations.argtypes=None
 		tr_lib.TR_AllowUnsafeTransformations.restype=None
 		tr_lib.TR_ForbidUnsafeTransformations.argtypes=None
@@ -124,7 +132,8 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	if len(sdir)>0 and sdir[-1] not in ["\\","/"]:
 		sdir+="/"
 	GEOIDS=geoid_dir
-	IS_INIT=tr_lib.TR_InitLibrary(sdir) #at some point use this info....
+	rc=tr_lib.TR_InitLibrary(sdir) 
+	IS_INIT=(rc==TR_OK)
 	return IS_INIT
 
 def GetLastError():
@@ -166,6 +175,9 @@ def GetEsriText(label):
 		wkt=None
 	return wkt
 
+def IsGeographic(mlb):
+	return ("geo" in mlb[:6])
+
 class CoordinateTransformation(object):
 	def __init__(self,mlb_in,mlb_out,geoid_name=""):
 		self.mlb_in=mlb_in
@@ -173,36 +185,82 @@ class CoordinateTransformation(object):
 		self.geoid_name=geoid_name
 		self.tr=None
 		self.rc=None #return code object
+		self.forward_method=None
+		self.inverse_method=None
+		self.is_geo_in=False
+		self.is_geo_out=False
 		if IS_INIT:
 			self.tr=tr_lib.TR_Open(mlb_in,mlb_out,geoid_name)
 			if self.tr is None:
 				raise LabelException()
+			self.is_geo_in=IsGeographic(self.mlb_in) #convert2radians?
+			self.is_geo_out=IsGeographic(self.mlb_out) #convert2radians?
+			self.forward_method=tr_lib.TR_Transform
+			self.inverse_method=tr_lib.TR_InverseTransform
 		else:
 			raise Exception("Initialise Library first!")
-	def Transform(self,x,y,z=0.0):
+	def Transform(self,*args,**kwargs):
+		#thus inverse 'switch' must be given as a keyword!#
+		if "inverse" in kwargs and kwargs["inverse"]:
+			inverse=True
+		else:
+			inverse=False
+		method=None
+		if len(args)>1:
+			try:
+				float(args[0])
+			except:
+				pass
+			else:
+				method=self.TransformPoint
+		elif len(args)==1:
+			if HAS_NUMPY and isinstance(args[0],np.ndarray):
+				method=self.TransformArray
+			else:
+				try: 
+					len(args[0])
+					len(args[0][0])
+				except:
+					pass
+				else:
+					method=self.TransformIterable
+		if method is None:
+			raise ValueError("Wrong input!")
+		return method(*args,inverse=inverse)
+	def InverseTransform(self,*args):
+		return self.Transform(*args,inverse=True)
+	def TransformPoint(self,x,y,z=0.0,inverse=False):
 		if self.tr is None:
 			raise LabelException()
-		if "geo" in self.mlb_in[0:6]: #convert2radians?
+		if not inverse:
+			tr_method=self.forward_method
+		else:
+			tr_method=self.inverse_method
+		if (self.is_geo_in and not inverse) or (self.is_geo_out and inverse):
 			x*=D2R
 			y*=D2R
 		x,y,z=map(ctypes.c_double,[x,y,z])
-		res=tr_lib.TR_Transform(self.tr,ctypes.byref(x),ctypes.byref(y),ctypes.byref(z),1)
+		res=tr_method(self.tr,ctypes.byref(x),ctypes.byref(y),ctypes.byref(z),1)
 		x=x.value
 		y=y.value
 		z=z.value
 		self.rc=res
 		if res!=TR_OK:
 			raise TransformationException("Error in transformation.")
-		if "geo" in self.mlb_out[0:6]:
+		if (self.is_geo_out and not inverse) or (self.is_geo_in and inverse):
 			x*=R2D
 			y*=R2D
 		return x,y,z
 	#Some copying required here - but overhead *small* compared to transformation
-	def TransformArray(self,xyz_in):
+	def TransformArray(self,xyz_in,inverse=False):
 		if not HAS_NUMPY:
 			raise Exception("This method needs numpy.")
 		if self.tr is None:
 			raise LabelException()
+		if not inverse:
+			tr_method=self.forward_method
+		else:
+			tr_method=self.inverse_method
 		if xyz_in.shape[1] not in [2,3]:
 			raise Exception("Array column dimension must be 2 or 3!")
 		npoints=xyz_in.shape[0]
@@ -210,15 +268,15 @@ class CoordinateTransformation(object):
 			return np.empty(xyz_in.shape)
 		X=np.require(xyz_in[:,0],dtype=np.float64, requirements=['A', 'O', 'W', 'C'])
 		Y=np.require(xyz_in[:,1],dtype=np.float64, requirements=['A', 'O', 'W', 'C'])
-		if "geo" in self.mlb_in[0:6]: #convert2radians?
+		if (self.is_geo_in and not inverse) or (self.is_geo_out and inverse):
 			X*=D2R
 			Y*=D2R
 		if xyz_in.shape[1]==3:  #3d
 			Z=np.require(xyz_in[:,2],dtype=np.float64, requirements=['A', 'O', 'W', 'C'])
-			res=tr_lib.TR_Transform(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),Z.ctypes.data_as(LP_c_double),npoints)
+			res=tr_method(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),Z.ctypes.data_as(LP_c_double),npoints)
 			xyz_out=np.column_stack((X,Y,Z))
 		else:
-			res=tr_lib.TR_Transform(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),None,npoints)
+			res=tr_method(self.tr,X.ctypes.data_as(LP_c_double),Y.ctypes.data_as(LP_c_double),None,npoints)
 			xyz_out=np.column_stack((X,Y))
 		self.rc=res
 		#Return values defined in header. Ctypes seems to be unable to import data values from a c-library#
@@ -227,8 +285,20 @@ class CoordinateTransformation(object):
 				raise TransformationException("Error in transformation.")
 			else:
 				raise Exception("Allocation/other-error in transformation library.")
-		if "geo" in self.mlb_out[0:6]: #convert2degrees?
+		if (self.is_geo_out and not inverse) or (self.is_geo_in and inverse):
 			xyz_out[:,0:2]*=R2D
+		return xyz_out
+	def TransformIterable(self,xyz_in,inverse=False):
+		xyz_out=[]
+		for data in xyz_in:
+			if len(data)==2:
+				x,y=data
+				x,y,z=self.TransformPoint(x,y,inverse=inverse)
+				xyz_out.append([x,y])
+			else:
+				x,y,z=data
+				x,y,z=self.TransformPoint(x,y,z,inverse=inverse)
+				xyz_out.append([x,y,z])
 		return xyz_out
 	def GetReturnCode(self):
 		return self.rc
@@ -245,20 +315,7 @@ class CoordinateTransformation(object):
 #Transforms a numpy array or a list of coordinates [(x,y,z),.....]
 def Transform(label_in,label_out,xyz_in,geoid=""):
 	TR=CoordinateTransformation(label_in,label_out,geoid)
-	if HAS_NUMPY and isinstance(xyz_in,np.ndarray):
-		xyz_out=TR.TransformArray(xyz_in)
-	else:
-		dim=len(xyz_in[0])
-		xyz_out=[]
-		for data in xyz_in:
-			if len(data)==2:
-				x,y=data
-				x,y,z=TR.Transform(x,y)
-				xyz_out.append([x,y])
-			else:
-				x,y,z=data
-				x,y,z=TR.Transform(x,y,z)
-				xyz_out.append([x,y,z])
+	xyz_out=TR.Transform(xyz_in)
 	if DEBUG:
 		rc=TR.GetReturnCode()
 		print("rc: %d" %rc)

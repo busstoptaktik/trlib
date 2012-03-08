@@ -13,7 +13,7 @@ public class TrLib {
 	private static native void Trclose(long addr);
 	private static native int Transform(long addr, double x[], double y[], double z[], int n);
 	
-	public static final String JNI_wrap="TrLib_java";
+	public static final String JNI_wrap="KMSTRLIB_java";
 	//Load the library
 	static{
 		System.loadLibrary(JNI_wrap);

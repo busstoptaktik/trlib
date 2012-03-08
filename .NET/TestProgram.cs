@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-
+/*written in a hurry! */
 namespace Kmstrlib.NET
 {
 	class TestProgram
@@ -10,30 +10,35 @@ namespace Kmstrlib.NET
 		static void Main(string[] args)
 		{
 			TrLib.TR_Error  error;
-			int i,err;
+			int i;
 			if (args.Length>0){
 				System.Console.WriteLine("Initialising library.");
-				err = TrLib.InitLibrary(args[0]);
-				System.Console.WriteLine("Init: {0}\n", err);}
+				error = TrLib.InitLibrary(args[0]);
+				System.Console.WriteLine("Init: {0}\n", error);}
 			else{
 				System.Console.WriteLine("Specify geoid library as first input parameter!");
 				return;}
 			System.Console.WriteLine("Loading functions from {0}",TrLib.TRLIB);
 			string version=TrLib.GetVersion();
 			System.Console.WriteLine("This is TrLib. v. {0}\n",version);
-			TrLib.SetThreadMode(false)
+			TrLib.SetThreadMode(false);
 			/*test various versions of overloaded transformation method*/ 
 			System.Console.WriteLine("\nTransformation from utm32Ewgs84 to utm33Eed50, using CoordinateTransformation class:\n"); 
 			System.Console.WriteLine("We try out various forms of overloaded method...\n");	
 			CoordinateTransformation tr=new CoordinateTransformation("utm32Ewgs84","utm33Eed50");
-			System.Console.WriteLine("First a transformation of a single point:"); 	
+			System.Console.WriteLine("First transformation of a single point class:"); 	
 			Point pt =new Point(512200.1,6143200.2,100.0);
 			System.Console.WriteLine("In: X:{0:f6}  Y:{1:f6}  Z:{2:f6}",pt.x,pt.y,pt.z);
 			error=tr.Transform(pt);
 			System.Console.WriteLine("out: X:{0:f6}  Y:{1:f6}  Z:{2:f6} ret:{3:d}",pt.x,pt.y,pt.z,pt.return_code);
-			double x=512200.1,y=6143200.2,z=100.0;
+			double x=512200.1,y=6143200.2,z=100.0,x1,y1,z1;
 			error=tr.Transform(ref x, ref y, ref z);
 			System.Console.WriteLine("Same thing, but with doubles as input:\nout: X:{0:f6}  Y:{1:f6}  Z:{2:f6} ret:{3:d}",x,y,z,error);
+			x=512200.1;
+			y=6143200.2;
+			z=100.0;
+			error=tr.Transform(x,y,z,out x1, out y1, out z1);
+			System.Console.WriteLine("Same thing, but with 'old style point input':\nout: X:{0:f6}  Y:{1:f6}  Z:{2:f6} ret:{3:d}",x1,y1,z1,error);	
 			double[] X =new double[] {512200.1,512499.1};
 			double[] Y =new double[] {6143200.1,6143300.1};
 			double[] Z =new double[] {100,200};

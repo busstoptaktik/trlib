@@ -11,6 +11,10 @@ EXPORTS
 	TR_Close
 	TR_Transform
 	TR_InverseTransform
+	TR_Transform2
+	TR_InverseTransform2
+	TR_TransformPoint
+	TR_InverseTransformPoint
 	TR_Stream
 	TR_AllowUnsafeTransformations
 	TR_ForbidUnsafeTransformations

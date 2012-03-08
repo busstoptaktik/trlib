@@ -38,4 +38,4 @@ struct XYZ {
 int TR_GeoidTable(struct TR*);
 int TR_IsMainThread(void);
 int TR_IsThreadSafe(union geo_lab*, union geo_lab*);
-int TR_tr(union geo_lab *plab_in,union geo_lab *plab_out, double *X, double *Y, double *Z, int n, int use_geoids, struct mgde_str *geoid_pt ); 
+int TR_tr(union geo_lab* ,union geo_lab*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 

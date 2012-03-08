@@ -69,7 +69,9 @@ def RandomPoints(N,dim,x,y,z=0,scale=1):
 			xy.append(random.random()*50)
 		xyz.append(xy)
 	return xyz
-		
+
+
+
 def RandomTests_2D(N=10000,repeat=3,log_file=sys.stdout):
 	nerr=RandomTests(TEST_SYSTEMS_2D,2,N,repeat,log_file)
 	return nerr
@@ -99,10 +101,22 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 		elif HAS_NUMPY:
 			log_file.write("Center of mass: %s\n" %xyz.mean(axis=0).tolist())
 		nok=0
+		try:
+			ct=TrLib.CoordinateTransformation(label_in,label_out,geoid)
+		except Exception,msg:
+			log_file.write(repr(msg)+"\n")
+			sys.stderr.write(repr(msg)+"\n")
+			msg="Failed to open %s->%s, geoid: %s, last error: %d\n" %(label_in,label_out,geoid,TrLib.GetLastError())
+			log_file.write(msg)
+			sys.stderr.write(msg)
+			nerr+=1
+			if THREAD_TEST:
+				return nerr
+			continue
 		for i in range(repeat):
 			tstart=time.clock()
 			try:
-				xyz_out=TrLib.Transform(label_in,label_out,xyz,geoid)
+				xyz_out=ct.Transform(xyz)
 			except Exception,msg:
 				log_file.write(repr(msg)+"\n")
 				sys.stderr.write(repr(msg)+"\n")
@@ -124,7 +138,7 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 		for i in range(repeat):
 			tstart=time.clock()
 			try:
-				xyz_back=TrLib.Transform(label_out,label_in,xyz_out,geoid)
+				xyz_back=ct.InverseTransform(xyz_out)
 			except Exception,msg:
 				log_file.write(repr(msg)+"\n")
 				sys.stderr.write(repr(msg)+"\n")
@@ -164,6 +178,7 @@ def RandomTests(TESTS,dim=3,N=10000,repeat=3,log_file=sys.stdout):
 			if "geo" in label_in[0:6]:
 				err_xy/=D2M
 			log_file.write("Maximum tr-loop error: xy: %.10f m z: %.10f m\n" %(err_xy,err_z))
+		ct.Close()
 	return nerr
 	
 		
