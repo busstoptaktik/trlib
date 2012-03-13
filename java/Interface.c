@@ -1,6 +1,10 @@
 #include <jni.h>
 #include <string.h>
+#ifdef _MSC_VER
+#include <stdint.h>
+#else
 #include <inttypes.h>
+#endif
 #include "trlib_api.h"
 JNIEXPORT jstring JNICALL Java_TrLib_GetVersion(JNIEnv *env, jclass jc){
 	char buf[128];

@@ -32,7 +32,7 @@
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "trthread.h"
-#define TRLIB_VERSION "RC2 v1.0 2012-03-08"
+#define TRLIB_VERSION "RC2 v1.0 2012-03-13"
 #ifndef TRLIB_REVISION
 #define TRLIB_REVISION "hg revison not specified"
 #endif
