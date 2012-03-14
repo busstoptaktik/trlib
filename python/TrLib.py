@@ -77,8 +77,15 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	IS_INIT=False
 	if len(lib_dir)==0:
 		lib_dir="."
+	lib_path=os.path.join(lib_dir,lib)
+	if not os.path.exists(lib_path):
+		print("%s does not exist!")
+		return False
+	#to be able to find extra runtime dlls on windows#
+	if "win" in sys.platform.lower():
+		os.environ["PATH"]+=";"+os.path.realpath(os.path.dirname(lib_path))
 	try:
-		tr_lib=ctypes.cdll.LoadLibrary(os.path.join(lib_dir,lib)) #Loads the simple API exported on top of the KMS transformation library.
+		tr_lib=ctypes.cdll.LoadLibrary(lib_path) #Loads the simple API exported on top of the KMS transformation library.
 		#Setup API, corresponds to header file of the API#
 		tr_lib.TR_InitLibrary.restype=ctypes.c_int
 		tr_lib.TR_InitLibrary.argtypes=[ctypes.c_char_p]
