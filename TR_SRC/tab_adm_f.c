@@ -151,7 +151,7 @@ int                  tab_adm_f(
   double                 BL[6];   /* Bmin, Bmax, Lmin, Lmax, dB, dL */
   int                    ezf[3];  /* ellipsoid, utm zone, fill      */
 
-  FILE                  *fd, *in_2d, *in_3d, *f_act;
+  FILE                  *fd = (FILE *) NULL, *in_2d = (FILE *) NULL, *in_3d = (FILE *) NULL, *f_act = (FILE *) NULL;
 
   struct typ_dec         g_tpd, r_tpd;
 

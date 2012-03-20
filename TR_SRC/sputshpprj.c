@@ -295,10 +295,10 @@ int get_val_str(char* val_str, double val) {
 
   val1 = val;
   val2 = floor(val1 + 0.5);
-  while (dec < 10 && fabs(val2 -val1) > fabs(val1) * 1.0e-12) {
+  while (dec < 10 && fabs(val2 - val1) > fabs(val1) * 1.0e-12) {
     val1 *= 10.0;
     val2 = floor(val1 + 0.5);
-    val3 = fabs(val2 -val1);
+    val3 = fabs(val2 - val1);
     ++ dec;
   }
   if (dec == 0) dec = 1;

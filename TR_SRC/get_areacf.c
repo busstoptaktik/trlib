@@ -76,7 +76,7 @@ FILE            *tr_error
   struct coord_lab   *csb = &(sflb_a.u_c_lab);
   struct dsh_str      trc;
   struct mgde_str     geoid_table;
-  FILE               *fw, *fw1, *fw2;
+  FILE               *fw = (FILE *) NULL, *fw1 = (FILE *) NULL, *fw2 = (FILE *) NULL;
 
 
 /* get_areaf                      # page 2    2 Feb 2004 14 02 */
@@ -87,7 +87,7 @@ FILE            *tr_error
   double              A0, A1, H, gh, n1, e1, n2, e2;
   double              Pm, P1, P2, s1, s2, s3, az, az1, az2;
   double              a, f, Smax, sum, g_sum = 0.0;
-  int                 i, j, pkt, ctrf = 0, res = 0, trr = 0;
+  int                 i, j = 0, pkt, ctrf = 0, res = 0, trr = 0;
   short               si, polar = 0, mask;
   char                g_mini[MLBLNG*4], *d_name, *p_name, *e_name;
   char                sep;

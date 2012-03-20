@@ -74,7 +74,7 @@ char                     *err_str
 
   int                         val_mode, nw_idx, idx = 0;
   long                        nw_pos, pos = 0;
-  int                         n_i, e_i, geo;
+  int                         n_i, e_i, geo = 0;
   double                      N_frac, E_frac, N_i, E_i;
   double                      L_p, scale;
 

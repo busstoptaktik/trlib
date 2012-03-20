@@ -86,19 +86,19 @@ char            *err_txt)
 //struct SHPRMinMax      KMS_ShpMinMaxM;
   int                    KMS_ShapeType;
 
-  int              curpos, Z_pos, boxpos, Zboxpos, recused, wpos;
+  int              curpos, Z_pos = 0.0, boxpos = 0, Zboxpos, recused, wpos;
   int              Rncount, Rlcount, Rucount, ZMcount;
-  int              ZMType, Z_Type, i, tr_res, qTrn = 0;
+  int              ZMType, Z_Type = 0, i, tr_res, qTrn = 0;
   int              FileLength, RecordLength;
   struct SHPRPoint XY[128], Zmin_max, *pXY;
   double           Z[128], M[128], Slave[3], gh, val_ff = 0.0;
-  double           XminF, YminF, ZminF, XmaxF, YmaxF, ZmaxF;
-  double           XminR, YminR, ZminR, XmaxR, YmaxR, ZmaxR;
+  double           XminF = 0.0, YminF = 0.0, ZminF = 0.0, XmaxF = 0.0, YmaxF = 0.0, ZmaxF = 0.0;
+  double           XminR = 0.0, YminR = 0.0, ZminR = 0.0, XmaxR = 0.0, YmaxR = 0.0, ZmaxR = 0.0;
   char            *pb;
   struct stat      buf;
   struct mgde_str  GeoidTable;
   int              conv_in = 0, conv_out = 0;
-  int              bGeo, bMval, bZval, bBox, bHupd;
+  int              bGeo, bMval, bZval, bBox, bHupd = 0;
   FILE            *fh_in, *fh_out;
   // Transform the .SHP file  very simple implementation
   // Copy      the .SHX file

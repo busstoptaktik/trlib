@@ -95,8 +95,8 @@ FILE                  *tr_error
   static struct dsh_str   ew_a, *ew = &ew_a; /* PERHAPS THESE NEED TO BE THREAD LOCAL? */
   static struct dsh_str   nw_a, *nw = &nw_a;
   static struct dsh_str   iw_a, *iw = &iw_a;
-  struct dsh_str   *fc, *tc, *wc;
-
+  struct dsh_str   *fc = NULL, *tc = NULL, *wc = NULL;
+  
   if (i_lab->lab_type != CRD_LAB) {
     return(t_status(tr_error, usertxt,
            "ctc(input label fault)", TRF_ILLEG_));

@@ -96,7 +96,7 @@ extern THREAD_SAFE size_t              init_tab_pos;
   size_t                     b_t;
   char                       datum[MLBLNG], p_dtm[MLBLNG];
   char                       tab_typ_txt[12], *p_nm = s_name +1, *p_tp, *p_te;
-  int                        i, r, qr, used, empty;
+  int                        i, r, qr, used, empty = 0;
   int                        f777 = 0;
   union geo_lab              g_lab;
   struct gde_lab            *t_lab = &(g_lab.u_g_lab);

@@ -104,8 +104,8 @@ Prog. KP OCT 1989/JAN 1992.
   double       n, n2, h = 0.0, h1, h2 = 0.0, *p;
   double       e2p, cos_b, cos2_b, V2, c;
 
-  double       gtm[5], nQ = 0.0, FQ;
-  double       mtg[5], nL = 0.0, FL;
+  double       gtm[5], nQ = 0.0, FQ = 0.0;
+  double       mtg[5], nL = 0.0, FL = 0.0;
 
   if (f >= 1.0) f = 1.0/f;
   n  = f/(2.0 - f);

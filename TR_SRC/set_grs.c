@@ -70,7 +70,7 @@ double      *e,
   int                         empty = 1, doc = 0, mode = 0, mode_234;
   int                         e_no, i, p = 0, qr, res = 0, used;
   double                      fh, n2, toise_t_m = 0.0;
-  double                      m, qd, qdp, d, omg2, n, Q;
+  double                      m, qd, qdp, d, omg2, n = 0, Q;
   double                      a, b, amg, J2 = 0.0, f = 0.0, e2p, geq;
   double                      GM, ksf, U0, sum;
   va_list                     gpu;

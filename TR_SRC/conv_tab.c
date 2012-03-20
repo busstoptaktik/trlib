@@ -98,7 +98,7 @@ struct gde_lab          *t_lab,
   int                        ezf[3];   /* ellipsoid, utm zone, fill  */
                                        /* or ellipsoid, -cstm, mode  */
   short                      p_no, mask;
-  char                       pth_mlb[512], *p_tp, h_dtm[24];
+  char                       pth_mlb[512], *p_tp = (char *) NULL, h_dtm[24];
   char                       d_name[24], e_name[24], p_name[24];
   double                     ell_p[10];
   struct dsh_str             trp_a;
@@ -184,8 +184,8 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n*** conv_tab: FEJL ved input af table-mark");
       (void) fprintf(stdout,
-                "\n blokaddr %8ld antal  = %4ld size = %4ld ;",
-                pos, qr, sizeof (int));
+                "\n blokaddr %8ld antal  = %4lu size = %4d ;",
+                pos, (unsigned long) qr, sizeof (int));
       fclose(tab_file);
       return (-1);
     }
@@ -208,8 +208,8 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n*** conv_tab: FEJL ved input af table-limits");
       (void) fprintf(stdout,
-                "\n blokaddr %8ld antal  = %4ld size = %4ld ;\n",
-                pos, qr, 6 * sizeof (double));
+                "\n blokaddr %8ld antal  = %4lu size = %4d ;\n",
+                pos, (unsigned long) qr, 6 * sizeof (double));
       fclose(tab_file);
       return (-2);
     }
@@ -221,8 +221,8 @@ struct gde_lab          *t_lab,
       (void) fprintf(stdout,
                 "\n*** conv_tab: FEJL ved input af table-params");
       (void) fprintf(stdout,
-                "\n blokaddr %8ld antal  = %4ld size = %4ld ;\n",
-                pos, qr, sizeof (ezf));
+                "\n blokaddr %8ld antal  = %4lu size = %4u ;\n",
+                pos, (unsigned long) qr, sizeof (ezf));
       fclose(tab_file);
       return (-2);
     }
@@ -421,7 +421,7 @@ struct gde_lab          *t_lab,
 
 /* conv_tab    ver 2010.1          # page 8   12 jan 2010 10 19 */
 
-      (void) fprintf(iofile, "\nlng       = %15ld", sizeof (*t_lab));
+      (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*t_lab));
       (void) fprintf(iofile, "\nlab_type  = %15d", t_lab->lab_type);
       if (geoid_t(t_lab, d_name, h_dtm, pth_mlb) == 0) {
         (void) fprintf(iofile, "\n DESCRIPTION: %s", pth_mlb);
@@ -471,9 +471,9 @@ struct gde_lab          *t_lab,
         (void) fprintf(iofile, "     %-12s %7d", "estop", t_lab->estop);
 
         (void) fprintf(iofile,
-                       "\n  %-12s %7ld", "row_size", t_lab->row_size);
+                       "\n  %-12s %7ld", "row_size", (long) t_lab->row_size);
         (void) fprintf(iofile,
-                       "     %-12s %7ld", "blk_size", t_lab->blk_size);
+                       "     %-12s %7ld", "blk_size", (long) t_lab->blk_size);
 
         (void) fprintf(iofile,
                        "\n  %-12s %7d", "rec_size", t_lab->rec_size);

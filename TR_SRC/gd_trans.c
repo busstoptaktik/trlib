@@ -153,7 +153,7 @@ FILE                     *tr_error
 
   short                       i_rgn, o_rgn;
   int                         action, lev, R_N, rs = 0, RES, RGH = 0;
-  int                         ies = 0, res, dsh, iEhr, oEhr, req_th = 0;
+  int                         ies = 0, res, dsh = 0, iEhr, oEhr, req_th = 0;
   char                        dstr[128];
   double                      N, E, H, gh, igh, dh = 0.0, Nh = 0.0;
   double                      NN, EE, HH, iEh, oEh = 0.0, th = 0.0;

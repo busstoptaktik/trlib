@@ -68,7 +68,7 @@ union geo_lab   *g_lab)
 
   char   prj_txt[1024], temp[128], param[128], std_lat[16];
   char  *p_tmp, c, sep = '_';
-  char  *p_txt = prj_txt, *p_txt1 = prj_txt, *p_txt2, *p_txt3, *p_txt4;
+  char  *p_txt = prj_txt, *p_txt1 = prj_txt, *p_txt2 = prj_txt, *p_txt3 = prj_txt, *p_txt4 = prj_txt;
   char   entry[128], lab_str[MLBLNG], mlb2[MLBLNG], dtm[MLBLNG];
   int    used, i, j, k;
   int    go_on = 1, params = 0, r_params = 0, completed = 0;

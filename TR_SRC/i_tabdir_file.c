@@ -92,9 +92,9 @@ char             *dir_name
   char                pth_mlb[512], *p_c;
   char                p_name[32], t_name[32], r_mode[4];
   int                 test = 1;
-  size_t             *init_pos, init_pos_a = 0, size;
+  size_t             *init_pos = (size_t *) NULL, init_pos_a = 0, size;
   struct stat         buf;
-  FILE              **f_in, *f_in_a = NULL;
+  FILE              **f_in = (FILE **) NULL, *f_in_a = NULL;
 
   (void) strcpy(r_mode, "rb"); //Binary mode used to support uniform line endings \n across platforms!
   (void) strcpy(p_name, name);
