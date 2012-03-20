@@ -39,6 +39,7 @@
 #include "kms_shape.h"
 #include "typ_dec.h"
 
+#include "trlib_api.h"
 
 
 extern "C" {
