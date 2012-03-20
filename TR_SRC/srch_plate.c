@@ -114,7 +114,7 @@ char                     *err_txt
             "\nsrch_plate: ERROR at read of poly_a");
         (void) sprintf(err_txt,
             "\n poly_a_adr %8ld plate  = %4d size = %4ld ;",
-            ftell(f_poly), p_pl_inf->plate_nr, sizeof(double));
+            ftell(f_poly), p_pl_inf->plate_nr, (long) sizeof(double));
         return(-2);
       }
       if (inpoly(poly, &B, &lon) < 0) {
@@ -126,7 +126,7 @@ char                     *err_txt
               "\nsrch_plate: ERROR at read of poly_b");
           (void) sprintf(err_txt,
               "\n poly_b_adr %8ld plate  = %4d size = %4ld ;",
-              ftell(f_poly), p_pl_inf->plate_nr, sizeof(double));
+              ftell(f_poly), p_pl_inf->plate_nr, (long) sizeof(double));
           return(-2);
         }
         new_srch = inpoly(poly, &B, &lon) < 0;
@@ -180,7 +180,7 @@ char                     *err_txt
             "\nsrch_plate: ERROR at read of poly_a");
         (void) sprintf(err_txt,
             "\n poly_a_adr %8ld plate  = %4d size = %4ld ;",
-            ftell(f_poly), p_pl_inf->plate_nr, sizeof(double));
+            ftell(f_poly), p_pl_inf->plate_nr, (long) sizeof(double));
         return(-2);
       }
       do {
@@ -192,7 +192,7 @@ char                     *err_txt
               "\nsrch_plate: ERROR at read of poly_a");
           (void) sprintf(err_txt,
               "\n poly_a_adr %8ld plate  = %4d size = %4ld ;",
-              ftell(f_poly), p_pl_inf->plate_nr, sizeof(double));
+              ftell(f_poly), p_pl_inf->plate_nr, (long) sizeof(double));
           return(-2);
         }
         new_srch = inpoly(poly, &B, &lon) < 0;
@@ -212,7 +212,7 @@ char                     *err_txt
               "\nsrch_plate: ERROR at read of poly_b");
           (void) sprintf(err_txt,
               "\n poly_b_adr %8ld plate  = %4d size = %4ld ;",
-              ftell(f_poly), p_pl_inf->plate_nr, sizeof(double));
+              ftell(f_poly), p_pl_inf->plate_nr, (long) sizeof(double));
           return(-2);
         }
         do {
@@ -224,7 +224,7 @@ char                     *err_txt
                 "\nsrch_plate: ERROR at read of poly_b");
             (void) sprintf(err_txt,
                 "\n poly_b_adr %8ld plate  = %4d size = %4ld ;",
-                ftell(f_poly), p_pl_inf->plate_nr, sizeof(double));
+                ftell(f_poly), p_pl_inf->plate_nr, (long) sizeof(double));
             return(-2);
           }
           new_srch = inpoly(poly, &B, &lon) < 0;

@@ -301,7 +301,7 @@ union  geo_lab          *u_lab,
       }
 
       /* General info */
-      (void) fprintf(iofile, "\nlng       = %15ld", sizeof (*w_lab));
+      (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*w_lab));
       (void) fprintf(iofile, "\nlab_type  = %15d", h_lab->lab_type);
       (void) fprintf(iofile,
                      "         version   = %15d", h_lab->version);
@@ -338,7 +338,7 @@ union  geo_lab          *u_lab,
       }
 
       /* General info */
-      (void) fprintf(iofile, "\nlng       = %15ld", sizeof (*p_lab));
+      (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*p_lab));
       (void) fprintf(iofile, "\nlab_type  = %15d", p_lab->lab_type);
       (void) fprintf(iofile,
                      "         version   = %15d", p_lab->version);
@@ -364,7 +364,7 @@ union  geo_lab          *u_lab,
       (void) fprintf(iofile, "%s", i_lab->mlb);
 
       /* General info */
-      (void) fprintf(iofile, "\nlng       = %15ld", sizeof (*i_lab));
+      (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*i_lab));
       (void) fprintf(iofile, "\nlab_type  = %15d", i_lab->lab_type);
       (void) fprintf(iofile,
                      "         version   = %15d", i_lab->version);

@@ -335,7 +335,7 @@ extern THREAD_SAFE size_t              init_gps_pos;
          (void) fprintf(o_file,
                          "\n * NAME: %s%s\n ", p_tp, p_lab->mlb);
        }
-       (void) fprintf(o_file, "\nlng       = %15ld", sizeof (*p_lab));
+       (void) fprintf(o_file, "\nlng       = %15ld", (long) sizeof (*p_lab));
        (void) fprintf(o_file, "\nlab_type  = %15d", p_lab->lab_type);
        (void) fprintf(o_file,
                       "         version   = %15d", p_lab->version);

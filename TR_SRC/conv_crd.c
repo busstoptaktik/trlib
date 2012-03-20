@@ -845,7 +845,7 @@ struct coord_lab        *c_lab,
     sepch = *(c_lab->mlb + c_lab->sepix);
     if (sepch == '\0') sepch = ' ';
     /* General info */
-    (void) fprintf(iofile, "\nlng       = %15ld", sizeof (*c_lab));
+    (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*c_lab));
     (void) fprintf(iofile, "\nlab_type  = %15d", c_lab->lab_type);
     (void) fprintf(iofile,
                    "         version   = %15d", c_lab->version);

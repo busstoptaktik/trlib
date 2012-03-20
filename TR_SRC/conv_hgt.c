@@ -294,7 +294,7 @@ struct hgt_lab          *h_lab,
     sepch = *(h_lab->mlb + h_lab->sepix);
     if (sepch == '\0') sepch = ' ';
     /* General info */
-    (void) fprintf(iofile, "\nlng       = %15ld", sizeof (*h_lab));
+    (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*h_lab));
     (void) fprintf(iofile, "\nlab_type  = %15d", h_lab->lab_type);
     (void) fprintf(iofile,
                    "         version   = %15d", h_lab->version);

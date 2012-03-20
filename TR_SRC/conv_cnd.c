@@ -394,7 +394,7 @@ struct obs_lab          *o_lab,
       sepch = *(o_lab->mlb + o_lab->sepix);
       if (sepch == '\0') sepch = ' ';
       /* General info */
-      (void) fprintf(iofile, "\nlng       = %15ld", sizeof (*o_lab));
+      (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*o_lab));
       (void) fprintf(iofile, "\nlab_type  = %15d", o_lab->lab_type);
       (void) fprintf(iofile,
                      "         version   = %15d", o_lab->version);
