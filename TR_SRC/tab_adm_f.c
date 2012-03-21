@@ -719,11 +719,11 @@ prst = gettabdir();
             if (val_mode == 1)
               (void) fprintf(fo, "  %5.3f", *(pfgh + j + r));
             else if (val_mode == 2)
-              (void) fprintf(fo, "  %5.3lf",
+              (void) fprintf(fo, "  %5.3f",
                     (*(ifgh + j + r) == INT_MAX) ? 9999.99 :
                     ((double) *(ifgh + j + r)) / scale);
             else
-              (void) fprintf(fo, "  %11.2lf", *(dfgh + j + r));
+              (void) fprintf(fo, "  %11.2f", *(dfgh + j + r));
           (void) fprintf(fo, "   ");
           (void) fputg(fo, B, &g_tpd, " +u");
           (void) fputg(fo, L, &g_tpd, " +u");
@@ -1060,7 +1060,7 @@ prst = gettabdir();
             if (*(ifgh +j +r) == INT_MAX)
                (void) fprintf(f_act, "  %+*.*f", gdc, gdd, 9999.0);
             else 
-               (void) fprintf(f_act, "%+*.*lf", gdc, gdd,
+               (void) fprintf(f_act, "%+*.*f", gdc, gdd,
                       ((double) *(ifgh +j +r)) * scale);
             f_act = (r == 0) ? in_2d : in_3d;
           }
@@ -1071,7 +1071,7 @@ prst = gettabdir();
             if (dim3 > 2) (void) fprintf(in_3d, "\n");
           }
           for (f_act = fo, r = 0; r < dim3; r ++) {
-            (void) fprintf(f_act, "  %+11.2lf", *(dfgh +j +r));
+            (void) fprintf(f_act, "  %+11.2f", *(dfgh +j +r));
             f_act = (r == 0) ? in_2d : in_3d;
           }
         }
@@ -1343,12 +1343,12 @@ prst = gettabdir();
             if (*(ifgh +j +r) == INT_MAX)
                (void) fprintf(fo, "  xxx");
             else 
-               (void) fprintf(fo, "%+*.*lf", gdc, gdd,
+               (void) fprintf(fo, "%+*.*f", gdc, gdd,
                       ((double) *(ifgh +j +r)) * scale);
           }
         } else {
           for (r = 0; r < dim3; r ++) {
-            (void) fprintf(fo, "  %+11.2lf", *(dfgh +j +r));
+            (void) fprintf(fo, "  %+11.2f", *(dfgh +j +r));
           }
         }
 
