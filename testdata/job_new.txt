@@ -3,6 +3,9 @@
 #paths are relative to the (i.e. this) job-definition file
 base/DK_3d.txt new/DK_3d_geoHed50_h_dvr90.txt geoEed50 8
 base/DK_3d.txt new/DK_3d_crt_wgs84.txt crt_wgs84 5
+base/DK_3d.txt new/DK_3d_gs.txt gs 5
 base/FO_3d.txt new/FO_fotmH_h_fvr09.txt fotmH_h_fvr09 5
+base/FO_3d.txt new/FO_fk89H_h_fvr09.txt fk89H_h_fvr09 5
+base/FO_3d.txt new/FO_fu50H_h_fvr09.txt fu50H_h_fvr09 5
 base/GR_3d.txt new/GR_utm.txt GR_utm22Egr96 5
 base/World_3d.txt new/World_webmrc.txt webmrcE 5
