@@ -638,7 +638,7 @@ struct coord_lab        *c_lab,
           *(rgn_name +i +1) = '\0';
           (void) fprintf(iofile, "%s", rgn_name);
         }
-        (void) fprintf(iofile, "  %lf", c_lab->scale);
+        (void) fprintf(iofile, "  %f", c_lab->scale);
         break;
       case 4:
       case 5:
@@ -793,7 +793,7 @@ struct coord_lab        *c_lab,
           *(rgn_name +i +1) = '\0';
           (void) fprintf(iofile, "%s", rgn_name);
         }
-        (void) fprintf(iofile, "  %lf", c_lab->scale);
+        (void) fprintf(iofile, "  %f", c_lab->scale);
         break;
       case 4:
       case 5:

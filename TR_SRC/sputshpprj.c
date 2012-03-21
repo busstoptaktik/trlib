@@ -77,7 +77,7 @@ union geo_lab   *g_lab)
   char              ell_txt[MLBLNG], ell[MLBLNG], h_sys[MLBLNG];
   char              prj[MLBLNG], dtm[MLBLNG], h_dtm[MLBLNG];
   char              entry[128], val_str[24];
-  char              *wkt_start;
+/*  char              *wkt_start; */
   short             region, sepch, p_no, mask;
   int               mode, used, i, k, params = 0;
   int               str_state = 0;
@@ -87,7 +87,7 @@ union geo_lab   *g_lab)
   union rgn_un      rgn_pref;
   FILE             *fp;
   
-  wkt_start=wkt_out; /*will allow us to keep track of the number of chars written *if needed* */
+ /* wkt_start=wkt_out; */ /*will allow us to keep track of the number of chars written *if needed* */
   fp = i_tabdir_file(5, "def_shp.txt", &i, prj_txt2);
   if (i) {
     wkt_out+=sprintf(wkt_out, 
@@ -290,7 +290,7 @@ union geo_lab   *g_lab)
 }
 
 int get_val_str(char* val_str, double val) {
-  double  val1, val2, val3;
+  double  val1, val2; /*, val3; */
   int     dec = 0;
 
   val1 = val;
@@ -298,11 +298,11 @@ int get_val_str(char* val_str, double val) {
   while (dec < 10 && fabs(val2 - val1) > fabs(val1) * 1.0e-12) {
     val1 *= 10.0;
     val2 = floor(val1 + 0.5);
-    val3 = fabs(val2 - val1);
+ /*   val3 = fabs(val2 - val1); */
     ++ dec;
   }
   if (dec == 0) dec = 1;
-  dec = sprintf(val_str, "%.*lf", dec, val);
+  dec = sprintf(val_str, "%.*f", dec, val);
   return(dec);
 }
 

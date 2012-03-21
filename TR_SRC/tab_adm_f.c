@@ -704,7 +704,7 @@ prst = gettabdir();
                 "\n*** tab_adm_f: ERROR at output of table value");
             (void) fprintf(fo,
                 "\n blockaddr %8ld count  = %4d size = %4ld ;",
-                ftell(fd), qr, load_sz);
+                ftell(fd), qr, (long) load_sz);
           }
         }
 

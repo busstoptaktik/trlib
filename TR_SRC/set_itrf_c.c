@@ -710,7 +710,7 @@ from_str, to___str, run_JD / 365.25);
               (void) sprintf(err_str,
                 "\n*** pla_adm_f: ERROR at f_poly read of info");
               (void) sprintf(err_str,
-                "\n plate_info_adr %8ld nmb = %4ld size = %4ld i = %d;",
+                "\n plate_info_adr %8ld nmb = %4d size = %4d i = %d;",
                 ftell(plm_lb->f_poly), p_pl_inf - pl_inf, size, i);
               return(s_status(err_str,
                               "set_itrf_c f_poly", PLATE_OUT_));

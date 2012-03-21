@@ -215,7 +215,8 @@ g, *tab_max, t_lab->mlb);
 
           /* not found */
           if (s == -1) {
-            i         = *victim = (++(*victim)) % GEOIDPAGES;
+            i = (++(*victim)) % GEOIDPAGES;
+		    *victim = i;
             *(ppsg+i) = g;
             *(ppge+i) = pos;
             g_pg_i    = g_pg + i;
