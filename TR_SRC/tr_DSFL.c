@@ -744,13 +744,13 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
             if (qXerror == 0) {
               bMinMaxOk = 1;
               (void) fprintf(fh_out,
-                             "%-6s %.0lf %.0lf","%H4", C1Max, C2Max);
-              if (bInputHeights) (void) fprintf(fh_out, " %.0lf", H4Z);
+                             "%-6s %.0f %.0f","%H4", C1Max, C2Max);
+              if (bInputHeights) (void) fprintf(fh_out, " %.0f", H4Z);
               (void) fprintf(fh_out,"\n");
               
               (void) fprintf(fh_out,
-                             "%-6s %.0lf %.0lf","%H5", C1Min, C2Min);
-              if (bInputHeights) (void) fprintf(fh_out, " %.0lf", H5Z);
+                             "%-6s %.0f %.0f","%H5", C1Min, C2Min);
+              if (bInputHeights) (void) fprintf(fh_out, " %.0f", H5Z);
               (void) fprintf(fh_out,"\n");
             }
             else {
@@ -774,10 +774,10 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
           }
           
           if (CooOk) {
-            (void) fprintf(fh_out, "%-6s %.*lf %.*lf",
+            (void) fprintf(fh_out, "%-6s %.*f %.*f",
                            "%H6", Dec, 0.0, Dec, 0.0);
             if (bInputHeights) {
-              (void) fprintf(fh_out, " %.*lf", Dec, 0.0);
+              (void) fprintf(fh_out, " %.*f", Dec, 0.0);
             }
             (void) fprintf(fh_out, "\n");
           }
@@ -791,7 +791,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
         case CMD_H9 :
           DummyH9 = 1;
           res     = fscanf(fh_in, "%lf", &DummyH);
-          (void) fprintf(fh_out, "%-6s %.*lf\n","%H9", Dec, DummyH);
+          (void) fprintf(fh_out, "%-6s %.*f\n","%H9", Dec, DummyH);
           break;
 
         case CMD_T :
@@ -864,14 +864,14 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
                 C1Out = C2Out;
                 C2Out = tmp;
               }
-              (void) fprintf(fh_out, "%c%-5s %.*lf %.*lf",
+              (void) fprintf(fh_out, "%c%-5s %.*f %.*f",
                       '%', CmdTxt, Dec, C1Out, Dec, C2Out);
               if (bInputHeights) {
                 if (DummyHout) {
                   C3Out     = DummyH;
                   DummyHout = 0;
                 }
-                (void) fprintf(fh_out, " %.*lf", Dec, C3Out);
+                (void) fprintf(fh_out, " %.*f", Dec, C3Out);
               }
               (void) fprintf(fh_out, "\n");
             }
@@ -973,7 +973,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
                   ParamValue        = atof(buffer);
                   if (bAfterParams) (void) fprintf(fh_out, ",");
                   (void) fprintf(fh_out,
-                                 " %s %3.3lf", ParamIdTxt, ParamValue);
+                                 " %s %3.3f", ParamIdTxt, ParamValue);
                   bAfterParams      = 1;
                   n                 = 0;
                 } else {
@@ -1028,10 +1028,10 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
                           C3Out     = DummyH;
                           DummyHout = 0;
                         }
-                        (void) fprintf(fh_out, " %.*lf %.*lf %.*lf", 
+                        (void) fprintf(fh_out, " %.*f %.*f %.*f", 
                                 Dec, C1Out, Dec, C2Out, Dec, C3Out);
                       } else
-                        (void) fprintf(fh_out, "% .*lf% .*lf",
+                        (void) fprintf(fh_out, "% .*f% .*f",
                                         Dec, C1Out, Dec, C2Out);
                       (void) fprintf(fh_out, "\n");
                     }

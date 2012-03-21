@@ -46,12 +46,12 @@ void               putsinexval(
 char              *ftx,
 double             val)
 {
-  int    chrs, i, j = 0;
+  int    i, j = 0;
   char   buf[39], *cp;
 
   cp   = ftx + 47;
   if (val != 0.0) {
-    chrs = sprintf(buf, (val > 0.0) ? "%.16E" : "%-.15E", val);
+    sprintf(buf, (val > 0.0) ? "%.16E" : "%-.15E", val);
     if (*buf == '-') ++ j;
     *(buf +j +1) = *(buf +j);
     *(buf +j   ) = '.';

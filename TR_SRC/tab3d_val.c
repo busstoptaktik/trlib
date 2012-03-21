@@ -227,7 +227,7 @@ char                     *err_str
                 "\n*** tab3d_val: ERROR input tab3de %s", t_lab->mlb);
             (void) fprintf(stdout,
                 "\n blokaddr %8ld number = %4d size = %4ld ;",
-                pos, qr, t_lab->blk_size);
+                pos, qr, (long) t_lab->blk_size);
             return(TAB_N_SYS_);
           }
           ++ (tab3d_table->agn);

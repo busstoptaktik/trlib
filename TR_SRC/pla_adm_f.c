@@ -240,7 +240,7 @@ char                *err_txt
           (void) sprintf(err_txt, "%s%s%8ld%s%4d%s%4ld ;",
               "\n*** pla_adm_f: ERROR at write of poly_a",
               "\n poly_a_addr ", ftell(o_fd),
-               " plate  = ", i, " size = ", sizeof(double));
+               " plate  = ", i, " size = ", (long) sizeof(double));
           return(-1);
         }
         ++ pol_ant;
@@ -315,7 +315,7 @@ char                *err_txt
           (void) sprintf(err_txt, "%s%s%8ld%s%4d%s%4ld ;",
               "\n*** pla_adm_f: ERROR at write of poly_b",
               "\n poly_b_addr ", ftell(o_fd),
-              "  plate  = ", plate, " size =", sizeof(double));
+              "  plate  = ", plate, " size =", (long) sizeof(double));
           return(-1);
         }
         ++ pol_ant;
@@ -387,7 +387,7 @@ char                *err_txt
           (void) sprintf(err_txt, "%s%s%8ld%s%4d%s%4ld ;",
               "\n*** pla_adm_f: ERROR at read of poly_a",
               "\n plate_info_adr ", ftell(o_fd),
-               " plate  = ", plate, " size = ", sizeof(double));
+               " plate  = ", plate, " size = ", (long) sizeof(double));
           return(-1);
         }
         pkt_ant = (int) *Bp;
@@ -438,7 +438,7 @@ char                *err_txt
           (void) sprintf(err_txt, "%s%s%8ld%s%4d%s%4ld ;",
               "\n*** pla_adm_f: ERROR at write of info poly_b",
               "\n plate_info_adr ", ftell(o_fd),
-               " plate  = ", plate, " size = ", sizeof(double));
+               " plate  = ", plate, " size = ", (long) sizeof(double));
           return(-1);
         }
         pkt_ant = (int) *Bp;
