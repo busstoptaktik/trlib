@@ -89,7 +89,7 @@ int TR_InitLibrary(char *path) {
     double x=512200.0,y=6143200.0,z=0.0;
     TR* trf;
     FILE *fp;
-    char buf[64],fname[1024],*init_path=0;
+    char buf[FILENAME_MAX],fname[FILENAME_MAX],*init_path=0;
     if (!TR_IsMainThread()) //Only one thread can succesfully initialise the library
 	    return TR_ERROR;
     if (strlen(path)>0) 
@@ -98,9 +98,14 @@ int TR_InitLibrary(char *path) {
 	    init_path=getenv(TR_TABDIR_ENV);
     if (0==init_path){ 
 	    sprintf(buf,"./");
-	    init_path=buf;}
-    else if (init_path[strlen(init_path)-1]!='/' && init_path[strlen(init_path)-1]!='\\')
-	    strcat(init_path,"/");
+	    init_path=buf;
+	    }
+    else if (init_path[strlen(init_path)-1]!='/' && init_path[strlen(init_path)-1]!='\\'){
+	    strcpy(buf,init_path);
+	    strcat(buf,"/");
+	    init_path=buf;
+	    }
+	    
     strcpy(fname,init_path);
     strcat(fname,TR_DEF_FILE);
     #ifdef _ROUT
@@ -108,7 +113,7 @@ int TR_InitLibrary(char *path) {
     #endif
     fp=fopen(fname,"r");
     if (0==fp)
-	    return 0;
+	    return TR_ERROR;
     fclose(fp);
     settabdir(init_path);
     #ifdef _ROUT
