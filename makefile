@@ -1,8 +1,8 @@
 BUILDDIR = ../BUILD/trlib
 CC = gcc
-CFLAGS = -W -Wall -pedantic -fPIC -O -g -I./TR_INC -DTHREAD_SAFE -D_ROUT
+CFLAGS = -W -Wall -pedantic -fPIC -O -pg -g -I./TR_INC -DTHREAD_SAFE -D_ROUT
 #-pthread
-LDFLAGS = -I./TR_INC -shared  -DTHREAD_SAFE 
+LDFLAGS = -I./TR_INC -shared  -DTHREAD_SAFE -pg -g
 #-pthread
  
 EXENAME = main
