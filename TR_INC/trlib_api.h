@@ -49,6 +49,7 @@ KMSTR_API void TR_TerminateLibrary(void);
 KMSTR_API void TR_TerminateThread(void);
 KMSTR_API void TR_AllowUnsafeTransformations(void);
 KMSTR_API void TR_ForbidUnsafeTransformations(void);
+KMSTR_API int TR_GetLocalGeometry(char *mlb, double x, double y, double *m, double *c);
 typedef struct  TR TR;
 KMSTR_API void TR_GeoidInfo(TR *tr);
 KMSTR_API TR  *TR_Open (char *label_in, char *label_out, char *geoid_name);

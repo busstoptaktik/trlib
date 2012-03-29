@@ -18,6 +18,7 @@ EXPORTS
 	TR_Stream
 	TR_AllowUnsafeTransformations
 	TR_ForbidUnsafeTransformations
+	TR_GetLocalGeometry
 	bh_lat
 	bh_lmb
 	bshlm1

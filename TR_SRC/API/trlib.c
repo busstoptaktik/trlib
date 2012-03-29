@@ -26,6 +26,7 @@
 #include "geoid_d.h"
 #include "geoid_c.h"
 #include "geoid_i.h"
+#include "ptg_d.h"
 #include "sputshpprj.h"
 #include "c_tabdir_file.h"
 #include "tab_doc_f.h"
@@ -37,6 +38,7 @@
 #define TRLIB_REVISION "hg revison not specified"
 #endif
 #define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
+#define GEO_SYS_CODE 2
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
 
@@ -121,6 +123,11 @@ int TR_InitLibrary(char *path) {
     #endif
     /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
     trf=TR_Open("utm32_ed50","utm32_wgs84","");
+    #ifdef _ROUT
+    if (!trf){
+	    fprintf(ERR_LOG,"Failed to open first transformation!\n");
+    }
+    #endif
     if (0!=trf){
 	    ok=TR_Transform(trf,&x,&y,&z,1);
 	    TR_Close(trf);
@@ -219,11 +226,24 @@ int TR_GeoidTable(TR *tr){
 		
 		
        
-
+union geo_lab *TR_OpenProjection(char *mlb){
+	int label_check;
+	union geo_lab *plab;
+	plab= malloc(sizeof(union geo_lab));
+	if (plab)
+		label_check = conv_lab(mlb,plab,"");
+	if ((0==plab) || (label_check==0) || (label_check==-1)) {
+		free(plab);
+		TR_LAST_ERROR=TR_LABEL_ERROR;
+		return 0;
+		}
+	return plab;
+}
+	
 
 
 TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
-    int label_check,err;
+    int err;
     union geo_lab *plab_in, *plab_out;
     struct mgde_str *special_geoid_table=NULL;
     int has_geoids=0;
@@ -236,31 +256,26 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     }
     
     /* initialize the plab_in object member */
-    plab_in= malloc(sizeof(union geo_lab));
-    if (plab_in)
-        label_check = conv_lab(label_in,plab_in,"");
-    if ((0==plab_in) || (label_check==0) || (label_check==-1)) {
-        free(plab_in);
-	TR_LAST_ERROR=TR_LABEL_ERROR;
-        return 0;
+    plab_in= TR_OpenProjection(label_in);
+    if (!plab_in){
+	    free(tr);
+	    return 0;
     }
-    
     /* initialize the plab_out object member */
-    plab_out = malloc(sizeof(union geo_lab));
-    if (plab_out)
-        label_check = conv_lab(label_out,plab_out,"");
-    if ((0==plab_out) || (label_check==0) || (label_check==-1)) {
-        free(plab_in);
-        free(plab_out);
-	TR_LAST_ERROR=TR_LABEL_ERROR;
-        return 0;
+    plab_out=TR_OpenProjection(label_out);
+    if (!plab_out){
+	    free(plab_in);
+	    free(tr);
+	    return 0;
     }
+    /* test for allowed transformation */
     if (!TR_IsThreadSafe(plab_in,plab_out) && !ALLOW_UNSAFE){
 	#ifdef _ROUT
 	fprintf(ERR_LOG,"%s-> %s not allowed in multithreaded mode!\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb);
 	#endif
 	free(plab_in);
         free(plab_out);
+	free(tr);
 	TR_LAST_ERROR=TR_LABEL_ERROR;
 	
         return 0;
@@ -276,6 +291,7 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
 	   if (has_geoids<0){  /*on error return null */
 		   free(plab_in);
 		   free(plab_out);
+		   free(tr);
 		   geoid_c(special_geoid_table,0,NULL);
 		   free(special_geoid_table);
 		   TR_LAST_ERROR=TR_ALLOCATION_ERROR;
@@ -506,16 +522,35 @@ DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
 
 
 
-/* This will work for now until we get a version of fputshpprj which writes to a string */
-int TR_GetEsriText(char *label_in, char *wkt_out){
-    union geo_lab *plab_in;
-    int   label_check;
-    plab_in = malloc(sizeof(union geo_lab));
-    label_check = conv_lab(label_in,plab_in,"");
-    if ((label_check==0) || (label_check==-1)){
-        free(plab_in);
-        return TR_LABEL_ERROR;
-    }
-    label_check=sputshpprj(wkt_out,plab_in); /* See fputshpprj.h for details on return value */
-    free(plab_in);
-    return label_check;}
+/* Translates mlb to ESRI wkt*/
+int TR_GetEsriText(char *mlb, char *wkt_out){
+    int err;
+    union geo_lab  *TC=TR_OpenProjection(mlb);
+    if (!TC)
+	return TR_LABEL_ERROR;
+    err=sputshpprj(wkt_out,TC); /* See fputshpprj.h for details on return value */
+    free(TC);
+    return err;}
+    
+/* out must be an array of length 2*/
+int TR_GetLocalGeometry(char *mlb, double x, double y, double *s, double *mc){
+	double xo,yo,out[2],dgo[4];
+	int direct=1,ret;
+	union geo_lab  *TC=TR_OpenProjection(mlb);
+	if (!TC)
+		return TR_LABEL_ERROR;
+	if (((TC->u_c_lab).cstm)==CRT_SYS_CODE){
+		free(TC);
+		return TR_ERROR;
+		}
+	direct=(((TC->u_c_lab).cstm)!=GEO_SYS_CODE)?1:-1;
+	#ifdef _ROUT
+	fprintf(ERR_LOG,"init: %d, %.2f %.2f\n",(TC->u_c_lab).init,x,y);
+	#endif
+	ret=ptg_d(TC,direct,y,x,&yo,&xo,"",ERR_LOG,out,dgo);
+	*s=out[0];
+	*mc=out[1];
+	free(TC);
+	return (ret==0)?TR_OK:TR_ERROR;
+}
+        
