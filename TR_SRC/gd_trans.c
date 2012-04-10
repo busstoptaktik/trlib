@@ -1172,7 +1172,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
             H   = (i_sep != 'E') ? H_in + igh : H_in;
           }
         } else
-        if (RES < 0) {
+        if (RGH < 0) {
           if (RES > RGH) RES = RGH;
           if (tr_error != NULL)
              (void) fprintf(tr_error, "%s\n%s\n", err_txt, usertxt);

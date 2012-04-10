@@ -86,7 +86,7 @@ char            *err_txt)
 //struct SHPRMinMax      KMS_ShpMinMaxM;
   int                    KMS_ShapeType;
 
-  int              curpos, Z_pos = 0.0, boxpos = 0, Zboxpos, recused, wpos;
+  int              curpos, Z_pos = 0, boxpos = 0, Zboxpos, recused, wpos;
   int              Rncount, Rlcount, Rucount, ZMcount;
   int              ZMType, Z_Type = 0, i, tr_res, qTrn = 0;
   int              FileLength, RecordLength;
