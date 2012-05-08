@@ -41,7 +41,8 @@
 #define GEO_SYS_CODE 2
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
-
+#define R2D 57.295779513082323 
+#define D2R 0.017453292519943295
 /*various global state variables */
 
 static int ALLOW_UNSAFE=0; //do we allow transformations which are not thread safe?
@@ -159,15 +160,26 @@ int TR_InitLibrary(char *path) {
 
 /* Mock up - not fully implemented! */
 void TR_GeoidInfo(TR *tr) {
-    char req[256];
+    char req[512];
+    char geoid_name[256];
     int res;
     strcpy(req,"*");
-    strcat(req,tr->geoid_name);
+    TR_GetGeoidName(tr,geoid_name);
+    //strcat(req,tr->geoid_name);
+    strcat(req,geoid_name);
     res=tab_doc_f(req,stdout);
     #ifdef _ROUT
     printf("Request: %s, res: %d\n",req,res);
     #endif
     }
+
+void TR_GetGeoidName(TR *tr,char *name) {
+	struct gde_lab *g_lab;
+	g_lab=&((tr->geoid_pt->table_u)[tr->geoid_pt->tab_nr]);
+	strcpy(name,g_lab->mlb);
+	return;
+}
+	
 
 
 void TR_GetVersion(char *buffer,int BufSize) {
@@ -433,13 +445,15 @@ int TR_tr(
 
 /* read xyz-tuples from f_in; stream transformed tuples to f_out */
 int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
-   
-    int ERR = 0,i=0;
+    double r2d=R2D;
+    double d2r=D2R;
+    int ERR = 0,i=0,is_geo_in,is_geo_out;
     enum {BUFSIZE = 16384};
     char buf[BUFSIZE];
     if ((0==trf) || (0==f_in) || (0==f_out))
         return TR_ERROR;
-  
+    is_geo_in=(((trf->plab_in->u_c_lab).cstm)==GEO_SYS_CODE);
+    is_geo_out=(((trf->plab_out->u_c_lab).cstm)==GEO_SYS_CODE);
     while (0 != fgets(buf, BUFSIZE, f_in)) {
         int    argc, err;
         double x,y,z;
@@ -458,7 +472,10 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
             if (n==0)
                 continue;
         }
-
+        if (is_geo_in){
+		x*=d2r;
+		y*=d2r;
+	}
         err = TR_Transform(trf,&x,&y,&z,1);
         i++;
 
@@ -468,7 +485,10 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
 
         if ((n==-1) && err)
             break;
-        
+        if (is_geo_out){
+		x*=r2d;
+		y*=r2d;
+	}
         fprintf(f_out, "%.10g %.10g %.10g\n", x,y,z);
 
         if (i==n)

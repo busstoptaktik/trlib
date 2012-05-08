@@ -40,3 +40,4 @@ int TR_IsMainThread(void);
 int TR_IsThreadSafe(union geo_lab*, union geo_lab*);
 int TR_tr(union geo_lab* ,union geo_lab*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 
 union geo_lab *TR_OpenProjection(char *mlb);
+void TR_GetGeoidName(struct TR *tr,char *name);

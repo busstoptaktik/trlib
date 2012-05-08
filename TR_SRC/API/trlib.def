@@ -19,6 +19,8 @@ EXPORTS
 	TR_AllowUnsafeTransformations
 	TR_ForbidUnsafeTransformations
 	TR_GetLocalGeometry
+	TR_OpenProjection
+	TR_GetGeoidName
 	bh_lat
 	bh_lmb
 	bshlm1

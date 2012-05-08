@@ -101,6 +101,8 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_char_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double] #todo get type of last arg
 		tr_lib.TR_GeoidInfo.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_GeoidInfo.restype=None
+		tr_lib.TR_GetGeoidName.argtypes=[ctypes.c_void_p,ctypes.c_char_p]
+		tr_lib.TR_GetGeoidName.restype=None
 		tr_lib.TR_Open.restype=ctypes.c_void_p
 		tr_lib.TR_Open.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.TR_Close.restype=None
@@ -121,6 +123,13 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_AllowUnsafeTransformations.restype=None
 		tr_lib.TR_ForbidUnsafeTransformations.argtypes=None
 		tr_lib.TR_ForbidUnsafeTransformations.restype=None
+		#Some extra functions which might get exposed in the API#
+		tr_lib.TR_OpenProjection.argtypes=[ctypes.c_char_p]
+		tr_lib.TR_OpenProjection.restype=ctypes.c_void_p
+		tr_lib.settabdir.argtypes=[ctypes.c_char_p]
+		tr_lib.settabdir.restype=None
+		tr_lib.bshlm2.restype=ctypes.c_int
+		tr_lib.bshlm2.argtypes=[ctypes.c_double]*6+[LP_c_double]*3+[ctypes.c_int]
 	except Exception, msg:
 		print repr(msg)
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
@@ -168,6 +177,19 @@ def SetThreadMode(on=True):
 	else:
 		AllowUnsafeTransformations()
 
+def SetGeoidDir(geoid_dir):
+	global GEOIDS
+	msg=""
+	for fname in REQUIRED_FILES:
+		if not os.path.exists(os.path.join(geoid_dir,fname)):
+			msg+="\nRequired file %s not found." %fname
+			return False,msg
+	if geoid_dir[-1] not in ["\\","/"]:
+		geoid_dir+="/"
+	GEOIDS=geoid_dir
+	tr_lib.settabdir(geoid_dir)
+	return True,msg
+
 
 def GetVersion():
 	buf=" "*100;
@@ -193,6 +215,15 @@ def GetLocalGeometry(label,x,y):
 		return s.value,(mc.value)*R2D
 	return 0,0
 
+def GetAzimuth(axis,flat,lon1,lat1,lon2,lat2):
+	if IS_INIT:
+		d=ctypes.c_double(0)
+		a1=ctypes.c_double(0)
+		a2=ctypes.c_double(0)
+		ret=tr_lib.bshlm2(axis,flat,lat1*D2R,lat2*D2R,lon1*D2R,lon2*D2R,ctypes.byref(a1),ctypes.byref(a2),ctypes.byref(d),0)
+		if ret<2:
+			return a1.value*R2D,a2.value*R2D,d.value
+	return None,None,None
 
 def IsGeographic(mlb):
 	return ("geo" in mlb[:6])
@@ -324,6 +355,12 @@ class CoordinateTransformation(object):
 	def GetGeoidInfo(self):
 		if self.tr is not None:
 			tr_lib.TR_GeoidInfo(self.tr)
+	def GetGeoidName(self):
+		if self.tr is not None:
+			name=" "*256
+			tr_lib.TR_GetGeoidName(self.tr,name)
+			return name.replace("\0","").strip()
+		return ""
 	def Close(self):
 		if self.tr is not None:
 			tr_lib.TR_Close(self.tr)
