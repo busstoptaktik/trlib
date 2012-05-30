@@ -34,6 +34,7 @@
 #include  <ctype.h>
 #include  "geo_lab.h"
 #include  "trthread.h"
+#include  "deprecated.h"
 
 #define    ERR    (17)
 
