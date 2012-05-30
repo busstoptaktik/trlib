@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2011, National Survey and Cadastre, Denmark
  * (Kort- og Matrikelstyrelsen), kms@kms.dk
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -13,9 +13,9 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
- 
+
 
 
 /*  sgetg.c version 1.0               # page 1   22 Feb 1993 12 54 */
@@ -164,7 +164,7 @@ char                        *udt
     case 5: /* EX = ok exit */
     case 6: /* AL = alarm exit */
       *p = '\0';
-      while (C_ALPHA(c)) {
+      while (isalpha(c)) {			// C_ALPHA udskiftet med isalpha
         *(np++) = (char) c;
         c       = *(str++);
       };
@@ -190,7 +190,7 @@ char                        *udt
 
 
   if (cf + dc) {
-    itd  = *set_tpd(np, cf, dc); 
+    itd  = *set_tpd(np, cf, dc);
     np   = h1;
     i    = get_tpd(&itd, &tp, np, &cf, &dc, &factor);
 
