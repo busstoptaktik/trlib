@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2011, National Survey and Cadastre, Denmark
  * (Kort- og Matrikelstyrelsen), kms@kms.dk
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -13,9 +13,9 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
- 
+
 
 
 /* tcts_u   ver 1999.01           # page 1   17 Nov 1999 13 25 */
@@ -115,12 +115,12 @@ Prog: Knud Poder, APR 1991
 
   static  double      P_tcla[] = {
     /*ant*/  11.0,
-    /*  1*/  6080000.0, 460000.0, 6130000.0, 440000.0, 
-    /*  3*/  6280000.0, 440000.0, 6370000.0, 496000.0, 
-    /*  5*/  6410000.0, 600000.0, 6300000.0, 670000.0, 
-    /*  7*/  6250000.0, 750000.0, 6190000.0, 770000.0, 
-    /*  9*/  6120000.0, 770000.0, 6030000.0, 700000.0, 
-    /* 11*/  6060000.0, 540000.0, 
+    /*  1*/  6080000.0, 460000.0, 6130000.0, 440000.0,
+    /*  3*/  6280000.0, 440000.0, 6370000.0, 496000.0,
+    /*  5*/  6410000.0, 600000.0, 6300000.0, 670000.0,
+    /*  7*/  6250000.0, 750000.0, 6190000.0, 770000.0,
+    /*  9*/  6120000.0, 770000.0, 6030000.0, 700000.0,
+    /* 11*/  6060000.0, 540000.0,
   };
 
   static  double      P_tcj[] = {
@@ -128,7 +128,7 @@ Prog: Knud Poder, APR 1991
     /* 1 */  6080000.0, 460000.0, 6130000.0, 435000.0,
     /* 3 */  6280000.0, 435000.0, 6370000.0, 496000.0,
     /* 5 */  6410000.0, 600000.0, 6300000.0, 670000.0,
-    /* 7 */  6050000.0, 670000.0, 6060000.0, 540000.0  
+    /* 7 */  6050000.0, 670000.0, 6060000.0, 540000.0
   };
 
   static  double      P_s34j[] = {
@@ -171,7 +171,7 @@ Prog: Knud Poder, APR 1991
     /*  7*/  227365.1, 214764.5, 256577.4, 174191.0
   };
 
-  /* Coefficients for polynomials : C_...[] = { 
+  /* Coefficients for polynomials : C_...[] = {
      /DEGREE /     g,
      /Poly NORTH/
        /e-degree = 0   : n-degree = 0,1,2, ..., g/
@@ -189,7 +189,7 @@ Prog: Knud Poder, APR 1991
        /n-degree = g-1 : e-degree = 0,1            /
        /n-degree = g   : e-degree = 0              /
        /e MEAN /   tcx
-     } 
+     }
   */
 
   static  double      C_ttj[] = {
@@ -1154,7 +1154,7 @@ Prog: Knud Poder, APR 1991
 /* tcts_u   ver 1999.01           # page 19   17 Nov 1999 13 25 */
 
 
-  pd = C_UPPER(landsdel);
+  pd = isupper(landsdel);				// C_UPPER udskiftet med isupper 20120529 stl
   if (pd) {
     va_start(o_p, tr_error);
     DD = va_arg(o_p, double *);
@@ -1296,7 +1296,7 @@ Nin, Ein, ins, direct, ins_alarm);
 */
 
   if (ins) {
-  
+
     if ((i=inpoly(pol, &Nin, &Ein)) < 0) res = TRF_INACC_;
 /*
 (void) fprintf(stdout, ", inpoly res = %d", res);
@@ -1329,7 +1329,7 @@ Nin, Ein, ins, direct, ins_alarm);
 (void) fprintf(stdout, "\n*loop i = %d, N = %7.3f, E = %7.3f;", i, N,E);
 */
         }
-  
+
 
         else { /* collect output coord, switch to reverse checking */
           *yout = N;
@@ -1342,7 +1342,7 @@ Nin, Ein, ins, direct, ins_alarm);
 
 /* tcts_u   ver 1999.01           # page 23   17 Nov 1999 13 25 */
 
-  
+
       /* Transformation loop */ /* with derivatives */
       for (i = -1; i <= 1; ++i)
         if (i) {

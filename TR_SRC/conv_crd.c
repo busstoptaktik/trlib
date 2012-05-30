@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2011, National Survey and Cadastre, Denmark
  * (Kort- og Matrikelstyrelsen), kms@kms.dk
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -13,9 +13,9 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
- 
+
 
 
 /* conv_crd    ver 2010.01          # page 1     5 Jan 2010 10 19 */
@@ -259,7 +259,7 @@ struct coord_lab        *c_lab,
       case    9: /* tsu**   Time Series utm zone ** */
       case   13: /* ETRS-TM, ETRS89 transverse mercator zone ** */
         if (p_lb->cha_str > 0) {
-          if (C_DIGIT(*(p_sys+p_lb->cha_str))) {
+          if (isdigit(*(p_sys+p_lb->cha_str))) {                   // C_DIGIT udskiftet med isdigit  20120529 stl
             if ((sscanf(p_sys+p_lb->cha_str, "%d", &zone) == 1)
                 && (1 <= zone && zone <= 60)) {
               c_lab->B0     = 0.0;
@@ -276,7 +276,7 @@ struct coord_lab        *c_lab,
 
       case 8: /* tm**  */
         if (p_lb->cha_str > 0) {
-          if (C_DIGIT(*(p_sys+p_lb->cha_str))) {
+          if (isdigit(*(p_sys+p_lb->cha_str))) {					// C_DIGIT udskiftet med isdigit  20120529 stl
             (void) sscanf(p_sys+p_lb->cha_str, "%d", &zone);
             c_lab->N0 = 0.0;
             c_lab->B0 = 0.0;
@@ -541,7 +541,7 @@ struct coord_lab        *c_lab,
 
         /* set trf. constants for completed systems */
         (void) set_trc(c_lab);
-  
+
       }
       else
         /* unintelligible ellipsoid */
