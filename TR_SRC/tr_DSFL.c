@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2011, National Survey and Cadastre, Denmark
  * (Kort- og Matrikelstyrelsen), kms@kms.dk
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -13,9 +13,10 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
- 
+
+// C_SPACE og C_DIGIT udskiftet med henh. isspace og isdigit   20120529 stl
 
 #include <stdio.h>
 #include <string.h>
@@ -31,9 +32,9 @@
 
 
 
-int tr_DSFL(char *MainFilePath, char *SlaveFilePath, 
+int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
             union geo_lab *g_lab_slave, char* MsgStr)
-{ 
+{
 
   enum CDSFLcommand {CMD_H1, CMD_H2, CMD_H3, CMD_H4, CMD_H5, CMD_H6,
     CMD_H9, CMD_T, CMD_P1K, CMD_LK, CMD_FK, CMD_STOP, CMD_DEFAULT};
@@ -43,7 +44,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
     enum CDSFLcommand  Cmd;
   };
 
-  enum CDSFLLabel {LAB_S34S, LAB_S34J, LAB_S45B, LAB_S34B, LAB_U32, 
+  enum CDSFLLabel {LAB_S34S, LAB_S34J, LAB_S45B, LAB_S34B, LAB_U32,
     LAB_U33, LAB_U32W, LAB_U33W, LAB_KP2000J, LAB_KP2000S, LAB_KP2000B,
     LAB_DKTM1, LAB_DKTM2, LAB_DKTM3, LAB_DKTM4, LAB_LOK, LAB_STOP,
     LAB_DVR90, LAB_DNN, LAB_DNNI, LAB_DNNM, HAB_STOP};
@@ -108,7 +109,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
   struct cccLab *DSFLlabPtrMaHgt = NULL;
   struct cccLab *DSFLlabPtrSlave = NULL;
   struct cccLab *DSFLlabPtrSlHgt = NULL;
-  
+
   enum CDSFLcommand   DSFLcommand;
   struct ccc         *CmdPtr;
   struct cccLab      *DSFLlabPtr;
@@ -165,7 +166,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
   }
   else {
     /* Is FileFormat Possible DSFL?  Look for '%' chars */
-    
+
     (void) fseek(fh_in, 0L, SEEK_SET);
     while (!cStop) {
       c = (char)getc(fh_in);
@@ -174,13 +175,13 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
       if (feof(fh_in) || NlCount>5) cStop = 1;
     }
     (void) fseek(fh_in, 0L, SEEK_SET);
-    
+
     if (NlCount>5 && PctCount<2) {
       (void) strcpy(MsgStr, "FileFormat is probably NOT DSFL !");
       (void) fclose(fh_in);
       return(-52);
     }
-    
+
 
     /* Test Syntax and set Label */
     H1Ok = 0;
@@ -189,7 +190,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
 
     do     c = (char) getc(fh_in);
     while (c!='%' && !feof(fh_in));
-      
+
     if (c == '%')  {
       do {
         cStop = 0;
@@ -209,7 +210,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
         lng    = 0;
         for (cp1 = mlbOut, cp2 = CmdTxt;
              *cp1 && !cStop && lng<10; cp1++) {
-          if (!C_SPACE(*cp1)) {
+          if (!isspace(*cp1)) {
             *(cp2++) = *cp1;
             lng++;
           }
@@ -220,7 +221,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
         }
         *cp2 = '\0';
         for (cp1 = TxtPtr, cp2 = DSFLmlb; *cp1; cp1++)
-            if (!C_SPACE(*cp1)) *(cp2++) = *cp1;
+            if (!isspace(*cp1)) *(cp2++) = *cp1;
         *cp2 = '\0';
 
         if (!strcmp(CmdTxt, "H1")) {
@@ -238,7 +239,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               }
             }
           }
-            
+
           if (!LabFound) {
             (void) sprintf(MsgStr,
                     "H1 command in line %d : no DSFLlabel : %s",
@@ -261,7 +262,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               }
             }
           }
-            
+
           if (!HLabFound) {
             (void) sprintf(MsgStr,
                     "H2 command in line %d : no DSFL_Hlabel : %s",
@@ -299,7 +300,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               if (!strncmp(DSFLmlb, "NE", 2)) {
                 bSwopInputCoo = 0;
                 H3Ok = 1;
-              } else 
+              } else
               if (!strncmp(DSFLmlb, "EN", 2)) {
                 bSwopInputCoo = 1;
                 H3Ok          = 1;
@@ -346,7 +347,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
       (void) fclose(fh_in);
       return(res);
     }
-    
+
     if (HLabFound != bInputHeights) {
       g_lab_main_ok          = 0;
     } else {
@@ -355,7 +356,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
 
   }
 
-  /* ProcessSlaveFile  */ 
+  /* ProcessSlaveFile  */
   if ((fh_out=fopen(SlaveFilePath, "w"))==NULL) {
     (void) sprintf(MsgStr,
                    "Cannot open output file: %s\n", SlaveFilePath);
@@ -370,7 +371,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
     (void) strcat(MsgStr, "Slave system NOT CRD_lab\n");
     res = -66;
   }
-  
+
   if (res) {
     (void) fclose(fh_out);
     (void) fclose(fh_in);
@@ -412,8 +413,8 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
     return(-67);
   }
 
-  
-  (void) strcpy(mlbOut, g_lab_slave->u_c_lab.mlb);  
+
+  (void) strcpy(mlbOut, g_lab_slave->u_c_lab.mlb);
   *(mlbOut + g_lab_slave->u_c_lab.sepix) = '_';
   for (DSFLlabPtr = DSFLlabels, LabFound = 0;
        !LabFound && *DSFLlabPtr->mlb != '\0'; DSFLlabPtr++) {
@@ -444,7 +445,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
         DSFLlabPtrSlHgt = DSFLlabPtr;
       }
     }
-    
+
     if (!LabFound) {
       (void) sprintf(MsgStr,
                      "The system <%s> cannot be used in DSFL-Format",
@@ -455,7 +456,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
       return(-66);
     }
   }
-  
+
   H1Ok = 0;
   H2Ok = 0;
   H3Ok = 0;
@@ -477,7 +478,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
         if (c == 'Y')  Lineno--; else
         if (c == '\n') Lineno++;
         if (c == '%')  cStop = 1;
-        else if (C_SPACE(c)) {
+        else if (isspace(c)) {
           if (cmdlng>0) {
             CmdTerm = c;
             cStop   = 1;
@@ -496,7 +497,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
         }
       }
       *(cp1) = '\0';
-      
+
       if (cmdlng > 0) {
         DSFLcommand = CMD_DEFAULT;
         (void) strcpy(CX, CmdTxt);
@@ -514,7 +515,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
             DSFLcommand = CmdPtr->Cmd;
           }
         }
-        
+
         switch (DSFLcommand) {
         case CMD_H1 :
           if (H1Ok) {
@@ -583,7 +584,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               c = (char) getc(fh_in);
               if (c == '\n') Lineno++; else
               if (c == '%')  cStop = 1; else
-              if (!C_DIGIT(c) && !C_SPACE(c)) {
+              if (!isdigit(c) && !isspace(c)) {
                 *(cp1++) = (char) toupper(c);
                 ++ lng;
               }
@@ -620,7 +621,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               (void) fclose(fh_in);
               return(-56);
             }
-            
+
             res = fscanf(fh_in, "%lf %lf", &H4C1, &H4C2);
             if (bInputHeights) res += fscanf(fh_in, "%lf", &H4Z);
 
@@ -629,13 +630,13 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               c = (char) getc(fh_in);
               if (c == '\n') Lineno++;
             }
-            
+
             if (res != (bInputHeights ? 3 :2)) {
               (void) strcpy(MsgStr, "Height missing/requested\n");
               qSyntaxError++;
               break;
             }
-            
+
             if (bSwopInputCoo) {
               tmp  = H4C1;
               H4C1 = H4C2;
@@ -650,7 +651,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               (void) fclose(fh_in);
               return(-57);
             }
-            
+
             res = fscanf(fh_in, "%lf %lf", &H5C1, &H5C2);
             if (bInputHeights)
               res += fscanf(fh_in, "%lf", &H5Z);
@@ -660,13 +661,13 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               c = (char) getc(fh_in);
               if (c == '\n') ++ Lineno;
             }
-            
+
             if (res != (bInputHeights ? 3 :2)) {
               (void) strcpy(MsgStr, "Height missing/requested\n");
               ++ qSyntaxError;
               break;
             }
-            
+
             if (bSwopInputCoo) {
               tmp  = H5C1;
               H5C1 = H5C2;
@@ -691,7 +692,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               H4Z  = H5Z;
               H5Z  = tmp;
             }
-            
+
             C1Min = C1Max = C2Min = C2Max = 0.0;
             for (s = 0; s<4; s++) {
               switch (s) {
@@ -733,10 +734,10 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
                   First = 0;
                 } else {
                   if (C1Max < C1Out) C1Max = C1Out;
-                  else 
+                  else
                   if (C1Min > C1Out) C1Min = C1Out;
                   if (C2Max < C2Out) C2Max = C2Out;
-                  else 
+                  else
                   if (C2Min > C2Out) C2Min = C2Out;
                 }
               }
@@ -747,7 +748,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
                              "%-6s %.0f %.0f","%H4", C1Max, C2Max);
               if (bInputHeights) (void) fprintf(fh_out, " %.0f", H4Z);
               (void) fprintf(fh_out,"\n");
-              
+
               (void) fprintf(fh_out,
                              "%-6s %.0f %.0f","%H5", C1Min, C2Min);
               if (bInputHeights) (void) fprintf(fh_out, " %.0f", H5Z);
@@ -756,7 +757,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
             else {
               qTransError += qXerror;
             }
-            
+
           }
           break;
 
@@ -772,7 +773,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
             c = (char) getc(fh_in);
             if (c == '\n') ++ Lineno;
           }
-          
+
           if (CooOk) {
             (void) fprintf(fh_out, "%-6s %.*f %.*f",
                            "%H6", Dec, 0.0, Dec, 0.0);
@@ -822,13 +823,13 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
             C3In  = 30.0;
             CooOk = ((short) res) == 2;
           }
-          
+
           c = ' ';
           while (!feof(fh_in) && c != '%') {
             c = (char) getc(fh_in);
             if (c == '\n') ++ Lineno;
           }
-          
+
           if (!CooOk) {
             (void) strcpy(MsgStr, "Height missing/requested\n");
             ++ qSyntaxError;
@@ -857,7 +858,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               }
 
               ++ qTransError;
-            } 
+            }
             else {
               if (bSwopOutputCoo) {
                 tmp   = C1Out;
@@ -945,11 +946,11 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
               bDigitsRecorded   = 0;
               p                 = buffer;
               *p                = '\0';
-              
+
               ParamIdTxt[0]     = c;
               cp                = ParamIdTxt + 1;
               c                 = (char) getc(fh_in);
-              while (!C_SPACE(c) && !feof(fh_in)) {
+              while (!isspace(c) && !feof(fh_in)) {
                 *(cp++) = c;
                 c       = (char) getc(fh_in);
               }
@@ -991,7 +992,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
                       C3In      = 30.0;
                       DummyHout = 1;
                     }
-                                        
+
                     if (bMinMaxOk && (C1In<H5C1
                         || H4C1<C1In || C2In<H5C2 || H4C2<C2In)) {
                       (void) strcpy(MsgStr, "Min/Max error\n");
@@ -1028,7 +1029,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
                           C3Out     = DummyH;
                           DummyHout = 0;
                         }
-                        (void) fprintf(fh_out, " %.*f %.*f %.*f", 
+                        (void) fprintf(fh_out, " %.*f %.*f %.*f",
                                 Dec, C1Out, Dec, C2Out, Dec, C3Out);
                       } else
                         (void) fprintf(fh_out, "% .*f% .*f",
@@ -1073,8 +1074,8 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
       if (DSFLcommand<=CMD_STOP) qTransCommands++;
 
     } /* end if cmdlng>0 */
-    
-    
+
+
   } while (!feof(fh_in) && !DSFLStop);
 
   (void) fprintf(fh_out,"\n\n");
@@ -1082,7 +1083,7 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
   (void) fclose(fh_in);
   (void) geoid_c(&geoid_table, 0, NULL);
   if (res == TRF_ILLEG_) return(res);
-  
+
   if (qTransError>0 || qSyntaxError>0) {
     (void) strcat(MsgStr, "Errors detected:\n");
     if (qSyntaxError>0) {
@@ -1099,8 +1100,8 @@ int tr_DSFL(char *MainFilePath, char *SlaveFilePath,
     }
     return(-68);
   }
-  
+
   return(0);
-  
+
 }
 

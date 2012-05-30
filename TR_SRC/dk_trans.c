@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2011, National Survey and Cadastre, Denmark
  * (Kort- og Matrikelstyrelsen), kms@kms.dk
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -13,9 +13,9 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
- 
+
 
 
 /* dk_trans  ver 2003.01        # page 1   12 Jan 2003 13 55 */
@@ -338,7 +338,7 @@ FILE                *tr_error
     (void) strcpy(outcs, outlab->mlb);
     pl = outcs + outlab->sepix;
     if (outlab->h_ix) *(outcs + outlab->h_ix -1) = (char) '\0';
-    if (C_UPPER(*pl)) *pl = (char) ((*(pl+1) != (char) '\0') ? '_' : '\0');
+    if (isupper(*pl)) *pl = (char) ((*(pl+1) != (char) '\0') ? '_' : '\0');		// C_UPPER udskiftet med isupper 20120529 stl
     /* Group and number */
     for (pml = mlab, outgr = -1; pml->trgr != -1; pml++)
       if (!strcmp(pml->s_lab, outcs)) {
@@ -383,7 +383,7 @@ outgr, outnr, pml->s_lab, outcs);
     (void) strcpy(in_cs, in_lab->mlb);
     pl = in_cs + in_lab->sepix;
     if (in_lab->h_ix) *(in_cs + in_lab->h_ix -1) = '\0';
-    if (C_UPPER(*pl)) *pl = (char) ((*(pl+1) != (char) '\0') ? '_' : '\0');
+    if (isupper(*pl)) *pl = (char) ((*(pl+1) != (char) '\0') ? '_' : '\0');		// C_UPPER udskiftet med isupper 20120529 stl
     /* Group and number */
     for (pml = mlab, in_gr = -1; pml->trgr != -1; pml++)
       if (!strcmp(pml->s_lab, in_cs)) {
@@ -541,7 +541,7 @@ ACTION[act], nst, level);
         else nst = (act == TGTP) ? 1 : 5;
         /* when totally outside DK, where utm32_ed50 == tc32_ed50 */
         break;
-  
+
 
 /* dk_trans  ver 2003.01        # page 10   12 Jan 2003 13 55 */
 
@@ -604,7 +604,7 @@ ACTION[act], nst, level);
         } else (void) t_status(tr_error, usertxt, "dk_trans", TRF_AREA_,
                         "m ", "", N, E, 0.0, 0.0);
         break;
-  
+
 
 /* dk_trans  ver 2003.01        # page 11   12 Jan 2003 13 55 */
 
@@ -662,7 +662,7 @@ ACTION[act], nst, level);
       case GSBU: /* gsb -> utm33 */
         res = utgs(N, E, &N, &E, 'b', -1, usertxt, tr_error);
         break;
-  
+
 
 /* dk_trans  ver 2003.01        # page 12   12 Jan 2003 13 55 */
 
@@ -698,7 +698,7 @@ ACTION[act], nst, level);
     }    while (act && result >= TRF_TOLLE_);
   }
   return (result);
-  
+
 
 /* dk_trans  ver 2003.01        # page 13   12 Jan 2003 13 55 */
 
@@ -719,24 +719,24 @@ ACTION[act], nst, level);
 #undef  ZTZD
 #undef  U_GS
 #undef  GS_U
-#undef  UGSB  
+#undef  UGSB
 #undef  GSBU
-#undef  J_OS  
-#undef  OS_J   
-#undef  S_KK  
-#undef  KK_S 
-#undef  U_SB 
+#undef  J_OS
+#undef  OS_J
+#undef  S_KK
+#undef  KK_S
+#undef  U_SB
 #undef  SB_U
-#undef  PTGS  
-#undef  GSTP 
-#undef  PTBS  
-#undef  BSTP 
-#undef  SDKS 
-#undef  DKSS 
-#undef  T32U 
-#undef  U32T 
-#undef  XIDT  
-#undef  ILLG 
+#undef  PTGS
+#undef  GSTP
+#undef  PTBS
+#undef  BSTP
+#undef  SDKS
+#undef  DKSS
+#undef  T32U
+#undef  U32T
+#undef  XIDT
+#undef  ILLG
 #undef  TGTP
 #undef  GTTP
 #undef  T32L
