@@ -1,6 +1,6 @@
 BUILDDIR = ../BUILD/trlib
 CC = gcc
-CFLAGS = -W -Wall -pedantic -fPIC -O -pg -g -I./TR_INC -DTHREAD_SAFE -D_ROUT
+CFLAGS = -W -Wall -pedantic -fPIC -O -pg -g -I./TR_INC -I./TR_INC/DEPRECATED -DTHREAD_SAFE -D_ROUT
 #-pthread
 LDFLAGS = -I./TR_INC -shared  -DTHREAD_SAFE -pg -g
 #-pthread
@@ -8,16 +8,18 @@ LDFLAGS = -I./TR_INC -shared  -DTHREAD_SAFE -pg -g
 EXENAME = main
 
 SRCS   =  $(wildcard TR_SRC/*.c)
+DEPSRC =  $(wildcard TR_SRC/DEPRECATED/*.c)
 APISRC =  $(wildcard TR_SRC/API/*.c)
 JNISRC =  $(wildcard java/*.c)
-#ALLSRC =  $(SRCS) $(APISRC) $(JNISRC)
-ALLSRC =  $(SRCS) $(APISRC)
+#ALLSRC =  $(SRCS) $(APISRC) $(JNISRC) $(DEPSRC)
+ALLSRC =  $(SRCS) $(DEPSRC) $(APISRC)
 
 OBJS   =  $(patsubst TR_SRC/%.c,     $(BUILDDIR)/%.o,  $(SRCS))
 APIOBJ =  $(patsubst TR_SRC/API/%.c, $(BUILDDIR)/%.o,  $(APISRC))
+DEPOBJ =  $(patsubst TR_SRC/DEPRECATED/%.c, $(BUILDDIR)/%.o,  $(DEPSRC))
 JNIOBJ =  $(patsubst java/%.c,       $(BUILDDIR)/%.o,  $(JNISRC))
-#ALLOBJ =  $(OBJS) $(APIOBJ) $(JNIOBJ)
-ALLOBJ =  $(OBJS) $(APIOBJ)
+#ALLOBJ =  $(OBJS) $(APIOBJ) $(JNIOBJ) $(DEPOBJ)
+ALLOBJ =  $(OBJS) $(DEPOBJ) $(APIOBJ)
 
 .PHONY: pre
 
@@ -36,6 +38,9 @@ $(BUILDDIR)/%.o: TR_SRC/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -c -o $@ $< $(CFLAGS) 2>>../BUILD/trlib/compile.err
 $(BUILDDIR)/%.o: TR_SRC/API/%.c
+	@mkdir -p $(dir $@)
+	$(CC) -c -o $@ $< $(CFLAGS) 2>>../BUILD/trlib/compile.err
+$(BUILDDIR)/%.o: TR_SRC/DEPRECATED/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -c -o $@ $< $(CFLAGS) 2>>../BUILD/trlib/compile.err
 $(BUILDDIR)/%.o: java/%.c
