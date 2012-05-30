@@ -655,9 +655,9 @@ extern THREAD_SAFE size_t    init_prj_pos;
   // mode = 2 seach first
   // mode = 3 seach next
 
-  if (mode == 0) { /* Replace digits by *'s in w_sys */
+  if (mode == 0) { /* Replace digits by ?'s in w_sys (i.e. UTM32 -> UTM?? etc.), for easier search */
     for (qr = 0; *(p_sys+qr); qr++)
-        *(w_sys+qr) = (C_DIGIT(*(p_sys+qr))) ? '?' : *(p_sys+qr);
+        *(w_sys+qr) = (isdigit(*(p_sys+qr))) ? '?' : *(p_sys+qr);
     *(w_sys+qr) = '\0';
   }
 

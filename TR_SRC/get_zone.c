@@ -18,15 +18,6 @@
  
 
 
-/* get_zone    ver 2000.01          # page 1   19 jan 1999 10 19 */
-
-
-/* Copyright (c) 1999  LG,  Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 /* get_zone(name, lab) service function for conv_lab           */
 /* NB should be called only from conv_lab                      */
@@ -59,9 +50,6 @@ union geo_lab          *u_lab
 
   if (c_lab->lab_type != CRD_LAB) return(-4);
 
-
-/* get_zone    ver 2000.01          # page 2   19 jan 1999 10 19 */
-
 
   /* get zone of the coord systems */
   /*_______________________________*/
@@ -74,7 +62,7 @@ union geo_lab          *u_lab
     case -1: /* utm**s */
     case 13: /* ETRS-TM, ETRS89 transverse mercator zone ** */
       i = (c_lab->mode == 13) ? 7 : 3;
-      if (C_DIGIT(*(p_sys+i))) {
+      if (isdigit(*(p_sys+i))) {
         if ((sscanf(p_sys+i, "%d", &zone) == 1)
             && (1 <= zone && zone <= 60)) {
           if (c_lab->L0 != (zone - 30.5)/30.0*M_PI) zone = -2;
@@ -84,7 +72,7 @@ union geo_lab          *u_lab
 
     case 5: /* eetm**   Estonia */
     case 6: /* eetm*    Estonia */
-      if (C_DIGIT(*(p_sys+4))) {
+      if (isdigit(*(p_sys+4))) {
         if ((sscanf(p_sys+4, "%d", &zone) == 1)
             && (zone == 27 || zone == 24 || zone == 21
             || (0 <= zone && zone <= 2))) {
@@ -101,7 +89,7 @@ union geo_lab          *u_lab
       break;
 
     case 8: /* tm**  */
-      if (C_DIGIT(*(p_sys+2))) {
+      if (isdigit(*(p_sys+2))) {
         if ((sscanf(p_sys+2, "%d", &zone) == 1)
             && (zone == 27 || zone == 24 || zone == 21)) {
           if (c_lab->L0 != zone*M_PI/180.0) zone = -2;
@@ -112,16 +100,13 @@ union geo_lab          *u_lab
     }
     break; /* end case 3 : utm, itm, dks, asb, sb */
 
-
-/* get_zone  ver 2000.01          # page 10   19 jan 1999 10 19 */
-
 
   case  5: /* lmb */
     switch(c_lab->mode) {
     case 1: /* lmb simple */
       if (c_lab->region == conv_rgn(-1, "GL", rgn_name)) {
          /* GI conf. con. W-Grønland or E-Grønland */
-        if (C_DIGIT(*(p_sys + 2))
+        if (isdigit(*(p_sys + 2))
             && (sscanf(p_sys + 2, "%1d", &zone) == 1)
             && (1 <= zone && zone <= 8)) {
           if (c_lab->B0 != (84.0 - 3.0*zone)/180.0*M_PI) zone = -2;
@@ -134,4 +119,3 @@ union geo_lab          *u_lab
 
   return(zone);
 }
-

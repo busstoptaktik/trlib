@@ -76,7 +76,7 @@ char               **h_mlb
     /* Collect and remove a contingent region prefix from the  */
     /* label textstring. Test first and second char for region */
     /* The third char must be an underscore                    */
-    if (C_UPPER(*(tx +0)) && C_UPPER(*(tx +1))
+    if (isupper(*(tx +0)) && isupper(*(tx +1))
         &&     (*(tx +2) == '_')) {
       (void) strncpy(rgn_pref, tx, 2);
       rgn_pref[2] = '\0';
@@ -106,7 +106,7 @@ char               **h_mlb
     else p_sep = ptx;
     /* try underscore or CAPITAL */
     for ( ; *p_sep != '\0'; p_sep++) {
-      if (*p_sep == '_' || C_UPPER(*p_sep)) {
+      if (*p_sep == '_' || isupper(*p_sep)) {
         *sepch = *p_sep;
         *p_sep = '\0';
         break;
@@ -133,7 +133,7 @@ char               **h_mlb
     (void) strcpy(mlb1, ptx);
     *mlb2  = '\0';
     for (p_mlb = mlb2, i = tx_lng, p_sep++; i; i --)
-       *(p_mlb ++) = (C_UPPER(*p_sep))
+       *(p_mlb ++) = (isupper(*p_sep))
                    ? (char) tolower(*p_sep++) : *(p_sep++);
   }
   else res = 0;
