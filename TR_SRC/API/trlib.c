@@ -464,16 +464,7 @@ int TR_itrf(
    int n_vel,                   /* Velocity XYZ in/out size (0->Use std plate velocity) */
    double *JD_in,               /* JD2000 epoch in array */
    int n_JD,                    /* JD2000 epoch in/size (1->Use same epoch for all coordinates) */
-   char *plate_model,           /* Name of plate model to use */
-   char *intra_plate_model,     /* Name of intra plate model to use */
-   int *plm_trf,                /* Plate model used (0->plate model NOT used) */
-   int *ipl_trf,                /* Plate model used using: 0->no intraplate, 4->intra plate (iJD=oJD=-10000000.0), 1->iJD, 2->oJD, 3->iJD and oJD */
-   double *plm_dt,              /* JD2000 plate model epoch */
-   double *ipl_idt,             /* JD2000 intra plate model epoch in */
-   double *ipl_odt,             /* JD2000 intra plate model epoch out */
-   char *plm_nam,               /* Name of used plate model */
-   char *plt_nam,               /* Name of used plate */
-   char *ipl_nam                /* Name of used intra plate */
+   struct PLATE *plate_info
    )
  {
 
@@ -491,7 +482,7 @@ int TR_itrf(
         if(n_vel==n){
             i_vel[0]=velx_in[i]; i_vel[1]=vely_in[i]; i_vel[2]=velz_in[i];
         }
-        err = itrf_trans(plab_in, plab_out, stn_vel, plate_model, intra_plate_model, i_crd, i_vel, i_JD, o_crd, o_vel, plm_trf, ipl_trf, plm_dt, ipl_idt, ipl_odt, plm_nam, plt_nam, ipl_nam, "", err_str);
+        err = itrf_trans(plab_in, plab_out, stn_vel, plate_info->plate_model, plate_info->intra_plate_model, i_crd, i_vel, i_JD, o_crd, o_vel, plate_info->plm_trf, plate_info->ipl_trf, plate_info->plm_dt, plate_info->ipl_idt, plate_info->ipl_odt, plate_info->plm_nam, plate_info->plt_nam, plate_info->ipl_nam, "", err_str);
         x_out[i]=o_crd[0]; y_out[i]=o_crd[1]; z_out[i]=o_crd[2];
         if(n_vel==n){
             velx_out[i]=o_vel[0]; vely_out[i]=o_vel[1]; velz_out[i]=o_vel[2];
