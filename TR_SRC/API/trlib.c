@@ -22,6 +22,7 @@
 /*#include <windows.h>* enable if we want to define our dllMain under windows */
 #include "conv_lab.h"
 #include "gd_trans.h"
+#include "itrf_trans.h"
 #include "gettabdir.h"
 #include "geoid_d.h"
 #include "geoid_c.h"
@@ -45,11 +46,11 @@
 #define D2R 0.017453292519943295
 /*various global state variables */
 
-static int ALLOW_UNSAFE=0; //do we allow transformations which are not thread safe?
-static int UNSAFE[]={FHMASK}; //list of imit-attrs of transformations deemed unsafe.
-static int HAS_GEOIDS=0; //global flag which signals if we have geoids available 
-static THREAD_SAFE int THREAD_ID=0; //used to distinguish the thread that initialised the library from other threads.
-static int *MAIN_THREAD_ID=0; // same as above - also signals whether the library has been succesfully initialised.
+static int ALLOW_UNSAFE=0; /*do we allow transformations which are not thread safe?*/
+static int UNSAFE[]={FHMASK}; /*list of imit-attrs of transformations deemed unsafe.*/
+static int HAS_GEOIDS=0; /*global flag which signals if we have geoids available*/
+static THREAD_SAFE int THREAD_ID=0; /*used to distinguish the thread that initialised the library from other threads.*/
+static int *MAIN_THREAD_ID=0; /* same as above - also signals whether the library has been succesfully initialised.*/
 
 THREAD_SAFE int TR_LAST_ERROR=TR_OK; /*Last error msg (int) from gd_trans - also set in TR_Open and TR_GeoidTable on allocation errors.*/
 FILE *ERR_LOG=0;
@@ -93,7 +94,7 @@ int TR_InitLibrary(char *path) {
     TR* trf;
     FILE *fp;
     char buf[FILENAME_MAX],fname[FILENAME_MAX],*init_path=0;
-    if (!TR_IsMainThread()) //Only one thread can succesfully initialise the library
+    if (!TR_IsMainThread()) /*Only one thread can succesfully initialise the library*/
 	    return TR_ERROR;
     if (strlen(path)>0) 
 	    init_path=path;
@@ -165,7 +166,7 @@ void TR_GeoidInfo(TR *tr) {
     int res;
     strcpy(req,"*");
     TR_GetGeoidName(tr,geoid_name);
-    //strcat(req,tr->geoid_name);
+    /*strcat(req,tr->geoid_name); */
     strcat(req,geoid_name);
     res=tab_doc_f(req,stdout);
     #ifdef _ROUT
@@ -341,7 +342,7 @@ void TR_Close (TR *tr) {
 	    #endif
 	    geoid_c(tr->geoid_pt,0,NULL);
 	    free(tr->geoid_pt);}
-    //gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);  might not be needed! WANT TO close hgrid static in gd_trans 
+    /*gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);  might not be needed! WANT TO close hgrid static in gd_trans  */
     free (tr);
     return;
 }
@@ -392,7 +393,7 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 return err;
  }
  
-/* transform one or more xyz-tuples */
+/* transform one or more xyz-tables */
 int TR_tr(
    union geo_lab *plab_in,
    union geo_lab *plab_out, 
@@ -410,7 +411,7 @@ int TR_tr(
 	 
    
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
-    int err, ERR = 0, i; //use_geoids; 
+    int err, ERR = 0, i; /*use_geoids; */
    
     if ((plab_in->u_c_lab).cstm==CRT_SYS_CODE){
         x_in=Y_in;
@@ -441,6 +442,71 @@ int TR_tr(
    
    return ERR? TR_ERROR: TR_OK;
     
+}
+
+/* transform ITRF one or more xyz-tables */
+int TR_itrf(
+   union geo_lab *plab_in,      /* In label */
+   union geo_lab *plab_out,     /* Out label */
+   double *x_in,                /* X in array */
+   double *y_in,                /* Y in array */
+   double *z_in,                /* Z in array */
+   double *x_out,               /* X out array */
+   double *y_out,               /* Y out array */
+   double *z_out,               /* Z out array */
+   int n,                       /* XYZ in/out array size */
+   double *velx_in,             /* Velocity X in array */
+   double *vely_in,             /* Velocity Y in array */
+   double *velz_in,             /* Velocity Z in array */
+   double *velx_out,            /* Velocity X out array */
+   double *vely_out,            /* Velocity Y out array */
+   double *velz_out,            /* Velocity Z out array */
+   int n_vel,                   /* Velocity XYZ in/out size (0->Use std plate velocity) */
+   double *JD_in,               /* JD2000 epoch in array */
+   int n_JD,                    /* JD2000 epoch in/size (1->Use same epoch for all coordinates) */
+   char *plate_model,           /* Name of plate model to use */
+   char *intra_plate_model,     /* Name of intra plate model to use */
+   int *plm_trf,                /* Plate model used (0->plate model NOT used) */
+   int *ipl_trf,                /* Plate model used using: 0->no intraplate, 4->intra plate (iJD=oJD=-10000000.0), 1->iJD, 2->oJD, 3->iJD and oJD */
+   double *plm_dt,              /* JD2000 plate model epoch */
+   double *ipl_idt,             /* JD2000 intra plate model epoch in */
+   double *ipl_odt,             /* JD2000 intra plate model epoch out */
+   char *plm_nam,               /* Name of used plate model */
+   char *plt_nam,               /* Name of used plate */
+   char *ipl_nam                /* Name of used intra plate */
+   )
+ {
+
+    double i_crd[3], i_vel[3], i_JD=-36525.0;
+    double o_crd[3], o_vel[3];
+    char *err_str=NULL;
+
+    int err, ERR = 0, i, stn_vel=0;
+
+    if(n_vel>0) stn_vel=1;
+
+    for (i = 0;  i < n;  i++) {
+        if(n_JD==1) i_JD=JD_in[0]; else if(n_JD==n) i_JD=JD_in[i];
+        i_crd[0]=x_in[i]; i_crd[1]=y_in[i]; i_crd[2]=z_in[i];
+        if(n_vel==n){
+            i_vel[0]=velx_in[i]; i_vel[1]=vely_in[i]; i_vel[2]=velz_in[i];
+        }
+        err = itrf_trans(plab_in, plab_out, stn_vel, plate_model, intra_plate_model, i_crd, i_vel, i_JD, o_crd, o_vel, plm_trf, ipl_trf, plm_dt, ipl_idt, ipl_odt, plm_nam, plt_nam, ipl_nam, "", err_str);
+        x_out[i]=o_crd[0]; y_out[i]=o_crd[1]; z_out[i]=o_crd[2];
+        if(n_vel==n){
+            velx_out[i]=o_vel[0]; vely_out[i]=o_vel[1]; velz_out[i]=o_vel[2];
+        }
+    #ifdef _ROUT
+    if (err)
+        fprintf(ERR_LOG,"\nProj: %s->%s, last err: %d, error str: %s, out: %.3f %.3f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,err_str,x_in[i],y_in[i],z_in[i]);
+    #endif
+        if (err)
+           ERR = err;
+   }
+   TR_LAST_ERROR=ERR;
+
+   return ERR? TR_ERROR: TR_OK;
+
 }
 
 /* read xyz-tuples from f_in; stream transformed tuples to f_out */
