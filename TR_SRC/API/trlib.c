@@ -33,6 +33,7 @@
 #include "tab_doc_f.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
+#include "parse_def_file.h"
 #include "trthread.h"
 #define TRLIB_VERSION "dev v1.0 2012-03-23"
 #ifndef TRLIB_REVISION
@@ -54,6 +55,8 @@ static int *MAIN_THREAD_ID=0; /* same as above - also signals whether the librar
 
 THREAD_SAFE int TR_LAST_ERROR=TR_OK; /*Last error msg (int) from gd_trans - also set in TR_Open and TR_GeoidTable on allocation errors.*/
 FILE *ERR_LOG=0;
+
+def_data *DEF_DATA=0;
 
 /*return last buffered error code from gd_trans */
 int TR_GetLastError(void){
@@ -118,10 +121,18 @@ int TR_InitLibrary(char *path) {
     fp=fopen(fname,"r");
     if (0==fp)
 	    return TR_ERROR;
+    DEF_DATA=open_def_data(fp,&rc);
     fclose(fp);
+    #ifdef _ROUT
+    fprintf(stdout,"Parsed def_lab.txt, errs: %d\n",rc);
+    #endif
     settabdir(init_path);
     #ifdef _ROUT
     ERR_LOG=fopen("TR_errlog.log","wt");
+    if (DEF_DATA && ERR_LOG){
+	    fprintf(ERR_LOG,"Contents of %s:\n",TR_DEF_FILE);
+	    present_data(ERR_LOG,DEF_DATA);
+	}
     #endif
     /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
     trf=TR_Open("utm32_ed50","utm32_wgs84","");
@@ -557,13 +568,16 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
 
 /* We need to close file pointers! Other ressources *should* be freed automatically! */
 void TR_TerminateLibrary(void) {
-     gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);
-     TR_GeoidTable(NULL);
-     c_tabdir_file(0,NULL);
+	TR_TerminateThread(); /*terminate the 'main' thread - assuming this haven't been done already (perhaps check for this??) */
+	if (DEF_DATA)
+		close_def_data(DEF_DATA);
+     
 }
 
 void TR_TerminateThread(void){
-    TR_TerminateLibrary();
+	gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);
+	TR_GeoidTable(NULL);
+	c_tabdir_file(0,NULL);
 }
 
 /*

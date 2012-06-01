@@ -29,6 +29,7 @@
 #define MODE_RGN "def_rgn"
 #define MODE_DTM "def_dtm"
 #define MODE_HTH "def_hth"
+#define MODE_DEF_LAB "def_lab"
 #define MODE_STOP "stop"
 #define N_TOKENS_PRJ 12
 #define N_TOKENS_DTM 14
@@ -222,7 +223,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
  def_data *open_def_data(FILE *fp, int *n_err){
 	/*stuff that match the formatting and 'modes' of the def_lab file */
 	void *entries[5]={NULL,NULL,NULL,NULL,NULL};
-	 def_data *data=NULL;
+	def_data *data=NULL;
 	enum modes {mode_prj,mode_grs,mode_rgn,mode_dtm,mode_hth,mode_none};
 	enum modes mode=mode_none;
 	int n_modes=6,new_mode;
@@ -236,16 +237,14 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	/*some other needed stuff for buffering etc */
 	char buf[4096],savelines[MAX_LINE_DEF][1024];
 	int n_lines=0;
-	char **tokens=NULL,**next_tokens=NULL;
-	int n_items,n_items2,n_items_line;
-	char *sub_str;
-	//buf[0]='\0';
+	char **tokens=NULL,**next_tokens=NULL,*sub_str;
+	int n_items=0,n_items2,n_items_line;
 	int n_chars,i;
 	int err;
 	int completed=1; /* needed for entries (all) that span more than one line */ 
 	*n_err=0; /* set no errors - yet! */
 	/* allocate memory for objects */
-	for(i=0;i<n_modes;i++){
+	for(i=0;i<n_modes-1;i++){
 		entries[i]=malloc(n_prealloc[i]*mode_sizes[i]);
 		if (entries[i]==NULL)
 			goto error;
@@ -259,23 +258,34 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 		if (strlen(buf)==0 || n_items_line==0)
 			continue;
 		if (buf[0]=='#'){
+			/* OK: so we might have found the beginning of the def_data - perhaps use this later */
+			if (strstr(buf+1,MODE_DEF_LAB)!=NULL)
+				continue;
+			
 			new_mode=0;
-			while((mode_name=mode_names[new_mode++])){
-				if ((sub_str=strstr(buf+1,mode_name))!=NULL){
+			
+			while((mode_name=mode_names[new_mode])){
+				if ((sub_str=strstr(buf+1,mode_name))!=NULL)
 					break;
-				}
+				new_mode++;
 			}
+			
 			/*if mode_rgn - start reading */
-			if (new_mode-1==mode_rgn)
+			if (new_mode==mode_rgn)
 				completed=0;
 			/*on new mode - continue */
 			if (mode_name!=NULL){
-				mode=new_mode-1;
-				//printf("mode: %s, new_mode: %d, mode: %d\n",mode_names[mode],new_mode,mode);
+				mode=new_mode;
+				/*printf("mode: %s, new_mode: %d, mode: %d\n",mode_names[mode],new_mode,mode);*/
 				continue;
 			}
-			if (mode==mode_none)
+			/*this shouldn't happen! */
+			if (mode==mode_none){
+				(*n_err)++;
+				/*printf("UUUPS: %d %d %d %d %d!\n",n_set[0],n_set[1],n_set[2],n_set[3],n_set[4]);
+				printf("%s\n",buf);*/
 				continue;
+			}
 			/*else we might have encountered a new item in some mode */
 			n_lines=0;
 			strncpy(savelines[0],buf+1,1024);
@@ -288,9 +298,20 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 			if (n_set[mode]<n_alloc[mode])
 				continue;
 			/*else re-allocate data*/
-			entries[mode]=realloc(entries[mode],mode_sizes[mode]*(n_alloc[mode]+n_prealloc[mode]));
-			n_alloc[mode]+=n_prealloc[mode];
+			{
+				void *more_space;
+				more_space=realloc(entries[mode],mode_sizes[mode]*(n_alloc[mode]+n_prealloc[mode]));
+				if (more_space!=NULL){
+					n_alloc[mode]+=n_prealloc[mode];
+					entries[mode]=more_space;
+				}
+				else{
+					(*n_err)++;
+					completed=1;
+					mode=mode_none;
+				}
 			continue;
+			}
 
 		}/*end found hash */
 	if (completed || mode==mode_none) /*keep going if entry is completed */
@@ -322,7 +343,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	next_tokens=get_items(savelines[n_lines]," \n\r", &n_items2);
 	if (next_tokens!=NULL && n_items2>0){
 		tokens=append_items(tokens,next_tokens,n_items,n_items2);
-		//printf("n_items: %d, n_items2: %d first: %s\n",n_items,n_items2,tokens[0]);
+		/*printf("n_items: %d, n_items2: %d first: %s\n",n_items,n_items2,tokens[0]);*/
 		n_items+=n_items2;
 		free(next_tokens);
 	}
@@ -408,16 +429,20 @@ void present_data(FILE *fp,def_data *data){
 		fprintf(fp,"native: %s\n",projections[i].native_proj);
 		for(j=0;j<projections[i].q_par;j++)
 			fprintf(fp," %f",projections[i].native_params[j]);
-	puts("\n");
+		if (projections[i].q_par>0)
+			fprintf(fp,"\n");
+	fprintf(fp,"\n");
 	}
+	fprintf(fp,"******************\n\n");
 	for(i=0; i<n_grs; i++){
 		fprintf(fp,"grs: %s\n",ellipsoids[i].mlb);
 		fprintf(fp,"%d %d %f %f %f %f\n",ellipsoids[i].no,ellipsoids[i].mode,ellipsoids[i].axis,ellipsoids[i].flattening,ellipsoids[i].km,ellipsoids[i].omega);
 	}
-	puts("\n");
+	fprintf(fp,"******************\n\n");
+	fprintf(fp,"Regions:\n");
 	for(i=0; i<n_rgn; i++)
 		fprintf(fp,"%s ",regions+(i*3));
-	puts("\n");
+	fprintf(fp,"\n******************\n\n");
 	for(i=0;i<n_dtm;i++){
 		fprintf(fp,"dtm : %s, no: %d\n",datums[i].mlb,datums[i].no);
 		fprintf(fp,"parent: %s, ellipsoid: %s\n",datums[i].p_datum,datums[i].ellipsoid);
@@ -425,7 +450,7 @@ void present_data(FILE *fp,def_data *data){
 		fprintf(fp,"TO-WGS84:\n%f %f %f\n%e %e %e\n\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2],
 		datums[i].rotation[0],datums[i].rotation[1],datums[i].rotation[2]);
 	}
-	puts("\n");
+	fprintf(fp,"*****************\n\n");
 		
 	for(i=0;i<n_hth;i++){
 		fprintf(fp,"hth: %s to %s\n", data->hth_entries[i].from_mlb,data->hth_entries[i].to_dtm);
@@ -439,22 +464,23 @@ void present_data(FILE *fp,def_data *data){
 				fprintf(fp,"constant: %f\n",data->hth_entries[i].constants[0]);
 				break;
 			case 3:
-				puts("Constants: ");
+				fprintf(fp,"Constants: ");
 				for(j=0;j<5;j++)
 					fprintf(fp," %e",data->hth_entries[i].constants[j]);
+				fprintf(fp,"\n");
 				break;
 			default:
 				fprintf(fp,"Unrecognized type!\n");
 		
 		}
-		puts("\n");
+		fprintf(fp,"\n");
 				
 	}
-	puts("\n");
+	fprintf(fp,"*****************\n\n");
 	{
 	int n_bytes=0;
 	n_bytes=sizeof( def_projection)*n_prj+sizeof( def_datum)*n_dtm+sizeof( def_grs)*n_grs+n_rgn*3+sizeof( def_hth_tr)*n_hth;
-	fprintf(fp,"bytes: %d\n",n_bytes);
+	fprintf(fp,"bytes used: %d\n",n_bytes);
 	}
 	
 	return;
@@ -469,7 +495,9 @@ void close_def_data( def_data *data){
 	free(data);
 	return;
 }
+
 /*
+
 int main(void){
 	int n_err=0;
 	FILE *fp=fopen("def_lab.txt","rb");
@@ -480,6 +508,6 @@ int main(void){
 	close_def_data(data);
 	printf("Errors: %d\n",n_err);
 	return 0;}
-*/	
-
+	
+*/
 
