@@ -38,12 +38,12 @@
 #define N_TOKENS_HTH 6
 #define MAX_LINE_DEF 4
 #define RGN_STOP "STOP"
-/*TODO: insert correct values below */
-#define KM_HERE 1001.1001
-#define OMEGA_HERE 3.14159265
-#define GEQ_HERE 456.123
-#define GEQ84_HERE 777.777
-#define KMW84_HERE 888.888
+/*Values  below pasted from def_lab.txt */
+#define KM_HERE       (3986005.e8)
+#define OMEGA_HERE (7292115.0e-11)
+#define GEQ_HERE     (978049.e-5)
+#define GEQ84_HERE  (979764.5e-5)
+#define KMW84_HERE (3986004.418e8)
 
 int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	strncpy(ellip->mlb,items[0],MLBLNG);
@@ -262,8 +262,12 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 			if (strstr(buf+1,MODE_DEF_LAB)!=NULL)
 				continue;
 			
-			new_mode=0;
+			/*If we got here, we have either found a new item or should start a new mode */
+			if (!completed)
+				(*n_err)++;
+			completed=1;
 			
+			new_mode=0;
 			while((mode_name=mode_names[new_mode])){
 				if ((sub_str=strstr(buf+1,mode_name))!=NULL)
 					break;
@@ -276,19 +280,18 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 			/*on new mode - continue */
 			if (mode_name!=NULL){
 				mode=new_mode;
-				/*printf("mode: %s, new_mode: %d, mode: %d\n",mode_names[mode],new_mode,mode);*/
 				continue;
 			}
 			/*this shouldn't happen! */
 			if (mode==mode_none){
 				(*n_err)++;
-				/*printf("UUUPS: %d %d %d %d %d!\n",n_set[0],n_set[1],n_set[2],n_set[3],n_set[4]);
-				printf("%s\n",buf);*/
 				continue;
 			}
 			/*else we might have encountered a new item in some mode */
 			n_lines=0;
 			strncpy(savelines[0],buf+1,1024);
+			if (tokens!=NULL)
+				free(tokens);
 			tokens=get_items(savelines[0]," \n\r", &n_items);
 			if (tokens==NULL || n_items==0)
 				continue;
@@ -311,12 +314,14 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 					mode=mode_none;
 				}
 			continue;
-			}
+			} /*end re-allocation */
 
 		}/*end found hash */
 	if (completed || mode==mode_none) /*keep going if entry is completed */
 		continue;
 	if (mode==mode_rgn){
+		if (tokens!=NULL)
+			free(tokens);
 		tokens=get_items(buf," \n\r",&n_items);
 		if (n_items>=N_TOKENS_RGN){
 			if (!strcmp(tokens[2],RGN_STOP)){
@@ -327,14 +332,13 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 				strncpy(((char*) entries[mode_rgn])+(n_set[mode_rgn]++)*mode_sizes[mode_rgn],tokens[0],mode_sizes[mode_rgn]);
 				}
 			}
-		free(tokens);
+		free(tokens); tokens=NULL;
 		continue;
 		}
 	/*something wrong?*/
 	if (n_lines>=MAX_LINE_DEF){
 		n_lines=0;
 		(*n_err)++;
-		free(tokens);
 		completed=1;
 		continue;
 	}
@@ -374,10 +378,10 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 		/*printf("Err: mode: %s, item: %s n_items: %d\n",mode_names[mode],tokens[0],n_items);*/
 		}
 	completed=1;
-	free(tokens);
 	/*end main loop over lines */
 	}
-	
+	if (tokens!=NULL)
+		free(tokens);
 	/*reallocate sizes of objects */
 	for(i=0;i<n_modes-1;i++)
 		entries[i]=realloc(entries[i],mode_sizes[i]*n_set[i]);
