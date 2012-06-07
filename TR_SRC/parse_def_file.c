@@ -124,9 +124,10 @@ int set_datum(char **tokens,  def_datum *dtm, int n_items){
 	dtm->imit= atoi(tokens[4]);
 	strncpy(dtm->rgn,tokens[5],2);
 	dtm->type=atoi(tokens[6]);
+	dtm->scale=get_number(tokens[10]);
 	for (i=0;i<3;i++){
 		dtm->translation[i]=get_number(tokens[7+i]);
-		dtm->rotation[i]=get_number(tokens[10+i]);
+		dtm->rotation[i]=get_number(tokens[11+i]);
 	}
 	return 0;
 }
@@ -408,6 +409,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 
 void present_data(FILE *fp,def_data *data){
 	int i,j;
+	double R2D=57.295779513082323;
 	def_projection *projections=data->projections;
 	def_datum *datums=data->datums;
 	def_grs *ellipsoids=data->ellipsoids;
@@ -440,7 +442,7 @@ void present_data(FILE *fp,def_data *data){
 	fprintf(fp,"******************\n\n");
 	for(i=0; i<n_grs; i++){
 		fprintf(fp,"grs: %s\n",ellipsoids[i].mlb);
-		fprintf(fp,"%d %d %f %f %f %f\n",ellipsoids[i].no,ellipsoids[i].mode,ellipsoids[i].axis,ellipsoids[i].flattening,ellipsoids[i].km,ellipsoids[i].omega);
+		fprintf(fp,"%d %d %f %f %e %e\n",ellipsoids[i].no,ellipsoids[i].mode,ellipsoids[i].axis,ellipsoids[i].flattening,ellipsoids[i].km,ellipsoids[i].omega);
 	}
 	fprintf(fp,"******************\n\n");
 	fprintf(fp,"Regions:\n");
@@ -451,8 +453,8 @@ void present_data(FILE *fp,def_data *data){
 		fprintf(fp,"dtm : %s, no: %d\n",datums[i].mlb,datums[i].no);
 		fprintf(fp,"parent: %s, ellipsoid: %s\n",datums[i].p_datum,datums[i].ellipsoid);
 		fprintf(fp,"imit: %d, type: %d, rgn: %s\n",datums[i].imit,datums[i].type,datums[i].rgn);
-		fprintf(fp,"TO-WGS84:\n%f %f %f\n%e %e %e\n\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2],
-		datums[i].rotation[0],datums[i].rotation[1],datums[i].rotation[2]);
+		fprintf(fp,"TO-WGS84:\n%f %f %f\n%f ppm %f dg %f dg %f dg\n\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2],datums[i].scale*1e6,
+		datums[i].rotation[0]*R2D,datums[i].rotation[1]*R2D,datums[i].rotation[2]*R2D);
 	}
 	fprintf(fp,"*****************\n\n");
 		

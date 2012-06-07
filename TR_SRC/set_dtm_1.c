@@ -41,7 +41,8 @@
 #include    <fcntl.h>
 #include    <math.h>
 #include    "geo_lab.h"
-#include    "trthread.h"
+#include    "parse_def_file.h"
+
 
 int             set_dtm_1(
 /*______________________*/
@@ -56,10 +57,7 @@ struct dsh_str     *trp
 )
 
 {
-#include              "fgetln_kms.h"
-#include              "fgetlhtx.h"
-#include              "i_tabdir_file.h"
-#include              "sgetg.h"
+extern def_data *DEF_DATA;
 
 #define  MAS  (RHO*1000.0)
 
@@ -183,11 +181,7 @@ struct dsh_str     *trp
   /* type        tx         ty         tz     */
   /* dm          rx         ry         rz     */
   /* Datumtext                                */
-extern THREAD_SAFE FILE               *def_lab_file;
-extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
 
-  static THREAD_SAFE  int                  d_quest = 0;
-  static THREAD_SAFE  size_t               pos = 0;
   char                        pth_mlb[512], *p_tp;
   char                        d_name[24], e_name[24], p_name[24];
   short                       d_nmb;  /* datum number    */
@@ -200,7 +194,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
 
 /* set_dtm     ver 2010.1          # page 4    12 jan 2010 10 19 */
 
-
+  def_datum *dtm=NULL;
   struct typ_dec              g_tpd, *r_tpd;
 /*
   struct dsh_par {
@@ -211,285 +205,114 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
     double       scale;
   };
 */
-
-  if (def_lab_file == NULL || init_prj_pos == 0) {
-    (void) i_tabdir_file(3, "", &res, pth_mlb);
-    if (res) {
-      (void) fprintf(stdout, "\n*** def_lab.txt: %s %s;\n", pth_mlb,
-        (res == -1) ? "NOT FOUND" :
-        (res == -2) ? "NOT lab definition file" :
-                      "Content not accepted");
-      return (-2);
-    }
-  }
-
-  if (init_dtm_pos) {
-    (void) fseek(def_lab_file, (long) init_dtm_pos, SEEK_SET);
-  } else { // search "def_dtm"
-    qr = 1;
-    do {
-      res = fgetlhtx(def_lab_file, w_name);
-      if (res == 0) {
-        if (!strcmp("def_dtm", w_name)) qr = 0;
-      }
-    } while (qr && res != EOF);
-    if (qr) {
-      (void) fprintf(stdout, 
-         "\n*** set_dtm: lab_def.txt DATUM not found ;\n");
-      return (-2);
-    }
-    init_dtm_pos = ftell(def_lab_file);
-  }
-  if (d_quest <= 0) pos = init_dtm_pos;
-  /* datum definition file detected */
-  res = -1;
-
-
-/* set_dtm     ver 2010.1          # page 5    12 jan 2010 10 19 */
-
+  int found=0, s_no,i;
+  if (DEF_DATA==NULL)
+	  return -2;
 
   /* find datum name from datum number */
+ 
   if (d_no > 0) {
-    d_quest = 0;
-    do {
-      qr = fgetlhtx(def_lab_file, d_name);
-      if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-      if (qr != EOF) {
-        (void) sscanf(pth_mlb, "%hd%n", &d_nmb, &used);
-        if (d_nmb == d_no) {
-          (void) strcpy(d_nm, d_name);
-          return((int) d_no);
-        }
-      }
-    } while (strcmp(d_name, "stop"));
-    return(-1);
-  } else {
+	for(i=0; i<DEF_DATA->n_dtm; i++){
+		if ((DEF_DATA->datums[i]).no==d_no){
+			strncpy(d_nm,DEF_DATA->datums[i].mlb,MLBLNG);
+			return d_no;
+		}
+	}
+  return -1;
+}
+  
     /* change to lover case letters */
     (void) strcpy(w_name, d_nm);
     w     = w_name;
     while ((*w = (char) tolower(*w)) != '\0') w++;
 
-    if (isalpha(*d_nm) && strlen(d_nm) > 1) {
+    if (!(isalpha(*d_nm) && strlen(d_nm) > 1))
+	    goto report;
       /* get datum info from datum name */
+    /* collect datum no */
+    for(i=0; i<DEF_DATA->n_dtm; i++){
+	    if(!strcmp(DEF_DATA->datums[i].mlb,w_name)){
+		    dtm=((DEF_DATA->datums)+i);
+		    break;
+	    }
+    }
+    if (dtm==NULL)
+	    return -1;
+    *p_no=-1;
+    for(i=0; i<DEF_DATA->n_dtm; i++){
+	    if(!strcmp(DEF_DATA->datums[i].mlb,dtm->p_datum)){
+		    *p_no=DEF_DATA->datums[i].no;
+		    break;
+	    }
+    }
+     
+      
+      res = dtm->no;
+       /* get names of parent datum and actual ellipsoid */
+      (void) strcpy(p_nm,dtm->p_datum);
+      (void) strcpy(e_nm, dtm->ellipsoid);
+      strncpy(rgn_nm,dtm->rgn,3);
+      *mask=dtm->imit;
+       /* translations */
+      trp->tx = dtm->translation[0];
 
-      d_quest = 0;
-      for (mode = 2; mode; mode --) {
-        do {
-          qr = fgetlhtx(def_lab_file, d_name);
-          if (qr != EOF) {
-            if (!strcmp(d_name, w_name)) {
-              qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-              (void) sscanf(pth_mlb, "%hd%n", &d_nmb, &used);
-              p_tp = pth_mlb + used;
-              /* collect datum no */
-              res = d_nmb;
+      trp->ty = dtm->translation[1];
+      
+      trp->tz = dtm->translation[2];
+      
 
-              /* get names of parent datum and actual ellipsoid */
-              (void) sscanf(p_tp, "%s%n", p_name, &used);
-              p_tp += used;
-              (void) strcpy(p_nm, p_name);
-              (void) sscanf(p_tp, "%s%n", e_name, &used);
-              (void) strcpy(e_nm, e_name);
-              p_tp += used;
-              (void) sscanf(p_tp, "%hd%n", mask, &used);
-              p_tp += used;
-              (void) sscanf(p_tp, "%s%n", rgn_nm, &used);
+      /* scale and rotations */
+      scale   = dtm->scale;
 
+      cos_rx  = dtm->rotation[0];
 
-
-/*   set_dtm     ver 2010.1          # page 6    12 jan 2010 10 19 */
+      sin_rx  = sin(cos_rx);
+      cos_rx  = cos(cos_rx);
 
+      cos_ry  = dtm->rotation[1];
 
-              /* collect datum shift params */
-              /*____________________________*/
-              if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
+      sin_ry  = sin(cos_ry);
+      cos_ry  = cos(cos_ry);
 
-              /* transformation type */
-              (void) sscanf(pth_mlb, "%d%n", &(trp->tp), &used);
-              p_tp = pth_mlb + used;
+      cos_rz  = dtm->rotation[2];
+      sin_rz  = sin(cos_rz);
+      cos_rz  = cos(cos_rz);
 
-              /* translations */
-              trp->tx = sgetg(p_tp, &g_tpd, &used, "m");
-              p_tp   += used;
-              trp->ty = sgetg(p_tp, &g_tpd, &used, "m");
-              p_tp   += used;
-              trp->tz = sgetg(p_tp, &g_tpd, &used, "m");
-              p_tp   += used;
-
-              /* scale and rotations */
-              if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-              scale   = sgetg(pth_mlb, &g_tpd, &used, "ppm");
-              p_tp    = pth_mlb + used;
-              cos_rx  = sgetg(p_tp, &g_tpd, &used, "sx");
-              p_tp   += used;
-              sin_rx  = sin(cos_rx);
-              cos_rx  = cos(cos_rx);
-
-              cos_ry  = sgetg(p_tp, &g_tpd, &used, "sx");
-              p_tp   += used;
-              sin_ry  = sin(cos_ry);
-              cos_ry  = cos(cos_ry);
-
-              cos_rz  = sgetg(p_tp, &g_tpd, &used, "sx");
-              sin_rz  = sin(cos_rz);
-              cos_rz  = cos(cos_rz);
-
-              /* DATUM SHIFT IS PERFORMED  STD : */
-              /* TO = scale * ROTZ * ROTY * ROTX * FROM + TRANSLA */
-              /*      ( cz sz 0)       (cy 0 -sy)       (1   0  0) */
-              /* ROTZ=(-sz cz 0), ROTY=(0  1   0), ROTX=(0  cx sx) */
-              /*      (  0  0 1)       (sy 0  cy)       (0 -sx cx) */
+      /* DATUM SHIFT IS PERFORMED  STD : */
+      /* TO = scale * ROTZ * ROTY * ROTX * FROM + TRANSLA */
+      /*      ( cz sz 0)       (cy 0 -sy)       (1   0  0) */
+      /* ROTZ=(-sz cz 0), ROTY=(0  1   0), ROTX=(0  cx sx) */
+      /*      (  0  0 1)       (sy 0  cy)       (0 -sx cx) */
 
 
 /*   set_dtm     ver 2010.1          # page 7    12 jan 2010 10 19 */
 
 
-              trp->r11  =  cos_ry*cos_rz;
-              trp->r12  =  cos_rx*sin_rz + sin_rx*sin_ry*cos_rz;
-              trp->r13  =  sin_rx*sin_rz - cos_rx*sin_ry*cos_rz;
+      trp->r11  =  cos_ry*cos_rz;
+      trp->r12  =  cos_rx*sin_rz + sin_rx*sin_ry*cos_rz;
+      trp->r13  =  sin_rx*sin_rz - cos_rx*sin_ry*cos_rz;
 
-              trp->r21  = -cos_ry*sin_rz;
-              trp->r22  =  cos_rx*cos_rz - sin_rx*sin_ry*sin_rz;
-              trp->r23  =  sin_rx*cos_rz + cos_rx*sin_ry*sin_rz;
+      trp->r21  = -cos_ry*sin_rz;
+      trp->r22  =  cos_rx*cos_rz - sin_rx*sin_ry*sin_rz;
+      trp->r23  =  sin_rx*cos_rz + cos_rx*sin_ry*sin_rz;
 
-              trp->r31  =  sin_ry;
-              trp->r32  = -sin_rx*cos_ry;
-              trp->r33  =  cos_rx*cos_ry;
+      trp->r31  =  sin_ry;
+      trp->r32  = -sin_rx*cos_ry;
+      trp->r33  =  cos_rx*cos_ry;
 
-              trp->scale = 1.0 + scale;
+      trp->scale = 1.0 + scale;
 
-              (void) fseek(def_lab_file, (long) init_dtm_pos, SEEK_SET);
-              if (strcmp(p_name, w_name)) {
-                *p_no = -1;
-                do {
-                  qr = fgetlhtx(def_lab_file, pth_mlb);
-                  if (qr != EOF) {
-                    if (!strcmp(p_name, pth_mlb)) {
-                      qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-                      (void) sscanf(pth_mlb, "%hd%n", p_no, &used);
-                    }
-                  }
-                } while (*p_no <= 0 && strcmp(d_name, "stop"));
-                if (*p_no == -1) {
-                  (void) fprintf(stderr,
-                      "\n*** set_dtm PROG FEJL, parent datum mgl for %s",
-                      d_name);
-                  return(-1);
-                }
-              } else *p_no = d_nmb;
-            }
-          }
-        } while (res <= 0 && strcmp(d_name, "stop"));
-        if (mode == 2) {
-          if (res > 0  || strlen(w_name) < 4) -- mode;
-          else 
-          if (*w_name == 'i' || *w_name == 'e') {
-            (void) fseek(def_lab_file, (long) init_dtm_pos, SEEK_SET);
-            /* try igsyy, itrfyy or etrfyy */
-            w       = w_name + strlen(w_name) - 2; 
-            *(w)    = 'y';
-            *(w +1) = 'y';
-          }
-          else -- mode;
-        }
-      }
+            
+      
       /* return res or 'no datum found' */
       return(res);
-    } else
+   
 
 
 /* set_dtm     ver 2010.1          # page 8    12 jan 2010 10 19 */
 
-
-    if (*d_nm == '!' || *d_nm == '?' || *d_nm == '*') {
-      all = (strlen(d_nm) == 1)   ? 0 : /* all datum texts */
-            (isalpha(*(d_nm +1))) ? 2 : 1;
-      if (all == 1) (void) sscanf(d_nm +1, "%hd", &d_no);
-      (void) fseek(def_lab_file, (long) pos, SEEK_SET);
-      for (mode = (all < 2) ? 1 : 2; mode; mode --) {
-        do {
-          qr = fgetlhtx(def_lab_file, d_name);
-          if (qr != EOF) {
-            qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-            /* collect datum no */
-            (void) sscanf(pth_mlb, "%hd%n", &d_nmb, &used);
-            if (all == 0 || (all == 1 && d_no == d_nmb) ||
-               (all == 2 && !strcmp(w_name +1, d_name))) {
-              p_tp = pth_mlb + used;
-              /* get names of parent datum and actual ellipsoid */
-              (void) sscanf(p_tp, "%s%n", p_name, &used);
-              p_tp += used;
-              (void) strcpy(p_nm, p_name);
-              (void) sscanf(p_tp, "%s%n", e_name, &used);
-              p_tp += used;
-              (void) strcpy(e_nm, e_name);
-              qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-              if (*d_nm == '*') {
-                /* transformation type */
-                (void) sscanf(pth_mlb, "%d%n", &(trp->tp), &used);
-                p_tp = pth_mlb + used;
-                /* translations */
-                r_tpd    = (struct typ_dec *) (&trp->r31);
-                trp->tx  = sgetg(p_tp, r_tpd, &used, "m");
-                p_tp    += used;
-                trp->ty  = sgetg(p_tp, r_tpd, &used, "m");
-                p_tp    += used;
-                trp->tz  = sgetg(p_tp, r_tpd, &used, "m");
-                p_tp    += used;
-                /* scale and rotations */
-                r_tpd = (struct typ_dec *) (&trp->r32);
-                if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-                trp->scale = sgetg(pth_mlb, r_tpd, &used, "ppm");
-                r_tpd      = (struct typ_dec *) (&trp->r33);
-                p_tp       = pth_mlb + used;
-                trp->r11   = sgetg(p_tp, r_tpd, &used, "sx");
-                p_tp      += used;
-                trp->r12   = sgetg(p_tp, r_tpd, &used, "sx");
-                p_tp      += used;
-                trp->r13   = sgetg(p_tp, r_tpd, &used, "sx");
-              }
-              else qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-              (void) fgets(pth_mlb, 72, def_lab_file);
-              qr = (int) strlen(pth_mlb) -1;
-              if (*(pth_mlb +qr) == '\n') *(pth_mlb +qr) = '\0';
-              (void) sprintf(d_nm, "%-10s   * %-36s;", d_name, pth_mlb);
-
-
-/*   set_dtm     ver 2010.1          # page 9    12 jan 2010 10 19 */
-
-              if (all == 0 && d_nmb > 0) {
-                pos     = ftell(def_lab_file);
-                ++ d_quest;
-              } else {
-                pos     = init_dtm_pos;
-                d_quest = 0;
-              }
-              return((int) d_nmb);
-            }
-          } else {
-            (void) fprintf(stderr,
-                   "\n*** set_dtm def_dtm.txt ERROR after count %d",
-                   d_quest);
-            pos     = init_dtm_pos;
-            d_quest = 0;
-            return(-1);
-          }
-        } while (res <= 0 && strcmp(d_name, "stop"));
-        if (mode == 2) {
-          if (res > 0) -- mode;
-          else {
-            /* try igsyy, itrfyy or etrfyy */
-            w       = w_name + strlen(w_name) - 2; 
-            *(w)    = 'y';
-            *(w +1) = 'y';
-            (void) fseek(def_lab_file, (long) pos, SEEK_SET);
-          }
-        } else {
-          pos = 0;
-        }
-      }
-    }
-  }
+report:
+    strcpy(d_nm,"Not implemented");
   return(-1);
 }
 

@@ -39,6 +39,7 @@ struct def_datum {
 	char rgn[3];
 	double translation[3];
 	double rotation[3];
+	double scale;
 	
 };
 
