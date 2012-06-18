@@ -16,21 +16,12 @@
  * 
  */
  
-
-/* set_dtm     ver 2010.1          # page 1   12 jan 2010 10 19 */
-
-
-/* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of Danish       */
-/* National Space Center  DTU  Denmark.  This copyright claim  */
-/* does not indicate an intention of publishing this code.     */
-
 /* Prog: KP OCT 1990                                           */
 /* Modified, KP MAY 1993                                       */
 /* Modified, KE JUL 2007                                       */
 /* Modified, KE JAN 2010                                       */
+/* Does not use def_lab anymore - instead use preparsed data stored in extern def_data *DEF_DATA */
+/* simlk, june 2012 */
 
 #include    <stdio.h>
 #include    <stdlib.h>
@@ -75,9 +66,6 @@ extern def_data *DEF_DATA;
 #define  IGSyy    (6)  /* IGSyy   for GPS only */
 #define  ITRFyy   (7)  /* ITRFyy  NOT for GPS */
 #define  ETRFyy   (8)  /* ETRFyy              */
-
-
-/* set_dtm     ver 2010.1          # page 2   12 jan 2010 10 19 */
 
 
   /* adjacent datums */
@@ -182,20 +170,16 @@ extern def_data *DEF_DATA;
   /* dm          rx         ry         rz     */
   /* Datumtext                                */
 
-  char                        pth_mlb[512], *p_tp;
-  char                        d_name[24], e_name[24], p_name[24];
-  short                       d_nmb;  /* datum number    */
-  int                         mode, all, qr, res = -1, used;
+  int                            res = -1, i;
   char                       *w, w_name[24];
   double                      sin_rx, cos_rx, scale;
   double                      sin_ry, cos_ry;
   double                      sin_rz, cos_rz;
 
-
-/* set_dtm     ver 2010.1          # page 4    12 jan 2010 10 19 */
+
 
   def_datum *dtm=NULL;
-  struct typ_dec              g_tpd, *r_tpd;
+
 /*
   struct dsh_par {
     double       tx, ty, tz;
@@ -205,7 +189,7 @@ extern def_data *DEF_DATA;
     double       scale;
   };
 */
-  int found=0, s_no,i;
+
   if (DEF_DATA==NULL)
 	  return -2;
 
@@ -229,30 +213,27 @@ extern def_data *DEF_DATA;
     if (!(isalpha(*d_nm) && strlen(d_nm) > 1))
 	    goto report;
       /* get datum info from datum name */
-    /* collect datum no */
+    
     for(i=0; i<DEF_DATA->n_dtm; i++){
 	    if(!strcmp(DEF_DATA->datums[i].mlb,w_name)){
 		    dtm=((DEF_DATA->datums)+i);
 		    break;
 	    }
-    }
-    if (dtm==NULL)
+      }
+    
+      if (dtm==NULL)
 	    return -1;
-    *p_no=-1;
-    for(i=0; i<DEF_DATA->n_dtm; i++){
-	    if(!strcmp(DEF_DATA->datums[i].mlb,dtm->p_datum)){
-		    *p_no=DEF_DATA->datums[i].no;
-		    break;
-	    }
-    }
-     
+      *p_no=dtm->p_no;
+    
+       res = dtm->no;
+       
+      /* get names of parent datum and actual ellipsoid */
+       (void) strcpy(p_nm,dtm->p_datum);
+       (void) strcpy(e_nm, dtm->ellipsoid);
+       strncpy(rgn_nm,dtm->rgn,3);
+       *mask=dtm->imit;
+       trp->tp=dtm->type;
       
-      res = dtm->no;
-       /* get names of parent datum and actual ellipsoid */
-      (void) strcpy(p_nm,dtm->p_datum);
-      (void) strcpy(e_nm, dtm->ellipsoid);
-      strncpy(rgn_nm,dtm->rgn,3);
-      *mask=dtm->imit;
        /* translations */
       trp->tx = dtm->translation[0];
 
@@ -284,8 +265,7 @@ extern def_data *DEF_DATA;
       /* ROTZ=(-sz cz 0), ROTY=(0  1   0), ROTX=(0  cx sx) */
       /*      (  0  0 1)       (sy 0  cy)       (0 -sx cx) */
 
-
-/*   set_dtm     ver 2010.1          # page 7    12 jan 2010 10 19 */
+
 
 
       trp->r11  =  cos_ry*cos_rz;
@@ -305,12 +285,13 @@ extern def_data *DEF_DATA;
             
       
       /* return res or 'no datum found' */
+     
       return(res);
    
 
-
-/* set_dtm     ver 2010.1          # page 8    12 jan 2010 10 19 */
 
+
+/* This is not implemented here - should perhaps be up to various applications to do that?? */
 report:
     strcpy(d_nm,"Not implemented");
   return(-1);

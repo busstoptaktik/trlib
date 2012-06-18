@@ -66,6 +66,7 @@
 #include "geo_lab.h"
 #include "fgetlhtx.h"
 #include "trthread.h"
+#include "parse_def_file.h"
 
 int               conv_lab(
 /*________________________*/
@@ -622,20 +623,29 @@ int srch_def(
   int                 s_mode,
   struct lab_def_str *p_lb)
 {
-#include      "i_tabdir_file.h"
+/*#include      "i_tabdir_file.h"
 
-  static THREAD_SAFE size_t  pos = 0;
+  static THREAD_SAFE size_t  pos = 0;*/
+
   char                       pth_mlb[512];
   char                       p_name[MLBLNG], *p_tp;
-  int                        qr, res = 0, used, cha_str;
+  int                        qr, res = 0, used, cha_str,n_prj=0,done;
   int                        l_cstm, l_mode, l_type;
   union rgn_un               rgn_pref, dum_rgn;
 
-extern THREAD_SAFE FILE     *def_lab_file;
-extern THREAD_SAFE size_t    init_prj_pos;
+/*extern THREAD_SAFE FILE     *def_lab_file;
+extern THREAD_SAFE size_t    init_prj_pos;*/
+extern def_data *DEF_DATA;
+def_projection *prj;
+res=0;
+if (DEF_DATA==NULL)
+{printf("uuppssss\n");
+	return -2;
+}
+	
   (void) strcpy(dum_rgn.prfx, "ZZ");
 
-  if (def_lab_file == NULL || init_prj_pos == 0) {
+  /*if (def_lab_file == NULL || init_prj_pos == 0) {
     (void) i_tabdir_file(3, "", &res, pth_mlb);
     if (res) {
       (void) fprintf(stdout, "\n*** def_lab.txt: %s %s;\n", pth_mlb,
@@ -645,15 +655,17 @@ extern THREAD_SAFE size_t    init_prj_pos;
       return (-2);
     }
   } else res = 0;
+*/
 
-  if (mode != 3 || pos == 0) pos = init_prj_pos;
-  (void) fseek(def_lab_file, (long) pos, SEEK_SET);
+ // if (mode != 3 || pos == 0) pos = init_prj_pos;
+ // (void) fseek(def_lab_file, (long) pos, SEEK_SET);
   /* prj definition file detected */
 
   // mode = 0 seach p_lb->s_sys or w_sys
   // mode = 1 seach s_type, s_cstm, s_mode
   // mode = 2 seach first
   // mode = 3 seach next
+
 
   if (mode == 0) { /* Replace digits by ?'s in w_sys (i.e. UTM32 -> UTM?? etc.), for easier search */
     for (qr = 0; *(p_sys+qr); qr++)
@@ -662,16 +674,13 @@ extern THREAD_SAFE size_t    init_prj_pos;
   }
 
   do {
-    qr = fgetlhtx(def_lab_file, p_name);
-    if (qr != EOF) {
-      (void) fgets(pth_mlb, 510, def_lab_file);
-      (void) sscanf(pth_mlb, "%d%n", &cha_str, &used);
-      p_tp  = pth_mlb + used;
-      (void) sscanf(p_tp, "%d%n", &l_type, &used);
-      p_tp += used;
-      (void) sscanf(p_tp, "%d%n", &l_cstm, &used);
-      p_tp += used;
-      (void) sscanf(p_tp, "%d%n", &l_mode, &used);
+    prj=DEF_DATA->projections+(n_prj++);
+    strcpy(p_name,prj->mlb);
+      cha_str=prj->numbers[0];
+      l_type=prj->numbers[1];
+      l_cstm=prj->numbers[2];
+      l_mode=prj->numbers[3];
+     
 
       qr = (mode == 0) ? (!strcmp((cha_str) ? w_sys : p_sys, p_name))
          : (mode == 1) ? 
@@ -684,23 +693,19 @@ extern THREAD_SAFE size_t    init_prj_pos;
         p_lb->d_type   = (short) l_mode;
         p_lb->cha_str  = (short) cha_str;
 
-        p_tp += used;
-        (void) sscanf(p_tp, "%hd%n", &p_lb->mask, &used);
-        p_tp += used;
+        p_lb->mask= prj->numbers[4];
+        strncpy(rgn_pref.prfx,prj->seq,4);
 
-        (void) sscanf(p_tp, "%s%n", rgn_pref.prfx, &used);
-        p_tp  += used;
+       
         if (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
             (void) strcpy(p_lb->a_seq, rgn_pref.prfx);
         else *p_lb->a_seq = '\0';
 
-        (void) sscanf(p_tp, "%s%n", rgn_pref.prfx, &used);
-        p_tp  += used;
+        strncpy(rgn_pref.prfx,prj->rgn,3);
         p_lb->lab_rgn = (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
                       ? rgn_pref.r_nr[0] : 0;
 
-        (void) sscanf(p_tp, "%s%n", p_name, &used);
-        p_tp  += used;
+        strcpy(p_name,prj->p_datum);
         if (*p_name != '\"') {
           (void) strcpy(p_lb->pr_dtm, p_name);
           if (p_lb->sepch == '_') p_lb->sepch = 0;
@@ -708,30 +713,24 @@ extern THREAD_SAFE size_t    init_prj_pos;
         else *p_lb->pr_dtm = '\0';
         /* datum has been read to p_lb->mlb2 (hopefully) */
 
-        (void) sscanf(p_tp, "%d%n", &qr, &used);
-        p_tp += used +2;
-        p_lb->q_par = (char) qr;
+       
+        p_lb->q_par = (char) prj->q_par;
 
-        if (*p_tp != '\"') {
-          used = (int) (strlen(p_tp) -1);
-          if (*(p_tp + used) == '\n') *(p_tp + used) = '\0';
-          (void) strcpy(p_lb->add_p, p_tp);
+        if (prj->param_tokens[0]!='\"') {
+          
+          (void) strcpy(p_lb->add_p, prj->param_tokens);
         }
         else *p_lb->add_p = '\0';
+	
+	strncpy(p_name,prj->native_proj,MLBLNG);
+        if (p_lb->q_par) (void) strcpy(p_lb->par_str,prj->param_text);
 
-        (void) fgets(pth_mlb, 510, def_lab_file);
-        (void) sscanf(pth_mlb, "%s%n", p_name, &used);
-        if (p_lb->q_par) (void) strcpy(p_lb->par_str, pth_mlb +used +2);
+      strcpy(p_lb->text,"No No No");
+      res = p_lb->lab_type;
+   }
+    
+  } while (res <= 0 && n_prj<DEF_DATA->n_prj);
 
-        (void) fgets(p_lb->text, 512, def_lab_file);
-        res = p_lb->lab_type;
-      }
-    } else {
-      pos = init_prj_pos;
-      return(-1);
-    }
-  } while (res <= 0 && strcmp(p_name, "stop"));
-  pos = ftell(def_lab_file);
 
   return(res);
 }

@@ -41,12 +41,13 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 #include "trthread.h"
+#include "parse_def_file.h"
 
 #ifndef    M_PI
 #include   "kms_math.h"
 #endif
-extern THREAD_SAFE FILE               *def_lab_file;
-extern THREAD_SAFE size_t              init_prj_pos, init_grs_pos;
+/*extern THREAD_SAFE FILE               *def_lab_file;
+extern THREAD_SAFE size_t              init_prj_pos, init_grs_pos; */
 
 int          set_grs(
 /*_________________*/
@@ -79,6 +80,10 @@ double      *e,
   double   J2f;       /* J2 or 1/f depending on definition */
   double   GMg;       /* GM or geq         -"-             */
   double   omg;       /* rotation velocity                 */
+  /* use the global parsed data : simlk, june 2012 */
+  extern def_data *DEF_DATA;
+  def_grs *grs_def;
+  int n_grs=0;
 
 
 /* set_grs version 2009.1            # page 2   30 Sep 2009 13 16 */
@@ -139,9 +144,10 @@ double      *e,
 
 /* set_grs version 2009.1            # page 3   30 Sep 2009 13 16 */
 
+if (DEF_DATA==NULL)
+	return -1;
 
-
-  if (def_lab_file == NULL || init_prj_pos == 0) {
+ /* if (def_lab_file == NULL || init_prj_pos == 0) {
     (void) i_tabdir_file(3, "", &res, pth_mlb);
     if (res) {
       (void) fprintf(stdout, "\n*** def_lab.txt: %s %s;\n", pth_mlb,
@@ -169,6 +175,7 @@ double      *e,
     init_grs_pos = ftell(def_lab_file);
   }
   if (e_quest <= 0) pos = init_grs_pos;
+  */
   /* GRS definition file detected */
 
 
@@ -185,11 +192,11 @@ double      *e,
       else if (*s_name == '?') p =  6;
       doc = 1;
       if (!strlen(++ell_nm)) {
-        if (e_quest > 0) (void) fseek(def_lab_file, (long) pos, SEEK_SET);
+       /* if (e_quest > 0) (void) fseek(def_lab_file, (long) pos, SEEK_SET);
         else {
           pos     = ftell(def_lab_file);
           e_quest = -1;
-        }
+        } */
         empty = -1;
       } else {
         e_quest = 0;
@@ -231,34 +238,40 @@ double      *e,
       break;
     }
 
-
+
 /* set_grs version 2009.1            # page 5   30 Sep 2009 13 16 */
 
 
     /* search for ellname */
     if (empty)
     do {
-      qr = fgetlhtx(def_lab_file, e_name);
-      if (qr != EOF) {
-        p_tp = fgets(pth_mlb, 512, def_lab_file);
-        if (strlen(pth_mlb) == 1)
-            p_tp = fgets(pth_mlb, 512, def_lab_file);
+      //qr = fgetlhtx(def_lab_file, e_name);
+      
+      //if (qr != EOF) {
+	grs_def=DEF_DATA->ellipsoids+(n_grs++);
+	strcpy(e_name,grs_def->mlb);
+        //p_tp = fgets(pth_mlb, 512, def_lab_file);
+       // if (strlen(pth_mlb) == 1)
+        //    p_tp = fgets(pth_mlb, 512, def_lab_file);
         if (!strcmp(e_name, ell_nm) || empty == -1) {
-          (void) sscanf(pth_mlb, "%d%n", &e_no, &used);
-          p_tp  = pth_mlb + used;
+          //(void) sscanf(pth_mlb, "%d%n", &e_no, &used);
+	  e_no=grs_def->no;
+          //p_tp  = pth_mlb + used;
           res   = e_no; /* ellip no */
           /* collect mode and definining params */
           /*____________________________________*/
-          (void) sscanf(p_tp, "%d%n", &mode, &used);
-          p_tp += used;
-
+          //(void) sscanf(p_tp, "%d%n", &mode, &used);
+         // p_tp += used;
+          mode=grs_def->mode;
           /* a_m, J2f, GMg, omg */
-          (void) sscanf(p_tp, "%lf%n", &a_m, &used);
-          p_tp += used;
-          (void) sscanf(p_tp, "%le%n", &J2f, &used);
-          p_tp += used;
-          while(isspace(*p_tp)) ++ p_tp;
-          if (isalpha(*p_tp)) {
+          //(void) sscanf(p_tp, "%lf%n", &a_m, &used);
+          //p_tp += used;
+	  a_m=grs_def->axis;
+          //(void) sscanf(p_tp, "%le%n", &J2f, &used);
+	   J2f=grs_def->flattening;
+          //p_tp += used;
+          //while(isspace(*p_tp)) ++ p_tp;
+          /*if (isalpha(*p_tp)) {
             (void) sscanf(p_tp, "%s%n", param_v, &used);
             if (strcmp(param_v, "KMW84") == 0) GMg = KMW84; 
             else
@@ -277,19 +290,22 @@ double      *e,
             }
           }
           else (void) sscanf(p_tp, "%le%n", &GMg, &used);
-          p_tp += used;
+          p_tp += used; */
+	  GMg=grs_def->km;
+	  /*
           while(isspace(*p_tp)) ++ p_tp;
           if (isalpha(*p_tp)) {
             (void) sscanf(p_tp, "%s%n", param_v, &used);
             if (strcmp(param_v, "OMEGA") == 0) omg = OMEGA; 
             else omg = 0.0; 
           }
-          else (void) sscanf(p_tp, "%le%n", &omg, &used);
+          else (void) sscanf(p_tp, "%le%n", &omg, &used); */
+	  omg=grs_def->omega;
           empty = 0;
         }
-      }
-    } while (res <= 0 && strcmp(e_name, "stop"));
-    if (e_quest) pos = ftell(def_lab_file);
+      //}
+    } while (res <= 0 &&  n_grs<DEF_DATA->n_ellip);
+    //if (e_quest) pos = ftell(def_lab_file);
   }
 
 
@@ -298,29 +314,35 @@ double      *e,
 
   else {
     do {
-      qr = fgetlhtx(def_lab_file, e_name);
-      if (qr != EOF) {
-        qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-        (void) sscanf(pth_mlb, "%d%n", &e_no, &used);
+      //qr = fgetlhtx(def_lab_file, e_name);
+      //if (qr != EOF) {
+       // qr = fgetln_kms(pth_mlb, &used, def_lab_file);
+       // (void) sscanf(pth_mlb, "%d%n", &e_no, &used);
+	grs_def=DEF_DATA->ellipsoids+(n_grs++);
+	e_no=grs_def->no;
         if (e_no == ell_nmb) {
           empty = 0;
-          p_tp  = pth_mlb + used;
+          //p_tp  = pth_mlb + used;
           /* collect datum no */
           res   = e_no;
 
           /* collect mode and definining params */
           /*____________________________________*/
-          (void) sscanf(p_tp, "%d%n", &mode, &used);
-          p_tp += used;
-
+          // (void) sscanf(p_tp, "%d%n", &mode, &used);
+          //p_tp += used;
+             mode=grs_def->mode;
+	     a_m=grs_def->axis;
+             J2f=grs_def->flattening;
+	     GMg=grs_def->km;
+	     omg=grs_def->omega;
           /* a_m, J2f, GMg, omg */
-          (void) sscanf(p_tp, "%lf%n", &a_m, &used);
-          p_tp += used;
-          (void) sscanf(p_tp, "%le%n", &J2f, &used);
-          p_tp += used +2;
+         // (void) sscanf(p_tp, "%lf%n", &a_m, &used);
+          //p_tp += used;
+          //(void) sscanf(p_tp, "%le%n", &J2f, &used);
+          //p_tp += used +2;
 
-          while(isspace(*p_tp)) ++ p_tp;
-          if (isalpha(*p_tp)) {
+          //while(isspace(*p_tp)) ++ p_tp;
+         /* if (isalpha(*p_tp)) {
             (void) sscanf(p_tp, "%s%n", param_v, &used);
             if (strcmp(param_v, "KMW84") == 0) GMg = KMW84; 
             else
@@ -337,8 +359,8 @@ double      *e,
               case '/': GMg = KM / sum; break;
               }
             }
-          }
-          else (void) sscanf(p_tp, "%le%n", &GMg, &used);
+          } */
+         /* else (void) sscanf(p_tp, "%le%n", &GMg, &used);
           p_tp += used;
           while(isspace(*p_tp)) ++ p_tp;
           if (isalpha(*p_tp)) {
@@ -346,11 +368,11 @@ double      *e,
             if (strcmp(param_v, "OMEGA") == 0) omg = OMEGA; 
             else omg = 0.0; 
           }
-          else (void) sscanf(p_tp, "%le%n", &omg, &used);
+          else (void) sscanf(p_tp, "%le%n", &omg, &used); */
           empty = 0;
         }
-      }
-    } while (res <= 0 && strcmp(e_name, "stop"));
+      //}
+    } while (res <= 0 && n_grs<DEF_DATA->n_ellip);
   }
 
 
@@ -579,12 +601,13 @@ double      *e,
       (void) fprintf(out, "\nMkv = %20.*g m", p+6, Q);
       (void) fprintf(out, "\n");
       if (e_no) {
-        do {
-          qr = fgetc(def_lab_file);
+	      fprintf(out,"Description should be parsed from def_lab.txt");
+        /*do {
+          qr = 
           if (qr != EOF) qr = '"';
           else
           if (qr != '"') (void) fputc((qr != '¨') ? qr : '#', out);
-        } while (qr != '"');
+        } while (qr != '"');*/
       } else {
         (void) fprintf(out,"\nUser-defined Geodetic Reference System.");
         (void) fprintf(out,"\nDefining parameters are indicated.");
@@ -593,7 +616,7 @@ double      *e,
     else /* output of a and f */ {
       (void) fprintf(out, "%6s%14.4f m", " ", a);
       if (f != 0.0) (void) fprintf(out, "%16.8f", 1.0/f);
-      else          (void) fprintf(out, "  Sfærisk");
+      else          (void) fprintf(out, "  Spherical");
     }
 
   }

@@ -82,7 +82,7 @@ int set_projection(char **items,  def_projection *proj, int n_items){
 	strncpy(proj->rgn,items[7],3);
 	strncpy(proj->p_datum,items[8],16);
 	proj->q_par= atoi(items[9]);
-	proj->param_txt[0]='\0';
+	proj->param_tokens[0]='\0';
 	if (items[10][0]!='"')
 		n_param=proj->q_par;
 	else
@@ -99,18 +99,22 @@ int set_projection(char **items,  def_projection *proj, int n_items){
 	}
 	
 	for (i=0; i<n_param && i<n_items-10; i++){
-		strcat(proj->param_txt,items[i+10]);
+		strcat(proj->param_tokens,items[i+10]);
 		if (i<n_param-1)
-			strcat(proj->param_txt," ");
+			strcat(proj->param_tokens," ");
 	}
 	
 	if (n_items>10+n_param)
 		strncpy(proj->native_proj,items[10+n_param],MLBLNG);
 	else
 		return 1;
-	
-	for(i=0; i<n_items-11-n_param; i++)
+	proj->param_text[0]='\0';
+	for(i=0; i<n_items-11-n_param; i++){
 		proj->native_params[i]=get_number(items[i+11+n_param]);
+		strcat(proj->param_text,items[i+11+n_param]);
+		if (i<n_items-11-n_param-1)
+			strcat(proj->param_text," ");
+	}
 	return 0;
 	
 }
@@ -119,6 +123,7 @@ int set_datum(char **tokens,  def_datum *dtm, int n_items){
 	int i;
 	strncpy(dtm->mlb,tokens[0],MLBLNG);
 	dtm->no= atoi(tokens[1]);
+	dtm->p_no=-1;
 	strncpy(dtm->p_datum,tokens[2],MLBLNG);
 	strncpy(dtm->ellipsoid,tokens[3],MLBLNG);
 	dtm->imit= atoi(tokens[4]);
@@ -233,7 +238,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	/* specifications for how much to preallocate */
 	int n_prealloc[5]={256,128,128,128,64};
 	int n_alloc[5]={256,128,128,128,64};
-	int mode_sizes[5]={sizeof( def_projection),sizeof( def_grs),3,sizeof( def_datum), sizeof( def_hth_tr)};
+	int mode_sizes[5]={sizeof( def_projection),sizeof( def_grs),sizeof(def_rgn),sizeof( def_datum), sizeof( def_hth_tr)};
 	char *mode_names[7]={MODE_PRJ,MODE_GRS,MODE_RGN,MODE_DTM,MODE_HTH,MODE_STOP,NULL},*mode_name;
 	/*some other needed stuff for buffering etc */
 	char buf[4096],savelines[MAX_LINE_DEF][1024];
@@ -330,7 +335,13 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 				completed=1;
 			}
 			else if (n_set[mode_rgn]<n_alloc[mode_rgn]){
-				strncpy(((char*) entries[mode_rgn])+(n_set[mode_rgn]++)*mode_sizes[mode_rgn],tokens[0],mode_sizes[mode_rgn]);
+				//strncpy(((char*) entries[mode_rgn])+(n_set[mode_rgn]++)*mode_sizes[mode_rgn],tokens[0],mode_sizes[mode_rgn]);
+				{
+					def_rgn *this_rgn;
+					this_rgn=((def_rgn*) entries[mode_rgn])+(n_set[mode_rgn]++);
+					strncpy(this_rgn->rgn_new,tokens[0],3);
+					strncpy(this_rgn->rgn_old,tokens[1],3);
+				}
 				}
 			}
 		free(tokens); tokens=NULL;
@@ -386,6 +397,26 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	/*reallocate sizes of objects */
 	for(i=0;i<n_modes-1;i++)
 		entries[i]=realloc(entries[i],mode_sizes[i]*n_set[i]);
+	/*set parent no of datums*/
+	
+	{
+	def_datum *dtm1,*dtm2;
+	int j;
+	for(i=0;i<n_set[mode_dtm]; i++){
+		dtm1=((def_datum*) entries[mode_dtm])+i;
+		//dtm1->p_no=-1;
+		for (j=0;j<n_set[mode_dtm];j++){
+			dtm2=((def_datum*) entries[mode_dtm])+j;
+			if (!strcmp(dtm2->mlb,dtm1->p_datum)){
+				dtm1->p_no=dtm2->no;
+				break;
+			}
+		}
+		if (dtm1->p_no<=0)
+			printf("Could not find p_datum!\n");
+	}
+	}
+	
 	/*transfer stuff to data object */
 	data->n_prj=n_set[mode_prj];
 	data->n_rgn=n_set[mode_rgn];
@@ -413,7 +444,7 @@ void present_data(FILE *fp,def_data *data){
 	def_projection *projections=data->projections;
 	def_datum *datums=data->datums;
 	def_grs *ellipsoids=data->ellipsoids;
-	char *regions=data->regions;
+	def_rgn *regions=data->regions;
 	int n_rgn=data->n_rgn;
 	int n_grs=data->n_ellip;
 	int n_dtm=data->n_dtm;
@@ -430,7 +461,7 @@ void present_data(FILE *fp,def_data *data){
 		for(j=0;j<5;j++){
 			fprintf(fp,"%d ",projections[i].numbers[j]);
 		}
-		fprintf(fp,"%s %s %s %s\n",projections[i].seq,projections[i].rgn,projections[i].p_datum,projections[i].param_txt);
+		fprintf(fp,"%s %s %s %s\n",projections[i].seq,projections[i].rgn,projections[i].p_datum,projections[i].param_tokens);
 		fprintf(fp,"par: %d\n",projections[i].q_par);
 		fprintf(fp,"native: %s\n",projections[i].native_proj);
 		for(j=0;j<projections[i].q_par;j++)
@@ -447,7 +478,7 @@ void present_data(FILE *fp,def_data *data){
 	fprintf(fp,"******************\n\n");
 	fprintf(fp,"Regions:\n");
 	for(i=0; i<n_rgn; i++)
-		fprintf(fp,"%s ",regions+(i*3));
+		fprintf(fp,"%s %s\n",regions[i].rgn_new,regions[i].rgn_old);
 	fprintf(fp,"\n******************\n\n");
 	for(i=0;i<n_dtm;i++){
 		fprintf(fp,"dtm : %s, no: %d\n",datums[i].mlb,datums[i].no);

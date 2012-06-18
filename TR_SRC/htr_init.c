@@ -34,6 +34,7 @@
 #include "geo_lab.h"
 #include "kms_math.h"
 #include "trthread.h"
+#include "parse_def_file.h"
 
 
 int                      htr_init(
@@ -54,7 +55,7 @@ char                    *dh_tr_info
 #include              "fgetlhtx.h"
 #include              "fgetln_kms.h"
 #include              "i_tabdir_file.h"
-#include              "set_dtm.h"
+#include              "set_dtm_1.h"
 #include              "sgetg.h"
 
   extern THREAD_SAFE FILE               *def_lab_file;
@@ -63,7 +64,7 @@ char                    *dh_tr_info
 
 /* htr_init  ver 2004.01          # page 2    24 Jan 2004 11 57 */
 
-
+ 
   static THREAD_SAFE  short          sh_dtm = 0;
   union  geo_lab        test_lab;
   char                  pth_mlb[512], c_mlb[MLBLNG], *p_tp;
@@ -75,6 +76,11 @@ char                    *dh_tr_info
   struct typ_dec        g_tpd;
   struct dsh_str        trp;
   union rgn_un          DK_rgn, FO_rgn, GR_rgn, DE_rgn;
+  char my_rgn[3];
+  short imit;
+  extern def_data *DEF_DATA;
+  def_hth_tr *htr_def;
+  int n_hth=0;
 
   if (i_clb->h_dtm < 200 || 299 < i_clb->h_dtm ||
       o_clb->h_dtm < 200 || 299 < o_clb->h_dtm) return(HTRF_ILLEG_);
@@ -87,8 +93,10 @@ char                    *dh_tr_info
 
 /* htr_init  ver 2004.01          # page 3    24 Jan 2004 11 57 */
 
+if (DEF_DATA==NULL)
+	return -1;
 
-  if (sh_dtm == 0) {
+ /* if (sh_dtm == 0) {
     if (def_lab_file == NULL || init_prj_pos == 0) {
       (void) i_tabdir_file(3, "", &res, pth_mlb);
       if (res) {
@@ -122,7 +130,7 @@ char                    *dh_tr_info
     htr_lab->u_c_lab.lab_type = ILL_LAB;
   }
   else (void) fseek(def_lab_file, (long) init_hth_pos, SEEK_SET);
-
+*/
   sh_dtm = -1;
   /* find datum name from datum number */
   i_hdtm = i_clb->h_dtm;
@@ -186,23 +194,25 @@ char                    *dh_tr_info
 
   if (i_hdtm == o_hdtm) tr_type = 0;
   else {
-    pos = ftell(def_lab_file);
-    (void) set_dtm(i_hdtm, i_nm, &p_no, p_nm, e_nm, &trp);
-    (void) set_dtm(o_hdtm, o_nm, &p_no, p_nm, e_nm, &trp);
-    (void) fseek(def_lab_file, (long) pos, SEEK_SET);
+    /*pos = ftell(def_lab_file);*/
+    (void) set_dtm_1(i_hdtm, i_nm, &p_no, p_nm, e_nm, my_rgn,&imit,&trp);
+    (void) set_dtm_1(o_hdtm, o_nm, &p_no, p_nm, e_nm,my_rgn,&imit, &trp);
+   /* (void) fseek(def_lab_file, (long) pos, SEEK_SET);*/
 
     do {
-      pos = ftell(def_lab_file);
-      (void) conv_lab("input", &test_lab, def_lab_file, "");
+      /*pos = ftell(def_lab_file);*/
+      htr_def=DEF_DATA->hth_entries+(n_hth++);
+	
+      (void) conv_lab(htr_def->from_mlb, &test_lab, "");
       if (test_lab.u_c_lab.lab_type == 1) {
-        (void) fseek(def_lab_file, (long) pos, SEEK_SET);
-        (void) fgetln_kms(pth_mlb, &used, def_lab_file); //now:skip lab line
+       /* (void) fseek(def_lab_file, (long) pos, SEEK_SET);
+        (void) fgetln_kms(pth_mlb, &used, def_lab_file); //now:skip lab line */
         l_inv = test_lab.u_c_lab.h_dtm == o_hdtm;
         if (test_lab.u_c_lab.h_dtm == i_hdtm || l_inv) {
-          qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-          if (qr != EOF) {
-            (void) sscanf(pth_mlb, "%s%n", c_mlb, &used); // to_dtm
-            if (!strcmp((l_inv) ? i_nm : o_nm, c_mlb)) { // FOUND
+          /*qr = fgetln_kms(pth_mlb, &used, def_lab_file); */
+         // if (qr != EOF) {
+            //(void) sscanf(pth_mlb, "%s%n", c_mlb, &used); // to_dtm 
+            if (!strcmp((l_inv) ? i_nm : o_nm, htr_def->to_dtm)) { // FOUND
               // The grid_val accepts NO height label part::
               p_tp = test_lab.u_c_lab.mlb+test_lab.u_c_lab.sepix;
               if (test_lab.u_c_lab.sepix+2 == test_lab.u_c_lab.h_ix)
@@ -214,50 +224,50 @@ char                    *dh_tr_info
               htr_const->inv   = l_inv;
               *htr_lab         = test_lab;
               sh_dtm           = o_hdtm;
-              p_tp             = pth_mlb + used;
-              (void) sscanf(p_tp, "%d%n", &tr_type, &used);
-              p_tp            += used;
-              htr_const->LAT0  = sgetg(p_tp, &g_tpd, &used, "nt");
-              p_tp            += used;
-              htr_const->LON0  = sgetg(p_tp, &g_tpd, &used, "nt");
+             // p_tp             = pth_mlb + used;
+              //(void) sscanf(p_tp, "%d%n", &tr_type, &used);
+	      tr_type=htr_def->type;
+              //p_tp            += used;
+              htr_const->LAT0  = htr_def->B0; //sgetg(p_tp, &g_tpd, &used, "nt");
+             // p_tp            += used;
+              htr_const->LON0  = htr_def->L0; //sgetg(p_tp, &g_tpd, &used, "nt");
               // params ::
-              qr               = fgetln_kms(pth_mlb, &used, def_lab_file);
-              if (qr != EOF) {
+              //qr               = fgetln_kms(pth_mlb, &used, def_lab_file);
+              
                 switch (tr_type) {
                 case 1: // dh_table
-                  (void) sscanf(pth_mlb, "%s%n", dh_table_name, &used);
+                  strncpy(dh_table_name,htr_def->table,MAX_TABLE_LEN); //(void) sscanf(pth_mlb, "%s%n", dh_table_name, &used);
                 break;
                 case 2: // Constant
-                  htr_const->a1 = sgetg(pth_mlb, &g_tpd, &used, "m");
+                  htr_const->a1 =htr_def->constants[0]; // sgetg(pth_mlb, &g_tpd, &used, "m");
                 break;
                 case 3: // Linear
-                  htr_const->M0  = sgetg(pth_mlb, &g_tpd, &used, "m");
-                  p_tp           = pth_mlb + used;
-                  htr_const->N0  = sgetg(p_tp, &g_tpd, &used, "m");
-                  p_tp          += used;
-                  htr_const->a1  = sgetg(p_tp, &g_tpd, &used, "m");
-                  p_tp          += used;
-                  htr_const->a2  = sgetg(p_tp, &g_tpd, &used, "sx");
-                  p_tp          += used;
-                  htr_const->a3  = sgetg(p_tp, &g_tpd, &used, "sx");
+                  htr_const->M0  = htr_def->constants[0]; //sgetg(pth_mlb, &g_tpd, &used, "m");
+                  //p_tp           = pth_mlb + used;
+                  htr_const->N0  = htr_def->constants[1]; //sgetg(p_tp, &g_tpd, &used, "m");
+                 // p_tp          += used;
+                  htr_const->a1  = htr_def->constants[2]; //sgetg(p_tp, &g_tpd, &used, "m");
+                  //p_tp          += used;
+                  htr_const->a2  = htr_def->constants[3]; //sgetg(p_tp, &g_tpd, &used, "sx");
+                 // p_tp          += used;
+                  htr_const->a3  = htr_def->constants[4]; //sgetg(p_tp, &g_tpd, &used, "sx");
                   o_hdtm         = (htr_const->inv) ? i_hdtm : o_hdtm;
                 }
-              }
-            } else {
-              used = fgetln_kms(pth_mlb, &used, def_lab_file); // params
-            }
+              
+            } 
+            
             if (tr_type > 0) // reference
-             (void) fgets(dh_tr_info, 127, def_lab_file);
-            else
-             (void) fgets(pth_mlb, 127, def_lab_file);
-          }
+             strncpy(dh_tr_info, "Not available.",127);
+           /* else
+             (void) fgets(pth_mlb, 127, def_lab_file);*/
+          
         } else {
-          qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-          used = fgetln_kms(pth_mlb, &used, def_lab_file); // params
-          (void) fgets(dh_tr_info, 127, def_lab_file); // info
+          /*qr = fgetln_kms(pth_mlb, &used, def_lab_file);
+          used = fgetln_kms(pth_mlb, &used, def_lab_file); // params */
+           strncpy(dh_tr_info, "Not available.",127); //(void) fgets(dh_tr_info, 127, def_lab_file); // info
         }
       } else test_lab.u_c_lab.lab_type = STP_LAB;
-    } while (test_lab.u_c_lab.lab_type != STP_LAB && tr_type <= 0);
+    } while (test_lab.u_c_lab.lab_type != STP_LAB && tr_type <= 0 && n_hth<DEF_DATA->n_hth);
   }
 
   if (tr_type < 0) {

@@ -28,6 +28,10 @@ struct def_grs {
 	double omega;
 };
 
+struct def_rgn {
+	char rgn_new[3];
+	char rgn_old[3];
+};
 
 struct def_datum {
 	char mlb[MLBLNG];
@@ -36,6 +40,7 @@ struct def_datum {
 	char ellipsoid[MLBLNG];
 	int imit;
 	int type;
+	int p_no;
 	char rgn[3];
 	double translation[3];
 	double rotation[3];
@@ -50,9 +55,11 @@ struct def_projection{
 	char rgn[3];
 	char p_datum[16];
 	int q_par;
-	char param_txt[64];
+	char param_tokens[32];
+	char param_text[128];
 	char native_proj[MLBLNG];
 	double native_params[8];
+	
 };
 
 struct  def_hth_tr{
@@ -70,13 +77,14 @@ typedef struct def_hth_tr def_hth_tr;
 typedef struct def_grs def_grs;
 typedef struct def_datum def_datum;
 typedef struct def_projection def_projection;
+typedef struct def_rgn def_rgn;
 
 struct def_data{
 	def_projection *projections;
 	def_datum      *datums;
 	def_grs    *ellipsoids;
 	def_hth_tr *hth_entries;
-	char *regions;
+	def_rgn     *regions;
 	int n_prj;
 	int n_dtm;
 	int n_ellip;
