@@ -22,7 +22,6 @@
 
 #include    <string.h>
 #include    <stdio.h>
-#include    <sys/stat.h>
 #include    "geo_lab.h"
 #include    "parse_def_file.h"
 
