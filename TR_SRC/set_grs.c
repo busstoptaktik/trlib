@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* set_grs version 2009.1            # page 1   30 Sep 2009 13 16 */
-
-
-/* Copyright (c) 2009, Danish National Space Center, DTU       */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of DNSC, DTU    */
-/* This copyright claim does not indicate an intention of      */
-/* publishing this code.                                       */
-
 /* Prog: KP OCT 1990                                           */
 /* Modified, KP MAY 1993                                       */
 /* Modified, KE JUL 2007                                       */
@@ -39,15 +27,12 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <stdarg.h>
-#include <sys/stat.h>
-#include "trthread.h"
 #include "parse_def_file.h"
 
 #ifndef    M_PI
 #include   "kms_math.h"
 #endif
-/*extern THREAD_SAFE FILE               *def_lab_file;
-extern THREAD_SAFE size_t              init_prj_pos, init_grs_pos; */
+
 
 int          set_grs(
 /*_________________*/
@@ -58,24 +43,20 @@ double      *e,
 )
 
 {
-#include   "fgetln_kms.h"
-#include   "fgetlhtx.h"
-#include   "i_tabdir_file.h"
 
-  static THREAD_SAFE  int                  e_quest = 0;
-  static THREAD_SAFE  size_t               pos = 0;
-  char                        pth_mlb[512];
-  char                        s_name[24], e_name[24], *ell_nm = s_name;
-  char                       *p_tp, param_v[24];
 
-  int                         empty = 1, doc = 0, mode = 0, mode_234;
-  int                         e_no, i, p = 0, qr, res = 0, used;
+
+
+  char                        s_name[24], *ell_nm = s_name;
+ 
+
+  int                         empty = 1, mode = 0, mode_234;
+  int                         e_no, i, res = 0;
   double                      fh, n2, toise_t_m = 0.0;
   double                      m, qd, qdp, d, omg2, n = 0, Q;
   double                      a, b, amg, J2 = 0.0, f = 0.0, e2p, geq;
   double                      GM, ksf, U0, sum;
-  va_list                     gpu;
-  FILE                       *out = NULL;
+ 
   double   a_m;       /* Semi-major axis or mean degree    */
   double   J2f;       /* J2 or 1/f depending on definition */
   double   GMg;       /* GM or geq         -"-             */
@@ -85,15 +66,14 @@ double      *e,
   def_grs *grs_def;
   int n_grs=0;
 
-
-/* set_grs version 2009.1            # page 2   30 Sep 2009 13 16 */
+
 
 
 #define  GEQ      978049.e-5      /* Equator qravity    */
 #define  KM       3986005.e8      /* Grav. const * Mass */
 #define  OMEGA    7292115.0e-11   /* Rotation velocity  */
 
-/* Defemce Mapping Agency, Dept. of Defence World Geodetic System 1984,
+/* Defence Mapping Agency, Dept. of Defence World Geodetic System 1984,
    DMA Technical Report 8350.2, Sec. Ed., September 1, 1991 */
 /* mcCarthy, D., IERS Conventions (1996), IERS Technical Note 21,
    Observatoire de Paris, 1996 */
@@ -141,70 +121,18 @@ double      *e,
   /* Reference text may continue over more lines         */
   /* Reference text is terminated by: "                  */
 
-
-/* set_grs version 2009.1            # page 3   30 Sep 2009 13 16 */
 
-if (DEF_DATA==NULL)
-	return -1;
+    if (DEF_DATA==NULL) 
+	    return -1;
 
- /* if (def_lab_file == NULL || init_prj_pos == 0) {
-    (void) i_tabdir_file(3, "", &res, pth_mlb);
-    if (res) {
-      (void) fprintf(stdout, "\n*** def_lab.txt: %s %s;\n", pth_mlb,
-        (res == -1) ? "NOT FOUND" :
-        (res == -2) ? "NOT lab definition file" :
-                      "Content not accepted");
-      return (-2);
-    }
-  }
-
-  if (init_grs_pos) {
-    (void) fseek(def_lab_file, (long) init_grs_pos, SEEK_SET);
-  } else { // search "def_grs"
-    qr = 1;
-    do {
-      if ((res = fgetlhtx(def_lab_file, e_name)) == 0) {
-        if (!strcmp("def_grs", e_name)) qr = 0;
-      }
-    } while (qr && res != EOF);
-    if (qr) {
-      (void) fprintf(stdout, 
-         "\n*** set_grs: lab_def.txt GRS not found ;\n");
-      return (-2);
-    }
-    init_grs_pos = ftell(def_lab_file);
-  }
-  if (e_quest <= 0) pos = init_grs_pos;
-  */
-  /* GRS definition file detected */
-
-
-/* set_grs version 2009.1            # page 4   30 Sep 2009 13 16 */
+ 
 
 
-  if (ell_nmb == -1) {
-    (void) strcpy(s_name, ellname);
-    switch(*s_name) {
-    case '!': /* list of ell-names */
-    case '?': /* documentation     */
-    case '*': /* full digit docum. */
-      if      (*s_name == '*') p = 12;
-      else if (*s_name == '?') p =  6;
-      doc = 1;
-      if (!strlen(++ell_nm)) {
-       /* if (e_quest > 0) (void) fseek(def_lab_file, (long) pos, SEEK_SET);
-        else {
-          pos     = ftell(def_lab_file);
-          e_quest = -1;
-        } */
-        empty = -1;
-      } else {
-        e_quest = 0;
-      }
+   
+    
 
-      break;
-
-    case '#': /* userdefined ellipsoid */
+    if (*s_name=='#'){ /* userdefined ellipsoid */
+      (void) strcpy(s_name, ellname);
       (void) sscanf(++ell_nm, "%d", &mode);
       if (*(e+3) <= 0.0)  *(e+3) = KM;
       if (*(e+6) <= 0.0)  *(e+6) = GEQ;
@@ -231,163 +159,36 @@ if (DEF_DATA==NULL)
       }
       a_m  = *(e+0);
       omg  = *(e+4);
-      if (!strlen(++ell_nm)) (void) sprintf(ell_nm, "%d",0);
+      if (!strlen(++ell_nm)) (void) sprintf(ell_nm, "%d",0); /*Why that?? Doesn't seem to be used anywhere? */
       res = empty = 0;
-      break;
-    default: /* terminate scan */
-      break;
-    }
-
-
-/* set_grs version 2009.1            # page 5   30 Sep 2009 13 16 */
-
-
-    /* search for ellname */
-    if (empty)
-    do {
-      //qr = fgetlhtx(def_lab_file, e_name);
+    } /*end user defined ellipsoid */
+    else{
+	    do {
+    
+	grs_def=DEF_DATA->ellipsoids+(n_grs++);
+	if ((ell_nmb==-1 && !strcmp(grs_def->mlb, ellname)) || (grs_def->no==ell_nmb && ell_nmb>=0)){ /*might not need ell_nmb>=0*/
+		e_no=grs_def->no;
+		res   = e_no; /* ellip no */
+          /* collect mode and definining params */
+          /*____________________________________*/
+		mode=grs_def->mode;
+		a_m=grs_def->axis;
+		J2f=grs_def->flattening;
+		GMg=grs_def->km;
+		omg=grs_def->omega;
+		empty = 0;
+		if (ell_nmb>=0)
+			strncpy(ellname,grs_def->mlb,MLBLNG);
+			
+        }
       
-      //if (qr != EOF) {
-	grs_def=DEF_DATA->ellipsoids+(n_grs++);
-	strcpy(e_name,grs_def->mlb);
-        //p_tp = fgets(pth_mlb, 512, def_lab_file);
-       // if (strlen(pth_mlb) == 1)
-        //    p_tp = fgets(pth_mlb, 512, def_lab_file);
-        if (!strcmp(e_name, ell_nm) || empty == -1) {
-          //(void) sscanf(pth_mlb, "%d%n", &e_no, &used);
-	  e_no=grs_def->no;
-          //p_tp  = pth_mlb + used;
-          res   = e_no; /* ellip no */
-          /* collect mode and definining params */
-          /*____________________________________*/
-          //(void) sscanf(p_tp, "%d%n", &mode, &used);
-         // p_tp += used;
-          mode=grs_def->mode;
-          /* a_m, J2f, GMg, omg */
-          //(void) sscanf(p_tp, "%lf%n", &a_m, &used);
-          //p_tp += used;
-	  a_m=grs_def->axis;
-          //(void) sscanf(p_tp, "%le%n", &J2f, &used);
-	   J2f=grs_def->flattening;
-          //p_tp += used;
-          //while(isspace(*p_tp)) ++ p_tp;
-          /*if (isalpha(*p_tp)) {
-            (void) sscanf(p_tp, "%s%n", param_v, &used);
-            if (strcmp(param_v, "KMW84") == 0) GMg = KMW84; 
-            else
-            if (strcmp(param_v, "KM") == 0) GMg = KM; 
-            else
-            if (strcmp(param_v, "GEQ") == 0) GMg = GEQ; 
-            else {
-              (void) sscanf(p_tp +3, "%lf%n", &sum, &used);
-              used += 3;
-              switch (*(p_tp +2)) {
-              case '*': GMg = KM * sum; break;
-              case '+': GMg = KM + sum; break;
-              case '-': GMg = KM - sum; break;
-              case '/': GMg = KM / sum; break;
-              }
-            }
-          }
-          else (void) sscanf(p_tp, "%le%n", &GMg, &used);
-          p_tp += used; */
-	  GMg=grs_def->km;
-	  /*
-          while(isspace(*p_tp)) ++ p_tp;
-          if (isalpha(*p_tp)) {
-            (void) sscanf(p_tp, "%s%n", param_v, &used);
-            if (strcmp(param_v, "OMEGA") == 0) omg = OMEGA; 
-            else omg = 0.0; 
-          }
-          else (void) sscanf(p_tp, "%le%n", &omg, &used); */
-	  omg=grs_def->omega;
-          empty = 0;
-        }
-      //}
     } while (res <= 0 &&  n_grs<DEF_DATA->n_ellip);
-    //if (e_quest) pos = ftell(def_lab_file);
-  }
+  } /*end not user defined */
+    
+  
+ 
 
-
-/* set_grs version 2009.1            # page 6   30 Sep 2009 13 16 */
-
-
-  else {
-    do {
-      //qr = fgetlhtx(def_lab_file, e_name);
-      //if (qr != EOF) {
-       // qr = fgetln_kms(pth_mlb, &used, def_lab_file);
-       // (void) sscanf(pth_mlb, "%d%n", &e_no, &used);
-	grs_def=DEF_DATA->ellipsoids+(n_grs++);
-	e_no=grs_def->no;
-        if (e_no == ell_nmb) {
-          empty = 0;
-          //p_tp  = pth_mlb + used;
-          /* collect datum no */
-          res   = e_no;
-
-          /* collect mode and definining params */
-          /*____________________________________*/
-          // (void) sscanf(p_tp, "%d%n", &mode, &used);
-          //p_tp += used;
-             mode=grs_def->mode;
-	     a_m=grs_def->axis;
-             J2f=grs_def->flattening;
-	     GMg=grs_def->km;
-	     omg=grs_def->omega;
-          /* a_m, J2f, GMg, omg */
-         // (void) sscanf(p_tp, "%lf%n", &a_m, &used);
-          //p_tp += used;
-          //(void) sscanf(p_tp, "%le%n", &J2f, &used);
-          //p_tp += used +2;
-
-          //while(isspace(*p_tp)) ++ p_tp;
-         /* if (isalpha(*p_tp)) {
-            (void) sscanf(p_tp, "%s%n", param_v, &used);
-            if (strcmp(param_v, "KMW84") == 0) GMg = KMW84; 
-            else
-            if (strcmp(param_v, "KM") == 0) GMg = KM; 
-            else
-            if (strcmp(param_v, "GEQ") == 0) GMg = GEQ; 
-            else {
-              (void) sscanf(p_tp +3, "%lf%n", &sum, &used);
-              used += 3;
-              switch (*(p_tp +2)) {
-              case '*': GMg = KM * sum; break;
-              case '+': GMg = KM + sum; break;
-              case '-': GMg = KM - sum; break;
-              case '/': GMg = KM / sum; break;
-              }
-            }
-          } */
-         /* else (void) sscanf(p_tp, "%le%n", &GMg, &used);
-          p_tp += used;
-          while(isspace(*p_tp)) ++ p_tp;
-          if (isalpha(*p_tp)) {
-            (void) sscanf(p_tp, "%s%n", param_v, &used);
-            if (strcmp(param_v, "OMEGA") == 0) omg = OMEGA; 
-            else omg = 0.0; 
-          }
-          else (void) sscanf(p_tp, "%le%n", &omg, &used); */
-          empty = 0;
-        }
-      //}
-    } while (res <= 0 && n_grs<DEF_DATA->n_ellip);
-  }
-
-
-/* set_grs version 2009.1            # page 7   30 Sep 2009 13 16 */
-
-
-  if (doc) {
-    if (e_no == -1) {
-      pos     = 0;
-      e_quest = 0;
-      return(-1);
-    }
-  }
-
-  if (empty) {
+if (empty) {
     ell_nmb = -2;
     *e      = 0.0;
     (void) strcpy(ellname, "undef ell");
@@ -432,8 +233,7 @@ if (DEF_DATA==NULL)
     n   = f/(2. - f);
     break;
 
-
-/* set_grs version 2009.1            # page 8   30 Sep 2009 13 16 */
+
 
 
   case  2: /* define by a, f, geq and omg */
@@ -490,8 +290,7 @@ if (DEF_DATA==NULL)
       break;
     }
 
-
-/* set_grs version 2009.1            # page 9   30 Sep 2009 13 16 */
+
 
 
     n2 = n*n;
@@ -510,7 +309,7 @@ if (DEF_DATA==NULL)
     geq = GM/a/b*(1. - m*(1. + qdp/qd));
     break;
   default:
-    (void) fprintf(stdout,
+    (void) fprintf(stderr,
           "\n** set_grs: mode %d is illegal\n", mode);
     *e = 0.0;
     return(-1);
@@ -533,7 +332,7 @@ if (DEF_DATA==NULL)
   Q  = a*M_PI_2/(1. + n)*(1. + n2*(1./4. + n2*(1./64. + n2/256.)));
 
   /* output of results */
-  (void) strcpy(ellname, e_name);
+  
   *(e+0) = a;
   *(e+1) = f;
   *(e+2) = J2;
@@ -544,84 +343,8 @@ if (DEF_DATA==NULL)
   *(e+7) = ksf;
   *(e+8) = Q;
 
-
-/* set_grs version 2009.1            # page 10   30 Sep 2009 13 16 */
-
-
-  /* documentation of params */
-  /*_________________________*/
-  if (doc) {
-
-    va_start(gpu, e);
-    out   = va_arg(gpu, FILE *);
-    va_end(gpu);
-    if (e_quest == -1) {
-      if (!p && e_quest == -1) {
-        (void) fprintf(out, "\n\n   Ellipsoid    KMS-nr");
-        (void) fprintf(out, "             a            1/f");
-      }
-      e_quest = 1;
-    }
-
-    (void) fprintf(out, ((p) ? "\n\nEllipsoid = %14s\nKMS_nmb: %17d"
-                             : "\n   %-12s %4d"), e_name, e_no);
-
-
-/* set_grs version 2009.1            # page 11   30 Sep 2009 13 16 */
-
-
-    if (p) { /* output of constants */
-      (void) fprintf(out, "\n\na   = %20.*g m       definition.",
-                     p+6, a);
-      if (mode == 4  && p == 12) { /* def by mean degree */
-        (void) fprintf(out, "\nmg  = %20.*g", p+6, amg);
-        if (toise_t_m != 1.0)
-           (void) fprintf(out, " toises  m/toise = %14.12f", toise_t_m);
-        else (void) fprintf(out, " m");
-      }
-      if (f != 0.0) {
-        (void) fprintf(out, "\n1/f = %20.*g", p+6, 1.0/f);
-        if (mode != 1) (void) fprintf(out, "         definition.");
-      }
-      if (p == 12 || f == 0.0) {
-        (void) fprintf(out, "\nf   =   %17.*e", p+4, f);
-        if (mode != 1) (void) fprintf(out, "     definition.");
-      }
-      (void) fprintf(out, "\nJ2  = %20.*e", p, J2);
-      if (mode == 1) (void) fprintf(out, "         definition.");
-      (void) fprintf(out, "\nGM  = %20.*e m3/s2", p, GM);
-      if ((mode == 1) || (mode == 3) || (mode == 4))
-          (void) fprintf(out, "   definition.");
-      (void) fprintf(out, "\nomg = %20.*e rad/s   definition.",
-                     p, omg);
-      (void) fprintf(out, "\nU0  = %20.*e m2/s2", p, U0);
-      (void) fprintf(out, "\ngeq = %20.*e m/s2", p, geq);
-      if (mode == 2) (void) fprintf(out, "    definition.");
-      (void) fprintf(out, "\nksf = %20.*e", p, ksf);
-      (void) fprintf(out, "\nMkv = %20.*g m", p+6, Q);
-      (void) fprintf(out, "\n");
-      if (e_no) {
-	      fprintf(out,"Description should be parsed from def_lab.txt");
-        /*do {
-          qr = 
-          if (qr != EOF) qr = '"';
-          else
-          if (qr != '"') (void) fputc((qr != '¨') ? qr : '#', out);
-        } while (qr != '"');*/
-      } else {
-        (void) fprintf(out,"\nUser-defined Geodetic Reference System.");
-        (void) fprintf(out,"\nDefining parameters are indicated.");
-      }
-    } /* end output of constants */
-    else /* output of a and f */ {
-      (void) fprintf(out, "%6s%14.4f m", " ", a);
-      if (f != 0.0) (void) fprintf(out, "%16.8f", 1.0/f);
-      else          (void) fprintf(out, "  Spherical");
-    }
-
-  }
-
-  return(e_no);
+ /*all documentation should be moved to another function */
+  return res;
 
 /* remove macro names */
 #undef  GEQ

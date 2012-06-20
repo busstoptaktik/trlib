@@ -621,45 +621,23 @@ int srch_def(
   int                 s_type,
   int                 s_cstm,
   int                 s_mode,
-  struct lab_def_str *p_lb)
-{
-/*#include      "i_tabdir_file.h"
+  struct lab_def_str *p_lb){
 
-  static THREAD_SAFE size_t  pos = 0;*/
 
-  char                       pth_mlb[512];
-  char                       p_name[MLBLNG], *p_tp;
-  int                        qr, res = 0, used, cha_str,n_prj=0,done;
+
+  char                       p_name[MLBLNG];
+  int                        qr, res = 0, cha_str,n_prj=0;
   int                        l_cstm, l_mode, l_type;
   union rgn_un               rgn_pref, dum_rgn;
-
-/*extern THREAD_SAFE FILE     *def_lab_file;
-extern THREAD_SAFE size_t    init_prj_pos;*/
-extern def_data *DEF_DATA;
-def_projection *prj;
-res=0;
-if (DEF_DATA==NULL)
-{printf("uuppssss\n");
+  extern def_data *DEF_DATA;
+  def_projection *prj;
+  
+  
+  if (DEF_DATA==NULL)
 	return -2;
-}
-	
+ 
   (void) strcpy(dum_rgn.prfx, "ZZ");
 
-  /*if (def_lab_file == NULL || init_prj_pos == 0) {
-    (void) i_tabdir_file(3, "", &res, pth_mlb);
-    if (res) {
-      (void) fprintf(stdout, "\n*** def_lab.txt: %s %s;\n", pth_mlb,
-        (res == -1) ? "NOT FOUND" :
-        (res == -2) ? "NOT lab definition file" :
-                      "Content not accepted");
-      return (-2);
-    }
-  } else res = 0;
-*/
-
- // if (mode != 3 || pos == 0) pos = init_prj_pos;
- // (void) fseek(def_lab_file, (long) pos, SEEK_SET);
-  /* prj definition file detected */
 
   // mode = 0 seach p_lb->s_sys or w_sys
   // mode = 1 seach s_type, s_cstm, s_mode
@@ -668,66 +646,61 @@ if (DEF_DATA==NULL)
 
 
   if (mode == 0) { /* Replace digits by ?'s in w_sys (i.e. UTM32 -> UTM?? etc.), for easier search */
-    for (qr = 0; *(p_sys+qr); qr++)
-        *(w_sys+qr) = (isdigit(*(p_sys+qr))) ? '?' : *(p_sys+qr);
-    *(w_sys+qr) = '\0';
-  }
+	for (qr = 0; *(p_sys+qr); qr++)
+		*(w_sys+qr) = (isdigit(*(p_sys+qr))) ? '?' : *(p_sys+qr);
+	*(w_sys+qr) = '\0';
+   }
 
   do {
-    prj=DEF_DATA->projections+(n_prj++);
-    strcpy(p_name,prj->mlb);
-      cha_str=prj->numbers[0];
-      l_type=prj->numbers[1];
-      l_cstm=prj->numbers[2];
-      l_mode=prj->numbers[3];
-     
+	prj=DEF_DATA->projections+(n_prj++);
+	strcpy(p_name,prj->mlb);
+	cha_str=prj->cha_str;
+	l_type=prj->type;
+	l_cstm=prj->cstm;
+	l_mode=prj->mode;
+	qr = (mode == 0) ? (!strcmp((cha_str) ? w_sys : p_sys, p_name))
+         : (mode == 1) ? (s_type == l_type && s_cstm == l_cstm && s_mode == l_mode): (mode >= 2);
+	if (qr) {
+		(void) strcpy(p_lb->name, (mode < 2) ? p_sys : p_name);
+		p_lb->lab_type = (short) l_type;
+		p_lb->d_kind   = (short) l_cstm;
+		p_lb->d_type   = (short) l_mode;
+		p_lb->cha_str  = (short) cha_str;
+		p_lb->mask= prj->mask;
+		strncpy(rgn_pref.prfx,prj->seq,4);
+		
+		if (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
+			(void) strcpy(p_lb->a_seq, rgn_pref.prfx);
+		else *p_lb->a_seq = '\0';
 
-      qr = (mode == 0) ? (!strcmp((cha_str) ? w_sys : p_sys, p_name))
-         : (mode == 1) ? 
-              (s_type == l_type && s_cstm == l_cstm && s_mode == l_mode)
-         : (mode >= 2);
-      if (qr) {
-        (void) strcpy(p_lb->name, (mode < 2) ? p_sys : p_name);
-        p_lb->lab_type = (short) l_type;
-        p_lb->d_kind   = (short) l_cstm;
-        p_lb->d_type   = (short) l_mode;
-        p_lb->cha_str  = (short) cha_str;
+		strncpy(rgn_pref.prfx,prj->rgn,3);
+		p_lb->lab_rgn = (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
+			      ? rgn_pref.r_nr[0] : 0;
 
-        p_lb->mask= prj->numbers[4];
-        strncpy(rgn_pref.prfx,prj->seq,4);
+		strcpy(p_name,prj->p_datum);
+		
+		if (*p_name != '\"') {
+			(void) strcpy(p_lb->pr_dtm, p_name);
+			if (p_lb->sepch == '_') p_lb->sepch = 0;
+		}
+		else *p_lb->pr_dtm = '\0';
+		
+		/* datum has been read to p_lb->mlb2 (hopefully) */
 
-       
-        if (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
-            (void) strcpy(p_lb->a_seq, rgn_pref.prfx);
-        else *p_lb->a_seq = '\0';
+	       
+		p_lb->q_par = (char) prj->q_par;
 
-        strncpy(rgn_pref.prfx,prj->rgn,3);
-        p_lb->lab_rgn = (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
-                      ? rgn_pref.r_nr[0] : 0;
+		if (prj->param_tokens[0]!='\"') {
+			(void) strcpy(p_lb->add_p, prj->param_tokens);
+		}
+		else *p_lb->add_p = '\0';
+		
+		strncpy(p_name,prj->native_proj,MLBLNG);
+		if (p_lb->q_par) (void) strcpy(p_lb->par_str,prj->param_text);
 
-        strcpy(p_name,prj->p_datum);
-        if (*p_name != '\"') {
-          (void) strcpy(p_lb->pr_dtm, p_name);
-          if (p_lb->sepch == '_') p_lb->sepch = 0;
-        }
-        else *p_lb->pr_dtm = '\0';
-        /* datum has been read to p_lb->mlb2 (hopefully) */
-
-       
-        p_lb->q_par = (char) prj->q_par;
-
-        if (prj->param_tokens[0]!='\"') {
-          
-          (void) strcpy(p_lb->add_p, prj->param_tokens);
-        }
-        else *p_lb->add_p = '\0';
-	
-	strncpy(p_name,prj->native_proj,MLBLNG);
-        if (p_lb->q_par) (void) strcpy(p_lb->par_str,prj->param_text);
-
-      strcpy(p_lb->text,"No No No");
-      res = p_lb->lab_type;
-   }
+		strcpy(p_lb->text,"TODO: parse this also."); /*TODO: Parse descriptions also and insert here (and hithere). */
+		res = p_lb->lab_type;
+	   }
     
   } while (res <= 0 && n_prj<DEF_DATA->n_prj);
 

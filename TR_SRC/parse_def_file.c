@@ -75,9 +75,11 @@ int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 int set_projection(char **items,  def_projection *proj, int n_items){
 	int i,n_param;
 	strncpy(proj->mlb,items[0],MLBLNG);
-	for (i=1;i<n_items && i<6;i++){
-		proj->numbers[i-1]=atoi(items[i]);
-	}
+	proj->cha_str=atoi(items[1]);
+	proj->type=atoi(items[2]);
+	proj->cstm=atoi(items[3]);
+	proj->mode=atoi(items[4]);
+	proj->mask=atoi(items[5]);
 	strncpy(proj->seq,items[6],4);
 	strncpy(proj->rgn,items[7],3);
 	strncpy(proj->p_datum,items[8],16);
@@ -457,13 +459,10 @@ void present_data(FILE *fp,def_data *data){
 	fprintf(fp,"n_hth: %d\n\n",n_hth);
 	for (i=0; i<data->n_prj; i++){
 		fprintf(fp,"prj: %s\n",projections[i].mlb);
-		fprintf(fp,"Stuff:\n");
-		for(j=0;j<5;j++){
-			fprintf(fp,"%d ",projections[i].numbers[j]);
-		}
-		fprintf(fp,"%s %s %s %s\n",projections[i].seq,projections[i].rgn,projections[i].p_datum,projections[i].param_tokens);
-		fprintf(fp,"par: %d\n",projections[i].q_par);
-		fprintf(fp,"native: %s\n",projections[i].native_proj);
+		fprintf(fp,"cha_str: %d type: %d cstm: %d mode: %d mask: %d\n",projections[i].cha_str,projections[i].type,projections[i].cstm,projections[i].mode,projections[i].mask);
+		fprintf(fp,"seq: %s rgn: %s p_dtm: %s par_tokens: %s\n",projections[i].seq,projections[i].rgn,projections[i].p_datum,projections[i].param_tokens);
+		fprintf(fp,"n_par: %d\n",projections[i].q_par);
+		fprintf(fp,"native_proj: %s\n",projections[i].native_proj);
 		for(j=0;j<projections[i].q_par;j++)
 			fprintf(fp," %f",projections[i].native_params[j]);
 		if (projections[i].q_par>0)

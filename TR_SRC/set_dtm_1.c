@@ -27,7 +27,7 @@
 #include    <stdlib.h>
 #include    <string.h>
 #include    <sys/types.h>
-#include    <sys/stat.h>
+//#include    <sys/stat.h>
 #include    <ctype.h>
 #include    <fcntl.h>
 #include    <math.h>
@@ -170,91 +170,92 @@ extern def_data *DEF_DATA;
   /* dm          rx         ry         rz     */
   /* Datumtext                                */
 
-  int                            res = -1, i;
-  char                       *w, w_name[24];
-  double                      sin_rx, cos_rx, scale;
-  double                      sin_ry, cos_ry;
-  double                      sin_rz, cos_rz;
+    int                            res = -1, i, mode;
+    char                       *w, w_name[24];
+    double                      sin_rx, cos_rx, scale;
+    double                      sin_ry, cos_ry;
+    double                      sin_rz, cos_rz;
 
 
 
-  def_datum *dtm=NULL;
+    def_datum *dtm=NULL;
 
-/*
-  struct dsh_par {
-    double       tx, ty, tz;
-    double       r11, r12, r13;
-    double       r21, r22, r23;
-    double       r31, r32, r33;
-    double       scale;
-  };
-*/
 
-  if (DEF_DATA==NULL)
+    if (DEF_DATA==NULL)
 	  return -2;
 
   /* find datum name from datum number */
  
-  if (d_no > 0) {
-	for(i=0; i<DEF_DATA->n_dtm; i++){
-		if ((DEF_DATA->datums[i]).no==d_no){
-			strncpy(d_nm,DEF_DATA->datums[i].mlb,MLBLNG);
-			return d_no;
+    if (d_no > 0) {
+	    for(i=0; i<DEF_DATA->n_dtm; i++){
+		    if ((DEF_DATA->datums[i]).no==d_no){
+			    strncpy(d_nm,DEF_DATA->datums[i].mlb,MLBLNG);
+			    return d_no;
+			    }
 		}
+    return -1;
 	}
-  return -1;
-}
   
     /* change to lover case letters */
     (void) strcpy(w_name, d_nm);
     w     = w_name;
     while ((*w = (char) tolower(*w)) != '\0') w++;
-
-    if (!(isalpha(*d_nm) && strlen(d_nm) > 1))
+	
+    /* documentation 'mode' not implemented here anymore */
+    if (!isalpha(*d_nm) || strlen(d_nm) < 2)
 	    goto report;
-      /* get datum info from datum name */
     
-    for(i=0; i<DEF_DATA->n_dtm; i++){
-	    if(!strcmp(DEF_DATA->datums[i].mlb,w_name)){
-		    dtm=((DEF_DATA->datums)+i);
-		    break;
-	    }
-      }
+    /* get datum info from datum name */
     
+    
+    
+    for(mode=0; mode<2; mode++){
+	    /* do the actual search */
+	    for(i=0; i<DEF_DATA->n_dtm && dtm==NULL; i++){
+		    if(!strcmp(DEF_DATA->datums[i].mlb,w_name))
+			    dtm=((DEF_DATA->datums)+i);
+	    
+	}
+	/* if not found and w_name looks right have another go with igsyy, itrfyy, etrfyy */
+	if (dtm==NULL && (*w_name=='i' || *w_name=='e') && strlen(w_name)>4 && isdigit(w_name[strlen(w_name)-1])){
+		w       = w_name + strlen(w_name) - 2; 
+		*(w)    = 'y';
+		*(w +1) = 'y';
+		}
+	else
+		break;
+	}
+	
       if (dtm==NULL)
-	    return -1;
+	      return -1;
+      
+      res = dtm->no;
+      /* transfer preparsed data */
+      
       *p_no=dtm->p_no;
-    
-       res = dtm->no;
-       
+     
       /* get names of parent datum and actual ellipsoid */
-       (void) strcpy(p_nm,dtm->p_datum);
-       (void) strcpy(e_nm, dtm->ellipsoid);
+      
+       strncpy(p_nm,dtm->p_datum,MLBLNG);
+       strncpy(e_nm, dtm->ellipsoid,MLBLNG);
        strncpy(rgn_nm,dtm->rgn,3);
        *mask=dtm->imit;
        trp->tp=dtm->type;
       
-       /* translations */
-      trp->tx = dtm->translation[0];
-
-      trp->ty = dtm->translation[1];
+      /* translations */
       
+      trp->tx = dtm->translation[0];
+      trp->ty = dtm->translation[1];
       trp->tz = dtm->translation[2];
       
-
-      /* scale and rotations */
+     /* scale and rotations */
       scale   = dtm->scale;
-
       cos_rx  = dtm->rotation[0];
-
       sin_rx  = sin(cos_rx);
       cos_rx  = cos(cos_rx);
-
       cos_ry  = dtm->rotation[1];
-
       sin_ry  = sin(cos_ry);
       cos_ry  = cos(cos_ry);
-
       cos_rz  = dtm->rotation[2];
       sin_rz  = sin(cos_rz);
       cos_rz  = cos(cos_rz);
@@ -291,9 +292,9 @@ extern def_data *DEF_DATA;
 
 
 
-/* This is not implemented here - should perhaps be up to various applications to do that?? */
-report:
-    strcpy(d_nm,"Not implemented");
-  return(-1);
+/* This is not implemented here - should perhaps be up to a separate documentation function??*/
+    report:
+         strcpy(d_nm,"Not implemented");
+         return(-1);
 }
 

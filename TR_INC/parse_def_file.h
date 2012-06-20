@@ -50,7 +50,7 @@ struct def_datum {
 
 struct def_projection{
 	char mlb[MLBLNG];
-	char numbers[5];
+	int cha_str, type, cstm, mode, mask;
 	char seq[4];
 	char rgn[3];
 	char p_datum[16];
