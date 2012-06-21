@@ -51,10 +51,11 @@ char            *rgn_name
 			if (rgn_nr==r_rgn.r_nr[0]){
 				strncpy(f_rgn.prfx,this_rgn->rgn_old,3);
 				strncpy(rgn_prfx,this_rgn->rgn_old,3);
-				return f_rgn.r_nr[0];
+				strcpy(rgn_name,this_rgn->country);
+				return f_rgn.r_nr[0]; /*return old rgn_nr */
 			}
 		}
-	return -1;
+	return (-1);
 	}
 	/*else search for rgn_prfx */
 	for(n_rgn=0; n_rgn<DEF_DATA->n_rgn; n_rgn++)
@@ -63,8 +64,9 @@ char            *rgn_name
 		if (!strcmp(this_rgn->rgn_new,rgn_prfx)){ /*found */
 			strncpy(r_rgn.prfx,this_rgn->rgn_new,3);
 			strncpy(rgn_prfx,this_rgn->rgn_old,3);
-			return r_rgn.r_nr[0];
+			strcpy(rgn_name,this_rgn->country);
+			return r_rgn.r_nr[0]; /*return new rgn_nr */
 		}
 	}
-	return(-1);
+	return (-1);
 }

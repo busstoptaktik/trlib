@@ -17,6 +17,7 @@
  */
  #include "geo_lab.h"
  #define MAX_TABLE_LEN (32)
+ #define MAX_DSCR_LEN (128)
  
 struct def_grs {
 	char mlb[MLBLNG];
@@ -31,6 +32,7 @@ struct def_grs {
 struct def_rgn {
 	char rgn_new[3];
 	char rgn_old[3];
+	char country[64];
 };
 
 struct def_datum {
@@ -45,6 +47,7 @@ struct def_datum {
 	double translation[3];
 	double rotation[3];
 	double scale;
+	char descr[MAX_DSCR_LEN];
 	
 };
 
@@ -59,6 +62,7 @@ struct def_projection{
 	char param_text[128];
 	char native_proj[MLBLNG];
 	double native_params[8];
+	char descr[MAX_DSCR_LEN];
 	
 };
 
@@ -70,6 +74,7 @@ struct  def_hth_tr{
 	double L0;
 	double constants[5];
 	char table[MAX_TABLE_LEN];
+	char descr[MAX_DSCR_LEN];
 };
 	
 

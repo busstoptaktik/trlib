@@ -51,6 +51,7 @@ int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	ellip->mode=atoi(items[2]);
 	ellip->axis=atof(items[3]);
 	ellip->flattening=atof(items[4]);
+	/* todo: implement +.-,* operators, * is problematic since fgetln_kms interprets it as the beginning of a comment! */
 	if (!isalpha(items[5][0]))
 		ellip->km=atof(items[5]);
 	else if (!strcmp(items[5],"KM"))
@@ -72,9 +73,14 @@ int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	return 0;
 }
 	
-int set_projection(char **items,  def_projection *proj, int n_items){
+int set_projection(char **items,  def_projection *proj, int n_items, char *descr){
 	int i,n_param;
 	strncpy(proj->mlb,items[0],MLBLNG);
+	if (descr!=NULL){
+		strncpy(proj->descr,descr,MAX_DSCR_LEN);
+		proj->descr[MAX_DSCR_LEN-1]='\0';
+		}
+	else *(proj->descr)='\0';
 	proj->cha_str=atoi(items[1]);
 	proj->type=atoi(items[2]);
 	proj->cstm=atoi(items[3]);
@@ -121,9 +127,14 @@ int set_projection(char **items,  def_projection *proj, int n_items){
 	
 }
 	
-int set_datum(char **tokens,  def_datum *dtm, int n_items){
+int set_datum(char **tokens,  def_datum *dtm, int n_items, char *descr){
 	int i;
 	strncpy(dtm->mlb,tokens[0],MLBLNG);
+	if (descr!=NULL){
+		strncpy(dtm->descr,descr,MAX_DSCR_LEN);
+		dtm->descr[MAX_DSCR_LEN-1]='\0';
+	}
+	else *(dtm->descr)='\0';
 	dtm->no= atoi(tokens[1]);
 	dtm->p_no=-1;
 	strncpy(dtm->p_datum,tokens[2],MLBLNG);
@@ -139,10 +150,16 @@ int set_datum(char **tokens,  def_datum *dtm, int n_items){
 	return 0;
 }
 
-int set_hth(char **tokens,  def_hth_tr *entry, int n_items){
+int set_hth(char **tokens,  def_hth_tr *entry, int n_items, char *descr){
 	int i;
 	double val;
 	strncpy(entry->from_mlb,tokens[0],MLBLNG);
+	if (descr!=NULL){
+		strncpy(entry->descr,descr,MAX_DSCR_LEN);
+		entry->descr[MAX_DSCR_LEN-1]='\0';
+	}
+	else *(entry->descr)='\0';
+	entry->descr[MAX_DSCR_LEN-1]='\0';
 	strncpy(entry->to_dtm,tokens[1],MLBLNG);
 	entry->type=atoi(tokens[2]);
 	entry->B0=get_number(tokens[3]);
@@ -245,7 +262,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	/*some other needed stuff for buffering etc */
 	char buf[4096],savelines[MAX_LINE_DEF][1024];
 	int n_lines=0;
-	char **tokens=NULL,**next_tokens=NULL,*sub_str;
+	char **tokens=NULL,**next_tokens=NULL,*sub_str, *descr;
 	int n_items=0,n_items2,n_items_line;
 	int n_chars,i;
 	int err;
@@ -271,8 +288,10 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 				continue;
 			
 			/*If we got here, we have either found a new item or should start a new mode */
-			if (!completed)
+			if (!completed){
+				fprintf(stderr,"mode: %d, cmplt: %d\n%s\n",mode,n_set[mode],buf);
 				(*n_err)++;
+			}
 			completed=1;
 			
 			new_mode=0;
@@ -343,6 +362,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 					this_rgn=((def_rgn*) entries[mode_rgn])+(n_set[mode_rgn]++);
 					strncpy(this_rgn->rgn_new,tokens[0],3);
 					strncpy(this_rgn->rgn_old,tokens[1],3);
+					strncpy(this_rgn->country,tokens[2],64);
 				}
 				}
 			}
@@ -365,24 +385,29 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 		n_items+=n_items2;
 		free(next_tokens);
 	}
-	
-	if (n_items<min_tokens[mode]) /*important logic here! We must be able to decide after reading some lines if we have the minimal number of items! */
+	/*important logic here! We must be able to decide after reading some lines if we have the minimal number of items! */
+	if (n_items<min_tokens[mode]) 
 		continue;
 	
+	/* and - the descr text line is the line immedeately after we have found the minimal number of items */
+	if (mode!=mode_grs){
+		descr=fgets(buf,MAX_DSCR_LEN,fp);
+	}
+	
 	if (mode==mode_prj)
-		err=set_projection(tokens,((def_projection*) entries[mode])+n_set[mode],n_items);
+		err=set_projection(tokens,((def_projection*) entries[mode])+n_set[mode],n_items,descr);
 	
 	else if (mode==mode_grs)
 		err=set_ellipsoid(tokens,((def_grs*) entries[mode])+n_set[mode],n_items);
 	
 	else if (mode==mode_dtm)
-		err=set_datum(tokens,((def_datum*) entries[mode])+n_set[mode],n_items);
+		err=set_datum(tokens,((def_datum*) entries[mode])+n_set[mode],n_items,descr);
 	
 	else if (mode==mode_hth)	
-		err=set_hth(tokens,((def_hth_tr*) entries[mode])+n_set[mode],n_items);
+		err=set_hth(tokens,((def_hth_tr*) entries[mode])+n_set[mode],n_items,descr);
 	
 	else{
-		fprintf(stdout,"Something wrong!\n"); /*TODO: use GLOBAL error handling system! */
+		fprintf(stderr,"parse_def: Something wrong!\n"); /*TODO: use GLOBAL error handling system! */
 		continue;
 	}
 	if (!err)
@@ -415,7 +440,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 			}
 		}
 		if (dtm1->p_no<=0)
-			printf("Could not find p_datum!\n");
+			fprintf(stderr,"parse_def: Could not find p_datum!\n");
 	}
 	}
 	
@@ -463,28 +488,30 @@ void present_data(FILE *fp,def_data *data){
 		fprintf(fp,"seq: %s rgn: %s p_dtm: %s par_tokens: %s\n",projections[i].seq,projections[i].rgn,projections[i].p_datum,projections[i].param_tokens);
 		fprintf(fp,"n_par: %d\n",projections[i].q_par);
 		fprintf(fp,"native_proj: %s\n",projections[i].native_proj);
-		for(j=0;j<projections[i].q_par;j++)
-			fprintf(fp," %f",projections[i].native_params[j]);
-		if (projections[i].q_par>0)
+		if (projections[i].q_par>0 && projections[i].param_tokens[0]=='\"'){
+			for(j=0;j<projections[i].q_par;j++) fprintf(fp," %f",projections[i].native_params[j]);
 			fprintf(fp,"\n");
-	fprintf(fp,"\n");
+		}
+		fprintf(fp,"%s\n\n",projections[i].descr);
+	
 	}
 	fprintf(fp,"******************\n\n");
 	for(i=0; i<n_grs; i++){
 		fprintf(fp,"grs: %s\n",ellipsoids[i].mlb);
-		fprintf(fp,"%d %d %f %f %e %e\n",ellipsoids[i].no,ellipsoids[i].mode,ellipsoids[i].axis,ellipsoids[i].flattening,ellipsoids[i].km,ellipsoids[i].omega);
+		fprintf(fp,"%d %d %f %f %e %e\n\n",ellipsoids[i].no,ellipsoids[i].mode,ellipsoids[i].axis,ellipsoids[i].flattening,ellipsoids[i].km,ellipsoids[i].omega);
 	}
 	fprintf(fp,"******************\n\n");
 	fprintf(fp,"Regions:\n");
 	for(i=0; i<n_rgn; i++)
-		fprintf(fp,"%s %s\n",regions[i].rgn_new,regions[i].rgn_old);
+		fprintf(fp,"%s %s %s\n",regions[i].rgn_new,regions[i].rgn_old,regions[i].country);
 	fprintf(fp,"\n******************\n\n");
 	for(i=0;i<n_dtm;i++){
 		fprintf(fp,"dtm : %s, no: %d\n",datums[i].mlb,datums[i].no);
 		fprintf(fp,"parent: %s, ellipsoid: %s\n",datums[i].p_datum,datums[i].ellipsoid);
 		fprintf(fp,"imit: %d, type: %d, rgn: %s\n",datums[i].imit,datums[i].type,datums[i].rgn);
-		fprintf(fp,"TO-WGS84:\n%f %f %f\n%f ppm %f dg %f dg %f dg\n\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2],datums[i].scale*1e6,
+		fprintf(fp,"TO-WGS84:\n%f %f %f\n%f ppm %f dg %f dg %f dg\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2],datums[i].scale*1e6,
 		datums[i].rotation[0]*R2D,datums[i].rotation[1]*R2D,datums[i].rotation[2]*R2D);
+		fprintf(fp,"%s\n\n",datums[i].descr);
 	}
 	fprintf(fp,"*****************\n\n");
 		
@@ -509,8 +536,8 @@ void present_data(FILE *fp,def_data *data){
 				fprintf(fp,"Unrecognized type!\n");
 		
 		}
-		fprintf(fp,"\n");
-				
+		fprintf(fp,"%s\n\n",data->hth_entries[i].descr);
+		
 	}
 	fprintf(fp,"*****************\n\n");
 	{

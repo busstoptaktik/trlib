@@ -626,7 +626,8 @@ int srch_def(
 
 
   char                       p_name[MLBLNG];
-  int                        qr, res = 0, cha_str,n_prj=0;
+  int                        qr, res = 0, cha_str;
+  static  THREAD_SAFE   int  n_prj=0; 
   int                        l_cstm, l_mode, l_type;
   union rgn_un               rgn_pref, dum_rgn;
   extern def_data *DEF_DATA;
@@ -643,7 +644,12 @@ int srch_def(
   // mode = 1 seach s_type, s_cstm, s_mode
   // mode = 2 seach first
   // mode = 3 seach next
-
+  if (mode!=3)
+	  n_prj=0;
+  else if (n_prj>=DEF_DATA->n_prj){
+		  n_prj=0;
+		  return -1;
+	  }
 
   if (mode == 0) { /* Replace digits by ?'s in w_sys (i.e. UTM32 -> UTM?? etc.), for easier search */
 	for (qr = 0; *(p_sys+qr); qr++)
@@ -698,7 +704,7 @@ int srch_def(
 		strncpy(p_name,prj->native_proj,MLBLNG);
 		if (p_lb->q_par) (void) strcpy(p_lb->par_str,prj->param_text);
 
-		strcpy(p_lb->text,"TODO: parse this also."); /*TODO: Parse descriptions also and insert here (and hithere). */
+		strcpy(p_lb->text,prj->descr); 
 		res = p_lb->lab_type;
 	   }
     
