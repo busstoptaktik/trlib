@@ -38,7 +38,7 @@
 #define N_TOKENS_HTH 6
 #define MAX_LINE_DEF 4
 #define RGN_STOP "STOP"
-/*Values  below pasted from def_lab.txt */
+/*Values  below copy-pasted from def_lab.txt */
 #define KM_HERE       (3986005.e8)
 #define OMEGA_HERE (7292115.0e-11)
 #define GEQ_HERE     (978049.e-5)
@@ -51,7 +51,8 @@ int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	ellip->mode=atoi(items[2]);
 	ellip->axis=atof(items[3]);
 	ellip->flattening=atof(items[4]);
-	/* todo: implement +.-,* operators, * is problematic since fgetln_kms interprets it as the beginning of a comment! */
+	/* todo: implement +.-,* operators. * is problematic since fgetln_kms interprets it as the beginning of a comment! */
+	/* only seems to be used in grs MOON so perhaps overkill to write code for that!! */
 	if (!isalpha(items[5][0]))
 		ellip->km=atof(items[5]);
 	else if (!strcmp(items[5],"KM"))
@@ -479,7 +480,7 @@ void present_data(FILE *fp,def_data *data){
 	int n_hth=data->n_hth;
 	fprintf(fp,"n_prj: %d\n",n_prj);
 	fprintf(fp,"n_rgn: %d\n",n_rgn);
-	fprintf(fp,"n_dtm: %d\n",n_rgn);
+	fprintf(fp,"n_dtm: %d\n",n_dtm);
 	fprintf(fp,"n_grs: %d\n",n_grs);
 	fprintf(fp,"n_hth: %d\n\n",n_hth);
 	for (i=0; i<data->n_prj; i++){
