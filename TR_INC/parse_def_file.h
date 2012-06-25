@@ -102,4 +102,3 @@ typedef struct def_data def_data;
 double get_number(char *item);
 def_data *open_def_data(FILE *fp, int *n_err);
 void close_def_data(def_data *data); 
-void present_data(FILE *fp, def_data *data);

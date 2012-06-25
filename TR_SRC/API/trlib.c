@@ -34,6 +34,7 @@
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "parse_def_file.h"
+#include "doc_def_file.h"
 #include "trthread.h"
 #define TRLIB_VERSION "dev v1.0 2012-03-23"
 #ifndef TRLIB_REVISION

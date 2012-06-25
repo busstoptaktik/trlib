@@ -17,8 +17,10 @@
  */
  
 /* int get_ellipsoid_data(union geo_lab *plab_in, double *data);*/
+
 int doc_rgn(char *rgn_name, char *descr, int detail);
 int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail);
 int doc_dtm(char *dtm_name, char *descr, int detail);
 int get_def_numbers(int *n_prj, int *n_dtm, int *n_grs, int *n_rgn);
 int doc_grs(char *ell_name, FILE *out, int detail);
+void present_data(FILE *fp,def_data *data);

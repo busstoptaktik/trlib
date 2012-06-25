@@ -26,7 +26,9 @@
 #include "doc_def_data.h"
 
 /* Purpose: move all documentation of labels - also stuff implemented in conv_lab - here for a cleaner 'aspect' oriented structure */
-/* Mainly thought of as usable for external apps, which operate on minilabels/strings or via consequtive array numbers *not* via the internal system numbers */
+/* Mainly thought of as usable for external apps, which operate on minilabels/strings *not* via the internal system numbers */
+/* Doc fuunctions can be called with "" or NULL in which case the 'next' item is requested (via an internal static). */
+/* This mode is *NOT* thread safe - otherwise the functions are thread safe. Could be made thread safe by adding THREAD_SAFE macro, This would be a bit wastefull... */
 
 /* simlk, june 2012 */
 
@@ -35,7 +37,7 @@
 
 extern def_data *DEF_DATA;  /* due to design, mimicking 'old style', this is global rather than a parameter to functions. */
 
-/* will simply output  "rgn country" */
+/* will simply output  "rgn" or "rgn country" depending on detail level requested */
 /* use conv_rgn for other types of call */
 int doc_rgn(char *rgn_name, char *descr, int detail){
 	int i;
@@ -70,6 +72,10 @@ int doc_rgn(char *rgn_name, char *descr, int detail){
 	
 	return TR_OK;
 }
+
+/* search for prj_name. If prj_name is "" or NULL, 'next' prj is requested */
+/* type can be used to separate proj labels from other types of labels */
+/* impl_datum is useful when describing prj labels like e.g. dktm1 or webmrc where the datum is implicit */
 
 int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail){
 	def_projection *prj=NULL;
@@ -123,6 +129,8 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 	return TR_OK;
 }
 
+/* search for dtm_name. If dtm_name is "" or NULL, 'next' prj is requested */
+
 int doc_dtm( char *dtm_name, char *descr, int detail){
 	def_datum *dtm=NULL;
 	int i,s_mode,mode;
@@ -175,7 +183,7 @@ int doc_dtm( char *dtm_name, char *descr, int detail){
 			
 			
 			
-	
+/* output number of predefined labels */	
 	
 	
 int get_def_numbers(int *n_prj, int *n_dtm, int *n_grs, int *n_rgn){
@@ -271,6 +279,8 @@ int doc_grs(char *ell_name, FILE *out, int detail){
 		(void) fprintf(out, "\nksf = %20.*e", p, ksf);
 		(void) fprintf(out, "\nMkv = %20.*g m", p+6, Q);
 		(void) fprintf(out, "\n");
+		/* The description of the ellipsoids is not preparsed and thus not available here */
+		/* Not considered interesting enough to 'waste' space with that, or? */  
 		/*if (e_no) {
 		do {
 		  qr = fgetc(def_lab_file);
@@ -286,17 +296,101 @@ int doc_grs(char *ell_name, FILE *out, int detail){
 	} /* end output of constants */
 	
 	else /* output of a and f */{
-	    (void) fprintf(out, "%6s%14.4f m", " ", a);
-	    if (f != 0.0) (void) fprintf(out, "%16.8f", 1.0/f);
-	    else          (void) fprintf(out, "  Spherical");
+		(void) fprintf(out, "%6s%14.4f m", " ", a);
+		if (f != 0.0) (void) fprintf(out, "%16.8f", 1.0/f);
+		else          (void) fprintf(out, "  Spherical");
 	}
 
 	return TR_OK;		
 }
 
+/* a function which should be usefull for extracting ellipsoid data to be used in bshlm1 */
 int get_ellipsoid_data(union geo_lab *plab_in, double *data){
 	return 0;
 }
 
-
+/* this function simply dumps all preparsed input - only usefull for debugging purposes */
+void present_data(FILE *fp,def_data *data){
+	int i,j;
+	double R2D=57.295779513082323;
+	def_projection *projections=data->projections;
+	def_datum *datums=data->datums;
+	def_grs *ellipsoids=data->ellipsoids;
+	def_rgn *regions=data->regions;
+	int n_rgn=data->n_rgn;
+	int n_grs=data->n_ellip;
+	int n_dtm=data->n_dtm;
+	int n_prj=data->n_prj;
+	int n_hth=data->n_hth;
+	fprintf(fp,"n_prj: %d\n",n_prj);
+	fprintf(fp,"n_rgn: %d\n",n_rgn);
+	fprintf(fp,"n_dtm: %d\n",n_dtm);
+	fprintf(fp,"n_grs: %d\n",n_grs);
+	fprintf(fp,"n_hth: %d\n\n",n_hth);
+	for (i=0; i<data->n_prj; i++){
+		fprintf(fp,"prj: %s\n",projections[i].mlb);
+		fprintf(fp,"cha_str: %d type: %d cstm: %d mode: %d mask: %d\n",projections[i].cha_str,projections[i].type,projections[i].cstm,projections[i].mode,projections[i].mask);
+		fprintf(fp,"seq: %s rgn: %s p_dtm: %s par_tokens: %s\n",projections[i].seq,projections[i].rgn,projections[i].p_datum,projections[i].param_tokens);
+		fprintf(fp,"n_par: %d\n",projections[i].q_par);
+		fprintf(fp,"native_proj: %s\n",projections[i].native_proj);
+		if (projections[i].q_par>0 && projections[i].param_tokens[0]=='\"'){
+			for(j=0;j<projections[i].q_par;j++) fprintf(fp," %f",projections[i].native_params[j]);
+			fprintf(fp,"\n");
+		}
+		fprintf(fp,"%s\n\n",projections[i].descr);
+	
+	}
+	fprintf(fp,"******************\n\n");
+	for(i=0; i<n_grs; i++){
+		fprintf(fp,"grs: %s\n",ellipsoids[i].mlb);
+		fprintf(fp,"%d %d %f %f %e %e\n\n",ellipsoids[i].no,ellipsoids[i].mode,ellipsoids[i].axis,ellipsoids[i].flattening,ellipsoids[i].km,ellipsoids[i].omega);
+	}
+	fprintf(fp,"******************\n\n");
+	fprintf(fp,"Regions:\n");
+	for(i=0; i<n_rgn; i++)
+		fprintf(fp,"%s %s %s\n",regions[i].rgn_new,regions[i].rgn_old,regions[i].country);
+	fprintf(fp,"\n******************\n\n");
+	for(i=0;i<n_dtm;i++){
+		fprintf(fp,"dtm : %s, no: %d\n",datums[i].mlb,datums[i].no);
+		fprintf(fp,"parent: %s, ellipsoid: %s\n",datums[i].p_datum,datums[i].ellipsoid);
+		fprintf(fp,"imit: %d, type: %d, rgn: %s\n",datums[i].imit,datums[i].type,datums[i].rgn);
+		fprintf(fp,"TO-WGS84:\n%f %f %f\n%f ppm %f dg %f dg %f dg\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2],datums[i].scale*1e6,
+		datums[i].rotation[0]*R2D,datums[i].rotation[1]*R2D,datums[i].rotation[2]*R2D);
+		fprintf(fp,"%s\n\n",datums[i].descr);
+	}
+	fprintf(fp,"*****************\n\n");
+		
+	for(i=0;i<n_hth;i++){
+		fprintf(fp,"hth: %s to %s\n", data->hth_entries[i].from_mlb,data->hth_entries[i].to_dtm);
+		fprintf(fp,"Bo: %f, L0: %f\n",data->hth_entries[i].B0,data->hth_entries[i].L0);
+		switch( (data->hth_entries[i]).type)
+		{
+			case 1:
+				fprintf(fp,"Table: %s\n",data->hth_entries[i].table);
+				break;
+			case 2:
+				fprintf(fp,"constant: %f\n",data->hth_entries[i].constants[0]);
+				break;
+			case 3:
+				fprintf(fp,"Constants: ");
+				for(j=0;j<5;j++)
+					fprintf(fp," %e",data->hth_entries[i].constants[j]);
+				fprintf(fp,"\n");
+				break;
+			default:
+				fprintf(fp,"Unrecognized type!\n");
+		
+		}
+		fprintf(fp,"%s\n\n",data->hth_entries[i].descr);
+		
+	}
+	fprintf(fp,"*****************\n\n");
+	{
+	int n_bytes=0;
+	n_bytes=sizeof( def_projection)*n_prj+sizeof( def_datum)*n_dtm+sizeof( def_grs)*n_grs+n_rgn*3+sizeof( def_hth_tr)*n_hth;
+	fprintf(fp,"bytes used: %d\n",n_bytes);
+	}
+	
+	return;
+}
 
