@@ -81,7 +81,7 @@ struct coord_lab        *c_lab,
   int                        zone;
   short                      par_dtm, dtm_req = 1, mask;
   double                     ell_p[10];
-  char                       e_name[24], p_name[24];
+  char                       e_name[MLBLNG], p_name[MLBLNG];
 
   char                       t_lab_a[2*MLBLNG], *t_lab = t_lab_a;
   char                      *p_dtm, sepch, *p_sys, *p_tp;
@@ -96,8 +96,9 @@ struct coord_lab        *c_lab,
   struct dsh_str            *d_s, d_sh;
 
   /* region prefix and name */
-  char                       rgn_name[24];
+  char                       rgn_name[MLBLNG];
   union rgn_un               rgn_EE, rgn_pref, dum_pref;
+
 
   static char    *c_types[] = {
     /*  1 */ "3-d Cartesian",
@@ -109,7 +110,7 @@ struct coord_lab        *c_lab,
     /*  7 */ "Equal-area",
     /*  8 */ "System 1934/45",
     /*  9 */ "GS conf. conical"
-    /* 10 */ "Københavns Kommune",
+    /* 10 */ "Koebenhavns Kommune",
     /* 11 */ "Cartesic 2D",
     /* 12 */ "RiksTriangukationen SE",
     /* 13 */ "",
@@ -120,9 +121,6 @@ struct coord_lab        *c_lab,
     /* 18 */ "gravity",
     /* 19 */ "",
   };
-
-
-/* conv_crd    ver 2010.01          # page 3     5 Jan 2010 10 19 */
 
 
   (void) strcpy(rgn_EE.prfx, "EE");

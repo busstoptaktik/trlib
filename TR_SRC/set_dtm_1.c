@@ -189,7 +189,7 @@ extern def_data *DEF_DATA;
     if (d_no > 0) {
 	    for(i=0; i<DEF_DATA->n_dtm; i++){
 		    if ((DEF_DATA->datums[i]).no==d_no){
-			    strncpy(d_nm,DEF_DATA->datums[i].mlb,MLBLNG);
+			    strcpy(d_nm,DEF_DATA->datums[i].mlb);
 			    return d_no;
 			    }
 		}
@@ -236,9 +236,9 @@ extern def_data *DEF_DATA;
      
       /* get names of parent datum and actual ellipsoid */
       
-       strncpy(p_nm,dtm->p_datum,MLBLNG);
-       strncpy(e_nm, dtm->ellipsoid,MLBLNG);
-       strncpy(rgn_nm,dtm->rgn,3);
+       strcpy(p_nm,dtm->p_datum);
+       strcpy(e_nm, dtm->ellipsoid);
+       strcpy(rgn_nm,dtm->rgn);
        *mask=dtm->imit;
        trp->tp=dtm->type;
       
