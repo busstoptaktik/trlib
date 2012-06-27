@@ -673,13 +673,11 @@ int srch_def(
 		p_lb->d_type   = (short) l_mode;
 		p_lb->cha_str  = (short) cha_str;
 		p_lb->mask= prj->mask;
-		strncpy(rgn_pref.prfx,prj->seq,4);
-		
+		strcpy(rgn_pref.prfx,prj->seq);
 		if (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
 			(void) strcpy(p_lb->a_seq, rgn_pref.prfx);
 		else *p_lb->a_seq = '\0';
-
-		strncpy(rgn_pref.prfx,prj->rgn,3);
+		strcpy(rgn_pref.prfx,prj->rgn);
 		p_lb->lab_rgn = (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
 			      ? rgn_pref.r_nr[0] : 0;
 
@@ -692,8 +690,7 @@ int srch_def(
 		else *p_lb->pr_dtm = '\0';
 		
 		/* datum has been read to p_lb->mlb2 (hopefully) */
-
-	       
+		
 		p_lb->q_par = (char) prj->q_par;
 
 		if (prj->param_tokens[0]!='\"') {
@@ -701,7 +698,7 @@ int srch_def(
 		}
 		else *p_lb->add_p = '\0';
 		
-		strncpy(p_name,prj->native_proj,MLBLNG);
+		strcpy(p_name,prj->native_proj);
 		if (p_lb->q_par) (void) strcpy(p_lb->par_str,prj->param_text);
 
 		strcpy(p_lb->text,prj->descr); 

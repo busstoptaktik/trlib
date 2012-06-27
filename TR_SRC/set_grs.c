@@ -178,7 +178,7 @@ double      *e,
 		omg=grs_def->omega;
 		empty = 0;
 		if (ell_nmb>=0)
-			strncpy(ellname,grs_def->mlb,MLBLNG);
+			strcpy(ellname,grs_def->mlb); /*used strncpy before, but this fct. could be called with too short strings */
 			
         }
       
