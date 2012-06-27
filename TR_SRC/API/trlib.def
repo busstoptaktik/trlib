@@ -45,6 +45,10 @@ EXPORTS
 	cwtJD
 	dk_trans
 	dks_tr
+	doc_prj
+	doc_rgn
+	doc_grs
+	doc_dtm
 	ee_trans
 	eetmtu_g
 	erad
@@ -74,6 +78,7 @@ EXPORTS
 	get_mlb
 	get_tpd
 	get_zone
+	get_def_numbers
 	getsinexlin
 	getsinexver
 	gettabdir
@@ -113,9 +118,11 @@ EXPORTS
 	sgetcw
 	sgetdt
 	sgetg
+	
 	sputcw
 	sputg
 	sputshpprj
+	
 	srch_plate
 	srch_tab_typ
 	t_status

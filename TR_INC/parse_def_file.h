@@ -17,6 +17,7 @@
  */
  #include "geo_lab.h"
  #define MAX_TABLE_LEN (32)
+ #define MAX_DSCR_LEN (128)
  
 struct def_grs {
 	char mlb[MLBLNG];
@@ -28,6 +29,11 @@ struct def_grs {
 	double omega;
 };
 
+struct def_rgn {
+	char rgn_new[3];
+	char rgn_old[3];
+	char country[64];
+};
 
 struct def_datum {
 	char mlb[MLBLNG];
@@ -36,23 +42,28 @@ struct def_datum {
 	char ellipsoid[MLBLNG];
 	int imit;
 	int type;
+	int p_no;
 	char rgn[3];
 	double translation[3];
 	double rotation[3];
 	double scale;
+	char descr[MAX_DSCR_LEN];
 	
 };
 
 struct def_projection{
 	char mlb[MLBLNG];
-	char numbers[5];
+	int cha_str, type, cstm, mode, mask;
 	char seq[4];
 	char rgn[3];
 	char p_datum[16];
 	int q_par;
-	char param_txt[64];
+	char param_tokens[32];
+	char param_text[128];
 	char native_proj[MLBLNG];
 	double native_params[8];
+	char descr[MAX_DSCR_LEN];
+	
 };
 
 struct  def_hth_tr{
@@ -63,6 +74,7 @@ struct  def_hth_tr{
 	double L0;
 	double constants[5];
 	char table[MAX_TABLE_LEN];
+	char descr[MAX_DSCR_LEN];
 };
 	
 
@@ -70,13 +82,14 @@ typedef struct def_hth_tr def_hth_tr;
 typedef struct def_grs def_grs;
 typedef struct def_datum def_datum;
 typedef struct def_projection def_projection;
+typedef struct def_rgn def_rgn;
 
 struct def_data{
 	def_projection *projections;
 	def_datum      *datums;
 	def_grs    *ellipsoids;
 	def_hth_tr *hth_entries;
-	char *regions;
+	def_rgn     *regions;
 	int n_prj;
 	int n_dtm;
 	int n_ellip;
@@ -89,4 +102,3 @@ typedef struct def_data def_data;
 double get_number(char *item);
 def_data *open_def_data(FILE *fp, int *n_err);
 void close_def_data(def_data *data); 
-void present_data(FILE *fp, def_data *data);

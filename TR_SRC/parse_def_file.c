@@ -38,7 +38,7 @@
 #define N_TOKENS_HTH 6
 #define MAX_LINE_DEF 4
 #define RGN_STOP "STOP"
-/*Values  below pasted from def_lab.txt */
+/*Values  below copy-pasted from def_lab.txt */
 #define KM_HERE       (3986005.e8)
 #define OMEGA_HERE (7292115.0e-11)
 #define GEQ_HERE     (978049.e-5)
@@ -51,6 +51,8 @@ int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	ellip->mode=atoi(items[2]);
 	ellip->axis=atof(items[3]);
 	ellip->flattening=atof(items[4]);
+	/* todo: implement +.-,* operators. * is problematic since fgetln_kms interprets it as the beginning of a comment! */
+	/* only seems to be used in grs MOON so perhaps overkill to write code for that!! */
 	if (!isalpha(items[5][0]))
 		ellip->km=atof(items[5]);
 	else if (!strcmp(items[5],"KM"))
@@ -72,17 +74,24 @@ int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	return 0;
 }
 	
-int set_projection(char **items,  def_projection *proj, int n_items){
+int set_projection(char **items,  def_projection *proj, int n_items, char *descr){
 	int i,n_param;
 	strncpy(proj->mlb,items[0],MLBLNG);
-	for (i=1;i<n_items && i<6;i++){
-		proj->numbers[i-1]=atoi(items[i]);
-	}
+	if (descr!=NULL){
+		strncpy(proj->descr,descr,MAX_DSCR_LEN);
+		proj->descr[MAX_DSCR_LEN-1]='\0';
+		}
+	else *(proj->descr)='\0';
+	proj->cha_str=atoi(items[1]);
+	proj->type=atoi(items[2]);
+	proj->cstm=atoi(items[3]);
+	proj->mode=atoi(items[4]);
+	proj->mask=atoi(items[5]);
 	strncpy(proj->seq,items[6],4);
 	strncpy(proj->rgn,items[7],3);
 	strncpy(proj->p_datum,items[8],16);
 	proj->q_par= atoi(items[9]);
-	proj->param_txt[0]='\0';
+	proj->param_tokens[0]='\0';
 	if (items[10][0]!='"')
 		n_param=proj->q_par;
 	else
@@ -99,26 +108,36 @@ int set_projection(char **items,  def_projection *proj, int n_items){
 	}
 	
 	for (i=0; i<n_param && i<n_items-10; i++){
-		strcat(proj->param_txt,items[i+10]);
+		strcat(proj->param_tokens,items[i+10]);
 		if (i<n_param-1)
-			strcat(proj->param_txt," ");
+			strcat(proj->param_tokens," ");
 	}
 	
 	if (n_items>10+n_param)
 		strncpy(proj->native_proj,items[10+n_param],MLBLNG);
 	else
 		return 1;
-	
-	for(i=0; i<n_items-11-n_param; i++)
+	proj->param_text[0]='\0';
+	for(i=0; i<n_items-11-n_param; i++){
 		proj->native_params[i]=get_number(items[i+11+n_param]);
+		strcat(proj->param_text,items[i+11+n_param]);
+		if (i<n_items-11-n_param-1)
+			strcat(proj->param_text," ");
+	}
 	return 0;
 	
 }
 	
-int set_datum(char **tokens,  def_datum *dtm, int n_items){
+int set_datum(char **tokens,  def_datum *dtm, int n_items, char *descr){
 	int i;
 	strncpy(dtm->mlb,tokens[0],MLBLNG);
+	if (descr!=NULL){
+		strncpy(dtm->descr,descr,MAX_DSCR_LEN);
+		dtm->descr[MAX_DSCR_LEN-1]='\0';
+	}
+	else *(dtm->descr)='\0';
 	dtm->no= atoi(tokens[1]);
+	dtm->p_no=-1;
 	strncpy(dtm->p_datum,tokens[2],MLBLNG);
 	strncpy(dtm->ellipsoid,tokens[3],MLBLNG);
 	dtm->imit= atoi(tokens[4]);
@@ -132,10 +151,16 @@ int set_datum(char **tokens,  def_datum *dtm, int n_items){
 	return 0;
 }
 
-int set_hth(char **tokens,  def_hth_tr *entry, int n_items){
+int set_hth(char **tokens,  def_hth_tr *entry, int n_items, char *descr){
 	int i;
 	double val;
 	strncpy(entry->from_mlb,tokens[0],MLBLNG);
+	if (descr!=NULL){
+		strncpy(entry->descr,descr,MAX_DSCR_LEN);
+		entry->descr[MAX_DSCR_LEN-1]='\0';
+	}
+	else *(entry->descr)='\0';
+	entry->descr[MAX_DSCR_LEN-1]='\0';
 	strncpy(entry->to_dtm,tokens[1],MLBLNG);
 	entry->type=atoi(tokens[2]);
 	entry->B0=get_number(tokens[3]);
@@ -233,12 +258,12 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	/* specifications for how much to preallocate */
 	int n_prealloc[5]={256,128,128,128,64};
 	int n_alloc[5]={256,128,128,128,64};
-	int mode_sizes[5]={sizeof( def_projection),sizeof( def_grs),3,sizeof( def_datum), sizeof( def_hth_tr)};
+	int mode_sizes[5]={sizeof( def_projection),sizeof( def_grs),sizeof(def_rgn),sizeof( def_datum), sizeof( def_hth_tr)};
 	char *mode_names[7]={MODE_PRJ,MODE_GRS,MODE_RGN,MODE_DTM,MODE_HTH,MODE_STOP,NULL},*mode_name;
 	/*some other needed stuff for buffering etc */
 	char buf[4096],savelines[MAX_LINE_DEF][1024];
 	int n_lines=0;
-	char **tokens=NULL,**next_tokens=NULL,*sub_str;
+	char **tokens=NULL,**next_tokens=NULL,*sub_str, *descr;
 	int n_items=0,n_items2,n_items_line;
 	int n_chars,i;
 	int err;
@@ -264,8 +289,10 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 				continue;
 			
 			/*If we got here, we have either found a new item or should start a new mode */
-			if (!completed)
+			if (!completed){
+				fprintf(stderr,"mode: %d, cmplt: %d\n%s\n",mode,n_set[mode],buf);
 				(*n_err)++;
+			}
 			completed=1;
 			
 			new_mode=0;
@@ -330,7 +357,14 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 				completed=1;
 			}
 			else if (n_set[mode_rgn]<n_alloc[mode_rgn]){
-				strncpy(((char*) entries[mode_rgn])+(n_set[mode_rgn]++)*mode_sizes[mode_rgn],tokens[0],mode_sizes[mode_rgn]);
+				//strncpy(((char*) entries[mode_rgn])+(n_set[mode_rgn]++)*mode_sizes[mode_rgn],tokens[0],mode_sizes[mode_rgn]);
+				{
+					def_rgn *this_rgn;
+					this_rgn=((def_rgn*) entries[mode_rgn])+(n_set[mode_rgn]++);
+					strncpy(this_rgn->rgn_new,tokens[0],3);
+					strncpy(this_rgn->rgn_old,tokens[1],3);
+					strncpy(this_rgn->country,tokens[2],64);
+				}
 				}
 			}
 		free(tokens); tokens=NULL;
@@ -352,24 +386,29 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 		n_items+=n_items2;
 		free(next_tokens);
 	}
-	
-	if (n_items<min_tokens[mode]) /*important logic here! We must be able to decide after reading some lines if we have the minimal number of items! */
+	/*important logic here! We must be able to decide after reading some lines if we have the minimal number of items! */
+	if (n_items<min_tokens[mode]) 
 		continue;
 	
+	/* and - the descr text line is the line immedeately after we have found the minimal number of items */
+	if (mode!=mode_grs){
+		descr=fgets(buf,MAX_DSCR_LEN,fp);
+	}
+	
 	if (mode==mode_prj)
-		err=set_projection(tokens,((def_projection*) entries[mode])+n_set[mode],n_items);
+		err=set_projection(tokens,((def_projection*) entries[mode])+n_set[mode],n_items,descr);
 	
 	else if (mode==mode_grs)
 		err=set_ellipsoid(tokens,((def_grs*) entries[mode])+n_set[mode],n_items);
 	
 	else if (mode==mode_dtm)
-		err=set_datum(tokens,((def_datum*) entries[mode])+n_set[mode],n_items);
+		err=set_datum(tokens,((def_datum*) entries[mode])+n_set[mode],n_items,descr);
 	
 	else if (mode==mode_hth)	
-		err=set_hth(tokens,((def_hth_tr*) entries[mode])+n_set[mode],n_items);
+		err=set_hth(tokens,((def_hth_tr*) entries[mode])+n_set[mode],n_items,descr);
 	
 	else{
-		fprintf(stdout,"Something wrong!\n"); /*TODO: use GLOBAL error handling system! */
+		fprintf(stderr,"parse_def: Something wrong!\n"); /*TODO: use GLOBAL error handling system! */
 		continue;
 	}
 	if (!err)
@@ -386,6 +425,26 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	/*reallocate sizes of objects */
 	for(i=0;i<n_modes-1;i++)
 		entries[i]=realloc(entries[i],mode_sizes[i]*n_set[i]);
+	/*set parent no of datums*/
+	
+	{
+	def_datum *dtm1,*dtm2;
+	int j;
+	for(i=0;i<n_set[mode_dtm]; i++){
+		dtm1=((def_datum*) entries[mode_dtm])+i;
+		//dtm1->p_no=-1;
+		for (j=0;j<n_set[mode_dtm];j++){
+			dtm2=((def_datum*) entries[mode_dtm])+j;
+			if (!strcmp(dtm2->mlb,dtm1->p_datum)){
+				dtm1->p_no=dtm2->no;
+				break;
+			}
+		}
+		if (dtm1->p_no<=0)
+			fprintf(stderr,"parse_def: Could not find p_datum!\n");
+	}
+	}
+	
 	/*transfer stuff to data object */
 	data->n_prj=n_set[mode_prj];
 	data->n_rgn=n_set[mode_rgn];
@@ -407,90 +466,8 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	    return NULL;
 }
 
-void present_data(FILE *fp,def_data *data){
-	int i,j;
-	double R2D=57.295779513082323;
-	def_projection *projections=data->projections;
-	def_datum *datums=data->datums;
-	def_grs *ellipsoids=data->ellipsoids;
-	char *regions=data->regions;
-	int n_rgn=data->n_rgn;
-	int n_grs=data->n_ellip;
-	int n_dtm=data->n_dtm;
-	int n_prj=data->n_prj;
-	int n_hth=data->n_hth;
-	fprintf(fp,"n_prj: %d\n",n_prj);
-	fprintf(fp,"n_rgn: %d\n",n_rgn);
-	fprintf(fp,"n_dtm: %d\n",n_rgn);
-	fprintf(fp,"n_grs: %d\n",n_grs);
-	fprintf(fp,"n_hth: %d\n\n",n_hth);
-	for (i=0; i<data->n_prj; i++){
-		fprintf(fp,"prj: %s\n",projections[i].mlb);
-		fprintf(fp,"Stuff:\n");
-		for(j=0;j<5;j++){
-			fprintf(fp,"%d ",projections[i].numbers[j]);
-		}
-		fprintf(fp,"%s %s %s %s\n",projections[i].seq,projections[i].rgn,projections[i].p_datum,projections[i].param_txt);
-		fprintf(fp,"par: %d\n",projections[i].q_par);
-		fprintf(fp,"native: %s\n",projections[i].native_proj);
-		for(j=0;j<projections[i].q_par;j++)
-			fprintf(fp," %f",projections[i].native_params[j]);
-		if (projections[i].q_par>0)
-			fprintf(fp,"\n");
-	fprintf(fp,"\n");
-	}
-	fprintf(fp,"******************\n\n");
-	for(i=0; i<n_grs; i++){
-		fprintf(fp,"grs: %s\n",ellipsoids[i].mlb);
-		fprintf(fp,"%d %d %f %f %e %e\n",ellipsoids[i].no,ellipsoids[i].mode,ellipsoids[i].axis,ellipsoids[i].flattening,ellipsoids[i].km,ellipsoids[i].omega);
-	}
-	fprintf(fp,"******************\n\n");
-	fprintf(fp,"Regions:\n");
-	for(i=0; i<n_rgn; i++)
-		fprintf(fp,"%s ",regions+(i*3));
-	fprintf(fp,"\n******************\n\n");
-	for(i=0;i<n_dtm;i++){
-		fprintf(fp,"dtm : %s, no: %d\n",datums[i].mlb,datums[i].no);
-		fprintf(fp,"parent: %s, ellipsoid: %s\n",datums[i].p_datum,datums[i].ellipsoid);
-		fprintf(fp,"imit: %d, type: %d, rgn: %s\n",datums[i].imit,datums[i].type,datums[i].rgn);
-		fprintf(fp,"TO-WGS84:\n%f %f %f\n%f ppm %f dg %f dg %f dg\n\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2],datums[i].scale*1e6,
-		datums[i].rotation[0]*R2D,datums[i].rotation[1]*R2D,datums[i].rotation[2]*R2D);
-	}
-	fprintf(fp,"*****************\n\n");
-		
-	for(i=0;i<n_hth;i++){
-		fprintf(fp,"hth: %s to %s\n", data->hth_entries[i].from_mlb,data->hth_entries[i].to_dtm);
-		fprintf(fp,"Bo: %f, L0: %f\n",data->hth_entries[i].B0,data->hth_entries[i].L0);
-		switch( (data->hth_entries[i]).type)
-		{
-			case 1:
-				fprintf(fp,"Table: %s\n",data->hth_entries[i].table);
-				break;
-			case 2:
-				fprintf(fp,"constant: %f\n",data->hth_entries[i].constants[0]);
-				break;
-			case 3:
-				fprintf(fp,"Constants: ");
-				for(j=0;j<5;j++)
-					fprintf(fp," %e",data->hth_entries[i].constants[j]);
-				fprintf(fp,"\n");
-				break;
-			default:
-				fprintf(fp,"Unrecognized type!\n");
-		
-		}
-		fprintf(fp,"\n");
-				
-	}
-	fprintf(fp,"*****************\n\n");
-	{
-	int n_bytes=0;
-	n_bytes=sizeof( def_projection)*n_prj+sizeof( def_datum)*n_dtm+sizeof( def_grs)*n_grs+n_rgn*3+sizeof( def_hth_tr)*n_hth;
-	fprintf(fp,"bytes used: %d\n",n_bytes);
-	}
-	
-	return;
-}
+
+
 
 void close_def_data( def_data *data){
 	free(data->projections);

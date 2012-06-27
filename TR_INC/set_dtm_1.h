@@ -98,7 +98,7 @@ The structure containing the datum shift parameters.
 See geo_lab.h.
 
 Prog: Knud Poder 1990, 1991, 1992, 1994
-Modified, KE JUL 2007, KE JAN 2010
+Modified, KE JUL 2007, KE JAN 2010, simlk june 2012.
 */
 
 #endif
