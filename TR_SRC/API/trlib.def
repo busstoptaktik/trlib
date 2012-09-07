@@ -1,5 +1,6 @@
 EXPORTS
 	TR_InitLibrary
+	TR_SetGeoidDir
 	TR_Transform
 	TR_GeoidInfo
 	TR_GetEsriText

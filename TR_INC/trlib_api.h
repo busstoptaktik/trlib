@@ -30,6 +30,7 @@
 #define KMSTR_API
 #endif 
 KMSTR_API int   TR_InitLibrary(char *path);
+KMSTR_API int   TR_SetGeoidDir(char *path);
 KMSTR_API int   TR_GetLastError(void);
 KMSTR_API void TR_GetVersion(char *buffer, int bufferlength);
 KMSTR_API int   TR_GetEsriText(char *label_in, char *wkt_out);

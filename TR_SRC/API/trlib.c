@@ -36,7 +36,7 @@
 #include "parse_def_file.h"
 #include "doc_def_data.h"
 #include "trthread.h"
-#define TRLIB_VERSION "dev v1.0 2012-03-23"
+#define TRLIB_VERSION "dev v1.0 2012-09-07"
 #ifndef TRLIB_REVISION
 #define TRLIB_REVISION "hg revison not specified"
 #endif
@@ -96,40 +96,18 @@ int TR_InitLibrary(char *path) {
     int ok=-1,rc;
     double x=512200.0,y=6143200.0,z=0.0;
     TR* trf;
-    FILE *fp;
-    char buf[FILENAME_MAX],fname[FILENAME_MAX],*init_path=0;
+    
     if (!TR_IsMainThread()) /*Only one thread can succesfully initialise the library*/
 	    return TR_ERROR;
-    if (strlen(path)>0) 
-	    init_path=path;
-    else
-	    init_path=getenv(TR_TABDIR_ENV);
-    if (0==init_path){ 
-	    sprintf(buf,"./");
-	    init_path=buf;
-	    }
-    else if (init_path[strlen(init_path)-1]!='/' && init_path[strlen(init_path)-1]!='\\'){
-	    strcpy(buf,init_path);
-	    strcat(buf,"/");
-	    init_path=buf;
-	    }
-	    
-    strcpy(fname,init_path);
-    strcat(fname,TR_DEF_FILE);
-    #ifdef _ROUT
-    fprintf(stdout,"%s %s\n",init_path,fname); /*just debugging */
-    #endif
-    fp=fopen(fname,"r");
-    if (0==fp)
-	    return TR_ERROR;
-    DEF_DATA=open_def_data(fp,&rc);
-    fclose(fp);
-    #ifdef _ROUT
-    fprintf(stdout,"Parsed def_lab.txt, errs: %d\n",rc);
-    #endif
-    settabdir(init_path);
     #ifdef _ROUT
     ERR_LOG=fopen("TR_errlog.log","wt");
+    #endif
+    ok=TR_SetGeoidDir(path);
+    if (ERR_LOG && ok!=TR_OK)
+	    fprintf(ERR_LOG,"Failed to parse def-file!\n");
+    if (ok!=TR_OK)
+	    return TR_ERROR;
+    #ifdef _ROUT
     if (DEF_DATA && ERR_LOG){
 	    fprintf(ERR_LOG,"Contents of %s:\n",TR_DEF_FILE);
 	    present_data(ERR_LOG,DEF_DATA);
@@ -169,6 +147,51 @@ int TR_InitLibrary(char *path) {
 	    MAIN_THREAD_ID=&THREAD_ID;
     return (ok==TR_OK)?TR_OK:TR_ERROR; 
 }
+
+/*
+* A function to change the tab-dir has turned out to be useful - this is done here: set or change the current tab-dir
+*/
+
+int TR_SetGeoidDir(char *path){
+	FILE *fp;
+	int rc;
+	char buf[FILENAME_MAX],fname[FILENAME_MAX],*init_path=0;
+	if (path && strlen(path)>0) 
+		init_path=path;
+	else
+		init_path=getenv(TR_TABDIR_ENV);
+	if (0==init_path){ 
+		sprintf(buf,"./");
+		init_path=buf;
+	}
+	else if (init_path[strlen(init_path)-1]!='/' && init_path[strlen(init_path)-1]!='\\'){
+		strcpy(buf,init_path);
+		strcat(buf,"/");
+		init_path=buf;
+	}
+		    
+	strcpy(fname,init_path);
+	strcat(fname,TR_DEF_FILE);
+	#ifdef _ROUT
+	fprintf(stdout,"%s %s\n",init_path,fname); /*just debugging */
+	#endif
+	fp=fopen(fname,"r");
+	if (0==fp)
+		return TR_ERROR;
+	/* close previously parsed definitions */
+	if (DEF_DATA) 
+		close_def_data(DEF_DATA);
+	/* close previously opened tab-dir files */
+	c_tabdir_file(0,NULL);
+	DEF_DATA=open_def_data(fp,&rc);
+	fclose(fp);
+	#ifdef _ROUT
+	fprintf(stdout,"Parsed def_lab.txt, errs: %d\n",rc);
+	#endif
+	settabdir(init_path);
+	return (DEF_DATA ? TR_OK: TR_ERROR);
+}
+	
 
 
 /* Mock up - not fully implemented! */

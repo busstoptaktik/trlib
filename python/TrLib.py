@@ -1,5 +1,5 @@
 """/*
-* Copyright (c) 2011, National Survey and Cadastre, Denmark
+* Copyright (c) 2012, National Survey and Cadastre, Denmark
 * (Kort- og Matrikelstyrelsen), kms@kms.dk
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -66,9 +66,11 @@ class LabelException(Exception):
 	def __str__(self):
 		return self.msg
 		
-##################
+###################
 ##Call this initializtion FIRST!
-##################
+###################
+#TODO: change prints to raise some Exception
+#Or: stdout must be mapped to some other logging method....
 def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	global tr_lib
 	global IS_INIT
@@ -79,7 +81,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		lib_dir="."
 	lib_path=os.path.join(lib_dir,lib)
 	if not os.path.exists(lib_path):
-		print("%s does not exist!")
+		print("%s does not exist!" %lib_path)
 		return False
 	#to be able to find extra runtime dlls on windows#
 	if "win" in sys.platform.lower():
@@ -126,10 +128,12 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		#Some extra functions which might get exposed in the API#
 		tr_lib.TR_OpenProjection.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_OpenProjection.restype=ctypes.c_void_p
-		tr_lib.settabdir.argtypes=[ctypes.c_char_p]
-		tr_lib.settabdir.restype=None
+		tr_lib.TR_SetGeoidDir.argtypes=[ctypes.c_char_p]
+		tr_lib.TR_SetGeoidDir.restype=ctypes.c_int
+		tr_lib.set_grs.argtypes=[ctypes.c_int,ctypes.c_char_p,LP_c_double]
 		tr_lib.bshlm2.restype=ctypes.c_int
 		tr_lib.bshlm2.argtypes=[ctypes.c_double]*6+[LP_c_double]*3+[ctypes.c_int]
+		
 	except Exception, msg:
 		print repr(msg)
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
@@ -182,13 +186,16 @@ def SetGeoidDir(geoid_dir):
 	msg=""
 	for fname in REQUIRED_FILES:
 		if not os.path.exists(os.path.join(geoid_dir,fname)):
-			msg+="\nRequired file %s not found." %fname
+			msg+="Required file %s not found.\n" %fname
 			return False,msg
 	if geoid_dir[-1] not in ["\\","/"]:
 		geoid_dir+="/"
-	GEOIDS=geoid_dir
-	tr_lib.settabdir(geoid_dir)
-	return True,msg
+	ok=tr_lib.TR_SetGeoidDir(geoid_dir)
+	if (ok!=TR_OK):
+		msg+="Failed to initialise library - probably a bad def_lab file."
+	else:
+		GEOIDS=geoid_dir
+	return ok==TR_OK,msg
 
 
 def GetVersion():
@@ -208,11 +215,14 @@ def GetEsriText(label):
 
 def GetLocalGeometry(label,x,y):
 	#out param determines wheteher prj_in or prj_out is used#
-	mc=ctypes.c_double(0)
-	s=ctypes.c_double(0)
-	ok=tr_lib.TR_GetLocalGeometry(label,x,y,ctypes.byref(s),ctypes.byref(mc))
-	if ok==TR_OK:
-		return s.value,(mc.value)*R2D
+	if IS_INIT:
+		if (IsGeographic(label)):
+			return 1,0
+		mc=ctypes.c_double(0)
+		s=ctypes.c_double(0)
+		ok=tr_lib.TR_GetLocalGeometry(label,x,y,ctypes.byref(s),ctypes.byref(mc))
+		if ok==TR_OK:
+			return s.value,(mc.value)*R2D
 	return 0,0
 
 def GetAzimuth(axis,flat,lon1,lat1,lon2,lat2):
@@ -224,6 +234,16 @@ def GetAzimuth(axis,flat,lon1,lat1,lon2,lat2):
 		if ret<2:
 			return a1.value*R2D,a2.value*R2D,d.value
 	return None,None,None
+
+def GetEllipsoidParameters(ell_nr):
+        if IS_INIT:
+                arr=ctypes.c_double*9
+                ell_par=arr()
+                name=" "*512
+                ret=tr_lib.set_grs(ell_nr,name,ctypes.cast(ell_par,LP_c_double))
+                if ret>0:
+                        return name.strip().replace("\0",""),ell_par[0],ell_par[1]
+        return None,None,None
 
 def IsGeographic(mlb):
 	return ("geo" in mlb[:6])
