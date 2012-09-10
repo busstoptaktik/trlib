@@ -81,7 +81,8 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 	def_projection *prj=NULL;
 	int i,mode=0;
 	static int n_prj=0;
-	char s_name[MLBLNG];
+	char s_name[MLBLNG],replaced[MLBLNG];
+	replaced[0]='\0';
 	if (DEF_DATA==NULL)
 		return TR_LABEL_ERROR;
 	*descr='\0';
@@ -96,15 +97,27 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 	}
 	/* else look for prj_name */
 	else{
+		int have_looked=0, n_digits=0;
 		mode=1;
-		strncpy(s_name,prj_name,MLBLNG);
-		/*replace digits by '?' - to be able to find utm projs */
-		for (i = 0; *(s_name+i); i++)  *(s_name+i) = (isdigit(*(s_name+i))) ? '?' : *(s_name+i);
-		*(s_name+i) = '\0';
-		for(i=0; i<DEF_DATA->n_prj && prj==NULL; i++)
-			if (!strcmp(DEF_DATA->projections[i].mlb,s_name))
-				prj=DEF_DATA->projections+i;
+		/*replace digits by '?' in second search to be able to find utm projs */
+		while (prj==NULL && have_looked<2){
+			for (i = 0; *(prj_name+i) && i<MLBLNG; i++){
+				if (isdigit(*(prj_name+i)) && have_looked>0){
+					*(replaced+n_digits++)=*(prj_name+i);
+					*(s_name+i)='?';
+					
+				}
+				else
+					*(s_name+i)=*(prj_name+i); /* copy char */
+			}
+			*(s_name+i) = '\0'; 
+			*(replaced+n_digits)='\0';
+			for(i=0; i<DEF_DATA->n_prj && prj==NULL; i++)
+				if (!strcmp(DEF_DATA->projections[i].mlb,s_name))
+					prj=DEF_DATA->projections+i;
+			have_looked++;
 		}
+	}
 	/*printf("Look for: %s n_prj is %d, found? %d\n", prj_name,n_prj,(prj==NULL));*/
 	if (prj==NULL){
 		
@@ -119,18 +132,29 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 	}
 	*type=prj->type;
 	/*decide what to print to descr*/
-	if (detail>1 || mode==0)
+	if (detail>1 || mode==0) /*iteration mode */
 		descr+=sprintf(descr,"%s ",prj->mlb);
 	if (detail>1)
 	/*todo: add whatever relevant here */
 		descr+=sprintf(descr,"mode: %d, cstm: %d ",prj->mode,prj->cstm);
-	if (detail>0 || mode==1)
-		sprintf(descr,"%s",prj->descr);
+	if (detail>0 || mode==1){
+		char *loop_over_descr=prj->descr, *loop_over_replaced=replaced;
+		/*replace ?? by the stored digits*/
+		while (*loop_over_descr){
+			if (*(loop_over_descr)=='?' && *loop_over_replaced){
+				*(descr++)=*(loop_over_replaced++);
+			}
+			else
+				*(descr++)=*(loop_over_descr);
+			loop_over_descr++;
+		}
+		*descr='\0';
+	}
 	return TR_OK;
 }
 
 /* search for dtm_name. If dtm_name is "" or NULL, 'next' prj is requested */
-
+/* if detail<0 only the ellipsoid name is copied to descr - usefull when looking only for ellipsoid data */
 int doc_dtm( char *dtm_name, char *descr, int detail){
 	def_datum *dtm=NULL;
 	int i,s_mode,mode;
@@ -169,13 +193,17 @@ int doc_dtm( char *dtm_name, char *descr, int detail){
 	}
 	if (dtm==NULL)
 		return TR_LABEL_ERROR;
-	if (mode==0 || detail>1)
-		descr+=sprintf(descr,"%s ",dtm->mlb);
-	if (detail>1)
-		/*todo: put more stuff here */
-		descr+=sprintf(descr,"%s %d %s ",dtm->ellipsoid,dtm->type,dtm->p_datum);
-	if (detail>0 || mode==1)
-		sprintf(descr,"%s",dtm->descr);
+	if (detail>-1){
+		if (mode==0 || detail>1)
+			descr+=sprintf(descr,"%s ",dtm->mlb);
+		if (detail>1)
+			/*todo: put more stuff here */
+			descr+=sprintf(descr,"%s %d %s ",dtm->ellipsoid,dtm->type,dtm->p_datum);
+		if (detail>0 || mode==1)
+			sprintf(descr,"%s",dtm->descr);
+	}
+	else
+		strcpy(descr,dtm->ellipsoid);
 	return TR_OK;
 }
 

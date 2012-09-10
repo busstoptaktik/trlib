@@ -51,10 +51,13 @@ GEOIDS=None
 #conversions
 D2R=math.pi/180.0
 R2D=180.0/math.pi
+#Globals for minilabel parsing
+SEPS=["E","H","N"]
 #debug flag- turns on extra verbosity here and there
 DEBUG=False
 #ctypes pointer to double#
 LP_c_double=ctypes.POINTER(ctypes.c_double)
+LP_c_int=ctypes.POINTER(ctypes.c_int)
 class TransformationException(Exception):
 	def __init__(self,msg="Transformation Error"):
 		self.msg=msg
@@ -131,8 +134,14 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_SetGeoidDir.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_SetGeoidDir.restype=ctypes.c_int
 		tr_lib.set_grs.argtypes=[ctypes.c_int,ctypes.c_char_p,LP_c_double]
+		tr_lib.bshlm1.restype=ctypes.c_int
+		tr_lib.bshlm1.argtypes=[ctypes.c_double]*3+[LP_c_double,ctypes.c_double]*3
 		tr_lib.bshlm2.restype=ctypes.c_int
 		tr_lib.bshlm2.argtypes=[ctypes.c_double]*6+[LP_c_double]*3+[ctypes.c_int]
+		tr_lib.doc_prj.argtypes=[ctypes.c_char_p]*3+[LP_c_int]+[ctypes.c_int]
+		tr_lib.doc_prj.restype=ctypes.c_int
+		tr_lib.doc_dtm.argtypes=[ctypes.c_char_p]*2+[ctypes.c_int]
+		tr_lib.doc_dtm.restype=ctypes.c_int
 		
 	except Exception, msg:
 		print repr(msg)
@@ -157,6 +166,13 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	rc=tr_lib.TR_InitLibrary(sdir) 
 	IS_INIT=(rc==TR_OK)
 	return IS_INIT
+
+#Convenience method for getting a proper python string out of a string returned from c-function
+def GetString(cstring):
+	i=cstring.find("\0")
+	if (i!=-1):
+		return cstring[:i].strip()
+	return cstring.strip()
 
 def GetLastError():
 	return tr_lib.TR_GetLastError()
@@ -208,7 +224,7 @@ def GetEsriText(label):
 	wkt=" "*2048;
 	retval=tr_lib.TR_GetEsriText(label,wkt)
 	if retval==0:
-		wkt=wkt.strip().replace("\0","")
+		wkt=GetString(wkt)
 	else:
 		wkt=None
 	return wkt
@@ -225,28 +241,140 @@ def GetLocalGeometry(label,x,y):
 			return s.value,(mc.value)*R2D
 	return 0,0
 
-def GetAzimuth(axis,flat,lon1,lat1,lon2,lat2):
+def BesselHelmert(axis,flat,lon1,lat1,lon2,lat2):
 	if IS_INIT:
+		if (max(abs(lon1-lon2),abs(lat1-lat2))<1e-11):
+			return 0.0,90.0,0.0
 		d=ctypes.c_double(0)
 		a1=ctypes.c_double(0)
 		a2=ctypes.c_double(0)
 		ret=tr_lib.bshlm2(axis,flat,lat1*D2R,lat2*D2R,lon1*D2R,lon2*D2R,ctypes.byref(a1),ctypes.byref(a2),ctypes.byref(d),0)
 		if ret<2:
-			return a1.value*R2D,a2.value*R2D,d.value
+			return d.value,a1.value*R2D,a2.value*R2D
 	return None,None,None
 
-def GetEllipsoidParameters(ell_nr):
+def InverseBesselHelmert(axis,flat,lon1,lat1,a1,dist):
+	if IS_INIT:
+		a2=ctypes.c_double(0)
+		lon2=ctypes.c_double(0)
+		lat2=ctypes.c_double(0)
+		ret=tr_lib.bshlm1(axis,flat,lat1*D2R,ctypes.byref(lat2),lon1*D2R,ctypes.byref(lon2),a1*D2R,ctypes.byref(a2),dist)
+		if (ret==0 or ret==1):
+			return lon2.value*R2D,lat2.value*R2D,a2.value*R2D
+	return None,None,None
+
+def GetEllipsoidParameters(ell_name):
         if IS_INIT:
                 arr=ctypes.c_double*9
                 ell_par=arr()
-                name=" "*512
-                ret=tr_lib.set_grs(ell_nr,name,ctypes.cast(ell_par,LP_c_double))
+                ret=tr_lib.set_grs(-1,ell_name,ctypes.cast(ell_par,LP_c_double))
                 if ret>0:
-                        return name.strip().replace("\0",""),ell_par[0],ell_par[1]
-        return None,None,None
+                        return ell_par[0],ell_par[1]
+        return None,None
+
+def DescribeProjection(mlb_prj):
+	if IS_INIT:
+		descr=" "*512
+		impl_dtm=" "*64
+		type=ctypes.c_int(0)
+		rc=tr_lib.doc_prj(mlb_prj,descr,impl_dtm,ctypes.byref(type),0)
+		if (rc==TR_OK):
+			if ("(" in descr):
+				descr=descr[:descr.find("(")]
+			return GetString(descr),GetString(impl_dtm)
+	return None,None
+
+def DescribeDatum(mlb_dtm):
+	if IS_INIT:
+		if (mlb_dtm=="E"):
+			return "Ellipsoidal heights"
+		if (mlb_dtm=="N"):
+			mlb_dtm="Normal heights"
+		descr=" "*512
+		rc=tr_lib.doc_dtm(mlb_dtm,descr,0)
+		if (rc==TR_OK):
+			return GetString(descr).replace("@","")
+	return None
+
+def GetEllipsoidParametersFromDatum(mlb_dtm):
+	if IS_INIT:
+		ell_name=" "*128
+		rc=tr_lib.doc_dtm(mlb_dtm,ell_name,-1)
+		if (rc==TR_OK):
+			a,f=GetEllipsoidParameters(ell_name)
+		return GetString(ell_name),a,f
+	return None,None,None
+
+def DescribeLabel(mlb):
+	try:
+		region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
+	except Exception,msg:
+		return "Bad minilabel. "+repr(msg)
+	if (not IS_INIT):
+		return "Library not initialised."
+	descr_prj,impl_dtm=DescribeProjection(prj)
+	if descr_prj is None:
+		descr_prj="Projection not ok"
+	elif (len(impl_dtm)>0 and len(dtm)==0):
+		dtm=impl_dtm
+	descr_dtm=DescribeDatum(dtm)
+	if (descr_dtm is None):
+		descr_dtm="datum not ok"
+	if (len(h_dtm)>0):
+		descr_h_dtm=DescribeDatum(h_dtm)
+		if (descr_h_dtm is None):
+			descr_h_dtm="height datum not ok"
+	else:
+		descr_h_dtm=""
+	descr=descr_prj+", "+descr_dtm
+	if len(descr_h_dtm)>0:
+		descr+=", "+descr_h_dtm
+	return descr+"."
+
+
+######################
+## Minilabel analasys methods #
+######################
+def SplitMLB(mlb):
+	mlb=mlb.split()[0].replace("L","_")
+	region=""
+	proj=""
+	datum=""
+	hdatum=""
+	htype=""
+	sep=""
+	if len(mlb)>2:
+		if mlb[:2].isupper() and mlb[2]=="_":
+			region=mlb[:2]
+			mlb=mlb[3:]
+	if len(mlb)>1:
+		for ssep in SEPS:
+			if ssep in mlb:
+				sep=ssep
+				break
+		#no heights#
+		if sep=="":
+			if "_" in mlb:
+				proj,datum=mlb.split("_")
+			else:
+				proj=mlb
+		#heights#
+		else:
+			proj,datum=mlb.split(sep)
+			if "_" in datum:
+				if sep!="H":
+					raise Exception("Bad minilabel")
+				datum,htype,hdatum=datum.split("_")
+			else:
+				hdatum=sep
+	return region,proj,datum,hdatum,htype
 
 def IsGeographic(mlb):
-	return ("geo" in mlb[:6])
+	try:
+		region,proj,datum,hdatum,htype=SplitMLB(mlb)
+	except:
+		return False
+	return proj=="geo"
 
 class CoordinateTransformation(object):
 	def __init__(self,mlb_in,mlb_out,geoid_name=""):
