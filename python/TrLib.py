@@ -302,14 +302,14 @@ def GetEllipsoidParametersFromDatum(mlb_dtm):
 		rc=tr_lib.doc_dtm(mlb_dtm,ell_name,-1)
 		if (rc==TR_OK):
 			a,f=GetEllipsoidParameters(ell_name)
-		return GetString(ell_name),a,f
+			return GetString(ell_name),a,f
 	return None,None,None
 
 def DescribeLabel(mlb):
 	try:
 		region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
 	except Exception,msg:
-		return "Bad minilabel. "+repr(msg)
+		return "Bad minilabel: "+repr(msg)
 	if (not IS_INIT):
 		return "Library not initialised."
 	descr_prj,impl_dtm=DescribeProjection(prj)
