@@ -44,6 +44,7 @@
 #define GEQ_HERE     (978049.e-5)
 #define GEQ84_HERE  (979764.5e-5)
 #define KMW84_HERE (3986004.418e8)
+#define KMMOON       KM_HERE*0.0122298 /* Moon parameter relative to Earth - fix of '*' char in def_lab which was interpreted as a */
 
 int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	strncpy(ellip->mlb,items[0],MLBLNG);
@@ -57,6 +58,8 @@ int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 		ellip->km=atof(items[5]);
 	else if (!strcmp(items[5],"KM"))
 		ellip->km=KM_HERE;
+	else if (!strcmp(items[5],"KMMOON"))
+		ellip->km=KMMOON;
 	else if (!strcmp(items[5],"GEQ"))
 		ellip->km=GEQ_HERE;
 	else if (!strcmp(items[5],"KMW84"))
