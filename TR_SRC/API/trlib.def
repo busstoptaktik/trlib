@@ -119,7 +119,7 @@ EXPORTS
 	sgetcw
 	sgetdt
 	sgetg
-	
+	sgetshpprj
 	sputcw
 	sputg
 	sputshpprj

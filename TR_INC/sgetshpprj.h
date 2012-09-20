@@ -16,14 +16,9 @@
  * 
  */
  
- #include "fgetshpprj.h"
-
- int fgetshpprj(FILE *fh_in, union geo_lab   *g_lab){
-	char wkt[4096];
-	size_t n_read=fread(wkt,1,4096,fh_in);
-	if (n_read==4096) /*overflow??*/
-		return -1;
-	return sgetshpprj(wkt,g_lab,NULL);
-}
-	 
- 
+ #include "geo_lab.h"
+ int              sgetshpprj(
+/*______________________*/
+char            *wkt_in,
+union geo_lab   *g_lab,
+char            *mlb_out);

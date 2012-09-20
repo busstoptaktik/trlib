@@ -142,6 +142,8 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.doc_prj.restype=ctypes.c_int
 		tr_lib.doc_dtm.argtypes=[ctypes.c_char_p]*2+[ctypes.c_int]
 		tr_lib.doc_dtm.restype=ctypes.c_int
+		tr_lib.sgetshpprj.argtypes=[ctypes.c_char_p,ctypes.c_void_p,ctypes.c_char_p]
+		tr_lib.sgetshpprj.restype=ctypes.c_int
 		
 	except Exception, msg:
 		print repr(msg)
@@ -221,13 +223,20 @@ def GetVersion():
 	return ver
 
 def GetEsriText(label):
-	wkt=" "*2048;
-	retval=tr_lib.TR_GetEsriText(label,wkt)
-	if retval==0:
-		wkt=GetString(wkt)
-	else:
-		wkt=None
-	return wkt
+	if IS_INIT:
+		wkt=" "*2048;
+		retval=tr_lib.TR_GetEsriText(label,wkt)
+		if retval==0:
+			return GetString(wkt)
+	return None
+	
+def FromEsriText(wkt):
+	if IS_INIT:
+		out=" "*256;
+		retval=tr_lib.sgetshpprj(wkt,None,out)
+		if retval==0:
+			return GetString(out)
+	return None
 
 def GetLocalGeometry(label,x,y):
 	#out param determines wheteher prj_in or prj_out is used#
