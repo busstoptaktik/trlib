@@ -51,10 +51,14 @@ inline float swapfloatifneeded(float p) {
 #ifdef TEST_ME
 #include <stdio.h>
 
+#define STRINGIFY(x)  #x
+#define TOSTRING(x)   STRINGIFY(x)
+#define LARG(x)        __FILE__ "(" TOSTRING(__LINE__) "): " x
+
 int main (void) {
     float f;
     unsigned int u = *is_little_endian;
-    printf ("is_little_endian = %u\n", u);
+    printf (LARG("is_little_endian = %u\n"), u);
     f = swapfloatifneeded(7);
 	printf ("f = %f\n", f);
 	
