@@ -18,6 +18,7 @@
 
 #include  <stdio.h>
 #include <stdarg.h>
+#include "trlib_intern.h"
 
 // muligheder for output_mode
 // stdout, stderr, FILE, nothing
@@ -30,7 +31,7 @@ int use_warning = 1;
 int use_error= 1;
 int use_critical = 1;
 
-void lord_debug(int *tr_lib_error_code, char *frmt, ...)
+void lord_debug(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_debug)
 	{
@@ -41,7 +42,7 @@ void lord_debug(int *tr_lib_error_code, char *frmt, ...)
 	}
 }
 
-void lord_info(int *tr_lib_error_code, char *frmt, ...)
+void lord_info(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_info)
 	{
@@ -52,7 +53,7 @@ void lord_info(int *tr_lib_error_code, char *frmt, ...)
 	}
 }
 	
-void lord_warning(int *tr_lib_error_code, char *frmt, ...)
+void lord_warning(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_warning)
 	{
@@ -63,7 +64,7 @@ void lord_warning(int *tr_lib_error_code, char *frmt, ...)
 	}
 }
 
-void lord_error(int *tr_lib_error_code, char *frmt, ...)
+void lord_error(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_error)
 	{
@@ -74,7 +75,7 @@ void lord_error(int *tr_lib_error_code, char *frmt, ...)
 	}
 }
 
-void lord_critical(int *tr_lib_error_code, char *frmt, ...)
+void lord_critical(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_critical)
 	{
@@ -85,12 +86,17 @@ void lord_critical(int *tr_lib_error_code, char *frmt, ...)
 	}
 }
 	
-void lord_set_parameters(int *debug)
+void lord_set_parameters(int debug)
 {
+	//implement that these parameters shall only be corrected from the main thread
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
 	use_debug = debug;
 }
 
-void lord_setQuitError(int *tr_lib_error_code, char *frmt, ...)
+void lord_setQuitError(int tr_lib_error_code, char *frmt, ...)
 {
 	(void) fprintf(stdout, frmt);
 }

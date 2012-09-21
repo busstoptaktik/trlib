@@ -18,16 +18,16 @@
  
 #include  <stdio.h>
 
-extern void lord_debug(int *tr_lib_error_code, char *frmt, ...);
+extern void lord_debug(int tr_lib_error_code, char *frmt, ...);
 
-extern void lord_info(int *tr_lib_error_code, char *frmt, ...);
+extern void lord_info(int tr_lib_error_code, char *frmt, ...);
 	
-extern void lord_warning(int *tr_lib_error_code, char *frmt, ...);
+extern void lord_warning(int tr_lib_error_code, char *frmt, ...);
 
-extern void lord_error(int *tr_lib_error_code, char *frmt, ...);
+extern void lord_error(int tr_lib_error_code, char *frmt, ...);
 
-extern void lord_critical(int *tr_lib_error_code, char *frmt, ...);
+extern void lord_critical(int tr_lib_error_code, char *frmt, ...);
 
-extern void lord_set_parameters(int *debug);
+extern void lord_set_parameters(int debug);
 
-extern void lord_setQuitError(int *tr_lib_error_code, char *frmt, ...);
+extern void lord_setQuitError(int tr_lib_error_code, char *frmt, ...);
