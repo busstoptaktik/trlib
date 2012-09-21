@@ -18,6 +18,12 @@
  
 #include  <stdio.h>
 
+/* Pepper the format string with file(line) information */
+#define STRINGIFY(x)  #x
+#define TOSTRING(x)   STRINGIFY(x)
+#define LORD(x)        __FILE__ "(" TOSTRING(__LINE__) "): " x
+
+
 extern void lord_debug(int tr_lib_error_code, char *frmt, ...);
 
 extern void lord_info(int tr_lib_error_code, char *frmt, ...);
