@@ -23,19 +23,19 @@
 
 
 
-static int first_byte_is_nonzero_if_little_endian = 1;
-static char *is_little_endian = &first_byte_is_nonzero_if_little_endian;
+static unsigned int  first_byte_is_nonzero_if_little_endian = 1;
+static unsigned char *is_little_endian = (unsigned char *) &first_byte_is_nonzero_if_little_endian;
 
 
 
-inline swapfloatifneeded(float p) {
+inline float swapfloatifneeded(float p) {
     unsigned char *v;
     unsigned char  w;
     
     if (*is_little_endian)
         return p;
 
-    *v = p;
+    v = (unsigned char *) &p;
     w = v[0];
 
     v[0] = v[3];
@@ -47,3 +47,19 @@ inline swapfloatifneeded(float p) {
 
     return p;
 }
+
+#ifdef TEST_ME
+#include <stdio.h>
+
+int main (void) {
+    float f;
+    unsigned int u = *is_little_endian;
+    printf ("is_little_endian = %u\n", u);
+    f = swapfloatifneeded(7);
+	printf ("f = %f\n", f);
+	
+	if (is_little_endian && (7==f))
+	    return 0;
+	return 1;
+}
+#endif
