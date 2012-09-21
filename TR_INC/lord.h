@@ -34,6 +34,16 @@ extern void lord_error(int tr_lib_error_code, char *frmt, ...);
 
 extern void lord_critical(int tr_lib_error_code, char *frmt, ...);
 
+extern void set_lord_debug_mode(int mode);
+
+extern void set_lord_info_mode(int mode);
+
+extern void set_lord_warning_mode(int mode);
+
+extern void set_lord_error_mode(int mode);
+
+extern void set_lord_critical_mode(int mode);
+
 extern void lord_set_parameters(int debug);
 
 extern void lord_setQuitError(int tr_lib_error_code, char *frmt, ...);

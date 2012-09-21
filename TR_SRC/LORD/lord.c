@@ -25,11 +25,11 @@
 
 // tr_lib_error_code not outputted yet
 
-int use_debug = 1;
-int use_info = 1;
-int use_warning = 1;
-int use_error= 1;
-int use_critical = 1;
+int use_debug = 0;
+int use_info = 0;
+int use_warning = 0;
+int use_error= 0;
+int use_critical = 0;
 
 void lord_debug(int tr_lib_error_code, char *frmt, ...)
 {
@@ -85,7 +85,72 @@ void lord_critical(int tr_lib_error_code, char *frmt, ...)
 		va_end(ap);
 	}
 }
-	
+
+void set_lord_debug_mode(int mode)
+{
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
+	if (mode ==0 || mode ==1)
+	{
+		use_debug = mode;
+	}
+}
+
+void set_lord_info_mode(int mode)
+{
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
+	if (mode ==0 || mode ==1)
+	{
+		use_info = mode;
+	}
+}
+
+void set_lord_warning_mode(int mode)
+{
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
+	if (mode ==0 || mode ==1)
+	{
+		use_warning = mode;
+	}
+}
+
+void set_lord_error_mode(int mode)
+{
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
+	if (mode ==0 || mode ==1)
+	{
+		use_error = mode;
+	}
+}
+
+void set_lord_critical_mode(int mode)
+{
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
+	if (mode ==0 || mode ==1)
+	{
+		use_critical = mode;
+	}
+}
+
 void lord_set_parameters(int debug)
 {
 	//implement that these parameters shall only be corrected from the main thread
