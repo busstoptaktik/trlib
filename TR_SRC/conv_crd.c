@@ -80,10 +80,10 @@ struct coord_lab        *c_lab,
   int                        zone;
   short                      par_dtm, dtm_req = 1, mask;
   double                     ell_p[10];
-  char                       e_name[24], p_name[24];
+  char                       e_name[MLBLNG], p_name[MLBLNG];
 
   char                       t_lab_a[2*MLBLNG], *t_lab = t_lab_a;
-  char                       iofile_str[128], *p_io;
+  char                       iofile_str[256], *p_io;
   char                      *p_dtm, sepch, *p_sys, *p_tp;
 
   char                      *p_eesti42 = "eesti42";
@@ -395,10 +395,7 @@ struct coord_lab        *c_lab,
         /* datum shift params (from set_dtm) */
         c_lab->p_dtm = (short) par_dtm;
 
-        /* set trf. constants for completed systems */
-        (void) set_trc(c_lab);
-  
-      }
+       }
       else
         /* unintelligible ellipsoid */
         if (c_lab->cstm != 11 /* crt2 */) c_lab->lab_type = ILL_LAB;
@@ -526,6 +523,9 @@ struct coord_lab        *c_lab,
         }
       }  /* ste */
     }  /* end input of additional params */
+     
+     /* set trf. constants for completed systems */
+     (void) set_trc(c_lab);
 
 
 /* conv_crd    ver 2012.01          # page  9    31 May 2012 10 19 */

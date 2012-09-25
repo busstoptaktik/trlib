@@ -24,6 +24,7 @@
 #include "sgetg.h"
 #include "parse_def_file.h"
 #include "trlib_api.h"
+#include "lord.h"
 #define MODE_PRJ "def_prj"
 #define MODE_GRS "def_grs"
 #define MODE_RGN "def_rgn"
@@ -44,6 +45,7 @@
 #define GEQ_HERE     (978049.e-5)
 #define GEQ84_HERE  (979764.5e-5)
 #define KMW84_HERE (3986004.418e8)
+#define KMMOON       KM_HERE*0.0122298 /* Moon parameter relative to Earth - fix of '*' char in def_lab which was interpreted as a */
 
 int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	strncpy(ellip->mlb,items[0],MLBLNG);
@@ -57,6 +59,8 @@ int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 		ellip->km=atof(items[5]);
 	else if (!strcmp(items[5],"KM"))
 		ellip->km=KM_HERE;
+	else if (!strcmp(items[5],"KMMOON"))
+		ellip->km=KMMOON;
 	else if (!strcmp(items[5],"GEQ"))
 		ellip->km=GEQ_HERE;
 	else if (!strcmp(items[5],"KMW84"))
@@ -290,7 +294,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 			
 			/*If we got here, we have either found a new item or should start a new mode */
 			if (!completed){
-				fprintf(stderr,"mode: %d, cmplt: %d\n%s\n",mode,n_set[mode],buf);
+				lord_debug(0,LORD("mode: %d, cmplt: %d\n%s\n"),mode,n_set[mode],buf);
 				(*n_err)++;
 			}
 			completed=1;
@@ -408,7 +412,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 		err=set_hth(tokens,((def_hth_tr*) entries[mode])+n_set[mode],n_items,descr);
 	
 	else{
-		fprintf(stderr,"parse_def: Something wrong!\n"); /*TODO: use GLOBAL error handling system! */
+		lord_debug(0,"parse_def: Something wrong!\n"); /*TODO: use GLOBAL error handling system! */
 		continue;
 	}
 	if (!err)
@@ -441,7 +445,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 			}
 		}
 		if (dtm1->p_no<=0)
-			fprintf(stderr,"parse_def: Could not find p_datum!\n");
+			lord_debug(0,"parse_def: Could not find p_datum!\n");
 	}
 	}
 	

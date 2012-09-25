@@ -36,7 +36,8 @@
 #include "parse_def_file.h"
 #include "doc_def_data.h"
 #include "trthread.h"
-#define TRLIB_VERSION "dev v1.0 2012-09-07"
+#include "lord.h"
+#define TRLIB_VERSION "dev v1.0 2012-09-21"
 #ifndef TRLIB_REVISION
 #define TRLIB_REVISION "hg revison not specified"
 #endif
@@ -173,7 +174,7 @@ int TR_SetGeoidDir(char *path){
 	strcpy(fname,init_path);
 	strcat(fname,TR_DEF_FILE);
 	#ifdef _ROUT
-	fprintf(stdout,"%s %s\n",init_path,fname); /*just debugging */
+	lord_debug(0,"%s %s\n",init_path,fname); /*just debugging */
 	#endif
 	fp=fopen(fname,"r");
 	if (0==fp)
@@ -186,7 +187,7 @@ int TR_SetGeoidDir(char *path){
 	DEF_DATA=open_def_data(fp,&rc);
 	fclose(fp);
 	#ifdef _ROUT
-	fprintf(stdout,"Parsed def_lab.txt, errs: %d\n",rc);
+	lord_debug(0,"Parsed def_lab.txt, errs: %d\n",rc);
 	#endif
 	settabdir(init_path);
 	return (DEF_DATA ? TR_OK: TR_ERROR);
