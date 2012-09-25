@@ -84,7 +84,7 @@ def GetRev(trlib):
 	return rev.strip()
 
 def RunCMD(cmd):
-	s=subprocess.Popen(cmd,stdout=subprocess.PIPE)
+	s=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 	out=""
 	while s.poll() is None:
 		line=s.stdout.readline()
@@ -136,9 +136,7 @@ def BuildLibrary(compiler,linker,outname,source,include,defines,options,link_opt
 		link="%s %s %s %s %s %s %s" %(linker,link_options,outname,implib,def_file,LINK_LIBRARIES,OBJ_FILES)
 	else:
 		link="%s %s %s %s %s %s %s" %(linker,link_options,outname,LINK_LIBRARIES,implib,def_file,OBJ_FILES)
-	#print compile
-	#print link
-	#return False
+	print compile
 	rc,text=RunCMD(compile)
 	if rc==0:
 		print link

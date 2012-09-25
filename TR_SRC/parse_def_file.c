@@ -294,7 +294,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 			
 			/*If we got here, we have either found a new item or should start a new mode */
 			if (!completed){
-				lord_debug(0,"mode: %d, cmplt: %d\n%s\n",mode,n_set[mode],buf);
+				lord_debug(0,LORD("mode: %d, cmplt: %d\n%s\n"),mode,n_set[mode],buf);
 				(*n_err)++;
 			}
 			completed=1;
