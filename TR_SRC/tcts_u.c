@@ -1426,9 +1426,9 @@ Nin, Ein, ins, direct, ins_alarm);
     ptx = "tcts_u(u32 -> tc32)";
     break;
   }
-  (void) t_status(tr_error, usertxt, ptx, res,
-         "m ", "", N, E, Nin - N, Ein - E);
-  return(res);
+  return((tr_error==NULL || res==0) ? res :
+          t_status(tr_error, usertxt, ptx, res,
+          "m ", "", N, E, Nin - N, Ein - E);
 
 #undef  TOL
 

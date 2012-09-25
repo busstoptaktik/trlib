@@ -427,8 +427,9 @@ FILE           *tr_error
     TC_init = as_z == as_w*as_w;
 
     if (!TC_init) {
-      return(t_status(tr_error, usertxt,
-             "dks_tr(state/action tabeller ej ok)", TRF_PROGR_));
+      return((tr_error==NULL) ? TRF_PROGR_ :
+              t_status(tr_error, usertxt,
+              "dks_tr(state/action tabeller ej ok)", TRF_PROGR_));
     }
   }
 
@@ -549,8 +550,9 @@ FILE           *tr_error
 
   } while (act && result >= TRF_TOLLE_);
 
-  return(t_status(tr_error, usertxt, "dks_tr", result,
-         "m ", "", N_in, E_in));
+  return((tr_error==NULL) ? result :
+          t_status(tr_error, usertxt, "dks_tr", result,
+          "m ", "", N_in, E_in));
 
 #undef   TOL
 

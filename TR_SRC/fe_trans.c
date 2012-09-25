@@ -278,8 +278,9 @@ FILE                *tr_error
       fe_w = (int) sqrt(1.0000001*fe_z);
       init = init && (fe_z == fe_w*fe_w);
       if (!init)
-        return(t_status(
-               tr_error, "", "fe_trans(internal labels)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "fe_trans(internal labels)", TRF_ILLEG_));
     }
 
     /* Check i/o labels, init of actual transf. systems */
@@ -350,8 +351,9 @@ outgr, outnr, pml->s_lab);
 #endif
 
       if (res == TRF_ILLEG_)
-        return(t_status(
-               tr_error, "", "fe_trans(outsys - lab)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "fe_trans(outsys - lab)", TRF_ILLEG_));
 
       /* In-system */
       /*___________*/
@@ -419,8 +421,9 @@ in_gr, in_nr, pml->s_lab);
 
 
       if (res == TRF_ILLEG_)
-        return(t_status(
-               tr_error, "", "fe_trans(in_sys)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "fe_trans(in_sys)", TRF_ILLEG_));
 
       /* Save check-sums */
       in_chsum = in_lab->ch_sum;
@@ -524,17 +527,18 @@ act, gst, nst);
 /* fe_trans  ver 2011.02        # page 8    9 Oct 2011 13 55 */
 
       default: /* programme error */
-        return(t_status(
-               tr_error, "", "fe_trans(prog error)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "fe_trans(prog error)", TRF_ILLEG_));
       } /* end switch(action) */
       if (ies < res) res = ies;
 
     } while (nst != gst && res >= TRF_TOLLE_);
   }
   else {
-
-    return(t_status(
-           tr_error, "", "fe_trans(i/o labels)", TRF_ILLEG_));
+    return((tr_error==NULL) ? TRF_ILLEG_ :
+            t_status(tr_error, "",
+            "fe_trans(i/o labels)", TRF_ILLEG_));
   }
 
   /* Return coord and result */

@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2011, National Survey and Cadastre, Denmark
  * (Kort- og Matrikelstyrelsen), kms@kms.dk
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -13,9 +13,9 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
- 
+
 
 
 /* gd_trans  ver 2010.1          # page 1   12 jan 2010 11 36 */
@@ -55,7 +55,7 @@
 #define NON_NON   3 /* Non-reg->Non-reg */
 
 /* TEST
-#define  DEBUGGDTRANS 
+#define  DEBUGGDTRANS
 TEST */
 
 int                        gd_trans(
@@ -175,7 +175,7 @@ FILE                     *tr_error
   /* nmb_sequence at datum shift = both up-hill and down-hill */
   /* strt_nr =     *io_nr_tab[i_cstm]                         */
   /* stop_no = 8 - *io_nr_tab[o_cstm]                         */
- 
+
   /* nmb_seq, no dshift, increasing io_nmb = only up-hill     */
   /* strt_nr =     *io_nr_tab[i_cstm]                         */
   /* stop_no =     *io_nr_tab[o_cstm] - 1                     */
@@ -283,7 +283,7 @@ FILE                     *tr_error
     s_grid_tab = grid_tab;
     s_req_gh   = req_gh;
     o_clb      = &(o_lab->u_c_lab);
-    s_req_tv   = (grid_tab->init == 1) && 
+    s_req_tv   = (grid_tab->init == 1) &&
                   grid_tab->table_u[0].lab_type != (short) GDE_LAB;
     s_lev      = (s_req_tv) ? 0 : 3;
     /* initial setting of ghr for setup of sequences */
@@ -301,20 +301,24 @@ FILE                     *tr_error
     /* Test for leagal datum and systems */
     if (i_clb->cstm < 1 || 16 < i_clb->cstm ||
         (6 <= i_clb->datum && i_clb->datum <= 8))
-      return(t_status(tr_error,
-             "", "gd_trans(unintelligible input label)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, "",
+              "gd_trans(unintelligible input label)", TRF_ILLEG_));
     if ((!s_req_tv) && (o_clb->cstm < 1 || 16 < o_clb->cstm ||
                         (6 <= o_clb->datum && o_clb->datum <= 8)))
-      return(t_status(tr_error,
-             "", "gd_trans(unintelligible output label)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, "",
+              "gd_trans(unintelligible output label)", TRF_ILLEG_));
 
     /* Test for regular systems */
     if (i_clb->imit == 0 && 7 < i_clb->cstm)
-      return(t_status(tr_error,
-             "", "gd_trans(ill. regular system)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, "",
+              "gd_trans(ill. regular system)", TRF_ILLEG_));
     if ((!s_req_tv) && o_clb->imit == 0 && 7 < o_clb->cstm)
-      return(t_status(tr_error,
-             "", "gd_trans(ill. regular system)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, "",
+              "gd_trans(ill. regular system)", TRF_ILLEG_));
 
     (void) strcpy(rgn_DE.prfx, "DE");
     (void) strcpy(rgn_EE.prfx, "EE");
@@ -390,7 +394,8 @@ FILE                     *tr_error
             }
             if (res < 0) {
               i_chsum = -i_clb->ch_tsum;
-              return(t_status(tr_error, "",
+              return((tr_error==NULL) ? TRF_GEOID_ :
+              t_status(tr_error, "",
                        "gd_trans(unintelligible labels)", TRF_GEOID_));
             }
             (void) conv_lab(grid_tab->table_u[0].clb, &H0_lab, "");
@@ -413,16 +418,17 @@ FILE                     *tr_error
         else
         if (i_clb->h_dtm == 0) s_req_dh = -7;
         else {
-          s_req_dh = htr_init(i_clb, o_clb, &H2_lab, 
+          s_req_dh = htr_init(i_clb, o_clb, &H2_lab,
                               &htr_const, H3_lab.u_c_lab.mlb, dstr);
           if (s_req_dh < 0) { /* ILLEGAL */
-            return(t_status(tr_error,
-               "", "gd_trans(ill. kote TRF)", HTRF_ILLEG_));
+            return((tr_error==NULL) ? TRF_ILLEG_ :
+                    t_status(tr_error, "",
+                    "gd_trans(ill. kote TRF)", HTRF_ILLEG_));
           }
         }
         switch(s_req_dh) {
         case 1: // DH_TAB height transformation
-          if (h_grid_tab.init == 1 && 
+          if (h_grid_tab.init == 1 &&
              strcmp(H3_lab.u_c_lab.mlb, h_grid_tab.table_u[0].mlb) != 0)
             (void) geoid_c(&h_grid_tab, 0, NULL);
 
@@ -431,7 +437,7 @@ FILE                     *tr_error
                           DHH_LAB, &h_grid_tab, usertxt);
             if (res < 0) return(res);
           }
-            
+           
           if (128 <= H2_lab.u_c_lab.datum
                   && H2_lab.u_c_lab.datum <= 129) {
             H3_lab = H2_lab;
@@ -519,9 +525,11 @@ FILE                     *tr_error
         else
         if (w_oclb->imit == EDMASK) rs = i_clb->imit;
         else {
-         (void) sprintf(dstr, "gd_trans %s -> %s illegal",
-                i_clb->mlb, w_oclb->mlb);
-         return(t_status(tr_error, usertxt, dstr, TRF_ILLEG_));
+          (void) sprintf(dstr, "gd_trans %s -> %s illegal",
+                 i_clb->mlb, w_oclb->mlb);
+          return((tr_error==NULL) ? TRF_ILLEG_ :
+                  t_status(tr_error, "",
+                  tr_error, usertxt, dstr, TRF_ILLEG_));
         }
         break;
       } /* end switch(R_N) */
@@ -570,8 +578,9 @@ b_lev, i_clb->mlb, w_oclb->mlb, o_clb->mlb, R_N);
             /* WARN: ONLY POSSIBLE when no gh */
             (void) sprintf(dstr, "geoE%s", i_clb->mlb+4);
             init &= (short) conv_lab(dstr, &t_lab,"")==CRD_LAB;
-            if (req_gh) return(t_status(
-                tr_error, usertxt, "geoid NOT posible", TRF_ILLEG_));
+            if (req_gh) return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, usertxt,
+                       "geoid NOT posible", TRF_ILLEG_));
           }
         } else
         if ((R_N == NON_REG || R_N == NON_NON) && i_clb->cstm == 1) {
@@ -785,7 +794,7 @@ rs, nonp_i[b_lev], nonp_o[b_lev], t_clb->mlb, (g_lab.u_c_lab).mlb);
 
       /* test for identical systems */
       if (b_lev == 0) {
-        if (i_clb->ch_sum == H_clb->ch_sum || 
+        if (i_clb->ch_sum == H_clb->ch_sum ||
                (ghr == 0 && s_req_tv == 0)) {
           sta[b_lev] = IDT;
           stp[b_lev] = IDT;
@@ -890,8 +899,9 @@ i_sep, i_sep, o_sep, o_sep);
       if (res < 0) {
         i_chsum = -i_clb->ch_tsum;
         init    = (short) res;
-        return(t_status(tr_error, "",
-               "gd_trans(unintelligible labels)", TRF_GEOID_));
+        return((tr_error==NULL) ? TRF_GEOID_ :
+                t_status(tr_error, "",
+                "gd_trans(unintelligible labels)", TRF_GEOID_));
       }
     }
 
@@ -900,8 +910,9 @@ i_sep, i_sep, o_sep, o_sep);
 
     if (!init) {
       i_chsum = -i_clb->ch_tsum;
-      return(t_status(tr_error, "",
-             "gd_trans(unintelligible labels)", TRF_PROGR_));
+      return((tr_error==NULL) ? TRF_PROGR_ :
+              t_status(tr_error, "",
+              "gd_trans(unintelligible labels)", TRF_PROGR_));
     }
 
   } /* end of init of tables */
@@ -968,7 +979,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
 */
 
       switch(action) {
-    
+   
       case  PRE: /* crt_* -> geoE* */
         /*_____________________*/
 #ifdef DEBUGGDTRANS
@@ -1022,7 +1033,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
 
 /* gd_trans  ver 2010.1          # page 16  12 jan 2010 11 36 */
 
-    
+   
       case  GTC: /* GEO -> CRT */
         /*_____________________*/
 #ifdef DEBUGGDTRANS
@@ -1053,7 +1064,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
         ies = ctc(i_Rlab, o_wlab, N, E, H, &N, &E, &H,
                   usertxt, tr_error);
         break;
-    
+   
       case  CTG: /* CRT -> GEO */
         /*_____________________*/
 #ifdef DEBUGGDTRANS
@@ -1097,7 +1108,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
 #endif
         }
         break;
-    
+   
       case  ANT: /* geoE* -> crt_* */
         /*_____________________*/
 #ifdef DEBUGGDTRANS
@@ -1131,13 +1142,15 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
 
       case  ILL: /* Illegal */
         *X  = *Y = *Z = 0.0;
-        return(t_status(tr_error, "",
-               "gd_trans(unintelligible labels)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "gd_trans(unintelligible labels)", TRF_ILLEG_));
 
       default:
         *X = *Y = *Z = 0.0;
-        return(t_status(tr_error, "",
-               "gd_trans(unintelligible labels)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "gd_trans(unintelligible labels)", TRF_ILLEG_));
       } /* end switch(action) */
 
       if (res > ies) res = ies;

@@ -314,9 +314,10 @@ FILE                *tr_error
     TC_init = act && ed_z == bs_w*bs_w;
 
     if (!TC_init)
-      return(t_status(
-          tr_error, usertxt, "dk_trans(init labels)", TRF_PROGR_));
-  }
+      return((tr_error==NULL) ? TRF_PROGR_ :
+              t_status(tr_error, usertxt,
+              "dk_trans(init labels)", TRF_PROGR_));
+    }
 
 
 /* dk_trans  ver 2003.01        # page 6   12 Jan 2003 13 55 */
@@ -328,7 +329,8 @@ FILE                *tr_error
     /* Coord labels */
     if   ( in_lab->lab_type != CRD_LAB
         || outlab->lab_type != CRD_LAB) {
-      return(t_status(tr_error, usertxt,
+      return((tr_error==NULL) ? TRF_PROGR_ :
+              t_status(tr_error, usertxt,
               "dk_trans(i/o labels error)", TRF_PROGR_));
     }
 
@@ -353,8 +355,9 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
       }
 
     if (outgr == 0 && outnr == 6) {
-        return(t_status(tr_error, usertxt,
-                "dk_trans(illegal crt_ed50)", TRF_PROGR_));
+      return((tr_error==NULL) ? TRF_PROGR_ :
+              t_status(tr_error, usertxt,
+              "dk_trans(illegal crt_ed50)", TRF_PROGR_));
     }
 
     /* Datum actions */
@@ -369,13 +372,14 @@ pml = mlab +8;
 outgr, outnr, pml->s_lab, outcs);
 #endif
       } else
-        return(t_status(tr_error, usertxt,
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, usertxt,
                 "dk_trans(unknown o-label)", TRF_ILLEG_));
-    }
+      }
 
 
 /* dk_trans  ver 2003.01        # page 7   12 Jan 2003 13 55 */
-
+ 
 
     /* In-system */
     /*____________*/
@@ -398,8 +402,9 @@ pml->trgr, pml->trnr, pml->s_lab, in_cs);
       }
 
     if (in_gr == 0 && in_nr == 6) {
-        return(t_status(tr_error, usertxt,
-                "dk_trans(illegal crt_ed50)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, usertxt,
+              "dk_trans(illegal crt_ed50)", TRF_ILLEG_));
     }
 
     /* Datum actions */
@@ -414,8 +419,9 @@ pml = mlab +8;
 outgr, outnr, pml->s_lab, in_cs);
 #endif
       } else
-        return(t_status(tr_error, usertxt,
-                "dk_trans(unknown i-label)", TRF_ILLEG_));
+      return((tr_error!=NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, usertxt,
+              "dk_trans(unknown i-label)", TRF_ILLEG_));
     }
 
     /* Save check-sums */
@@ -589,8 +595,10 @@ ACTION[act], nst, level);
                 : tcts_u(N, E, &N, &E, 's',  1, usertxt, tr_error);
           } else /* BORNHOLM */
             res = tcts_u(N, E, &N, &E, 'b',  1, usertxt, tr_error);
-        } else (void) t_status(tr_error, usertxt, "dk_trans", TRF_AREA_,
-                        "m ", "", N, E, 0.0, 0.0);
+        } else
+        if (tr_error!=NULL)
+           (void) t_status(tr_error, usertxt, "dk_trans", TRF_AREA_,
+                           "m ", "", N, E, 0.0, 0.0);
         break;
       case LT32: /* s34  -> tc32 */
         if (N > 0.0) {
@@ -601,7 +609,9 @@ ACTION[act], nst, level);
                 : tcts_u(N, E, &N, &E, 'j', -1, usertxt, tr_error);
           } else /* BORNHOLM */
             res = tcts_u(N, E, &N, &E, 'b', -1, usertxt, tr_error);
-        } else (void) t_status(tr_error, usertxt, "dk_trans", TRF_AREA_,
+        } else
+        if (tr_error!=NULL)
+           (void) t_status(tr_error, usertxt, "dk_trans", TRF_AREA_,
                         "m ", "", N, E, 0.0, 0.0);
         break;
 
@@ -681,10 +691,12 @@ ACTION[act], nst, level);
         break;
 
       case ILLG: /* illegal transformation */
-        return(t_status(tr_error, usertxt,
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, usertxt,
                 "dk_trans(illegal)", TRF_ILLEG_));
       default: /* programme error */
-        return(t_status(tr_error, usertxt,
+        return((tr_error==NULL) ? TRF_PROGR_ :
+                t_status(tr_error, usertxt,
                 "dk_trans(prog error)", TRF_PROGR_));
       }
 #ifdef  DEBUGDKTRANS

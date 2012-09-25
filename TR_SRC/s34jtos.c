@@ -172,8 +172,9 @@ Note the operator & on Y and X.
       && res == 0) return (0);
   else if (res == 0) res = TRF_TOLLE_;
 
-  return(t_status(tr_error, usertxt, "s34jtos", res,
-         "m ", "", N, E, N - y, E - x));
+  return((tr_error==NULL || res==0) ? res :
+          t_status(tr_error, usertxt, "s34jtos", res,
+          "m ", "", N, E, N - y, E - x));
 
 }
 

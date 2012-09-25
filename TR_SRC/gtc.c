@@ -202,11 +202,11 @@ errors    KE JAN 2001.
   }
   else res = TRF_PROGR_;
 
-  (void) t_status(tr_error, usertxt, "gtc", res,
-      (direct > 0) ? "sx" : "m ", "m ",
-      B, L, H, dCx, dCy, dCz);
+  return((tr_error==NULL || res == 0) ? res :
+          t_status(tr_error, "gtc", res,
+          (direct > 0) ? "sx" : "m ", "m ",
+          B, L, H, dCx, dCy, dCz);
 
-  return(res);
 }
 
 

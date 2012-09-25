@@ -183,8 +183,9 @@ in Sealand or Jutland. Note the & operator on N1, E1.
     };
     break;
   default:
-    return(t_status(
-           tr_error, usertxt, "utgs(landsdel?)", TRF_AREA_));
+    return((tr_error==NULL) ? TRF_AREA_ :
+            t_status(tr_error, usertxt,
+            "utgs(landsdel?)", TRF_AREA_));
   } /* end landsdel cases */
 
   d = ((direct > 0) ? (1) : (direct < 0 ? (-1) : 0));
@@ -231,8 +232,9 @@ in Sealand or Jutland. Note the & operator on N1, E1.
       && res == 0)   return (0);
   else if (res >= TRF_INACC_) res = TRF_TOLLE_;
 
-  return(t_status(tr_error, usertxt, "utgs", res,
-         "m ", "", N, E, N - Nin, E - Ein));
+  return((tr_error==NULL || res==0) ? res :
+          t_status(tr_error, usertxt, "utgs", res,
+          "m ", "", N, E, N - Nin, E - Ein));
 
 #undef  GSTOLMS
 }

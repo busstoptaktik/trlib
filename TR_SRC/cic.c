@@ -73,8 +73,9 @@ FILE                  *tr_error
       e = -1;
     }
     else
-      return(t_status(tr_error, usertxt,
-             "\n*** cic: %s UDEFINERET RETNING;\n", TRF_PROGR_));
+    return((tr_error==NULL) ? TRF_PROGR_ :
+            t_status(tr_error, usertxt,
+                     "\n*** cic: UDEFINERET RETNING;\n", TRF_PROGR_));
 
 
 /* cic    ver 1999.01               # page 2   12 Jan 1999 12 06 */
@@ -126,9 +127,11 @@ X-Xi, Y-Yi, Z-Zi);
       if     (fabs(X - Xi) < tol
           &&  fabs(Y - Yi) < tol
           &&  fabs(Z - Zi) < tol) return(0);
-      else return(t_status(tr_error, usertxt, 
-                   "cic", TRF_TOLLE_,
-                   "m ", "m ", X, Y, Z, X - Xi, Y - Yi, Z - Zi));
+      else 
+      return((tr_error==NULL) ? TRF_TOLLE_ :
+              t_status(tr_error, usertxt, 
+                       "cic", TRF_TOLLE_,
+                       "m ", "m ", X, Y, Z, X - Xi, Y - Yi, Z - Zi));
     }
 
   }

@@ -176,8 +176,9 @@ FILE                     *tr_error
   }
   else if (res > TRF_AREA_) res = TRF_AREA_;
 
-  return(t_status(tr_error, usertxt, "utsb", res,
-         "m ", "", N_in, E_in,N_in - N, E_in - E));
+  return((tr_error==NULL || res==0) ? res :
+          t_status(tr_error, usertxt, "utsb", res,
+          "m ", "", N_in, E_in,N_in - N, E_in - E));
 }
 
 

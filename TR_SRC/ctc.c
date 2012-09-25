@@ -100,13 +100,15 @@ FILE                  *tr_error
   short mask;
   
   if (i_lab->lab_type != CRD_LAB) {
-    return(t_status(tr_error, usertxt,
-           "ctc(input label fault)", TRF_ILLEG_));
+          return((tr_error==NULL) ? TRF_ILLEG_ :
+                  t_status(tr_error, usertxt,
+                  "ctc(input label fault)", TRF_ILLEG_));
   }
 
   if (o_lab->lab_type != CRD_LAB) {
-    return(t_status(tr_error, usertxt,
-           "ctc(output label fault)", TRF_ILLEG_));
+    return((tr_error==NULL) ? TRF_ILLEG_ :
+            t_status(tr_error, usertxt,
+            "ctc(output label fault)", TRF_ILLEG_));
   }
 
   if (!init) {
@@ -194,8 +196,9 @@ FILE                  *tr_error
 
   }
   else {
-    return(t_status(tr_error, usertxt,
-           "ctc(unknown datum shift)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+      	      t_status(tr_error, usertxt,
+              "ctc(unknown datum shift)", TRF_ILLEG_));
   }
 
   *Xo = X;

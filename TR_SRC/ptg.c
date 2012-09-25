@@ -641,10 +641,10 @@ FILE                   *tr_error
     res = TRF_ILLEG_;
   }
 
-  (void) t_status(tr_error, usertxt, ptx, res,
-         (direct > 0) ? "m " : "sx", "", N, E, dCn, dCe);
+  return((tr_error==NULL || res==0) ? res :
+          t_status(tr_error, usertxt, ptx, res,
+          (direct > 0) ? "m " : "sx", "", N, E, dCn, dCe);
 
-  return(res);
 }
 
 
