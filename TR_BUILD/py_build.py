@@ -191,9 +191,10 @@ def BuildTest(compiler,outname,cfiles,include,link="",build_dir="."):
 	for inc_dir in include:
 		include_str+="%s%s " %(INCLUDE_SWITCH,inc_dir)
 	print("Compiling test program(s)...")
+	print("Executables placed in build dir: %s" %build_dir)
 	for fname in cfiles:
 		if not IS_MSVC:
-			pname=LINK_OUTPUT_SWITCH+os.path.splitext(os.path.basename(fname))[0]+EXE_EXT
+			pname=LINK_OUTPUT_SWITCH+" "+os.path.splitext(os.path.basename(fname))[0]+EXE_EXT
 		else:
 			pname=""
 		if "thread" in fname.lower() and os.path.exists(link_libs):
