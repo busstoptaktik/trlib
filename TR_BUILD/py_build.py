@@ -4,6 +4,7 @@
 ## Assumes that we have subdisrs in trlib: TR_SRC, TR_INC, TR_SRC/API 
 ## simlk, march 2012
 ##############################
+#!/usr/bin/python 
 import sys,os,glob,shutil,subprocess
 if "-msvc" in sys.argv:
 	from msvc_options import *
