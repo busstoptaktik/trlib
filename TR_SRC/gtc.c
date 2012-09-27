@@ -205,7 +205,7 @@ errors    KE JAN 2001.
   return((tr_error==NULL || res == 0) ? res :
           t_status(tr_error, "gtc", res,
           (direct > 0) ? "sx" : "m ", "m ",
-          B, L, H, dCx, dCy, dCz);
+          B, L, H, dCx, dCy, dCz));
 
 }
 

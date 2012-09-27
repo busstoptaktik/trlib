@@ -445,9 +445,9 @@ FILE                    *tr_error
     }
   }
   else res = TRF_PROGR_;  /* UNDEFINED DIRECTION */
-  return((tr_error==NULL || res=0) ? res :
+  return((tr_error==NULL || res==0) ? res :
           t_status(tr_error, usertxt, "eetmtu_g", res,
-          "m ", "", N, E, N - N_in, E - E_in);
+          "m ", "", N, E, N - N_in, E - E_in));
 
 #undef   COORLIM
 #undef   MAP_LIM

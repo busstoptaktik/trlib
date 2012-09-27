@@ -56,10 +56,12 @@ DEFINES=""
 BUILD_LOG="py_build.log"
 #ONLY FOR COMPILING THREAD TESTS - PUT YOUR THREAD LIBRARIES AND HEADERS IN THE LIB-DIR#
 #AND NAME YOUR c-FILE WITH SOMETHING CONTAINING 'thread' - OTHERWISE NOTHING HAPPENS!#
-if "win" in sys.platform:
+if sys.platform.startswith("win"):
+	IS_WINDOWS=True
 	THREAD_LIB=os.path.join(LIB_DIR,"pthreadGC2.dll")
 	THREAD_LIB_W64=os.path.join(LIB_DIR,"pthreadGC2-w64.dll")
 else:
+	IS_WINDOWS=False
 	THREAD_LIB="-lpthreads"
 #PREDEFINED  TESTS TO RUN#
 TESTS=[]
@@ -80,11 +82,18 @@ def TestOptions(opts):
 	return True
 
 def GetRev(trlib):
-	rc,rev=RunCMD("hg identify -i %s" % trlib)
+	try:
+		rc,rev=RunCMD("hg identify -i %s" % trlib)
+	except:
+		return "Could not get hg-rev"
 	return rev.strip()
 
 def RunCMD(cmd):
-	s=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+	if IS_WINDOWS:
+		shell=False
+	else:
+		shell=True
+	s=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=shell)
 	out=""
 	while s.poll() is None:
 		line=s.stdout.readline()
@@ -93,6 +102,22 @@ def RunCMD(cmd):
 	rc=s.poll()
 	s.stdout.close()
 	return rc, out
+
+def GetModified(src_dirs,build_dir):
+	source=""
+	for dir in src_dirs:
+		files=glob.glob(os.path.join(dir,"*.c"))
+		for fname in files:
+			t_src=os.path.getmtime(fname)
+			obj_name=os.path.join(build_dir,os.path.splitext(os.path.basename(fname))[0]+OBJ_FILES.replace("*",""))
+			if os.path.exists(obj_name):
+				t_obj=os.path.getmtime(obj_name)
+			else:
+				t_obj=-1
+			if t_src>t_obj:
+				source+=fname+" "
+	return source
+	
 
 class RedirectStdout(object):
 	def __init__(self,file_pointer,print_out=False):
@@ -129,15 +154,22 @@ def BuildLibrary(compiler,linker,outname,source,include,defines,options,link_opt
 	compile="%s %s %s %s %s" %(compiler,defines,options,include_str,source)
 	implib=os.path.splitext(outname)[0]+IMPLIB_EXT
 	def_file=DEF_FILE_SWITCH+def_file
-	implib=IMPLIB_SWITCH+implib
-	outname=LINK_OUTPUT_SWITCH+outname
+	if IS_WINDOWS:
+		implib=IMPLIB_SWITCH+implib
+	else:
+		implib=""
+	outname=LINK_OUTPUT_SWITCH+" "+outname
 	#TODO: check gcc linker option like -g -O etc...
 	if (IS_MSVC):
 		link="%s %s %s %s %s %s %s" %(linker,link_options,outname,implib,def_file,LINK_LIBRARIES,OBJ_FILES)
 	else:
 		link="%s %s %s %s %s %s %s" %(linker,link_options,outname,LINK_LIBRARIES,implib,def_file,OBJ_FILES)
-	print compile
-	rc,text=RunCMD(compile)
+	if len(source)>0:
+		print compile
+		rc,text=RunCMD(compile)
+	else: #No modified files, I s'pose :-)
+		print "No modified source files... linking..."
+		rc=0
 	if rc==0:
 		print link
 		rc,text=RunCMD(link)
@@ -236,7 +268,9 @@ def main(args):
 		if not os.path.exists(outdir):
 			os.mkdir(outdir)
 		defines=DEFINES
-		defines+=""" %sTRLIB_REVISION=\\"%s\\" """ %(DEFINE_SWITCH,GetRev(TRLIB))
+		print("Building source in %s at revision:" %TRLIB)
+		rev=GetRev(TRLIB)
+		defines+=""" %sTRLIB_REVISION=\\"%s\\" """ %(DEFINE_SWITCH,rev)
 		if "-debuggd" in args:
 			defines+=" %sDEBUGGDTRANS" %DEFINE_SWITCH
 		if "-pattern" in args:
@@ -252,10 +286,11 @@ def main(args):
 				for dir in src_dirs:
 					source+=" "+os.path.join(dir,"*.c")
 			else:
-				source=os.path.join(src_dirs[1],"*.c")
+				source=GetModified(src_dirs,build_dir)
 			if "-java" in args:
 				source+=" "+os.path.join(TRLIB,JAVA_JNI_SRC)
 				inc_dirs+=JAVA_INC
+			
 		if "-thread_safe" in args:
 			defines+=" %sTHREAD_SAFE" %DEFINE_SWITCH
 		
