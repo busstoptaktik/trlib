@@ -26,12 +26,13 @@ OBJ_FILES="*.o"
 #STANDARD BUILD OPTIONS
 RELEASE_OPTIONS=ALL_BUILD+" -O3"
 DEBUG_OPTIONS=ALL_BUILD+" -g -O -D_ROUT"
+DEBUG_OPTIONS_TEST="-g -Wall -pedantic -O -D_ROUT"
+if "-gprof" in sys.argv:
+	DEBUG_OPTIONS_TEST+=" -pg"
 if IS_WINDOWS:
 	LINK_LIBRARIES="-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32"
-	EXE_EXT=".exe"
 else:
 	LINK_LIBRARIES="-lm"
-	EXE_EXT=".out"
 DEBUG_LINK=DEFAULT_LINK_OPTIONS+""
 RELEASE_LINK=DEFAULT_LINK_OPTIONS+""
 

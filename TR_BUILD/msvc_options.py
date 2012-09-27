@@ -18,6 +18,7 @@ ALL_BUILD="/c /D_WINDOWS /W3 /Zm1000 /TC /fp:precise"
 DEFAULT_LINK_OPTIONS="/DLL"
 RELEASE_OPTIONS=ALL_BUILD+" /MD /O2 /Ob2 /D NDEBUG"
 DEBUG_OPTIONS=ALL_BUILD+" /D_ROUT /D_DEBUG /MDd /Zi /Ob0 /Od /RTC1"
+DEBUG_OPTIONS_TEST="/D_ROUT /D_DEBUG /W3"
 LINK_LIBRARIES='kernel32.lib  user32.lib  gdi32.lib  winspool.lib  shell32.lib  ole32.lib  oleaut32.lib  uuid.lib  comdlg32.lib  advapi32.lib'
 #LINK_LIBRARIES=""
 RELEASE_LINK=DEFAULT_LINK_OPTIONS+" /INCREMENTAL:NO"

@@ -1,9 +1,9 @@
 #!/usr/bin/python 
 #########################
-## simple build instructions for TrLib (Mingw-windows)
-## Run: build.py <trlib_dir> options......
-## Assumes that we have subdisrs in trlib: TR_SRC, TR_INC, TR_SRC/API 
-## simlk, march 2012
+## simple build instructions for TrLib (Mingw, gcc linux/mac and msvc windows).
+## Run: py_build.py <trlib_dir> options......
+## Assumes that we have subdisrs in trlib: TR_SRC, TR_INC, TR_SRC/API, TR_SRC/LORD
+## simlk, sep. 2012
 ##############################
 import sys,os,glob,shutil,subprocess
 if "-msvc" in sys.argv:
@@ -12,25 +12,25 @@ if "-msvc" in sys.argv:
 else:
 	from gcc_options import *
 	IS_MSVC=False
-OPTIONS={"-thread_safe": "Compile a thread safe library",
-"-msvc":"Use MSVC compiler",
-"-debug":"Include gdb debug symbols"
-,"-debuggd":"Extra output from gd_trans",
-"-o": "<shared_object> :Specify output name",
-"-x64":"Use cross compiler",
-"-x86":"Default compiler",
-"-build": "Build something - default API only",
-"-all":"Build all c-source",
-"-buildtest":"Build test programs",
+OPTIONS={"-thread_safe": "Compile a thread safe library.",
+"-msvc":"Use MSVC compiler (windows only).",
+"-debug":"Include debug symbols.",
+"-debuggd":"Extra output from gd_trans.",
+"-o": "<shared_object> :Specify output name.",
+"-x64":"Use cross compiler (windows only).",
+"-x86":"Default compiler (windows only).",
+"-build": "Build shared libaray- default: modified source only.",
+"-all":"Build all c-source.",
+"-buildtest":"Build test programs.",
 "-pattern":" <pattern>  : Build files matching pattern.",
 "-clean": "Delete objcet files.",
-"-test":"Run tests",
-"-kmsfncs":"(DEPRECATED) Expose KE's functions (windows)",
-"-gprof":"Include symbols for gprof",
+"-test":"Run tests.",
+"-kmsfncs":"(DEPRECATED) Expose KE's functions (windows).",
+"-gprof":"Include symbols for gprof.",
 "-compiler_version":"Echo compiler selection.",
-"-java":"Build java (jni) bindings",
-"-java_external":"Build and link a separate library for jni-bindings",
-"-build_java":"Build java source"}
+"-java":"Build java (jni) bindings.",
+"-java_external":"Build and link a separate library for jni-bindings.",
+"-build_java":"Build java source (not implemented)."}
 CWD=os.path.realpath(os.getcwd())
 #THIS IS WHERE YOU WILL GET YOUR OBJECT FILES
 BUILD_DIR=os.path.realpath("./BUILD_PY")
@@ -61,9 +61,11 @@ if sys.platform.startswith("win"):
 	IS_WINDOWS=True
 	THREAD_LIB=os.path.join(LIB_DIR,"pthreadGC2.dll")
 	THREAD_LIB_W64=os.path.join(LIB_DIR,"pthreadGC2-w64.dll")
+	EXE_EXT=".exe"
 else:
 	IS_WINDOWS=False
 	THREAD_LIB="-lpthreads"
+	EXE_EXT=".out"
 #PREDEFINED  TESTS TO RUN#
 TESTS=[]
 
@@ -190,12 +192,15 @@ def BuildTest(compiler,outname,cfiles,include,link="",build_dir="."):
 		include_str+="%s%s " %(INCLUDE_SWITCH,inc_dir)
 	print("Compiling test program(s)...")
 	for fname in cfiles:
-		pname=LINK_OUTPUT_SWITCH+os.path.splitext(os.path.basename(fname))[0]+EXE_EXT
+		if not IS_MSVC:
+			pname=LINK_OUTPUT_SWITCH+os.path.splitext(os.path.basename(fname))[0]+EXE_EXT
+		else:
+			pname=""
 		if "thread" in fname.lower() and os.path.exists(link_libs):
 			link_libs=link
 		else:
 			link_libs=""
-		compile="%s %s %s %s %s %s %s" %(compiler,pname,DEBUG_OPTIONS,include_str,link_libs,fname,outname) 
+		compile="%s %s %s %s %s %s %s" %(compiler,pname,DEBUG_OPTIONS_TEST,include_str,link_libs,fname,outname) 
 		print compile
 		rc,text=RunCMD(compile)
 		if rc==0:
