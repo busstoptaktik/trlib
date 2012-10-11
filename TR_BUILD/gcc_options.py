@@ -1,11 +1,19 @@
 import os,sys,shutil
 #DEFAULT COMPILERS AND SWITCHES#
-COMPILER="gcc"
+IS_WINDOWS=sys.platform.startswith("win")
+if "darwin" in sys.platform:
+	COMPILER="/opt/local/bin/gcc-mp-4.6" #perhaps add a function to find a proper compiler....
+else:
+	COMPILER="gcc"
 CROSS_COMPILER="x86_64-w64-mingw32-gcc.exe" #REMEMBER to include this in your path!
 DEFINE_SWITCH="-D"
 INCLUDE_SWITCH="-I"
-ALL_BUILD="-c"
-DEFAULT_LINK_OPTIONS="-shared -Wl,--kill-at"
+ALL_BUILD="-c -Wall -pedantic"
+if (not IS_WINDOWS):
+	ALL_BUILD+=" -fPIC"
+DEFAULT_LINK_OPTIONS="-shared" 
+if IS_WINDOWS:
+	DEFAULT_LINK_OPTIONS+=" -Wl,--kill-at"
 LINK_OUTPUT_SWITCH="-o"
 VERSION_SWITCH="--version"
 DEF_FILE_SWITCH=""
@@ -16,14 +24,15 @@ CROSS_LINKER=CROSS_COMPILER
 #OBJ FILES#
 OBJ_FILES="*.o"
 #STANDARD BUILD OPTIONS
-RELEASE_OPTIONS=ALL_BUILD+" -O3 -pedantic -Wall"
-DEBUG_OPTIONS=ALL_BUILD+" -g -O -Wall -D_ROUT -pedantic"
-if "win" in sys.platform:
+RELEASE_OPTIONS=ALL_BUILD+" -O3"
+DEBUG_OPTIONS=ALL_BUILD+" -g -O -D_ROUT"
+DEBUG_OPTIONS_TEST="-g -Wall -pedantic -O -D_ROUT"
+if "-gprof" in sys.argv:
+	DEBUG_OPTIONS_TEST+=" -pg"
+if IS_WINDOWS:
 	LINK_LIBRARIES="-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32"
-	EXE_EXT=".exe"
 else:
 	LINK_LIBRARIES="-lm"
-	EXE_EXT=".out"
 DEBUG_LINK=DEFAULT_LINK_OPTIONS+""
 RELEASE_LINK=DEFAULT_LINK_OPTIONS+""
 

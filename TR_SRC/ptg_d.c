@@ -690,6 +690,6 @@ The constants for the trig series to calc 1/m and c.
 
   return((tr_error==NULL || res==0) ? res :
           t_status(tr_error, usertxt, ptx, res,
-          (direct > 0) ? "m " : "sx", "", N, E, dCn, dCe);
+          (direct > 0) ? "m " : "sx", "", N, E, dCn, dCe));
 
 }

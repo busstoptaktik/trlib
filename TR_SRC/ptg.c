@@ -643,7 +643,7 @@ FILE                   *tr_error
 
   return((tr_error==NULL || res==0) ? res :
           t_status(tr_error, usertxt, ptx, res,
-          (direct > 0) ? "m " : "sx", "", N, E, dCn, dCe);
+          (direct > 0) ? "m " : "sx", "", N, E, dCn, dCe));
 
 }
 

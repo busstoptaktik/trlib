@@ -1428,7 +1428,7 @@ Nin, Ein, ins, direct, ins_alarm);
   }
   return((tr_error==NULL || res==0) ? res :
           t_status(tr_error, usertxt, ptx, res,
-          "m ", "", N, E, Nin - N, Ein - E);
+          "m ", "", N, E, Nin - N, Ein - E));
 
 #undef  TOL
 
