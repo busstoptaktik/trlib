@@ -536,6 +536,7 @@ gps_table->plm_dt - gps_table->o_ipl_dt);
       if (pos == 0) return(s_status(err_str, "set_itrf_c", ITRF_NAM_));
       qr   = get_tab_item(1, pth_mlb, p_gps, run_JD,
                           from_str, 5, to___str, D_gps, err_str);
+      if (qr < 0) return(ITRF_DTM_);
 /*
 (void) fprintf(stdout,
 "\n*%s_%s: %5.3f year - <ref_year>;", from_str, to___str,
@@ -605,6 +606,7 @@ dd);
     if (pos == 0) return(s_status(err_str, "set_itrf_c", ITRF_NAM_));
     qr    = get_tab_item(1, pth_mlb, p_gps, run_JD,
     /* dummy D_gate.. */ from_str, 6, to___str, &D_gate_igs, err_str);
+    if (qr < 0) return(ITRF_DTM_);
 /*
 (void) fprintf(stdout, "\n*%s_%s: %5.3f year - <ref_year>;",
 from_str, to___str, run_JD / 365.25);
@@ -630,6 +632,7 @@ from_str, to___str, run_JD / 365.25);
     if (pos == 0) return(s_status(err_str, "set_itrf_c", ITRF_NAM_));
     qr    = get_tab_item(1-stn_vel, pth_mlb, p_gps, run_JD,
     /* dummy D_gate.. */ from_str, 6, to___str, &D_gate_igs, err_str);
+    if (qr < 0) return(ITRF_DTM_);
 /*
 (void) fprintf(stdout, "\n*%s_%s: %5.3f year - <ref_year>;",
 from_str, to___str, run_JD / 365.25);

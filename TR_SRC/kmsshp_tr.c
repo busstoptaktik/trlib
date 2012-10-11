@@ -476,6 +476,7 @@ char            *err_txt)
         curpos = ftell(fh_in);
       }
     }
+    curpos = ftell(fh_in); // needed when no records to Header
   }
 
   // set min/max in file header
