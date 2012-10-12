@@ -28,6 +28,7 @@ Possible types are debug, info, warning, error and critical*/
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #include "trlib_intern.h"
 
 // tr_lib_error_code not outputted yet
