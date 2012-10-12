@@ -38,19 +38,19 @@ pre:
 #../BUILD/trlib/%.o: TR_SRC/%.c
 $(BUILDDIR)/%.o: TR_SRC/%.c
 	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>../BUILD/trlib/compile.err
+	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
 $(BUILDDIR)/%.o: TR_SRC/LORD/%.c
 	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>../BUILD/trlib/compile.err
+	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
 $(BUILDDIR)/%.o: TR_SRC/API/%.c
 	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>../BUILD/trlib/compile.err
+	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
 $(BUILDDIR)/%.o: TR_SRC/DEPRECATED/%.c
 	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>../BUILD/trlib/compile.err
+	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
 $(BUILDDIR)/%.o: java/%.c
 	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>../BUILD/trlib/compile.err
+	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
 
 
 
@@ -60,4 +60,4 @@ $(EXENAME): $(OBJS)
 	$(CC) -o $@ $< $(LDFLAGS) 
 
 clean:
-	rm -rf $(EXENAME) ../BUILD/trlib/
+	rm -rf $(EXENAME) $(BUILDDIR)
