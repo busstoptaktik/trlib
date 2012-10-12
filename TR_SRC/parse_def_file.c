@@ -21,9 +21,9 @@
 #include <ctype.h>
 #include "geo_lab.h"
 #include "fgetln_kms.h"
-#include "sgetg.h"
 #include "parse_def_file.h"
 #include "trlib_api.h"
+#include "strong.h"
 #include "lord.h"
 #define MODE_PRJ "def_prj"
 #define MODE_GRS "def_grs"
@@ -191,57 +191,6 @@ int set_hth(char **tokens,  def_hth_tr *entry, int n_items, char *descr){
 	return 0;
 }
 
-/* gets a number - if it has a unit sgetg is used */
-double get_number(char *item){
-	int n_chars=strlen(item);
-	int used;
-	struct typ_dec type;
-	char term[2];
-	if (isalpha(item[n_chars-1]))
-		return sgetg(item,&type,&used,term);
-	return atof(item);
-}	
-
-/*append items from list2 to list1 */
-char **append_items(char **items1, char **items2, int n_items1, int n_items2){
-	int i;
-	char **new_items= (char **) realloc(items1,sizeof(char*)*(n_items1+n_items2));
-	if (new_items==NULL)
-		return NULL;
-	
-	for (i=0;i<n_items2;i++)
-		new_items[n_items1+i]=items2[i];
-	return new_items;
-}
-
-
-/* splits string into items */
-char **get_items(char *line, char *delimiter, int *item_count){
-	char *item;
-	int n_items=0,buf_length=40,buf_size=40;
-	char **items=malloc(sizeof(char*)*buf_length);
-	if (items==NULL)
-		return NULL;
-	item=strtok(line,delimiter);
-	if (item==NULL){
-		free(items);
-		return NULL;
-	}
-	while (item && items){
-		*(items+(n_items++))=item;
-	
-		if (n_items>buf_size)
-			{
-			buf_size+=buf_length;
-			items=realloc(items,(buf_size)*sizeof(char*));
-			}
-		item=strtok(NULL,delimiter);
-	}
-	items=realloc(items,n_items*sizeof(char*));
-	*item_count=n_items;
-	return items;
-}
-
 
 /* 
 Function that parses def_lab file. All is well as long as we can determine via a min_tokens attribute if 'entries' spanning more than one line
@@ -361,7 +310,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 				completed=1;
 			}
 			else if (n_set[mode_rgn]<n_alloc[mode_rgn]){
-				//strncpy(((char*) entries[mode_rgn])+(n_set[mode_rgn]++)*mode_sizes[mode_rgn],tokens[0],mode_sizes[mode_rgn]);
+				/*strncpy(((char*) entries[mode_rgn])+(n_set[mode_rgn]++)*mode_sizes[mode_rgn],tokens[0],mode_sizes[mode_rgn]);*/
 				{
 					def_rgn *this_rgn;
 					this_rgn=((def_rgn*) entries[mode_rgn])+(n_set[mode_rgn]++);
@@ -436,7 +385,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	int j;
 	for(i=0;i<n_set[mode_dtm]; i++){
 		dtm1=((def_datum*) entries[mode_dtm])+i;
-		//dtm1->p_no=-1;
+		/*dtm1->p_no=-1;*/
 		for (j=0;j<n_set[mode_dtm];j++){
 			dtm2=((def_datum*) entries[mode_dtm])+j;
 			if (!strcmp(dtm2->mlb,dtm1->p_datum)){
