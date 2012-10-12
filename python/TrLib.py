@@ -144,10 +144,11 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.doc_dtm.restype=ctypes.c_int
 		tr_lib.sgetshpprj.argtypes=[ctypes.c_char_p,ctypes.c_void_p,ctypes.c_char_p]
 		tr_lib.sgetshpprj.restype=ctypes.c_int
+		tr_lib.proj4_to_mlb.argtypes=[ctypes.c_char_p]*2
+		tr_lib.proj4_to_mlb.restype=ctypes.c_int
 		tr_lib.set_lord_file.argtypes=[ctypes.c_char_p]
 		tr_lib.set_lord_file.restypes=None
 
-		
 	except Exception, msg:
 		print repr(msg)
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
@@ -240,6 +241,14 @@ def FromEsriText(wkt):
 		if retval==0:
 			return GetString(out)
 	return None
+
+def FromProj4(proj4def):
+	mlb=" "*256
+	retval=tr_lib.proj4_to_mlb(proj4def,mlb)
+	if retval!=TR_OK:
+		return None
+	else:
+		return GetString(mlb)
 
 def GetLocalGeometry(label,x,y):
 	#out param determines wheteher prj_in or prj_out is used#

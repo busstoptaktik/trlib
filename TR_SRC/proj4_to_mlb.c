@@ -33,8 +33,10 @@
 	 int item_count,i,pair;
 	 proj4_entry *proj_entry;
 	 no_spaces=malloc(sizeof(char)*strlen(proj4_text));
-	 if (no_spaces=NULL)
-		 return TR_ALLOCATION_ERROR;
+	 if (no_spaces==NULL){
+		 lord_error(TR_ALLOCATION_ERROR,LORD("Unable to allocate memory!"));
+		 return NULL;
+	 }
 	 remove_whitespace(proj4_text,no_spaces);
 	 tokens=get_items(no_spaces,"+",&item_count);
 	 if (tokens==NULL||item_count<2){
