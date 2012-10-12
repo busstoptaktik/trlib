@@ -46,4 +46,6 @@ extern void set_lord_critical_mode(FILE * stream, char *verbosity);
 
 extern void lord_set_parameters(FILE * stream, char *verbosity);
 
+extern void set_lord_file(char *fullfilename);
+
 extern void init_lord();

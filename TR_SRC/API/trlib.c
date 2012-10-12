@@ -103,7 +103,9 @@ int TR_InitLibrary(char *path) {
     #ifdef _ROUT
     ERR_LOG=fopen("TR_errlog.log","wt");
     #endif
-    ok=TR_SetGeoidDir(path);
+    init_lord();  // initialise the lord (logging, report and debugging) module with default values
+	ok=TR_SetGeoidDir(path);
+	
     if (ERR_LOG && ok!=TR_OK)
 	    fprintf(ERR_LOG,"Failed to parse def-file!\n");
     if (ok!=TR_OK)
@@ -141,6 +143,7 @@ int TR_InitLibrary(char *path) {
     if (0!=trf){
 	    rc=TR_Transform(trf,&x,&y,&z,1);
 	    TR_Close(trf);}
+
     if (0!=ERR_LOG)
 	    fprintf(ERR_LOG,"Is init: %d\n************ end initialisation **************\n",(ok==TR_OK));
     /* Set the main thread id */

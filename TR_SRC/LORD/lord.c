@@ -16,27 +16,37 @@
  * 
  */
 
-#include  <stdio.h>
-#include <stdarg.h>
-#include "trlib_intern.h"
-
+/* This module is a logging, reporting and debugging module....*/
+/* For use, first initialise and open each type by using
+set_lord_type_mode(FILE * stream, char *verbosity)
+then output each call by using 
+lord_type(int tr_lib_error_code, char *frmt, ...)
+Possible types are debug, info, warning, error and critical*/
 // muligheder for output_mode
 // stdout, stderr, FILE, NULL
 
+
+#include <stdio.h>
+#include <stdarg.h>
+#include "trlib_intern.h"
+
 // tr_lib_error_code not outputted yet
 
+// Flag whether type is on or off
 int use_debug;
 int use_info;
 int use_warning;
 int use_error;
 int use_critical;
 
+// The level output for each type
 int verbosity_debug;
 int	verbosity_info;
 int	verbosity_warning;
 int	verbosity_error;
 int	verbosity_critical;
 
+// The output stream used for each type
 FILE * stream_debug;
 FILE * stream_info;
 FILE * stream_warning;
@@ -47,8 +57,8 @@ void lord_debug(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_debug)
 	{
-		fprintf(stream_debug, "\nDEBUG:\t");
 		va_list ap;
+		fprintf(stream_debug, "\nDEBUG:\t");
 		va_start(ap, frmt);
 		(void) vfprintf(stream_debug, frmt,ap);
 		va_end(ap);
@@ -59,8 +69,8 @@ void lord_info(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_info)
 	{
-		fprintf(stream_info, "\nINFO:\t");
 		va_list ap;
+		fprintf(stream_info, "\nINFO:\t");
 		va_start(ap, frmt);
 		(void) vfprintf(stream_info, frmt,ap);
 		va_end(ap);
@@ -71,8 +81,8 @@ void lord_warning(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_warning)
 	{
-		fprintf(stream_warning, "\nWARNING:\t");
 		va_list ap;
+		fprintf(stream_warning, "\nWARNING:\t");
 		va_start(ap, frmt);
 		(void) vfprintf(stream_warning, frmt,ap);
 		va_end(ap);
@@ -83,8 +93,8 @@ void lord_error(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_error)
 	{
-		fprintf(stream_error, "\nERROR:\t");
 		va_list ap;
+		fprintf(stream_error, "\nERROR:\t");
 		va_start(ap, frmt);
 		(void) vfprintf(stream_error, frmt,ap);
 		va_end(ap);
@@ -95,8 +105,8 @@ void lord_critical(int tr_lib_error_code, char *frmt, ...)
 {
 	if (use_critical)
 	{
-		fprintf(stream_critical, "\nCRITICAL:\t");
 		va_list ap;
+		fprintf(stream_critical, "\nCRITICAL:\t");
 		va_start(ap, frmt);
 		(void) vfprintf(stream_critical, frmt,ap);
 		va_end(ap);
@@ -298,3 +308,17 @@ void init_lord()
 	stream_error = stdout;
 	stream_critical = stdout;
 }
+
+//void set_lord_file_all(char *fullfilename)
+
+// implement it so only one file when implemented in pythin binding
+
+void set_lord_file(char *fullfilename)
+{
+	stream_debug = fopen (fullfilename , "w");
+	stream_info = stream_debug;
+	stream_warning = stream_debug;
+	stream_error = stream_debug;
+	stream_critical = stream_debug;
+}
+

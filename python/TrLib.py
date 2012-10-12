@@ -144,6 +144,9 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.doc_dtm.restype=ctypes.c_int
 		tr_lib.sgetshpprj.argtypes=[ctypes.c_char_p,ctypes.c_void_p,ctypes.c_char_p]
 		tr_lib.sgetshpprj.restype=ctypes.c_int
+		tr_lib.set_lord_file.argtypes=[ctypes.c_char_p]
+		tr_lib.set_lord_file.restypes=None
+
 		
 	except Exception, msg:
 		print repr(msg)

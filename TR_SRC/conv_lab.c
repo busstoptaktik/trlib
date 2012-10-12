@@ -67,6 +67,7 @@
 #include "fgetlhtx.h"
 #include "trthread.h"
 #include "parse_def_file.h"
+#include "lord.h"
 
 int               conv_lab(
 /*________________________*/
@@ -191,7 +192,8 @@ union geo_lab    *u_lab,
       p_tp = (char *) i_lab;
       for (i = sizeof(*i_lab) -1; i >= 0; i--) *(p_tp+i) = 0;
       if (res != EOF) {
-        (void) fprintf(stdout, "\n***conv_lab: error in label input");
+        (void) lord_error(0, LORD("***conv_lab: error in label input"));
+		//(void) fprintf(stdout, "\n***conv_lab: error in label input");
         i_lab->lab_type = ILL_LAB;
         return(ILL_LAB);
       }
@@ -420,7 +422,13 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
         if (!recurs) {
           recurs = 1;
           if ((fc = fopen(t_info, "r")) == NULL) {
-            (void) fprintf(stdout,
+            FILE * pFile = fopen ("myfile.txt" , "w");
+			set_lord_error_mode(pFile, "all");
+			(void) lord_error(0, LORD("*** conv_lab: ILLEGAL or FILE %s not found;"), t_info);
+			set_lord_error_mode(stdout, "all");
+			fclose(pFile);
+			
+			(void) fprintf(stdout,
                "\n*** conv_lab: ILLEGAL or FILE %s not found;", t_info);
             recurs = 0;
             return(UNDEFSYS);

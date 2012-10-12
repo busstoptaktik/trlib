@@ -26,7 +26,10 @@
 static unsigned int  first_byte_is_nonzero_if_little_endian = 1;
 static unsigned char *is_little_endian = (unsigned char *) &first_byte_is_nonzero_if_little_endian;
 
-
+// This is used when compiling in VS
+#ifdef _MSC_VER
+#define inline
+#endif
 
 inline float swapfloatifneeded(float p) {
     unsigned char *v;
