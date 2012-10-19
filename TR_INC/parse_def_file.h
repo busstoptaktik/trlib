@@ -39,7 +39,7 @@ struct def_datum {
 	char mlb[MLBLNG];
 	int no;
 	char p_datum[MLBLNG];
-	char ellipsoid[MLBLNG];
+	char ellipsoid[MLBLNG]; /*really a reference to a def_grs struct */
 	int imit;
 	int type;
 	int p_no;

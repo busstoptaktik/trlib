@@ -17,8 +17,8 @@
  */
  """
 #########################
-## Python bindings for simple test api to KmsTrLib/KMSTrans
-## simlk, may->sep 2011                
+## Python bindings for (Kms) TrLib
+## simlk, 2011,2012            
 #########################
 try:
 	import numpy as np
@@ -32,8 +32,10 @@ import os
 import sys
 import time
 IS_INIT=False
-if "win" in sys.platform:
+if sys.platform.startswith("win"):
 	STD_LIB="KMSTRLIB.dll"
+elif "darwin" in sys.platform:
+	STD_LIB="KMSTRLIB.dylib"
 else:
 	STD_LIB="KMSTRLIB.so"
 STD_DIRNAME=os.path.dirname(__file__)

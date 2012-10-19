@@ -18,7 +18,10 @@
  struct proj4_entry{
 	char proj[64];
 	char datum[64];
+	char ellps[64];
 	char units[16];
+	double towgs84[7];
+	int n_params;
 	int zone;
 	double x_0;
 	double y_0;
@@ -27,7 +30,11 @@
 	double k;
  };
  
+ 
+	 
+	 
  typedef struct proj4_entry proj4_entry;
+
  
  /*Remember to free the returned pointer*/
  proj4_entry *parse_proj4(char *proj4_text);
