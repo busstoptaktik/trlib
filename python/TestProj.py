@@ -21,7 +21,7 @@ def test():
 		mlb=TrLib.FromProj4(text)
 		if mlb is None:
 			mlb="Unable to translate..."
-			ner+=1
+			nerr+=1
 		print("\n%s\n-> %s"%(text,mlb))
 	return nerr
 
