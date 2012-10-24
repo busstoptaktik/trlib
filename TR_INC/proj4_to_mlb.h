@@ -18,6 +18,7 @@
  struct proj4_entry{
 	char proj[64];
 	char datum[64];
+	char vdatum[64];
 	char ellps[64];
 	char units[16];
 	double towgs84[7];
@@ -40,4 +41,7 @@
  proj4_entry *parse_proj4(char *proj4_text);
  
  int proj4_to_mlb(char *proj4_text, char *mlb);
+ 
+ /* setter function for flag to allow kms-datum extensions */
+ void set_kms_datums_allowed(int is_allowed);
  

@@ -29,7 +29,8 @@
 * lots of hardcoded stuff, which should perhaps be made more visible....
 */
 
-
+/* flag which signals whether or not we allow extended (kms) datums in the proj4 +datum key*/ 
+static int ALLOW_KMS_DATUMS=1; 
 
 struct translation_entry{
 	char *proj4_name;
@@ -55,16 +56,19 @@ ELLIPSOID_TRANSLATIONS[]={
 /* the datums that we want to guess from proj4-ellipsoids */
 static struct translation_entry
 ELLIPSOID_TO_DATUM[]={
-{"GRS80","etrs89"}, /*could be gr96 as well */
-{"WGS84","wgs84"},
+{"grs80","etrs89"}, /*could be gr96 as well */
+{"wgs84","wgs84"},
 {NULL,NULL}
 };
 
-/*translations of proj4 datums to kms datums*/
+/*translations of proj4 datums to kms datums
+* only datums (usually) build into the library "proj", which have direct kms-translations should be stated here...
+* If we allow kms datums in the +datum parameter (see global flag above), only proj4-datums which do not appear under the same name as kms-datum are relevant
+*/
 static struct translation_entry
 PROJ4_TO_KMS_DATUM[]={
-{"WGS84","wgs84"},
-{"NAD83","nad83"},
+{"wgs84","wgs84"},
+{"nad83","nad83"},
 /*perhaps we should add some more ourselves, even if they are not supported by the library proj, but only by the language proj?? */
 {NULL,NULL}
 };
@@ -73,14 +77,27 @@ PROJ4_TO_KMS_DATUM[]={
 static struct towgs84_translation
 COMMON_PROJ4_DEFINITIONS[]={
 {"ed50","intl",3,{-87,-98,-121,0,0,0,0}},
-{"etrs89","GRS80",3,{0,0,0,0,0,0,0}},   /*and this could be gr96 as well! */
+{"etrs89","grs80",3,{0,0,0,0,0,0,0}},   /*and this could be gr96 as well! */
 {NULL,NULL,0,{0,0,0,0,0,0,0}}
 };
 
-	
+/* Some KMS aliases for etrs89 - possibly others as well*/
+static struct translation_entry
+KMS_DATUM_ALIAS[]={
+{"etrf89","etrs89"},
+{"euref89","etrs89"},
+{NULL,NULL}
+};
+
+/*setter function for allowing/disallowing KMS-datum extensions */
+/*Not thread safe! */
+
+void set_kms_datums_allowed(int is_allowed){
+	(is_allowed) ? (ALLOW_KMS_DATUMS=1) : (ALLOW_KMS_DATUMS=0);
+}
+
 
 /*Function that parses proj4 tokens into a struct*/
-
  proj4_entry *parse_proj4(char *proj4_text){
 	 char **tokens=NULL, *no_spaces;
 	 int item_count,i,pair;
@@ -107,6 +124,7 @@ COMMON_PROJ4_DEFINITIONS[]={
 	 /*set default values*/
 	 proj_entry->proj[0]='\0';
 	 proj_entry->datum[0]='\0';
+	 proj_entry->vdatum[0]='\0';
 	 proj_entry->ellps[0]='\0';
 	 strcpy(proj_entry->units,"m");
 	 proj_entry->x_0=0;
@@ -127,11 +145,16 @@ COMMON_PROJ4_DEFINITIONS[]={
 			 continue;
 		 }
 		 /*parse proj key value pairs*/
-		 /*printf("key: %s, val: %s\n",key_val[0],key_val[1]);*/
+		 /* convert string to lower case for easier comparison */
+		 string_tolower(key_val[0]);
+		 string_tolower(key_val[1]);
+		 
 		 if (!strcmp(key_val[0],"proj"))
 			 strncpy(proj_entry->proj,key_val[1],64);
 		else if (!strcmp(key_val[0],"datum"))
 			strncpy(proj_entry->datum,key_val[1],64);
+		else if(!strcmp(key_val[0],"vdatum"))
+			strncpy(proj_entry->vdatum,key_val[1],64);
 		else if (!strcmp(key_val[0],"ellps"))
 			strncpy(proj_entry->ellps,key_val[1],64);
 		else if (!strcmp(key_val[0],"units"))
@@ -172,6 +195,7 @@ COMMON_PROJ4_DEFINITIONS[]={
 *  A *few* shaky defaults will be built in here however.... 
 */
 static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
+	extern def_data *DEF_DATA; /*pointer to the preparsed def_data structure*/
 	/*if no datum - look for towgs84 params or guesssssss*/
 	datum[0]='\0';
 	/*if proj4 datum token is not set, we will conduct a search for a KMS-match */
@@ -220,7 +244,7 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 		
 	} /*end datum token not given */
 	else{ /*datum token is given and we look for a translation */
-	/*TODO: add more of predefined proj4-datums*/
+		/*First check the proj4->kms datum translations*/
 		struct translation_entry *current_try=PROJ4_TO_KMS_DATUM;
 		while (current_try->proj4_name!=NULL){
 			if (!strcmp(current_try->proj4_name,proj_entry->datum)){
@@ -229,22 +253,54 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 			}
 			current_try++;
 		} /*end loop over translations */
+		/*IF allowed, see if the datum given is a valid kms-datum*/
+		if (ALLOW_KMS_DATUMS && strlen(datum)==0){
+			if (DEF_DATA==NULL)
+				lord_warning(1,"Label definitions not initialised - unable to check proj4-datum");
+			else{ /*look for a kms-datum*/
+				def_datum *current_dtm;
+				int i;
+				for(i=0;i<DEF_DATA->n_dtm;i++){
+					current_dtm=DEF_DATA->datums+i;
+					if (!strcmp(proj_entry->datum,current_dtm->mlb)){
+						strcpy(datum,current_dtm->mlb);
+						break;
+					}
+				}
+			} /*end look for kms-datum*/
+		}
 		if (strlen(datum)==0){ /*if datum not supported */
 			lord_error(TR_LABEL_ERROR,"Proj4-datum: %s, not supported.",proj_entry->datum);
 			return TR_LABEL_ERROR;
 		}
 	}/* end else datum is given */
+	/*normalise datum - i.e. if given as an alias name return the standard name*/
+	{
+		struct translation_entry *look_up=KMS_DATUM_ALIAS;
+		/*yes: the field names are misleading, todo: change field names.... */
+		while (look_up->proj4_name!=NULL){
+			if (!strcmp(datum,look_up->proj4_name)){
+				strcpy(datum,look_up->kms_name);
+				break;
+			}
+			look_up++;
+		}
+	}
 	return TR_OK;
 }
 /*the actual conversion of proj4 text to mlb */
 
 int proj4_to_mlb(char *proj4_text, char *mlb){
 	extern def_data *DEF_DATA;
-	int is_transverse_mercator=0,rc;
-	char proj[32],datum[32];
+	int is_transverse_mercator=0,found_exact_alias=0,rc;
+	char proj[32],datum[32],vdatum[32],sep_char='E';
+	char param_string[128]; /*string to print extra parameters to */
+	
 	proj4_entry *proj_entry=parse_proj4(proj4_text);
 	proj[0]='\0';
 	datum[0]='\0';
+	vdatum[0]='\0';
+	param_string[0]='\0'; /*no extra parameters as default*/
 	if (proj_entry==NULL){
 		lord_error(TR_LABEL_ERROR,"Unable to parse proj4 string: %s",proj4_text);
 		return TR_LABEL_ERROR;
@@ -288,13 +344,29 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 		free(proj_entry);
 		return TR_LABEL_ERROR;
 	}
+	/*if given - set vdatum */
+	if (strlen(proj_entry->vdatum)>0){
+		if (DEF_DATA==NULL)
+			lord_warning(1,LORD("definition data not initialised - unable to search for vdatum minilabel."));
+		else{
+			int i;
+			for(i=0;i<DEF_DATA->n_dtm; i++){
+				if (!strcmp((DEF_DATA->datums+i)->mlb,proj_entry->vdatum)){
+					strcpy(vdatum,(DEF_DATA->datums+i)->mlb);
+					sep_char='H';
+					break;
+				}
+			}
+		}
+	}/*end looking for vdatum*/
+			
 	/*put extra parameters*/
 	if (is_transverse_mercator){
 		/*search for definition*/
 		def_projection *prj=NULL,*this_prj;
 		int i,params_ok;
 		if (DEF_DATA==NULL)
-			lord_warning(1,LORD("definition data not initialised - unable to search for minilabel."));
+			lord_warning(1,LORD("definition data not initialised - unable to search for projection minilabel."));
 		else{
 			for(i=0;i<DEF_DATA->n_prj; i++){
 				params_ok=0;
@@ -305,10 +377,11 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 					if (!strcmp(proj_entry->units,"km"))
 						scale=1000;
 					params_ok+=(proj_entry->k==this_prj->native_params[4]);
-					params_ok+=(fabs(proj_entry->lat_0-this_prj->native_params[0]*DOUT)<0.0000001);
-					params_ok+=(fabs(proj_entry->y_0*scale-this_prj->native_params[1])<0.000001);
-					params_ok+=(fabs(proj_entry->lon_0-this_prj->native_params[2]*DOUT)<0.0000001);
-					params_ok+=(fabs(proj_entry->x_0*scale-this_prj->native_params[3])<0.000001);
+					/*allow some 'round off' flexibility here....*/
+					params_ok+=(fabs(proj_entry->lat_0-this_prj->native_params[0]*DOUT)<1e-9);
+					params_ok+=(fabs(proj_entry->y_0*scale-this_prj->native_params[1])<1e-9);
+					params_ok+=(fabs(proj_entry->lon_0-this_prj->native_params[2]*DOUT)<1e-9);
+					params_ok+=(fabs(proj_entry->x_0*scale-this_prj->native_params[3])<1e-9);
 					if (params_ok==5){
 						prj=this_prj;
 						break;
@@ -317,17 +390,24 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 				}
 			}
 		} /*end else*/
-		if (prj!=NULL && !strcmp(datum,prj->p_datum))
+		if (prj!=NULL && !strcmp(datum,prj->p_datum)){
 			strcpy(mlb,prj->mlb);
+			found_exact_alias=1;
+		}
 		else{
-			sprintf(mlb,"itm_%s  %.2fdg  %.2f%s  %.2fdg  %.2f%s  %.8f",datum,proj_entry->lat_0,proj_entry->y_0,proj_entry->units,
+			strcpy(proj,"itm");
+			sprintf(param_string,"%.2fdg  %.2f%s  %.2fdg  %.2f%s  %.8f",proj_entry->lat_0,proj_entry->y_0,proj_entry->units,
 			proj_entry->lon_0,proj_entry->x_0,proj_entry->units,proj_entry->k);
 			if (prj!=NULL)
 				lord_info(1,"Proj4: %s found semi-matching mlb %s, however no datum match.",proj4_text,prj->mlb);
 		}
 	}
-	else{
-		sprintf(mlb,"%s_%s",proj,datum);
+	if (!found_exact_alias){
+		mlb+=sprintf(mlb,"%s%c%s",proj,sep_char,datum);
+		if (sep_char!='E' && strlen(vdatum)>0)
+			mlb+=sprintf(mlb,"_h_%s",vdatum);
+		if (strlen(param_string)>0)
+			sprintf(mlb,"  %s",param_string);
 	}
 	free(proj_entry);
 	return TR_OK;
