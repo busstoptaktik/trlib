@@ -18,6 +18,9 @@ TESTS=["+proj=utm +zone=32 +units=m +ellps=GRS80 +nodefs",
 "+proj=latlong +datum=ed50 +nodefs",
 "+proj=latlong +datum=etrs89 +vdatum=dvr90",
 "+proj=utm +zone=32 +datum=wgs84 +vdatum=dnn +units=m",
+"+proj=merc +lat_ts=0 +y_0=0 +lon_0=0 +x_0=0 +k=1 +datum=WGS84 +units=m +nodefs",
+"+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +y_0=0 +lon_0=0 +x_0=0 +k=1 +datum=WGS84 +units=m +nadgrids=@null",
+"+proj=merc +lat_ts=10 +y_0=100000 +lon_0=0 +x_0=200000 +k=1 +datum=ed50 +units=m +nodefs"
 ]
 
 def test():

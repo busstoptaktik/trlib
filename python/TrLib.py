@@ -242,6 +242,8 @@ def FromEsriText(wkt):
 		retval=tr_lib.sgetshpprj(wkt,None,out)
 		if retval==0:
 			return GetString(out)
+		elif DEBUG:
+			print retval
 	return None
 
 def FromProj4(proj4def):

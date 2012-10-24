@@ -21,14 +21,18 @@
 	char vdatum[64];
 	char ellps[64];
 	char units[16];
+	char nadgrids[64];
 	double towgs84[7];
 	int n_params;
 	int zone;
 	double x_0;
 	double y_0;
 	double lat_0;
+	double lat_ts;
 	double lon_0;
 	double k;
+	double a;
+	double b;
  };
  
  

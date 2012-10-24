@@ -53,6 +53,8 @@ ELLIPSOID_TRANSLATIONS[]={
 };
 */
  
+ #define NO_DATA (-9999)
+ #define RADIUS_FLAT (6378137) /*used to recognize web Mercator */
 /* the datums that we want to guess from proj4-ellipsoids */
 static struct translation_entry
 ELLIPSOID_TO_DATUM[]={
@@ -89,12 +91,15 @@ KMS_DATUM_ALIAS[]={
 {NULL,NULL}
 };
 
+
+
 /*setter function for allowing/disallowing KMS-datum extensions */
 /*Not thread safe! */
 
 void set_kms_datums_allowed(int is_allowed){
 	(is_allowed) ? (ALLOW_KMS_DATUMS=1) : (ALLOW_KMS_DATUMS=0);
 }
+
 
 
 /*Function that parses proj4 tokens into a struct*/
@@ -126,14 +131,18 @@ void set_kms_datums_allowed(int is_allowed){
 	 proj_entry->datum[0]='\0';
 	 proj_entry->vdatum[0]='\0';
 	 proj_entry->ellps[0]='\0';
+	 proj_entry->nadgrids[0]='\0';
 	 strcpy(proj_entry->units,"m");
 	 proj_entry->x_0=0;
 	 proj_entry->y_0=0;
 	 proj_entry->k=1.0;
 	 proj_entry->n_params=0;
-	 proj_entry->lon_0=-9999;
-	 proj_entry->lat_0=-9999;
-	 proj_entry->zone=-9999;
+	 proj_entry->lon_0=NO_DATA;
+	 proj_entry->lat_0=NO_DATA;
+	 proj_entry->lat_ts=NO_DATA;
+	 proj_entry->zone=NO_DATA;
+	 proj_entry->a=NO_DATA;
+	 proj_entry->b=NO_DATA;
 	 
 	 for(i=0;i<item_count;i++){
 		 /*printf("token: %s\n",tokens[i]);*/
@@ -159,6 +168,8 @@ void set_kms_datums_allowed(int is_allowed){
 			strncpy(proj_entry->ellps,key_val[1],64);
 		else if (!strcmp(key_val[0],"units"))
 			strncpy(proj_entry->units,key_val[1],16);
+		else if (!strcmp(key_val[0],"nadgrids"))
+			strncpy(proj_entry->nadgrids,key_val[1],64);
 		else if (!strcmp(key_val[0],"zone"))
 			proj_entry->zone=atoi(key_val[1]);
 		else if (!strcmp(key_val[0],"x_0"))
@@ -169,6 +180,12 @@ void set_kms_datums_allowed(int is_allowed){
 			proj_entry->lat_0=atof(key_val[1]);
 		else if (!strcmp(key_val[0],"lon_0"))
 			proj_entry->lon_0=atof(key_val[1]);
+		else if (!strcmp(key_val[0],"lat_ts"))
+			proj_entry->lat_ts=atof(key_val[1]);
+		else if (!strcmp(key_val[0],"a"))
+			proj_entry->a=atof(key_val[1]);
+		else if (!strcmp(key_val[0],"b"))
+			proj_entry->b=atof(key_val[1]);
 		else if (!strcmp(key_val[0],"k_0") || !strcmp(key_val[0],"k"))
 			proj_entry->k=atof(key_val[1]);
 		else if (!strcmp(key_val[0],"towgs84")){
@@ -289,11 +306,11 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 	return TR_OK;
 }
 /*the actual conversion of proj4 text to mlb */
-
+/*TODO: streamline recognition of mlbs with implicit datum to work more generally.... */
 int proj4_to_mlb(char *proj4_text, char *mlb){
 	extern def_data *DEF_DATA;
-	int is_transverse_mercator=0,found_exact_alias=0,rc;
-	char proj[32],datum[32],vdatum[32],sep_char='E';
+	int is_transverse_mercator=0,is_mercator=0,found_exact_alias=0,rc;
+	char proj[32],datum[32],vdatum[32],sep_char='_';
 	char param_string[128]; /*string to print extra parameters to */
 	
 	proj4_entry *proj_entry=parse_proj4(proj4_text);
@@ -330,6 +347,10 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 		is_transverse_mercator=1;
 		strcpy(proj,"itm");
 	}
+	else if (!strcmp(proj_entry->proj,"merc")){
+		is_mercator=1;
+		strcpy(proj,"mrc");
+	}
 	else{
 		strcpy(mlb,"err");
 		lord_error(TR_LABEL_ERROR,LORD("Proj4-projection: %s, not supported."),proj_entry->proj);
@@ -345,7 +366,7 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 		return TR_LABEL_ERROR;
 	}
 	/*if given - set vdatum */
-	if (strlen(proj_entry->vdatum)>0){
+	if (strlen(proj_entry->vdatum)>0 && ALLOW_KMS_DATUMS){
 		if (DEF_DATA==NULL)
 			lord_warning(1,LORD("definition data not initialised - unable to search for vdatum minilabel."));
 		else{
@@ -402,9 +423,25 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 				lord_info(1,"Proj4: %s found semi-matching mlb %s, however no datum match.",proj4_text,prj->mlb);
 		}
 	}
+	else if (is_mercator){ /*TODO: the same as above....*/
+		/*check mrc0 and webmrc */
+		if (proj_entry->lat_ts==0 && proj_entry->lon_0==0 && proj_entry->x_0==0 && proj_entry->y_0==0 && proj_entry->k==1){
+			if (proj_entry->a==RADIUS_FLAT && proj_entry->b==RADIUS_FLAT && strcmp(proj_entry->nadgrids,"@null")==0 && strcmp(datum,"wgs84")==0){
+				strcpy(mlb,"webmrc");
+				found_exact_alias=1;
+			}
+			else if (proj_entry->a==NO_DATA && proj_entry->b==NO_DATA)
+				strcpy(proj,"mrc0");
+		}
+		else{
+			sprintf(param_string,"%.2fdg  %.2f%s  %.2fdg  %.2f%s",proj_entry->lat_ts,proj_entry->y_0,proj_entry->units,
+			proj_entry->lon_0,proj_entry->x_0,proj_entry->units);
+		}
+			
+	}
 	if (!found_exact_alias){
 		mlb+=sprintf(mlb,"%s%c%s",proj,sep_char,datum);
-		if (sep_char!='E' && strlen(vdatum)>0)
+		if (sep_char!='E' && sep_char!='_' && strlen(vdatum)>0)
 			mlb+=sprintf(mlb,"_h_%s",vdatum);
 		if (strlen(param_string)>0)
 			sprintf(mlb,"  %s",param_string);
