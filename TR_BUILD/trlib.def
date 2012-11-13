@@ -1,5 +1,6 @@
 EXPORTS
 	TR_InitLibrary
+	TR_SetGeoidDir
 	TR_Transform
 	TR_GeoidInfo
 	TR_GetEsriText
@@ -19,6 +20,8 @@ EXPORTS
 	TR_AllowUnsafeTransformations
 	TR_ForbidUnsafeTransformations
 	TR_GetLocalGeometry
+	TR_OpenProjection
+	TR_GetGeoidName
 	bh_lat
 	bh_lmb
 	bshlm1
@@ -43,6 +46,10 @@ EXPORTS
 	cwtJD
 	dk_trans
 	dks_tr
+	doc_prj
+	doc_rgn
+	doc_grs
+	doc_dtm
 	ee_trans
 	eetmtu_g
 	erad
@@ -59,7 +66,6 @@ EXPORTS
 	fputcw
 	fputg
 	fputshpprj
-	fputst
 	gatg
 	gd_t_val
 	gd_trans
@@ -73,6 +79,7 @@ EXPORTS
 	get_mlb
 	get_tpd
 	get_zone
+	get_def_numbers
 	getsinexlin
 	getsinexver
 	gettabdir
@@ -100,7 +107,6 @@ EXPORTS
 	s_status
 	sand_afst
 	sand_areal
-	scn_cho
 	setDtrc
 	set_dtm
 	set_dtm_1
@@ -113,11 +119,11 @@ EXPORTS
 	sgetcw
 	sgetdt
 	sgetg
-	sgetst
+	sgetshpprj
 	sputcw
 	sputg
 	sputshpprj
-	sputst
+	
 	srch_plate
 	srch_tab_typ
 	t_status

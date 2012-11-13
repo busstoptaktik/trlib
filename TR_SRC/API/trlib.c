@@ -22,6 +22,7 @@
 /*#include <windows.h>* enable if we want to define our dllMain under windows */
 #include "conv_lab.h"
 #include "gd_trans.h"
+#include "itrf_trans.h"
 #include "gettabdir.h"
 #include "geoid_d.h"
 #include "geoid_c.h"
@@ -32,8 +33,11 @@
 #include "tab_doc_f.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
+#include "parse_def_file.h"
+#include "doc_def_data.h"
 #include "trthread.h"
-#define TRLIB_VERSION "dev v1.0 2012-03-23"
+#include "lord.h"
+#define TRLIB_VERSION "dev v1.0 2012-09-21"
 #ifndef TRLIB_REVISION
 #define TRLIB_REVISION "hg revison not specified"
 #endif
@@ -41,17 +45,20 @@
 #define GEO_SYS_CODE 2
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
-
+#define R2D 57.295779513082323 
+#define D2R 0.017453292519943295
 /*various global state variables */
 
-static int ALLOW_UNSAFE=0; //do we allow transformations which are not thread safe?
-static int UNSAFE[]={FHMASK}; //list of imit-attrs of transformations deemed unsafe.
-static int HAS_GEOIDS=0; //global flag which signals if we have geoids available 
-static THREAD_SAFE int THREAD_ID=0; //used to distinguish the thread that initialised the library from other threads.
-static int *MAIN_THREAD_ID=0; // same as above - also signals whether the library has been succesfully initialised.
+static int ALLOW_UNSAFE=0; /*do we allow transformations which are not thread safe?*/
+static int UNSAFE[]={FHMASK}; /*list of imit-attrs of transformations deemed unsafe.*/
+static int HAS_GEOIDS=0; /*global flag which signals if we have geoids available*/
+static THREAD_SAFE int THREAD_ID=0; /*used to distinguish the thread that initialised the library from other threads.*/
+static int *MAIN_THREAD_ID=0; /* same as above - also signals whether the library has been succesfully initialised.*/
 
 THREAD_SAFE int TR_LAST_ERROR=TR_OK; /*Last error msg (int) from gd_trans - also set in TR_Open and TR_GeoidTable on allocation errors.*/
 FILE *ERR_LOG=0;
+
+def_data *DEF_DATA=0;
 
 /*return last buffered error code from gd_trans */
 int TR_GetLastError(void){
@@ -90,36 +97,24 @@ int TR_InitLibrary(char *path) {
     int ok=-1,rc;
     double x=512200.0,y=6143200.0,z=0.0;
     TR* trf;
-    FILE *fp;
-    char buf[FILENAME_MAX],fname[FILENAME_MAX],*init_path=0;
-    if (!TR_IsMainThread()) //Only one thread can succesfully initialise the library
+    
+    if (!TR_IsMainThread()) /*Only one thread can succesfully initialise the library*/
 	    return TR_ERROR;
-    if (strlen(path)>0) 
-	    init_path=path;
-    else
-	    init_path=getenv(TR_TABDIR_ENV);
-    if (0==init_path){ 
-	    sprintf(buf,"./");
-	    init_path=buf;
-	    }
-    else if (init_path[strlen(init_path)-1]!='/' && init_path[strlen(init_path)-1]!='\\'){
-	    strcpy(buf,init_path);
-	    strcat(buf,"/");
-	    init_path=buf;
-	    }
-	    
-    strcpy(fname,init_path);
-    strcat(fname,TR_DEF_FILE);
-    #ifdef _ROUT
-    fprintf(stdout,"%s %s\n",init_path,fname); /*just debugging */
-    #endif
-    fp=fopen(fname,"r");
-    if (0==fp)
-	    return TR_ERROR;
-    fclose(fp);
-    settabdir(init_path);
     #ifdef _ROUT
     ERR_LOG=fopen("TR_errlog.log","wt");
+    #endif
+    init_lord();  // initialise the lord (logging, report and debugging) module with default values
+	ok=TR_SetGeoidDir(path);
+	
+    if (ERR_LOG && ok!=TR_OK)
+	    fprintf(ERR_LOG,"Failed to parse def-file!\n");
+    if (ok!=TR_OK)
+	    return TR_ERROR;
+    #ifdef _ROUT
+    if (DEF_DATA && ERR_LOG){
+	    fprintf(ERR_LOG,"Contents of %s:\n",TR_DEF_FILE);
+	    present_data(ERR_LOG,DEF_DATA);
+	}
     #endif
     /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
     trf=TR_Open("utm32_ed50","utm32_wgs84","");
@@ -148,6 +143,7 @@ int TR_InitLibrary(char *path) {
     if (0!=trf){
 	    rc=TR_Transform(trf,&x,&y,&z,1);
 	    TR_Close(trf);}
+
     if (0!=ERR_LOG)
 	    fprintf(ERR_LOG,"Is init: %d\n************ end initialisation **************\n",(ok==TR_OK));
     /* Set the main thread id */
@@ -156,18 +152,74 @@ int TR_InitLibrary(char *path) {
     return (ok==TR_OK)?TR_OK:TR_ERROR; 
 }
 
+/*
+* A function to change the tab-dir has turned out to be useful - this is done here: set or change the current tab-dir
+*/
+
+int TR_SetGeoidDir(char *path){
+	FILE *fp;
+	int rc;
+	char buf[FILENAME_MAX],fname[FILENAME_MAX],*init_path=0;
+	if (path && strlen(path)>0) 
+		init_path=path;
+	else
+		init_path=getenv(TR_TABDIR_ENV);
+	if (0==init_path){ 
+		sprintf(buf,"./");
+		init_path=buf;
+	}
+	else if (init_path[strlen(init_path)-1]!='/' && init_path[strlen(init_path)-1]!='\\'){
+		strcpy(buf,init_path);
+		strcat(buf,"/");
+		init_path=buf;
+	}
+		    
+	strcpy(fname,init_path);
+	strcat(fname,TR_DEF_FILE);
+	#ifdef _ROUT
+	lord_debug(0,"%s %s\n",init_path,fname); /*just debugging */
+	#endif
+	fp=fopen(fname,"r");
+	if (0==fp)
+		return TR_ERROR;
+	/* close previously parsed definitions */
+	if (DEF_DATA) 
+		close_def_data(DEF_DATA);
+	/* close previously opened tab-dir files */
+	c_tabdir_file(0,NULL);
+	DEF_DATA=open_def_data(fp,&rc);
+	fclose(fp);
+	#ifdef _ROUT
+	lord_debug(0,"Parsed def_lab.txt, errs: %d\n",rc);
+	#endif
+	settabdir(init_path);
+	return (DEF_DATA ? TR_OK: TR_ERROR);
+}
+	
+
 
 /* Mock up - not fully implemented! */
 void TR_GeoidInfo(TR *tr) {
-    char req[256];
+    char req[512];
+    char geoid_name[256];
     int res;
     strcpy(req,"*");
-    strcat(req,tr->geoid_name);
+    TR_GetGeoidName(tr,geoid_name);
+    /*strcat(req,tr->geoid_name); */
+    strcat(req,geoid_name);
     res=tab_doc_f(req,stdout);
     #ifdef _ROUT
     printf("Request: %s, res: %d\n",req,res);
     #endif
     }
+
+void TR_GetGeoidName(TR *tr,char *name) {
+	struct gde_lab *g_lab;
+	g_lab=&((tr->geoid_pt->table_u)[tr->geoid_pt->tab_nr]);
+	strcpy(name,g_lab->mlb);
+	return;
+}
+	
 
 
 void TR_GetVersion(char *buffer,int BufSize) {
@@ -329,7 +381,7 @@ void TR_Close (TR *tr) {
 	    #endif
 	    geoid_c(tr->geoid_pt,0,NULL);
 	    free(tr->geoid_pt);}
-    //gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);  might not be needed! WANT TO close hgrid static in gd_trans 
+    /*gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);  might not be needed! WANT TO close hgrid static in gd_trans  */
     free (tr);
     return;
 }
@@ -380,7 +432,7 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 return err;
  }
  
-/* transform one or more xyz-tuples */
+/* transform one or more xyz-tables */
 int TR_tr(
    union geo_lab *plab_in,
    union geo_lab *plab_out, 
@@ -398,7 +450,7 @@ int TR_tr(
 	 
    
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
-    int err, ERR = 0, i; //use_geoids; 
+    int err, ERR = 0, i; /*use_geoids; */
    
     if ((plab_in->u_c_lab).cstm==CRT_SYS_CODE){
         x_in=Y_in;
@@ -431,15 +483,73 @@ int TR_tr(
     
 }
 
+/* transform ITRF one or more xyz-tables */
+int TR_itrf(
+   union geo_lab *plab_in,      /* In label */
+   union geo_lab *plab_out,     /* Out label */
+   double *x_in,                /* X in array */
+   double *y_in,                /* Y in array */
+   double *z_in,                /* Z in array */
+   double *x_out,               /* X out array */
+   double *y_out,               /* Y out array */
+   double *z_out,               /* Z out array */
+   int n,                       /* XYZ in/out array size */
+   double *velx_in,             /* Velocity X in array */
+   double *vely_in,             /* Velocity Y in array */
+   double *velz_in,             /* Velocity Z in array */
+   double *velx_out,            /* Velocity X out array */
+   double *vely_out,            /* Velocity Y out array */
+   double *velz_out,            /* Velocity Z out array */
+   int n_vel,                   /* Velocity XYZ in/out size (0->Use std plate velocity) */
+   double *JD_in,               /* JD2000 epoch in array */
+   int n_JD,                    /* JD2000 epoch in/size (1->Use same epoch for all coordinates) */
+   struct PLATE *plate_info
+   )
+ {
+
+    double i_crd[3], i_vel[3], i_JD=-36525.0;
+    double o_crd[3], o_vel[3];
+    char *err_str=NULL;
+
+    int err, ERR = 0, i, stn_vel=0;
+
+    if(n_vel>0) stn_vel=1;
+
+    for (i = 0;  i < n;  i++) {
+        if(n_JD==1) i_JD=JD_in[0]; else if(n_JD==n) i_JD=JD_in[i];
+        i_crd[0]=x_in[i]; i_crd[1]=y_in[i]; i_crd[2]=z_in[i];
+        if(n_vel==n){
+            i_vel[0]=velx_in[i]; i_vel[1]=vely_in[i]; i_vel[2]=velz_in[i];
+        }
+        err = itrf_trans(plab_in, plab_out, stn_vel, plate_info->plate_model, plate_info->intra_plate_model, i_crd, i_vel, i_JD, o_crd, o_vel, plate_info->plm_trf, plate_info->ipl_trf, plate_info->plm_dt, plate_info->ipl_idt, plate_info->ipl_odt, plate_info->plm_nam, plate_info->plt_nam, plate_info->ipl_nam, "", err_str);
+        x_out[i]=o_crd[0]; y_out[i]=o_crd[1]; z_out[i]=o_crd[2];
+        if(n_vel==n){
+            velx_out[i]=o_vel[0]; vely_out[i]=o_vel[1]; velz_out[i]=o_vel[2];
+        }
+    #ifdef _ROUT
+    if (err)
+        fprintf(ERR_LOG,"\nProj: %s->%s, last err: %d, error str: %s, out: %.3f %.3f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,err_str,x_in[i],y_in[i],z_in[i]);
+    #endif
+        if (err)
+           ERR = err;
+   }
+   TR_LAST_ERROR=ERR;
+
+   return ERR? TR_ERROR: TR_OK;
+
+}
+
 /* read xyz-tuples from f_in; stream transformed tuples to f_out */
 int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
-   
-    int ERR = 0,i=0;
+    double r2d=R2D;
+    double d2r=D2R;
+    int ERR = 0,i=0,is_geo_in,is_geo_out;
     enum {BUFSIZE = 16384};
     char buf[BUFSIZE];
     if ((0==trf) || (0==f_in) || (0==f_out))
         return TR_ERROR;
-  
+    is_geo_in=(((trf->plab_in->u_c_lab).cstm)==GEO_SYS_CODE);
+    is_geo_out=(((trf->plab_out->u_c_lab).cstm)==GEO_SYS_CODE);
     while (0 != fgets(buf, BUFSIZE, f_in)) {
         int    argc, err;
         double x,y,z;
@@ -458,7 +568,10 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
             if (n==0)
                 continue;
         }
-
+        if (is_geo_in){
+		x*=d2r;
+		y*=d2r;
+	}
         err = TR_Transform(trf,&x,&y,&z,1);
         i++;
 
@@ -468,7 +581,10 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
 
         if ((n==-1) && err)
             break;
-        
+        if (is_geo_out){
+		x*=r2d;
+		y*=r2d;
+	}
         fprintf(f_out, "%.10g %.10g %.10g\n", x,y,z);
 
         if (i==n)
@@ -480,13 +596,16 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
 
 /* We need to close file pointers! Other ressources *should* be freed automatically! */
 void TR_TerminateLibrary(void) {
-     gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);
-     TR_GeoidTable(NULL);
-     c_tabdir_file(0,NULL);
+	TR_TerminateThread(); /*terminate the 'main' thread - assuming this haven't been done already (perhaps check for this??) */
+	if (DEF_DATA)
+		close_def_data(DEF_DATA);
+     
 }
 
 void TR_TerminateThread(void){
-    TR_TerminateLibrary();
+	gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);
+	TR_GeoidTable(NULL);
+	c_tabdir_file(0,NULL);
 }
 
 /*

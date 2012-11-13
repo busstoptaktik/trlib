@@ -131,8 +131,9 @@ FILE           *tr_error
   }
   else res = TRF_PROGR_;
 
-  return(t_status(tr_error, usertxt, "hlm_tr", res,
-                  "m ", "", N, E, N - N_in, E - E_in));
+  return((tr_error==NULL || res==0) ? res :
+          t_status(tr_error, usertxt, "hlm_tr", res,
+          "m ", "", N, E, N - N_in, E - E_in));
 
 }
 

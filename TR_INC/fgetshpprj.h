@@ -21,13 +21,6 @@
 /* fgetshpprj  ver 2008.01          # page 1     6 Jan 2009 11 57 */
 
 
-/* Copyright (c) 2009, National Space Institute, DTU, Denmark */
-/* All rights reserved.                                       */
-
-/* This is unpublished proprietary source code of DTU, Denmark */
-/* This copyright claim does not indicate an intention of      */
-/* publishing this code.                                       */
-
 #include <stdio.h>
 #include <string.h>
 #include "geo_lab.h"

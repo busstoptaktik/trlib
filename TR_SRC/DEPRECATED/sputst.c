@@ -32,6 +32,7 @@
 #include  <stdio.h>
 #include  <string.h>
 #include  "geo_lab.h"
+#include  "deprecated.h"
 
 int                       sputst(
 /*_____________________________*/

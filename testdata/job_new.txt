@@ -4,6 +4,7 @@
 base/DK_3d.txt new/DK_3d_geoHed50_h_dvr90.txt geoEed50 8
 base/DK_3d.txt new/DK_3d_crt_wgs84.txt crt_wgs84 5
 base/DK_3d.txt new/DK_3d_gs.txt gs 5
+base/DK_3d.txt new/DK_3d_dktm1.txt dktm1H_h_dnn 5
 base/FO_3d.txt new/FO_fotmH_h_fvr09.txt fotmH_h_fvr09 5
 base/FO_3d.txt new/FO_fk89H_h_fvr09.txt fk89H_h_fvr09 5
 base/FO_3d.txt new/FO_fu50H_h_fvr09.txt fu50H_h_fvr09 5

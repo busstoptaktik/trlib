@@ -18,18 +18,6 @@
  
 /* API header til eksterne brugere og til internt 'sanity' check, simlk, thokn sep. 2011 */
 
-/*
-Vi kan overveje om returmeddelelser skal være som i LH's API.....
-enum KMSTR_Error
-{
-	KMSTR_OK = 0,  // No Error
-	KMSTR_LABELERROR = 1, // Invalid input or output label
-	KMSTR_TRANSFORMATIONERROR =2,  // Transformation failed
-	KMSTR_EXCEPTION = 3, // Caught exception 
-	KMSTR_GEOIDINITFAILED = 4, // Failed to initialise geoid library
-	KMSTR_GDTRANSLOADFAILED = 5, // Failed to load GDTRANS
-	KMSTR_GEOIDSALREADYINITIALISED = 6, // Geoid library has already been initialized 
-}; */
 #define TR_OK 0
 #define TR_LABEL_ERROR 1
 #define TR_ERROR 2
@@ -42,6 +30,7 @@ enum KMSTR_Error
 #define KMSTR_API
 #endif 
 KMSTR_API int   TR_InitLibrary(char *path);
+KMSTR_API int   TR_SetGeoidDir(char *path);
 KMSTR_API int   TR_GetLastError(void);
 KMSTR_API void TR_GetVersion(char *buffer, int bufferlength);
 KMSTR_API int   TR_GetEsriText(char *label_in, char *wkt_out);

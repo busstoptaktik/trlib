@@ -579,9 +579,10 @@ FILE                    *tr_error
     cb = U29_FK89;  cw = FK89_U29;  break;
   case 8: /* fk89 -> utm29_etrs89 (inverse) */
     cb = FK89_U29;  cw = U29_FK89;  break;
-  default: 
-    return(t_status(tr_error, usertxt, "fo_g_tr", TRF_PROGR_, 
-           "m ", "", N, E, N - N_in, E - E_in));
+  default:
+    return((tr_error==NULL) ? TRF_ILLEG_ :
+            t_status(tr_error, "", "fo_g_tr", TRF_PROGR_, 
+            "m ", "", N, E, N - N_in, E - E_in));
   }
 
   if (direct) {
@@ -629,8 +630,9 @@ FILE                    *tr_error
   }
   else res = TRF_PROGR_;  /* UNDEFINED DIRECTION */
 
-  return(t_status(tr_error, usertxt, "fo_g_tr", res, 
-         "m ", "", N, E, N - N_in, E - E_in));
+  return((tr_error==NULL) ? TRF_ILLEG_ :
+          t_status(tr_error, "", "fo_g_tr", res, 
+          "m ", "", N, E, N - N_in, E - E_in));
 
 #undef   COORDLIM
 }

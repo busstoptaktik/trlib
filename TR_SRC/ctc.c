@@ -55,7 +55,7 @@ FILE                  *tr_error
 {
 
 #include          "cic.h"
-#include          "set_dtm.h"
+#include          "set_dtm_1.h"
 #include          "t_status.h"
 
   struct coord_lab   *i_lab = &(i_lab_u->u_c_lab);
@@ -96,21 +96,25 @@ FILE                  *tr_error
   static struct dsh_str   nw_a, *nw = &nw_a;
   static struct dsh_str   iw_a, *iw = &iw_a;
   struct dsh_str   *fc = NULL, *tc = NULL, *wc = NULL;
+  char rgn[3];
+  short mask;
   
   if (i_lab->lab_type != CRD_LAB) {
-    return(t_status(tr_error, usertxt,
-           "ctc(input label fault)", TRF_ILLEG_));
+          return((tr_error==NULL) ? TRF_ILLEG_ :
+                  t_status(tr_error, usertxt,
+                  "ctc(input label fault)", TRF_ILLEG_));
   }
 
   if (o_lab->lab_type != CRD_LAB) {
-    return(t_status(tr_error, usertxt,
-           "ctc(output label fault)", TRF_ILLEG_));
+    return((tr_error==NULL) ? TRF_ILLEG_ :
+            t_status(tr_error, usertxt,
+            "ctc(output label fault)", TRF_ILLEG_));
   }
 
   if (!init) {
-    (void) set_dtm(-1, "ed50",   &p_no, p_nm, e_nm, ew);
-    (void) set_dtm(-1, "nwl9d",   &p_no, p_nm, e_nm, nw);
-    (void) set_dtm(-1, "etrs89", &p_no, p_nm, e_nm, iw);
+    (void) set_dtm_1(-1, "ed50",   &p_no, p_nm, e_nm, rgn,&mask,ew);
+    (void) set_dtm_1(-1, "nwl9d",   &p_no, p_nm, e_nm, rgn,&mask,nw);
+    (void) set_dtm_1(-1, "etrs89", &p_no, p_nm, e_nm, rgn,&mask,iw);
     init = 1;
   }
 
@@ -192,8 +196,9 @@ FILE                  *tr_error
 
   }
   else {
-    return(t_status(tr_error, usertxt,
-           "ctc(unknown datum shift)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+      	      t_status(tr_error, usertxt,
+              "ctc(unknown datum shift)", TRF_ILLEG_));
   }
 
   *Xo = X;

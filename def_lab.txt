@@ -1556,6 +1556,7 @@ dummy
 *  Observatoire de Paris, 1996                               ;
 * GEQ84    979764.5e-5     * Equator qravity                 ;
 *KMW84    3986004.418e8   * Grav. const * Mass               ;
+*KMMOON  KM*0.0122298  ;
 *STOP                                                        ;
 
 * SYNTAX::                                                   ;
@@ -1698,7 +1699,7 @@ Volume 62  no. 3  1988  page 348."
 Unit Sphere  for Astronomy" 
 
 #Moon
- 99   1         1737400.0   256e-6       KM*0.0122298  266170.0e-11
+ 99   1         1737400.0   256e-6       KMMOON  266170.0e-11
 June 2007: http://www.solarviews.com/eng/moon.htm."
 * NOT USED ::                                                .
 #Moon                                                        .

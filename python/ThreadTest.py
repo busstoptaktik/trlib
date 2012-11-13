@@ -15,6 +15,11 @@ NTHREADS_2D=5
 NTHREADS_3D=5
 NITERATIONS=3
 NPOINTS=1000
+
+class NoOut(object):
+	def write(*args):
+		pass
+		
 class BadGuy(threading.Thread):
 	def __init__(self,id,n,iterations=3,is3d=False,log_file=None):
 		self.N=n
@@ -26,7 +31,7 @@ class BadGuy(threading.Thread):
 	def run(self):
 		n=self.N #+something random??
 		if self.log_file is None:
-			fp=sys.stdout
+			fp=NoOut()
 		else:
 			fp=open(self.log_file,"w")
 		while self.iterations>0:
@@ -66,12 +71,25 @@ def main(args):
 	print("Shared library is: %s" %repr(TrLib.tr_lib))
 	if not os.path.exists(OUTPUT_DIR):
 		os.mkdir(OUTPUT_DIR)
+	if "-noout" in args:
+		write_out=False
+		print("Not using output to file!")
+	else:
+		write_out=True
 	threads=[]
 	RandomTests.SetThreadMode()
 	for i in range(NTHREADS_2D):
-		threads.append(BadGuy(i,NPOINTS,NITERATIONS,False,os.path.join(OUTPUT_DIR,"2dthread_%i.txt"%i)))
+		if write_out:
+			fname=os.path.join(OUTPUT_DIR,"2dthread_%i.txt"%i)
+		else:
+			fname=None
+		threads.append(BadGuy(i,NPOINTS,NITERATIONS,False,fname))
 	for i in range(NTHREADS_3D):
-		threads.append(BadGuy(NTHREADS_2D+i,NPOINTS,NITERATIONS,True,os.path.join(OUTPUT_DIR,"3dthread_%i.txt"%i)))
+		if write_out:
+			fname=os.path.join(OUTPUT_DIR,"3dthread_%i.txt"%i)
+		else:
+			fname=None
+		threads.append(BadGuy(NTHREADS_2D+i,NPOINTS,NITERATIONS,True,fname))
 	for thread in threads:
 		thread.start()
 	while threading.activeCount()>1:

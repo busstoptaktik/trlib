@@ -32,6 +32,7 @@
 #include   <string.h>
 #include   "geo_lab.h"
 #include   "trthread.h"
+#include  "deprecated.h"
 
 int                      scn_cho(
 /*_____________________________*/

@@ -115,8 +115,9 @@ FILE                *tr_error
       fh_w = (int) sqrt(1.0000001*fh_z);
       init = fh_z == fh_w*fh_w;
       if (!init)
-        return(t_status(
-               tr_error, "", "fh_trans(internal labels)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "fh_trans(internal labels)", TRF_ILLEG_));
     }
 
 
@@ -133,8 +134,9 @@ FILE                *tr_error
       if (outnr > 2) outnr = 2;
 
       if (outlab->datum != 32)
-        return(t_status(
-               tr_error, "", "fh_trans(outsys)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "fh_trans(outsys)", TRF_ILLEG_));
 
       /* In-system */
       /*___________*/
@@ -146,8 +148,9 @@ FILE                *tr_error
 #endif
 
       if (in_lab->datum != 32)
-        return(t_status(
-               tr_error, "", "fh_trans(in_sys)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "fh_trans(in_sys)", TRF_ILLEG_));
 
       if (in_lab->date < 50.0) {
         lim[0] = sgetg("5422nt", &tpd, &nst, "nt");
@@ -182,7 +185,8 @@ FILE                *tr_error
       switch(act) {
       case GTP: /* geo -> prj */
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+           ies = (tr_error==NULL) ? TRF_AREA_ :
+                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
         res = ptg(outlab_u, -1, N, E, &N, &E, usertxt, tr_error);
         *Nout = N;
         *Eout = E;
@@ -190,13 +194,15 @@ FILE                *tr_error
       case PTG: /* prj -> geo */
         res = ptg(in_lab_u, +1, N, E, &N, &E,  usertxt, tr_error);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+           ies = (tr_error==NULL) ? TRF_AREA_ :
+                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
         *Nout = N;
         *Eout = E;
         break;
       case GTC: /* geo -> crt */
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+           ies = (tr_error==NULL) ? TRF_AREA_ :
+                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
         res   = gtc(in_lab_u, +1, N, E, H, &N, &E, &H, usertxt, tr_error);
         *Nout = N;
         *Eout = E;
@@ -205,7 +211,8 @@ FILE                *tr_error
       case CTG: /* crt -> geo */
         res = gtc(outlab_u, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-            ies = t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+           ies = (tr_error==NULL) ? TRF_AREA_ :
+                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
         *Nout = N;
         *Eout = E;
         *Hout = H;
@@ -215,7 +222,8 @@ FILE                *tr_error
         *Eout = E;
         res = ptg(in_lab_u, +1, N, E, &N, &E,  usertxt, tr_error);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+           ies = (tr_error==NULL) ? TRF_AREA_ :
+                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
         if (in_lab_u->u_c_lab.cstm != outlab_u->u_c_lab.cstm) {
           rrs   = ptg(outlab_u, -1, N, E, &N, &E,  usertxt, tr_error); 
           if (rrs < res) res = rrs;
@@ -225,21 +233,23 @@ FILE                *tr_error
         break;
       case IDT: /* ident, geo -> geo */
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-            ies = t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+           ies = (tr_error==NULL) ? TRF_AREA_ :
+                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
         *Nout = N;
         *Eout = E;
         break;
       default: /* programme error */
-        return(t_status(
-               tr_error, "", "fh_trans(prog error)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, "",
+                "fh_trans(prog error)", TRF_ILLEG_));
       } /* end switch(action) */
 
       if (res < RES) RES = res;
       if (ies < IES) IES = ies;
     } while (nst && RES >= TRF_TOLLE_);
-  } else
-    return(t_status(
-           tr_error, "", "fh_trans(i/o labels)", TRF_ILLEG_));
+  } else return((tr_error==NULL) ? TRF_ILLEG_ :
+                 t_status(tr_error, "",
+                 "fh_trans(i/o labels)", TRF_ILLEG_));
   /* Return coord and result */
   if (IES < RES) RES = IES;
   return (RES);

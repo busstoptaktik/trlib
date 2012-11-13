@@ -1,5 +1,5 @@
 """/*
-* Copyright (c) 2011, National Survey and Cadastre, Denmark
+* Copyright (c) 2012, National Survey and Cadastre, Denmark
 * (Kort- og Matrikelstyrelsen), kms@kms.dk
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -17,8 +17,8 @@
  */
  """
 #########################
-## Python bindings for simple test api to KmsTrLib/KMSTrans
-## simlk, may->sep 2011                
+## Python bindings for (Kms) TrLib
+## simlk, 2011,2012            
 #########################
 try:
 	import numpy as np
@@ -32,8 +32,10 @@ import os
 import sys
 import time
 IS_INIT=False
-if "win" in sys.platform:
+if sys.platform.startswith("win"):
 	STD_LIB="KMSTRLIB.dll"
+elif "darwin" in sys.platform:
+	STD_LIB="KMSTRLIB.dylib"
 else:
 	STD_LIB="KMSTRLIB.so"
 STD_DIRNAME=os.path.dirname(__file__)
@@ -51,10 +53,13 @@ GEOIDS=None
 #conversions
 D2R=math.pi/180.0
 R2D=180.0/math.pi
+#Globals for minilabel parsing
+SEPS=["E","H","N"]
 #debug flag- turns on extra verbosity here and there
 DEBUG=False
 #ctypes pointer to double#
 LP_c_double=ctypes.POINTER(ctypes.c_double)
+LP_c_int=ctypes.POINTER(ctypes.c_int)
 class TransformationException(Exception):
 	def __init__(self,msg="Transformation Error"):
 		self.msg=msg
@@ -66,9 +71,11 @@ class LabelException(Exception):
 	def __str__(self):
 		return self.msg
 		
-##################
+###################
 ##Call this initializtion FIRST!
-##################
+###################
+#TODO: change prints to raise some Exception
+#Or: stdout must be mapped to some other logging method....
 def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	global tr_lib
 	global IS_INIT
@@ -79,7 +86,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		lib_dir="."
 	lib_path=os.path.join(lib_dir,lib)
 	if not os.path.exists(lib_path):
-		print("%s does not exist!")
+		print("%s does not exist!" %lib_path)
 		return False
 	#to be able to find extra runtime dlls on windows#
 	if "win" in sys.platform.lower():
@@ -101,6 +108,8 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_char_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double] #todo get type of last arg
 		tr_lib.TR_GeoidInfo.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_GeoidInfo.restype=None
+		tr_lib.TR_GetGeoidName.argtypes=[ctypes.c_void_p,ctypes.c_char_p]
+		tr_lib.TR_GetGeoidName.restype=None
 		tr_lib.TR_Open.restype=ctypes.c_void_p
 		tr_lib.TR_Open.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.TR_Close.restype=None
@@ -121,6 +130,27 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_AllowUnsafeTransformations.restype=None
 		tr_lib.TR_ForbidUnsafeTransformations.argtypes=None
 		tr_lib.TR_ForbidUnsafeTransformations.restype=None
+		#Some extra functions which might get exposed in the API#
+		tr_lib.TR_OpenProjection.argtypes=[ctypes.c_char_p]
+		tr_lib.TR_OpenProjection.restype=ctypes.c_void_p
+		tr_lib.TR_SetGeoidDir.argtypes=[ctypes.c_char_p]
+		tr_lib.TR_SetGeoidDir.restype=ctypes.c_int
+		tr_lib.set_grs.argtypes=[ctypes.c_int,ctypes.c_char_p,LP_c_double]
+		tr_lib.bshlm1.restype=ctypes.c_int
+		tr_lib.bshlm1.argtypes=[ctypes.c_double]*3+[LP_c_double,ctypes.c_double]*3
+		tr_lib.bshlm2.restype=ctypes.c_int
+		tr_lib.bshlm2.argtypes=[ctypes.c_double]*6+[LP_c_double]*3+[ctypes.c_int]
+		tr_lib.doc_prj.argtypes=[ctypes.c_char_p]*3+[LP_c_int]+[ctypes.c_int]
+		tr_lib.doc_prj.restype=ctypes.c_int
+		tr_lib.doc_dtm.argtypes=[ctypes.c_char_p]*2+[ctypes.c_int]
+		tr_lib.doc_dtm.restype=ctypes.c_int
+		tr_lib.sgetshpprj.argtypes=[ctypes.c_char_p,ctypes.c_void_p,ctypes.c_char_p]
+		tr_lib.sgetshpprj.restype=ctypes.c_int
+		tr_lib.proj4_to_mlb.argtypes=[ctypes.c_char_p]*2
+		tr_lib.proj4_to_mlb.restype=ctypes.c_int
+		tr_lib.set_lord_file.argtypes=[ctypes.c_char_p]
+		tr_lib.set_lord_file.restypes=None
+
 	except Exception, msg:
 		print repr(msg)
 		print("Unable to load library %s in directory %s." %(lib,lib_dir))
@@ -145,6 +175,13 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	IS_INIT=(rc==TR_OK)
 	return IS_INIT
 
+#Convenience method for getting a proper python string out of a string returned from c-function
+def GetString(cstring):
+	i=cstring.find("\0")
+	if (i!=-1):
+		return cstring[:i].strip()
+	return cstring.strip()
+
 def GetLastError():
 	return tr_lib.TR_GetLastError()
 
@@ -168,6 +205,22 @@ def SetThreadMode(on=True):
 	else:
 		AllowUnsafeTransformations()
 
+def SetGeoidDir(geoid_dir):
+	global GEOIDS
+	msg=""
+	for fname in REQUIRED_FILES:
+		if not os.path.exists(os.path.join(geoid_dir,fname)):
+			msg+="Required file %s not found.\n" %fname
+			return False,msg
+	if geoid_dir[-1] not in ["\\","/"]:
+		geoid_dir+="/"
+	ok=tr_lib.TR_SetGeoidDir(geoid_dir)
+	if (ok!=TR_OK):
+		msg+="Failed to initialise library - probably a bad def_lab file."
+	else:
+		GEOIDS=geoid_dir
+	return ok==TR_OK,msg
+
 
 def GetVersion():
 	buf=" "*100;
@@ -176,26 +229,177 @@ def GetVersion():
 	return ver
 
 def GetEsriText(label):
-	wkt=" "*2048;
-	retval=tr_lib.TR_GetEsriText(label,wkt)
-	if retval==0:
-		wkt=wkt.strip().replace("\0","")
+	if IS_INIT:
+		wkt=" "*2048;
+		retval=tr_lib.TR_GetEsriText(label,wkt)
+		if retval==0:
+			return GetString(wkt)
+	return None
+	
+def FromEsriText(wkt):
+	if IS_INIT:
+		out=" "*256;
+		retval=tr_lib.sgetshpprj(wkt,None,out)
+		if retval==0:
+			return GetString(out)
+		elif DEBUG:
+			print retval
+	return None
+
+def FromProj4(proj4def):
+	mlb=" "*256
+	retval=tr_lib.proj4_to_mlb(proj4def,mlb)
+	if retval!=TR_OK:
+		return None
 	else:
-		wkt=None
-	return wkt
+		return GetString(mlb)
 
 def GetLocalGeometry(label,x,y):
 	#out param determines wheteher prj_in or prj_out is used#
-	mc=ctypes.c_double(0)
-	s=ctypes.c_double(0)
-	ok=tr_lib.TR_GetLocalGeometry(label,x,y,ctypes.byref(s),ctypes.byref(mc))
-	if ok==TR_OK:
-		return s.value,(mc.value)*R2D
+	if IS_INIT:
+		if (IsGeographic(label)):
+			return 1,0
+		mc=ctypes.c_double(0)
+		s=ctypes.c_double(0)
+		ok=tr_lib.TR_GetLocalGeometry(label,x,y,ctypes.byref(s),ctypes.byref(mc))
+		if ok==TR_OK:
+			return s.value,(mc.value)*R2D
 	return 0,0
 
+def BesselHelmert(axis,flat,lon1,lat1,lon2,lat2):
+	if IS_INIT:
+		if (max(abs(lon1-lon2),abs(lat1-lat2))<1e-11):
+			return 0.0,90.0,0.0
+		d=ctypes.c_double(0)
+		a1=ctypes.c_double(0)
+		a2=ctypes.c_double(0)
+		ret=tr_lib.bshlm2(axis,flat,lat1*D2R,lat2*D2R,lon1*D2R,lon2*D2R,ctypes.byref(a1),ctypes.byref(a2),ctypes.byref(d),0)
+		if ret<2:
+			return d.value,a1.value*R2D,a2.value*R2D
+	return None,None,None
+
+def InverseBesselHelmert(axis,flat,lon1,lat1,a1,dist):
+	if IS_INIT:
+		a2=ctypes.c_double(0)
+		lon2=ctypes.c_double(0)
+		lat2=ctypes.c_double(0)
+		ret=tr_lib.bshlm1(axis,flat,lat1*D2R,ctypes.byref(lat2),lon1*D2R,ctypes.byref(lon2),a1*D2R,ctypes.byref(a2),dist)
+		if (ret==0 or ret==1):
+			return lon2.value*R2D,lat2.value*R2D,a2.value*R2D
+	return None,None,None
+
+def GetEllipsoidParameters(ell_name):
+        if IS_INIT:
+                arr=ctypes.c_double*9
+                ell_par=arr()
+                ret=tr_lib.set_grs(-1,ell_name,ctypes.cast(ell_par,LP_c_double))
+                if ret>0:
+                        return ell_par[0],ell_par[1]
+        return None,None
+
+def DescribeProjection(mlb_prj):
+	if IS_INIT:
+		descr=" "*512
+		impl_dtm=" "*64
+		type=ctypes.c_int(0)
+		rc=tr_lib.doc_prj(mlb_prj,descr,impl_dtm,ctypes.byref(type),0)
+		if (rc==TR_OK):
+			if ("(" in descr):
+				descr=descr[:descr.find("(")]
+			return GetString(descr),GetString(impl_dtm)
+	return None,None
+
+def DescribeDatum(mlb_dtm):
+	if IS_INIT:
+		if (mlb_dtm=="E"):
+			return "Ellipsoidal heights"
+		if (mlb_dtm=="N"):
+			mlb_dtm="Normal heights"
+		descr=" "*512
+		rc=tr_lib.doc_dtm(mlb_dtm,descr,0)
+		if (rc==TR_OK):
+			return GetString(descr).replace("@","")
+	return None
+
+def GetEllipsoidParametersFromDatum(mlb_dtm):
+	if IS_INIT:
+		ell_name=" "*128
+		rc=tr_lib.doc_dtm(mlb_dtm,ell_name,-1)
+		if (rc==TR_OK):
+			a,f=GetEllipsoidParameters(ell_name)
+			return GetString(ell_name),a,f
+	return None,None,None
+
+def DescribeLabel(mlb):
+	try:
+		region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
+	except Exception,msg:
+		return "Bad minilabel: "+repr(msg)
+	if (not IS_INIT):
+		return "Library not initialised."
+	descr_prj,impl_dtm=DescribeProjection(prj)
+	if descr_prj is None:
+		descr_prj="Projection not ok"
+	elif (len(impl_dtm)>0 and len(dtm)==0):
+		dtm=impl_dtm
+	descr_dtm=DescribeDatum(dtm)
+	if (descr_dtm is None):
+		descr_dtm="datum not ok"
+	if (len(h_dtm)>0):
+		descr_h_dtm=DescribeDatum(h_dtm)
+		if (descr_h_dtm is None):
+			descr_h_dtm="height datum not ok"
+	else:
+		descr_h_dtm=""
+	descr=descr_prj+", "+descr_dtm
+	if len(descr_h_dtm)>0:
+		descr+=", "+descr_h_dtm
+	return descr+"."
+
+
+######################
+## Minilabel analasys methods #
+######################
+def SplitMLB(mlb):
+	mlb=mlb.split()[0].replace("L","_")
+	region=""
+	proj=""
+	datum=""
+	hdatum=""
+	htype=""
+	sep=""
+	if len(mlb)>2:
+		if mlb[:2].isupper() and mlb[2]=="_":
+			region=mlb[:2]
+			mlb=mlb[3:]
+	if len(mlb)>1:
+		for ssep in SEPS:
+			if ssep in mlb:
+				sep=ssep
+				break
+		#no heights#
+		if sep=="":
+			if "_" in mlb:
+				proj,datum=mlb.split("_")
+			else:
+				proj=mlb
+		#heights#
+		else:
+			proj,datum=mlb.split(sep)
+			if "_" in datum:
+				if sep!="H":
+					raise Exception("Bad minilabel")
+				datum,htype,hdatum=datum.split("_")
+			else:
+				hdatum=sep
+	return region,proj,datum,hdatum,htype
 
 def IsGeographic(mlb):
-	return ("geo" in mlb[:6])
+	try:
+		region,proj,datum,hdatum,htype=SplitMLB(mlb)
+	except:
+		return False
+	return proj=="geo"
 
 class CoordinateTransformation(object):
 	def __init__(self,mlb_in,mlb_out,geoid_name=""):
@@ -324,6 +528,12 @@ class CoordinateTransformation(object):
 	def GetGeoidInfo(self):
 		if self.tr is not None:
 			tr_lib.TR_GeoidInfo(self.tr)
+	def GetGeoidName(self):
+		if self.tr is not None:
+			name=" "*256
+			tr_lib.TR_GetGeoidName(self.tr,name)
+			return name.replace("\0","").strip()
+		return ""
 	def Close(self):
 		if self.tr is not None:
 			tr_lib.TR_Close(self.tr)

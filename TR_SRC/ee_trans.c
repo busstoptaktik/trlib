@@ -239,8 +239,9 @@ FILE                *tr_error
     pv_w = (int) sqrt(1.0000001*ee_z);
     init = act && (ee_z == pv_w*pv_w);
 
-    if (!init) return(t_status(tr_error, usertxt,
-               "ee_trans(init lab error)", TRF_ILLEG_));
+    if (!init) return((tr_error==NULL) ? TRF_ILLEG_ :
+                       t_status(tr_error, usertxt,
+                       "ee_trans(init lab error)", TRF_ILLEG_));
   }
 
   /* Check i/o labels, init of actual transf. systems */
@@ -249,8 +250,9 @@ FILE                *tr_error
     /* Coord labels */
     if   ( in_lab->lab_type != CRD_LAB
         || outlab->lab_type != CRD_LAB) {
-      return(t_status(
-          tr_error, usertxt, "ee_trans(i/o labels error)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, usertxt,
+              "ee_trans(i/o labels error)", TRF_ILLEG_));
     }
 
 
@@ -284,8 +286,9 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
     switch (outgr) {
     case 0: /* Label */
       if (!strcmp(p_dtm, "eeref89"))
-        return(t_status(tr_error, usertxt,
-               "ee_trans(missing : EE_ or ill_lab)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, usertxt,
+                "ee_trans(missing : EE_ or ill_lab)", TRF_ILLEG_));
       break;
     case 1:
       break;
@@ -302,8 +305,9 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
       break;
 
     default: /* Unknown label */
-      return(t_status(
-           tr_error, usertxt, "ee_trans(unknown o-label)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, usertxt,
+              "ee_trans(unknown o-label)", TRF_ILLEG_));
     } /* end out-label check */
 
 
@@ -337,8 +341,9 @@ pml->trgr, pml->trnr, pml->s_lab);
     switch (in_gr) {
     case 0: /* Label */
       if (!strcmp(p_dtm, "eeref89"))
-        return(t_status(tr_error, usertxt,
-               "ee_trans(missing : EE_ or ill_lab)", TRF_ILLEG_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, usertxt,
+                "ee_trans(missing : EE_ or ill_lab)", TRF_ILLEG_));
       break;
     case 1:
       break;
@@ -355,14 +360,16 @@ pml->trgr, pml->trnr, pml->s_lab);
       break;
 
     default: /* Unknown label */
-      return(t_status(
-           tr_error, usertxt, "ee_trans(unknown i-label)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, usertxt,
+              "ee_trans(unknown i-label)", TRF_ILLEG_));
 
     } /* end in-label check */
 
     if (in_nr == 3 || outnr == 3)
-      return(t_status(
-           tr_error, usertxt, "ee_trans(crt_) ILLEGAL", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, usertxt,
+              "ee_trans(crt_) ILLEGAL", TRF_ILLEG_));
 
     /* Save check-sums */
     in_chsum = in_lab->ch_sum;
@@ -492,8 +499,9 @@ ACTION[act], gst, nst, level);
 
 
       default: /* programme error */
-        return(t_status(
-               tr_error, usertxt, "ee_trans(prog error)", TRF_PROGR_));
+        return((tr_error==NULL) ? TRF_ILLEG_ :
+                t_status(tr_error, usertxt,
+                "ee_trans(prog error)", TRF_PROGR_));
       }
       if (res < result) result = res;
 

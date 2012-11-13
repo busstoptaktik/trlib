@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2011, National Survey and Cadastre, Denmark
+ * Copyright (c) 2012, National Survey and Cadastre, Denmark
  * (Kort- og Matrikelstyrelsen), kms@kms.dk
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -13,15 +13,15 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
- 
+
 
 
 /* conv_crd    ver 2012.01          # page 1    31 May 2012 10 19 */
 
 
-/* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
+/* Copyright (c) 2012 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
 
 /* This is unpublished proprietary source code of Danish       */
@@ -80,10 +80,10 @@ struct coord_lab        *c_lab,
   int                        zone;
   short                      par_dtm, dtm_req = 1, mask;
   double                     ell_p[10];
-  char                       e_name[24], p_name[24];
+  char                       e_name[MLBLNG], p_name[MLBLNG];
 
   char                       t_lab_a[2*MLBLNG], *t_lab = t_lab_a;
-  char                       iofile_str[128], *p_io;
+  char                       iofile_str[256], *p_io;
   char                      *p_dtm, sepch, *p_sys, *p_tp;
 
   char                      *p_eesti42 = "eesti42";
@@ -109,7 +109,7 @@ struct coord_lab        *c_lab,
     /*  7 */ "Equal-area",
     /*  8 */ "System 1934/45",
     /*  9 */ "GS conf. conical"
-    /* 10 */ "Københavns Kommune",
+    /* 10 */ "Koebenhavns Kommune",
     /* 11 */ "Cartesic 2D",
     /* 12 */ "RiksTriangukationen SE",
     /* 13 */ "",
@@ -259,7 +259,7 @@ struct coord_lab        *c_lab,
       case    9: /* tsu**   Time Series utm zone ** */
       case   13: /* ETRS-TM, ETRS89 transverse mercator zone ** */
         if (p_lb->cha_str > 0) {
-          if (C_DIGIT(*(p_sys+p_lb->cha_str))) {
+          if (isdigit(*(p_sys+p_lb->cha_str))) {   // C_DIGIT udskiftet med isdigit  20120529 stl
             if ((sscanf(p_sys+p_lb->cha_str, "%d", &zone) == 1)
                 && (1 <= zone && zone <= 60)) {
               c_lab->B0     = 0.0;
@@ -276,7 +276,7 @@ struct coord_lab        *c_lab,
 
       case 8: /* tm**  */
         if (p_lb->cha_str > 0) {
-          if (C_DIGIT(*(p_sys+p_lb->cha_str))) {
+          if (isdigit(*(p_sys+p_lb->cha_str))) {	// C_DIGIT udskiftet med isdigit  20120529 stl
             (void) sscanf(p_sys+p_lb->cha_str, "%d", &zone);
             c_lab->N0 = 0.0;
             c_lab->B0 = 0.0;
@@ -335,7 +335,7 @@ struct coord_lab        *c_lab,
     }
 
 
-/* conv_crd    ver 2012.01          # page 7     31 May 2012 10 19 */
+/* conv_crd    ver 2012.01          # page  7    31 May 2012 10 19 */
 
 
     /* PRODUCE THE MINI-LAB  from : mlb1, sepch, dtm */
@@ -385,7 +385,7 @@ struct coord_lab        *c_lab,
       }
 
 
-/* conv_crd    ver 2012.01          # page 8     31 May 2012 10 19 */
+/* conv_crd    ver 2012.01          # page  8    31 May 2012 10 19 */
 
 
       if (c_lab->ellipsoid >= 0) {
@@ -463,7 +463,7 @@ struct coord_lab        *c_lab,
       } else {
         p_tp = p_io;
         if (*p_io != '\0' && strlen(p_io) > 4) {
-          switch (p_lb->q_par) {
+         switch (p_lb->q_par) {
           case 2:
             c_lab->B1  = sgetg(p_tp, &(c_lab->g_tpd), &used, "sx");
             p_tp      += used;
@@ -526,12 +526,13 @@ struct coord_lab        *c_lab,
         }
       }  /* ste */
     }  /* end input of additional params */
+     
 
 
-/* conv_crd    ver 2012.01          # page 9     31 May 2012 10 19 */
+/* conv_crd    ver 2012.01          # page  9    31 May 2012 10 19 */
 
 
-    /* INPUT OF DATE at datums: ITRF, IGS, ETRF */
+     /* INPUT OF DATE at datums: ITRF, IGS, ETRF */
     if (6 <= c_lab->datum && c_lab->datum <= 8) {
       if (conv_mode == 0 || conv_mode == 1) {
         if (p_tp != (char *) 0 && strlen(p_tp) >= 8) {

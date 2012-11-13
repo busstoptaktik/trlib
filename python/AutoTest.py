@@ -9,6 +9,7 @@ import TrLib
 import TestFiles
 import RandomTests
 import ThreadTest
+import TestProj
 import time,os,sys,platform
 TEST_DATA=os.path.join(os.path.dirname(__file__),os.path.join("..","testdata"))
 JOB_DEF=os.path.join(TEST_DATA,"job_new.txt")
@@ -80,6 +81,12 @@ def main(args): #progname, test_lib
 	print LS
 	try:
 		TestFiles.main(["TestFiles.py",JOB_DEF])
+	except Exception,msg:
+		nerr+=1
+		print("Error:\n%s" %repr(msg))
+	print LS
+	try:
+		nerr+=TestProj.main(["TestProj.py"])
 	except Exception,msg:
 		nerr+=1
 		print("Error:\n%s" %repr(msg))

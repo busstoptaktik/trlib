@@ -218,7 +218,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   struct gps_c_str           *shp = NULL, *Dshp = NULL;
 
   int                         act, lev, rs, ipl_tr;
-  int                         res = 0, ipl_res = 0;
+  int                         stn_vel, res = 0, ipl_res = 0;
   double                      N, E, H, h, B=0.0, L=0.0, X, Y, Z;
   double                      VX=0.0, VY=0.0, VZ=0.0, WX, WY, WZ;
 

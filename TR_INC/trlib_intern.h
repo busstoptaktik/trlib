@@ -33,10 +33,26 @@ struct TR {
 struct XYZ {
     double x, y, z;
     int err;
-}; 
+};
+
+struct PLATE {
+    char *plate_model;           /* Name of plate model to use */
+    char *intra_plate_model;     /* Name of intra plate model to use */
+    int *plm_trf;                /* Plate model used (0->plate model NOT used) */
+    int *ipl_trf;                /* Plate model used using: 0->no intraplate, 4->intra plate (iJD=oJD=-10000000.0), 1->iJD, 2->oJD, 3->iJD and oJD */
+    double *plm_dt;              /* JD2000 plate model epoch */
+    double *ipl_idt;             /* JD2000 intra plate model epoch in */
+    double *ipl_odt;             /* JD2000 intra plate model epoch out */
+    char *plm_nam;               /* Name of used plate model */
+    char *plt_nam;               /* Name of used plate */
+    char *ipl_nam;               /* Name of used intra plate */
+};
+
 /* 'Internal' functions not meant to be exposed in API */
 int TR_GeoidTable(struct TR*);
 int TR_IsMainThread(void);
 int TR_IsThreadSafe(union geo_lab*, union geo_lab*);
 int TR_tr(union geo_lab* ,union geo_lab*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 
+int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
 union geo_lab *TR_OpenProjection(char *mlb);
+void TR_GetGeoidName(struct TR *tr,char *name);

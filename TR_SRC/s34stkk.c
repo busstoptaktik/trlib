@@ -154,8 +154,9 @@ int               res = 0;
     if (fabs(N - y) < tol  && fabs (E - x) < tol) return (0);
     else res = TRF_TOLLE_;
   }
-  return(t_status(tr_error, usertxt, "s34stkk", res,
-         "m ", "", N, E, N - y, E - x));
+  return((tr_error==NULL || res==0) ? res :
+          t_status(tr_error, usertxt, "s34stkk", res,
+          "m ", "", N, E, N - y, E - x));
 
 }
 

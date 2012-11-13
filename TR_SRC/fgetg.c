@@ -162,7 +162,8 @@ char                        *udt
     case 6: /* AL = alarm exit */
       *p = '\0';
       np = h1;
-      while (C_ALPHA(c)) {
+      /*while (C_ALPHA(c)) */
+      while (isalpha(c)) {
         *(np++) = (char) c;
         u++;
         c       = getc(str);

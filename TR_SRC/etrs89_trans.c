@@ -162,8 +162,9 @@ FILE                     *tr_error
         res = 0;
       }
     }
-    if (res) return(t_status(tr_error, "",
-             "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
+    if (res) return((tr_error==NULL) ? TRF_ILLEG_ :
+                     t_status(tr_error, "",
+                     "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
 
     for (p_cstm_lst = cstm_lst, res = 1;
          p_cstm_lst->str_lng && res > 0; ++ p_cstm_lst) {
@@ -172,19 +173,22 @@ FILE                     *tr_error
         res = 0;
       }
     }
-    if (res) return(t_status(tr_error, "",
-             "etrs89_trans(unintelligible output_str)", TRF_ILLEG_));
+    if (res) return((tr_error==NULL) ? TRF_ILLEG_ :
+                     t_status(tr_error, "",
+                     "etrs89_trans(unintelligible output_str)", TRF_ILLEG_));
 
     (void) sprintf(mlb_str, "%s_etrs89", i_lab_str);
     res = conv_lab(mlb_str, &i_lab, "");
-    if (res != CRD_LAB) return(t_status(tr_error, "",
-             "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
+    if (res != CRD_LAB) return((tr_error==NULL) ? TRF_ILLEG_ :
+               t_status(tr_error, "",
+               "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
     (void) strcpy(si_lab_str, i_lab_str);
 
     (void) sprintf(mlb_str, "%s_etrs89", o_lab_str);
     res = conv_lab(mlb_str, &o_lab, "");
-    if (res != CRD_LAB) return(t_status(tr_error, "",
-             "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
+    if (res != CRD_LAB) return((tr_error==NULL) ? TRF_ILLEG_ :
+               t_status(tr_error, "",
+               "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
     (void) strcpy(so_lab_str, o_lab_str);
 
     init =  1;
@@ -270,8 +274,9 @@ sta, stp, ptp);
     case  ILL: /* Illegal */
     default:
       *X  = *Y = 0.0;
-      return(t_status(tr_error, "",
-             "etrs89_trans(unintelligible labels)", TRF_ILLEG_));
+      return((tr_error==NULL) ? TRF_ILLEG_ :
+              t_status(tr_error, "",
+              "etrs89_trans(unintelligible labels)", TRF_ILLEG_));
       break;
     } /* end switch(action) */
 
