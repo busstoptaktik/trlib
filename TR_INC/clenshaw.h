@@ -47,7 +47,7 @@ R, I:        The real and imaginary part of the sum.
 clenshaw:
 Computes the sum of a series A[j-1]*F(j*argr + i*j*argi)
 (where i is the imaginary unit) by Clenshaw summation
-from g down to S. The coefficients are here real and
+from g down to zero. The coefficients are here real and
 the argument of F is complex. The real part of the sum
 is the value of the function.
 

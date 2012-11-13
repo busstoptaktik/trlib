@@ -39,26 +39,7 @@
 
 int                      itrf_trans(
 /*________________________________*/
-union geo_lab            *i_lab,
-union geo_lab            *o_lab,
-int                       stn_vel,      /* velocity for stn in i_vel */
-char                     *tab_t,        /* name of plate model requested */
-char                     *tab_i,        /* name of intra plate model requested */
-double                   *i_crd,        /* input coords:: 0:2 */
-double                   *i_vel,        /* velocity to coords:: 0:2 */
-double                    i_JD,         /* Julian Day from 2000.0 */
-double                   *o_crd,        /* output coords:: 0:2 */
-double                   *o_vel,        /* NOT calculated:: 0:2 (==0.0) */
-int                      *plm_trf,      /* plates model used :      0/1 */
-int                      *ipl_trf,      /* intra plate model used : 0/1 */
-double                   *plm_JD,       /* Plate model gate date */
-double                   *ipl_iJD,      /* input INTRA plate gate date */
-double                   *ipl_oJD,      /*       INTRA plate gate date output */
-char                     *used_plm_nam, /* name of plate used */
-char                     *used_plt_nam, /* name of plate used */
-char                     *used_ipt_nam, /* name of intra plate used */
-char                     *usertxt,
-char                     *err_str
+struct itrf_str         *itrf_inf
 )
 {
 
@@ -68,6 +49,24 @@ char                     *err_str
 #include              "srch_plate.h"
 #include              "s_status.h"
 #include              "tab3d_c.h"
+
+union geo_lab  *i_lab     = itrf_inf->i_lab;
+union geo_lab  *o_lab     = itrf_inf->o_lab;
+char           *tab_t     = itrf_inf->tab_t;  /* name of plate model requested */
+char           *tab_i     = itrf_inf->tab_i;  /* name of intra plate model requested */
+double         *i_crd     = itrf_inf->i_crd;  /* input coords:: 0:2 */
+double         *i_vel     = itrf_inf->i_vel;  /* velocity to coords:: 0:2 */
+double         *o_crd     = itrf_inf->o_crd;  /* output coords:: 0:2 */
+double         *o_vel     = itrf_inf->o_vel;  /* NOT calculated:: 0:2 (==0.0) */
+int            *plm_trf   = itrf_inf->plm_trf;/* plates model used :      0/1 */
+int            *ipl_trf   = itrf_inf->ipl_trf;/* intra plate model used : 0/1 */
+double         *plm_JD    = itrf_inf->plm_JD; /* Plate model gate date */
+double         *ipl_iJD   = itrf_inf->ipl_iJD;/* input INTRA plate gate date */
+double         *ipl_oJD   = itrf_inf->ipl_oJD;/*       INTRA plate gate date output */
+char           *u_plm_nam = itrf_inf->used_plm_nam;/* name of plate used */
+char           *u_plt_nam = itrf_inf->used_plt_nam;/* name of plate used */
+char           *u_ipt_nam = itrf_inf->used_ipt_nam;/* name of intra plate used */
+double         *tr_par    = itrf_inf->tr_par; /* 7-par describing the transf. */
 
 int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
              double tr_yy, double B, double L,
@@ -107,6 +106,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   /*  -30000 ITRF_NON_     : NO entries found             (TRF_PROGR_)  */
   /*  -40000 ITRF_SEQ_     : entries are NOT consequtive  (TRF_PROGR_)  */
   /*  -50000 ITRF_DTM_     : Illegal datum in from_lb/to_lb             */
+  /*  -60000               : tr_par != NULL && stn_vel !=0 : ILLEGAL    */
   /*  -70000 ITRF_NAM_     : manager.gps table_name (gpstab) not found  */
   /*  -80000 ITRF_SYS_     : manager.gps file not found                 */
   /*  -90000 PLATE_NO_VEL_ : Plate has no velocity                      */
@@ -164,6 +164,13 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   /* ipl_nam is tha name of the actual intra plate model       */
   /* err_str: at ERROR: user_txt cat ERROR description         */
 
+  /* tr_par == NULL gives transformations only                 */
+  /* tr_par != NULL && stn_vel !=0 gives -6000: ILLEGAL        */
+  /* tr_par != NULL && stn_vel ==0                             */
+  /*           gives transformations and 7-par values          */
+  /*           in tr_par: T1, T2, T3, R1, R2, R3, D            */
+  /*           se formula below                                */
+
   /*         TRANSFORMATION PRODUCTION LINE   */
   /*         <--UP-HILL--> <--DOWN-HILL-->    */
   /* cstm:     PRJ   CRT     CRT    PRJ       */
@@ -171,9 +178,9 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   /* action:       0      1       2           */
 
   /* basic transformation formula (Molodensky) ::                   */
-  /* (XS) = (X) + (T1) + ( D  -R3  R2) (X)                          */
-  /* (YS) = (Y) + (T2) + ( R3  D  -R1) (Y)                          */
-  /* (ZS) = (Z) + (T3) + (-R2  R1  D ) (Z)                          */
+  /* (XS)   (X)   (T1)   ( D  -R3  R2) (X)                          */
+  /* (YS) = (Y) + (T2) + ( R3  D  -R1)*(Y)                          */
+  /* (ZS)   (Z)   (T3)   (-R2  R1  D ) (Z)                          */
 
 
   /* req_ipl_tr (gps_table)is true when region is from {DK, NO, SE, FI}*/
@@ -196,8 +203,8 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   static THREAD_SAFE  struct gps_c_str     plm_tr;
   static THREAD_SAFE  struct plate_info    pl_inf[MAX_ENT_PLM];
   static THREAD_SAFE  char                 s_tab_t[MLBLNG], s_tab_i[MLBLNG];
-  static THREAD_SAFE  char                 s_used_plm_nam[MLBLNG];
-  static THREAD_SAFE  char                 s_used_ipl_nam[MLBLNG];
+  static THREAD_SAFE  char                 s_u_plm_nam[MLBLNG];
+  static THREAD_SAFE  char                 s_u_ipl_nam[MLBLNG];
 
 
 /* itrf_trans  ver 2007.02          # page 3    10 Oct 2008 11 57 */
@@ -242,7 +249,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
       b_lev                = -49;
       gps_table.req_plm_tr = -2;
       gps_table.req_ipl_tr = 0;
-      *s_used_plm_nam      = *s_used_ipl_nam = '\0';
+      *s_u_plm_nam      = *s_u_ipl_nam = '\0';
       return(0);
     } else
     return(-999);
@@ -250,7 +257,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   if (b_lev == -99) {
     b_lev            = -49;
     ipl_table.init   = 0;
-    *s_used_plm_nam  = *s_used_ipl_nam = '\0';
+    *s_u_plm_nam  = *s_u_ipl_nam = '\0';
   }
 
 /* itrf_trans  ver 2007.02          # page 4    10 Oct 2008 11 57 */
@@ -262,8 +269,8 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
       i_chsum   != (i_lab->u_c_lab).ch_sum ||
       o_clb     != &(o_lab->u_c_lab) ||
       o_chsum   != (o_lab->u_c_lab).ch_sum ||
-      s_stn_vel != stn_vel ||
-      sate_in   != i_JD || sate_out != o_lab->u_c_lab.JD ||
+      s_stn_vel != itrf_inf->stn_vel ||
+      sate_in   != itrf_inf->i_JD || sate_out != o_lab->u_c_lab.JD ||
       strcmp(tab_t, s_tab_t) || strcmp(tab_i, s_tab_i)) {  
 /*
 (void) fprintf(stdout, "\n\nitrf_trans:: %s, %s, %s, %s\n",
@@ -277,12 +284,12 @@ i_lab->u_c_lab.mlb, o_lab->u_c_lab.mlb, tab_t, tab_i);
     gps_table.req_ipl_tr = 0;
     /* Coord labels */
     if (i_clb->lab_type != CRD_LAB || o_clb->lab_type != CRD_LAB) {
-      return(s_status(err_str,
+      return(s_status(itrf_inf->err_str,
              "itrf_trans(i/o labels error)", TRF_PROGR_));
     }
     if ((i_clb->cstm != 1 && *(i_clb->mlb + i_clb->sepix) != 'E') ||
         (o_clb->cstm != 1 && *(o_clb->mlb + o_clb->sepix) != 'E')) {
-      return(s_status(err_str,
+      return(s_status(itrf_inf->err_str,
              "itrf_trans(i/o CRT or Ellipsoid error)", TRF_PROGR_));
     }
 /*
@@ -292,15 +299,15 @@ i_clb->cstm, i_clb->datum);
 o_clb->cstm, o_clb->datum);
 */
 
-    (void) strcpy(used_plm_nam, "");
-    (void) strcpy(used_plt_nam, "non");
-    (void) strcpy(used_ipt_nam, "non");
+    (void) strcpy(u_plm_nam, "");
+    (void) strcpy(u_plt_nam, "non");
+    (void) strcpy(u_ipt_nam, "non");
 
-    seq_max = set_itrf_c(i_clb, o_clb, &i_JD, stn_vel, &o_stn_vel,
+    seq_max = set_itrf_c(i_clb, o_clb, &itrf_inf->i_JD, itrf_inf->stn_vel, &o_stn_vel,
                          &gps_table, tab_t, plm_lab, pl_inf,
                          tab_i, &ipl_table, &Hipl_lab,
-                         s_used_plm_nam, s_used_ipl_nam,
-                         err_str);
+                         s_u_plm_nam, s_u_ipl_nam,
+                         itrf_inf->err_str);
 if (TU)
 (void) fprintf(stdout, "\n*itrf_trans : seq_max = %d;", seq_max);
 
@@ -319,7 +326,7 @@ if (TU)
 
     /* test for identical systems */
     if (i_clb->ch_sum == o_clb->ch_sum 
-        && !stn_vel && !gps_table.req_plm_tr && !gps_table.req_ipl_tr) {
+        && !itrf_inf->stn_vel && !gps_table.req_plm_tr && !gps_table.req_ipl_tr) {
       b_lev = 5;
       s_lev = 4;
     }
@@ -329,13 +336,18 @@ if (TU)
     /* save checksums */
     i_chsum   = i_clb->ch_sum;
     o_chsum   = o_clb->ch_sum;
-    s_stn_vel = stn_vel;
-    sate_in   = i_JD;
+    stn_vel   = itrf_inf->stn_vel;
+    sate_in   = itrf_inf->i_JD;
     sate_out  = o_clb->JD;  
     (void) strcpy(s_tab_t, tab_t);
     (void) strcpy(s_tab_i, tab_i);
 
   } /* init of tables */
+
+  if (tr_par != NULL) {
+    for (rs = 0; rs < 7; rs++) *(tr_par + rs) = 0.0;
+    if (stn_vel) return(-6000);
+  }
 
   *plm_trf = 0;
   *ipl_trf = 0;
@@ -346,12 +358,12 @@ if (TU)
 (void) fprintf(stdout, "\n*itrf_trans : b_lev, s_lev = %d, %d;",
 b_lev, s_lev);
 (void) fprintf(stdout, "\n*itrf_trans : i_dat,o_dat = %f, %f;",
-i_JD, o_clb->JD);
+itrf_inf->i_JD, o_clb->JD);
 */
   N = *(i_crd +0);
   E = *(i_crd +1);
   H = *(i_crd +2);
-  if (stn_vel) {
+  if (itrf_inf->stn_vel) {
     VX = *(i_vel +0);
     VY = *(i_vel +1);
     VZ = *(i_vel +2);
@@ -387,13 +399,19 @@ if (TU)
       if (gps_table.req_ipl_tr & 2) *ipl_oJD = gps_table.o_ipl_dt;
       if (seq_max == 0 && gps_table.req_ipl_tr) {
         ipl_res  = ipl_move(&Hipl_lab, &ipl_table, gps_table.ipl_yy,
-                            B, L, &X, &Y, &Z, used_ipt_nam,
-                            err_str);
+                            B, L, &X, &Y, &Z, u_ipt_nam,
+                            itrf_inf->err_str);
         N       += X;
         E       += Y;
         H       += Z;
         ipl_tr   = -1;
         *ipl_trf = (gps_table.req_ipl_tr) ? gps_table.req_ipl_tr : 4;
+
+        if (tr_par != NULL) {
+          *(tr_par +0) += X;
+          *(tr_par +1) += Y;
+          *(tr_par +2) += Z;
+        }
       }
       if (ipl_tr == OGAT) ipl_tr += 10;
 
@@ -424,7 +442,7 @@ if (TU)
           break;
         default: /* ERROR  */
           shp = NULL;
-          return(s_status(err_str, "itrf_trans", TRF_ILLEG_));
+          return(s_status(itrf_inf->err_str, "itrf_trans", TRF_ILLEG_));
         }
 
 
@@ -436,21 +454,26 @@ if (TU)
 (void) fprintf(stdout, "\n*trf : %-8.6f  %-8.6f   %-8.6f;", N, E, H);
 */
           ipl_res  = ipl_move(&Hipl_lab, &ipl_table, gps_table.ipl_yy,
-                              B, L, &X, &Y, &Z, used_ipt_nam,
-                              err_str);
+                              B, L, &X, &Y, &Z, u_ipt_nam,
+                              itrf_inf->err_str);
           N       += X;
           E       += Y;
           H       += Z;
           ipl_tr   = -1;
           *ipl_trf = (gps_table.req_ipl_tr) ? gps_table.req_ipl_tr : 4;
 
+          if (tr_par != NULL) {
+            *(tr_par +0) += X;
+            *(tr_par +1) += Y;
+            *(tr_par +2) += Z;
+          }
 /*
 (void) fprintf(stdout, "\n*ipl : %-8.6f  %-8.6f   %-8.6f;", X, Y, Z);
 */
         }
 
         if (shp != NULL) {
-          if (stn_vel && Dshp != NULL) {
+          if (itrf_inf->stn_vel && Dshp != NULL) {
             /* Molodensky transformation SMALL SHIFTS only */
             /* SECOND ORDER REMOVED */            /* I_VEL Trf + DT */
             WX  = /*VX*shp->sc*/ +Dshp->tx - VY*shp->rz + VZ * shp->ry;
@@ -487,6 +510,16 @@ shp->rx, shp->ry, shp->rz);
           N += X;
           E += Y;
           H += Z;
+
+          if (tr_par != NULL) {
+            *(tr_par +0) += shp->tx;
+            *(tr_par +1) += shp->ty;
+            *(tr_par +2) += shp->tz;
+            *(tr_par +3) += shp->rx;
+            *(tr_par +4) += shp->ry;
+            *(tr_par +5) += shp->rz;
+            *(tr_par +6) += shp->sc;
+          }
         }
         if (act == ipl_tr) {
 /*
@@ -495,13 +528,19 @@ shp->rx, shp->ry, shp->rz);
 B*180/M_PI, L*180/M_PI);
 */
           ipl_res  = ipl_move(&Hipl_lab, &ipl_table, gps_table.ipl_yy,
-                              B, L, &X, &Y, &Z, used_ipt_nam,
-                              err_str);
+                              B, L, &X, &Y, &Z, u_ipt_nam,
+                              itrf_inf->err_str);
           N       += X;
           E       += Y;
           H       += Z;
           ipl_tr   = -1;
           *ipl_trf = (gps_table.req_ipl_tr) ? gps_table.req_ipl_tr : 4;
+
+          if (tr_par != NULL) {
+            *(tr_par +0) += X;
+            *(tr_par +1) += Y;
+            *(tr_par +2) += Z;
+          }
 /*
 (void) fprintf(stdout, "\n*ipl : %-8.6f  %-8.6f   %-8.6f;", X, Y, Z);
 */
@@ -519,11 +558,11 @@ B*180/M_PI, L*180/M_PI);
 */
         /* select plate no *plate_nr */
         if ((res = srch_plate(pl_inf, B, L,
-                   plm_lab, &plm_tr, err_str)) >= 0) {
-          (void) strcpy(used_plm_nam, plm_lab->mlb);
+                   plm_lab, &plm_tr, itrf_inf->err_str)) >= 0) {
+          (void) strcpy(u_plm_nam, plm_lab->mlb);
           if (pl_inf->poly_tp < 60) {
-            (void) strcpy(used_plm_nam, plm_lab->mlb);
-            (void) strcpy(used_plt_nam, plm_tr.datum);
+            (void) strcpy(u_plm_nam, plm_lab->mlb);
+            (void) strcpy(u_plt_nam, plm_tr.datum);
             *plm_trf = 1;
             *plm_JD  = gps_table.plm_dt;
 /*
@@ -542,19 +581,25 @@ plm_tr.rz*180*60*60/M_PI, gps_table.plm_yy);
             N     += X;
             E     += Y;
             H     += Z;
+
+            if (tr_par != NULL) {
+              *(tr_par +0) += X;
+              *(tr_par +1) += Y;
+              *(tr_par +2) += Z;
+            }
           }
           else res = PLATE_NO_VEL_;
         } else {
-          (void) strcpy(used_plt_nam, "PLATE_OUT");
+          (void) strcpy(u_plt_nam, "PLATE_OUT");
           plm_tr.rx = 0.0;
           plm_tr.ry = 0.0;
           plm_tr.rz = 0.0;
           res       = PLATE_OUT_;
-          (void) s_status(err_str, usertxt, res);
+          (void) s_status(itrf_inf->err_str, itrf_inf->usertxt, res);
         }
       }
       else
-      if (stn_vel) {
+      if (itrf_inf->stn_vel) {
         X      = *(i_vel +0) * gps_table.plm_yy;
         Y      = *(i_vel +1) * gps_table.plm_yy;
         Z      = *(i_vel +2) * gps_table.plm_yy;
@@ -573,7 +618,7 @@ plm_tr.rz*180*60*60/M_PI, gps_table.plm_yy);
       if (res < TRF_TOLLE_) return(res);
       break;
     default:
-      return(s_status(err_str, usertxt, TRF_ILLEG_));
+      return(s_status(itrf_inf->err_str, itrf_inf->usertxt, TRF_ILLEG_));
     }
   } /* lev LOOP */
 

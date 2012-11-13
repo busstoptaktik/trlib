@@ -34,26 +34,7 @@
 
 extern int               itrf_trans(
 /*________________________________*/
-union geo_lab           *i_lab,
-union geo_lab           *o_lab,
-int                       stn_vel,      /* velocity for stn in i_vel */
-char                     *tab_t,        /* name of plate model requested */
-char                     *tab_i,        /* name of intra plate model requested */
-double                   *i_crd,        /* input coords:: 0:2 */
-double                   *i_vel,        /* velocity to coords:: 0:2 */
-double                    i_JD,         /* Julian Day from 2000.0 */
-double                   *o_crd,        /* output coords:: 0:2 */
-double                   *o_vel,        /* NOT calculated:: 0:2 (==0.0) */
-int                      *plm_trf,      /* plates model used :      0/1 */
-int                      *ipl_trf,      /* intra plate model used : 0/1 */
-double                   *plm_JD,       /* Plate model gate date */
-double                   *ipl_iJD,      /* input INTRA plate gate date */
-double                   *ipl_oJD,      /*       INTRA plate gate date output */
-char                     *used_plm_nam, /* name of plate used */
-char                     *used_plt_nam, /* name of plate used */
-char                     *used_ipt_nam, /* name of intra plate used */
-char                     *usertxt,
-char                     *err_str
+struct itrf_str         *itrf_inf
 );
 
 /* itrf_trans initialize the tables needed or closes the tables */
@@ -90,6 +71,7 @@ char                     *err_str
 /*  -30000 ITRF_NON_     : NO entries found             (TRF_PROGR_) */
 /*  -40000 ITRF_SEQ_     : entries are NOT consequtive  (TRF_PROGR_) */
 /*  -50000 ITRF_DTM_     : Illegal datum in from_lb/to_lb            */
+/*  -60000               : tr_par != NULL && stn_vel !=0 : ILLEGAL   */
 /*  -70000 ITRF_NAM_     : manager.gps table_name (gpstab) not found */
 /*  -90000 ITRF_SYS_     : manager.gps file not found                */
 /* -100000 PLATE_NO_VEL_ : Plate has no velocity                     */
@@ -148,6 +130,13 @@ char                     *err_str
 /* itrf_trans  ver 2007.02          # page 3    10 Oct 2008 11 57 */
 
 
+/* tr_par == NULL gives transformations only                 */
+/* tr_par != NULL && stn_vel !=0 gives -6000: ILLEGAL        */
+/* tr_par != NULL && stn_vel ==0                             */
+/*           gives transformations and 7-par values          */
+/*           in tr_par: T1, T2, T3, R1, R2, R3, D            */
+/*           se formula below                                */
+
 /*         TRANSFORMATION PRODUCTION LINE   */
 /*         <--UP-HILL--> <--DOWN-HILL-->    */
 /* cstm:     PRJ   CRT     CRT    PRJ       */
@@ -155,7 +144,7 @@ char                     *err_str
 /* action:       0      1       2           */
 
 /* basic transformation formula (Molodensky) ::                   */
-/* (XS) = (X) + (T1) + ( D  -R3  R2) (X)                          */
-/* (YS) = (Y) + (T2) + ( R3  D  -R1) (Y)                          */
-/* (ZS) = (Z) + (T3) + (-R2  R1  D ) (Z)                          */
+/* (XS)   (X)   (T1)   ( D  -R3  R2) (X)                          */
+/* (YS) = (Y) + (T2) + ( R3  D  -R1)*(Y)                          */
+/* (ZS)   (Z)   (T3)   (-R2  R1  D ) (Z)                          */
 

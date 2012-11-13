@@ -180,6 +180,30 @@ struct  gps_str {
 /* seq[2] : number of third  transf / 0 == IDT and STOP */
 /* seq[3] : number of fourth transf / 0 == IDT and STOP */
 
+struct itrf_str {
+  union geo_lab  *i_lab;
+  union geo_lab  *o_lab;
+  int             stn_vel;      /* velocity for stn in i_vel */
+  char           *tab_t;        /* name of plate model requested */
+  char           *tab_i;        /* name of intra plate model requested */
+  double         *i_crd;        /* input coords:: 0:2 */
+  double         *i_vel;        /* velocity to coords:: 0:2 */
+  double          i_JD;         /* Julian Day from 2000.0 */
+  double         *o_crd;        /* output coords:: 0:2 */
+  double         *o_vel;        /* NOT calculated:: 0:2 (==0.0) */
+  int            *plm_trf;      /* plates model used :      0/1 */
+  int            *ipl_trf;      /* intra plate model used : 0/1 */
+  double         *plm_JD;       /* Plate model gate date */
+  double         *ipl_iJD;      /* input INTRA plate gate date */
+  double         *ipl_oJD;      /*       INTRA plate gate date output */
+  char           *used_plm_nam; /* name of plate used */
+  char           *used_plt_nam; /* name of plate used */
+  char           *used_ipt_nam; /* name of intra plate used */
+  double         *tr_par;       /* 7-par describing the transformation */
+  char           *usertxt;
+  char           *err_str;
+};
+
 #define      ILL_LAB        (0)
 #define      CRD_LAB        (1)
 #define      HGT_LAB        (2)
