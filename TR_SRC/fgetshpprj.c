@@ -24,7 +24,6 @@
 	if (n_read==4096) /*overflow??*/
 		return -1;
 	return sgetshpprj(wkt,g_lab,NULL);
-          (void) fgetlhtx(fp, entry);
 }
 	 
  
