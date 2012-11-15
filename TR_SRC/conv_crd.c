@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2011, National Survey and Cadastre, Denmark
  * (Kort- og Matrikelstyrelsen), kms@kms.dk
- *
+ * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -13,12 +13,12 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
+ * 
  */
+ 
 
 
-
-/* conv_crd    ver 2010.01          # page 1     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 1    31 May 2012 10 19 */
 
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
@@ -59,8 +59,7 @@ struct coord_lab        *c_lab,
 #include              "set_grs.h"
 #include              "set_dtm_1.h"
 #include              "set_trc.h"
-#include              "fgetdt.h"
-#include              "fgetg.h"
+#include              "fgetln_kms.h"
 #include              "sgetdt.h"
 #include              "sgetg.h"
 #include              "sputg.h"
@@ -70,7 +69,7 @@ struct coord_lab        *c_lab,
 #include              "set_tpd.h"
 
 
-/* conv_crd    ver 2010.01          # page 2     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 2    31 May 2012 10 19 */
 
 
   FILE                      *iofile = (FILE *) NULL;
@@ -84,6 +83,7 @@ struct coord_lab        *c_lab,
   char                       e_name[24], p_name[24];
 
   char                       t_lab_a[2*MLBLNG], *t_lab = t_lab_a;
+  char                       iofile_str[128], *p_io;
   char                      *p_dtm, sepch, *p_sys, *p_tp;
 
   char                      *p_eesti42 = "eesti42";
@@ -122,7 +122,7 @@ struct coord_lab        *c_lab,
   };
 
 
-/* conv_crd    ver 2010.01          # page 3     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 3    31 May 2012 10 19 */
 
 
   (void) strcpy(rgn_EE.prfx, "EE");
@@ -204,7 +204,7 @@ struct coord_lab        *c_lab,
     }
 
 
-/* conv_crd    ver 2010.01          # page 4     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 4    31 May 2012 10 19 */
 
 
     /* set params of the coord systems */
@@ -242,7 +242,7 @@ struct coord_lab        *c_lab,
         break;
 
 
-/* conv_crd    ver 2010.01          # page 5     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 5    31 May 2012 10 19 */
 
 
       case 0:
@@ -259,7 +259,7 @@ struct coord_lab        *c_lab,
       case    9: /* tsu**   Time Series utm zone ** */
       case   13: /* ETRS-TM, ETRS89 transverse mercator zone ** */
         if (p_lb->cha_str > 0) {
-          if (isdigit(*(p_sys+p_lb->cha_str))) {                   // C_DIGIT udskiftet med isdigit  20120529 stl
+          if (isdigit(*(p_sys+p_lb->cha_str))) {
             if ((sscanf(p_sys+p_lb->cha_str, "%d", &zone) == 1)
                 && (1 <= zone && zone <= 60)) {
               c_lab->B0     = 0.0;
@@ -276,7 +276,7 @@ struct coord_lab        *c_lab,
 
       case 8: /* tm**  */
         if (p_lb->cha_str > 0) {
-          if (isdigit(*(p_sys+p_lb->cha_str))) {					// C_DIGIT udskiftet med isdigit  20120529 stl
+          if (isdigit(*(p_sys+p_lb->cha_str))) {
             (void) sscanf(p_sys+p_lb->cha_str, "%d", &zone);
             c_lab->N0 = 0.0;
             c_lab->B0 = 0.0;
@@ -298,7 +298,7 @@ struct coord_lab        *c_lab,
       break; /* end case 3 : utm, itm, dks, asb, sb */
 
 
-/* conv_crd    ver 2010.01          # page 9     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 6    31 May 2012 10 19 */
 
 
     case  4: /* mrc */
@@ -335,7 +335,7 @@ struct coord_lab        *c_lab,
     }
 
 
-/* conv_crd    ver 2010.01          # page 15     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 7     31 May 2012 10 19 */
 
 
     /* PRODUCE THE MINI-LAB  from : mlb1, sepch, dtm */
@@ -353,6 +353,69 @@ struct coord_lab        *c_lab,
       (void) sprintf(c_lab->mlb, "%s%c", p_sys, sepch);
       p_dtm = p_lb->pr_dtm;
     }
+
+    if (dtm_req) {
+      /* prepare generated c_label */
+      /*___________________________*/
+
+      /* SPECIAL : Estonian EUREF89 <-> WGS84 */
+      if (c_lab->region == rgn_EE.r_nr[0] ||
+          c_lab->p_rgn  == rgn_EE.r_nr[0]) {
+        if (!strcmp(p_dtm, "etrf89") ||
+            !strcmp(p_dtm, "etrs89") ||
+            !strcmp(p_dtm, "euref89")) {
+          (void) strcpy(p_dtm, "eeref89");
+        }
+      }
+
+      /* datum and datum shift constants */
+      if (*p_lb->pr_dtm != '\0') p_dtm = p_lb->pr_dtm;
+      (void) strcpy(t_lab, p_dtm);
+      c_lab->datum = (short) set_dtm_1(-1, p_dtm, &par_dtm, p_name,
+                     e_name, rgn_pref.prfx, &mask, &(c_lab->dsh_con));
+
+      if (c_lab->datum > 0) {
+        if (c_lab->p_rgn == 0 && dum_pref.r_nr[0] != rgn_pref.r_nr[0])
+            c_lab->p_rgn = rgn_pref.r_nr[0];
+        if (c_lab->imit == 0) c_lab->imit = mask;
+        c_lab->ellipsoid = (short) set_grs(-1, e_name, ell_p);
+      } else {
+        c_lab->ellipsoid = (short) set_grs(-1, t_lab, ell_p);
+        c_lab->datum     = -2;
+      }
+
+
+/* conv_crd    ver 2012.01          # page 8     31 May 2012 10 19 */
+
+
+      if (c_lab->ellipsoid >= 0) {
+        /* ellipsoid params */
+        c_lab->a = *(ell_p+0);
+        c_lab->f = *(ell_p+1);
+        /* datum shift params (from set_dtm) */
+        c_lab->p_dtm = (short) par_dtm;
+
+        /* set trf. constants for completed systems */
+        (void) set_trc(c_lab);
+  
+      }
+      else
+        /* unintelligible ellipsoid */
+        if (c_lab->cstm != 11 /* crt2 */) c_lab->lab_type = ILL_LAB;
+    } else {
+      c_lab->datum     = 0;
+      c_lab->ellipsoid = 0;
+    }
+
+    if (conv_mode == 1) {  /* iofile */
+      if ((p_lb->q_par && *p_lb->add_p == '\0') || 
+          (6 <= c_lab->datum && c_lab->datum <= 8)) {
+        (void) fgetln_kms(iofile_str, &i, iofile);
+      }
+      p_io = iofile_str;
+    }  /* iofile */
+    else p_io = io_str;
+
     /* INPUT OF ADDITIONAL PARAMETERS */
     if (p_lb->q_par) {
       if (*p_lb->add_p == '\0') { /* read predifined */
@@ -396,60 +459,25 @@ struct coord_lab        *c_lab,
           break;
         }
         c_lab->cmplt = 1;
-      } else
-      if (conv_mode == 1) {  /* iofile */
-        switch (p_lb->q_par) {
-        case 2:
-          c_lab->B1 = fgetg(iofile, &(c_lab->g_tpd), &used, "sx");
-          (void) fscanf(iofile, "%lf%n", &(c_lab->scale), &used);
-          break;
-        case 3:
-          f = fgetg(iofile, &(c_lab->m_tpd), &used, "m");
-          if (c_lab->cstm == 6) // upsn / upss
-              c_lab->N0 = f;
-          else  /* s34 */ c_lab->B0 = f;
-          c_lab->E0  = fgetg(iofile, &m_tpd, &used, "m");
-          (void) fscanf(iofile, "%lf%n", &(c_lab->scale), &used);
-          break;
-        case 4:
-        case 5:
-        case 6:
-          c_lab->B0 = fgetg(iofile, &(c_lab->g_tpd), &used, "sx");
-          c_lab->N0 = fgetg(iofile, &(c_lab->m_tpd), &used, "m");
-          c_lab->L0 = fgetg(iofile, &g_tpd, &used, "sx");
-          c_lab->E0 = fgetg(iofile, &g_tpd, &used, "m");
-          if (p_lb->q_par == 5 && c_lab->cstm == 3)
-             (void) fscanf(iofile, "%lf%n", &(c_lab->scale), &used);
-          else {
-            c_lab->B1 = fgetg(iofile, &(c_lab->p1tpd), &used, "sx");
-            if (p_lb->q_par == 6) { // dlmb
-              c_lab->B2 = fgetg(iofile, &(c_lab->p2tpd), &used, "sx");
-            }
-          }
-          break;
-        }
-        c_lab->cmplt = 2;
-      } /* input from file */
-
-
-/* conv_crd    ver 2010.01          # page 16     5 Jan 2010 10 19 */
-
-      else if (conv_mode == 0) { /* io_str */
-        if (*io_str != '\0' && strlen(io_str) > 4) {
-          p_tp = io_str;
+        p_tp = p_io;
+      } else {
+        p_tp = p_io;
+        if (*p_io != '\0' && strlen(p_io) > 4) {
           switch (p_lb->q_par) {
           case 2:
             c_lab->B1  = sgetg(p_tp, &(c_lab->g_tpd), &used, "sx");
             p_tp      += used;
             (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
+            p_tp      += used;
             break;
           case 3:
-            f = fgetg(iofile, &(c_lab->m_tpd), &used, "m");
+            f = sgetg(p_tp, &(c_lab->m_tpd), &used, "m");
             if (c_lab->cstm == 6) // upsn / upss
                 c_lab->N0 = f;
             else  /* s34 */ c_lab->B0 = f;
-            c_lab->E0  = fgetg(iofile, &m_tpd, &used, "m");
-            (void) fscanf(iofile, "%lf%n", &(c_lab->scale), &used);
+            c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
+            (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
+            p_tp      += used;
             break;
           case 4:
           case 5:
@@ -471,6 +499,7 @@ struct coord_lab        *c_lab,
                 c_lab->B2  = sgetg(p_tp, &g_tpd, &used, "sx");
               }
             }
+            p_tp += used;
             break;
           }
           c_lab->cmplt = 1;
@@ -499,70 +528,14 @@ struct coord_lab        *c_lab,
     }  /* end input of additional params */
 
 
-/* conv_crd    ver 2010.01          # page 17     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 9     31 May 2012 10 19 */
 
-
-    if (dtm_req) {
-      /* prepare generated c_label */
-      /*___________________________*/
-
-      /* SPECIAL : Estonian EUREF89 <-> WGS84 */
-      if (c_lab->region == rgn_EE.r_nr[0] ||
-          c_lab->p_rgn  == rgn_EE.r_nr[0]) {
-        if (!strcmp(p_dtm, "etrf89") ||
-            !strcmp(p_dtm, "etrs89") ||
-            !strcmp(p_dtm, "euref89")) {
-          (void) strcpy(p_dtm, "eeref89");
-        }
-      }
-
-      /* datum and datum shift constants */
-      if (*p_lb->pr_dtm != '\0') p_dtm = p_lb->pr_dtm;
-      (void) strcpy(t_lab, p_dtm);
-      c_lab->datum = (short) set_dtm_1(-1, p_dtm, &par_dtm, p_name,
-                     e_name, rgn_pref.prfx, &mask, &(c_lab->dsh_con));
-
-      if (c_lab->datum > 0) {
-        if (c_lab->p_rgn == 0 && dum_pref.r_nr[0] != rgn_pref.r_nr[0])
-            c_lab->p_rgn = rgn_pref.r_nr[0];
-        if (c_lab->imit == 0) c_lab->imit = mask;
-        c_lab->ellipsoid = (short) set_grs(-1, e_name, ell_p);
-      } else {
-        c_lab->ellipsoid = (short) set_grs(-1, t_lab, ell_p);
-        c_lab->datum     = -2;
-      }
-
-      if (c_lab->ellipsoid >= 0) {
-        /* ellipsoid params */
-        c_lab->a = *(ell_p+0);
-        c_lab->f = *(ell_p+1);
-        /* datum shift params (from set_dtm) */
-        c_lab->p_dtm = (short) par_dtm;
-
-        /* set trf. constants for completed systems */
-        (void) set_trc(c_lab);
-
-      }
-      else
-        /* unintelligible ellipsoid */
-        if (c_lab->cstm != 11 /* crt2 */) c_lab->lab_type = ILL_LAB;
-    } else {
-      c_lab->datum     = 0;
-      c_lab->ellipsoid = 0;
-    }
 
     /* INPUT OF DATE at datums: ITRF, IGS, ETRF */
     if (6 <= c_lab->datum && c_lab->datum <= 8) {
-      if (conv_mode == 1) {
-        c_lab->date = fgetdt(&c_lab->JD, &used, &i, iofile);
-        if (c_lab->date < -1) {
-          c_lab->date = -1.0;
-          c_lab->JD   = -36525.0;
-        }
-      } else
-      if (conv_mode == 0) {
-        if (io_str != (char *) 0 && strlen(io_str) >= 8) {
-          c_lab->date = sgetdt(io_str, &c_lab->JD, &used, &i);
+      if (conv_mode == 0 || conv_mode == 1) {
+        if (p_tp != (char *) 0 && strlen(p_tp) >= 8) {
+          c_lab->date = sgetdt(p_tp, &c_lab->JD, &used, &i);
           if (c_lab->date < -1) {
             c_lab->date = -1.0;
             c_lab->JD   = -36525.0;
@@ -582,7 +555,7 @@ struct coord_lab        *c_lab,
     break; /* end conv_mode 0 & 1 */
 
 
-/* conv_crd    ver 2010.01          # page 18     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 10    31 May 2012 10 19 */
 
 
   case 3:  /* output of minilabel, simple */
@@ -697,7 +670,7 @@ struct coord_lab        *c_lab,
       }
 
 
-/* conv_crd    ver 2010.01          # page 19     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 11    31 May 2012 10 19 */
 
 
       /* Datum, ellipsoid, and parent datum */
@@ -742,7 +715,7 @@ struct coord_lab        *c_lab,
     break; /* end case 3 & 4, output label */
 
 
-/* conv_crd    ver 2010.01          # page 20     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 12    31 May 2012 10 19 */
 
 
   case 5:   /* DOCUMENTATION OF THE LABEL */
@@ -905,7 +878,7 @@ struct coord_lab        *c_lab,
     }
 
 
-/* conv_crd    ver 2010.01          # page 21     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 13    31 May 2012 10 19 */
 
 
     /* Enumeration of coord system */
@@ -960,7 +933,7 @@ struct coord_lab        *c_lab,
        (void) fprintf(iofile, "\ns34 curv. = %15.14e", c_lab->cP);
 
 
-/* conv_crd    ver 2010.01          # page 22     5 Jan 2010 10 19 */
+/* conv_crd    ver 2012.01          # page 14    31 May 2012 10 19 */
 
 
     if (c_lab->cstm != 7) {

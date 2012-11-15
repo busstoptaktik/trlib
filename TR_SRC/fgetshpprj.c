@@ -131,6 +131,7 @@ union geo_lab   *g_lab)
             if (strncmp(p_txt3, "radian", p_txt4-p_txt3-2)==0)
                 g_lab->u_c_lab.g_tpd = *set_tpd("rad", 2, 7);
           }
+          (void) fgetlhtx(fp, entry);
           break;
         case 3:  // PROJCS
           -- go_on;

@@ -52,6 +52,7 @@ double                   *ipl_oJD,      /*       INTRA plate gate date output */
 char                     *used_plm_nam, /* name of plate used */
 char                     *used_plt_nam, /* name of plate used */
 char                     *used_ipt_nam, /* name of intra plate used */
+double                   *tr_par,       /* 7-par describing the transformation */
 char                     *usertxt,
 char                     *err_str
 );
@@ -90,6 +91,7 @@ char                     *err_str
 /*  -30000 ITRF_NON_     : NO entries found             (TRF_PROGR_) */
 /*  -40000 ITRF_SEQ_     : entries are NOT consequtive  (TRF_PROGR_) */
 /*  -50000 ITRF_DTM_     : Illegal datum in from_lb/to_lb            */
+/*  -60000               : tr_par != NULL && stn_vel !=0 : ILLEGAL   */
 /*  -70000 ITRF_NAM_     : manager.gps table_name (gpstab) not found */
 /*  -90000 ITRF_SYS_     : manager.gps file not found                */
 /* -100000 PLATE_NO_VEL_ : Plate has no velocity                     */
@@ -140,13 +142,20 @@ char                     *err_str
 /* ipl_oJD  : ipl_dt of output National (INTRA Plate)        */
 /* plm_nam is the name of the actual nnr plate model         */
 /* plt_nam is the name of the actual plate                   */
-/* ipl_nam is tha name of the actual intra plate model       */
+/* ipl_nam is the name of the actual intra plate model       */
 
 /* err_str: at ERROR: user_txt cat ERROR description         */
 
 
 /* itrf_trans  ver 2007.02          # page 3    10 Oct 2008 11 57 */
 
+
+/* tr_par == NULL gives transformations only                 */
+/* tr_par != NULL && stn_vel !=0 gives -6000: ILLEGAL        */
+/* tr_par != NULL && stn_vel ==0                             */
+/*           gives transformations and 7-par values          */
+/*           in tr_par: T1, T2, T3, R1, R2, R3, D            */
+/*           se formula below                                */
 
 /*         TRANSFORMATION PRODUCTION LINE   */
 /*         <--UP-HILL--> <--DOWN-HILL-->    */

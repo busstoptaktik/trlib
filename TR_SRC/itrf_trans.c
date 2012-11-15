@@ -57,6 +57,7 @@ double                   *ipl_oJD,      /*       INTRA plate gate date output */
 char                     *used_plm_nam, /* name of plate used */
 char                     *used_plt_nam, /* name of plate used */
 char                     *used_ipt_nam, /* name of intra plate used */
+double                   *tr_par,       /* 7-par describing the transformation */
 char                     *usertxt,
 char                     *err_str
 )
@@ -107,6 +108,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   /*  -30000 ITRF_NON_     : NO entries found             (TRF_PROGR_)  */
   /*  -40000 ITRF_SEQ_     : entries are NOT consequtive  (TRF_PROGR_)  */
   /*  -50000 ITRF_DTM_     : Illegal datum in from_lb/to_lb             */
+  /*  -60000               : tr_par != NULL && stn_vel !=0 : ILLEGAL   */
   /*  -70000 ITRF_NAM_     : manager.gps table_name (gpstab) not found  */
   /*  -80000 ITRF_SYS_     : manager.gps file not found                 */
   /*  -90000 PLATE_NO_VEL_ : Plate has no velocity                      */
@@ -163,6 +165,13 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   /* plt_nam is the name of the actual plate                   */
   /* ipl_nam is tha name of the actual intra plate model       */
   /* err_str: at ERROR: user_txt cat ERROR description         */
+
+  /* tr_par == NULL gives transformations only                 */
+  /* tr_par != NULL && stn_vel !=0 gives -6000: ILLEGAL        */
+  /* tr_par != NULL && stn_vel ==0                             */
+  /*           gives transformations and 7-par values          */
+  /*           in tr_par: T1, T2, T3, R1, R2, R3, D            */
+  /*           se formula below                                */
 
   /*         TRANSFORMATION PRODUCTION LINE   */
   /*         <--UP-HILL--> <--DOWN-HILL-->    */
@@ -337,6 +346,11 @@ if (TU)
 
   } /* init of tables */
 
+  if (tr_par != NULL) {
+    for (rs = 0; rs < 7; rs++) *(tr_par + rs) = 0.0;
+    if (stn_vel) return(-6000);
+  }
+
   *plm_trf = 0;
   *ipl_trf = 0;
   *ipl_iJD = -10000000.0;
@@ -444,6 +458,11 @@ if (TU)
           ipl_tr   = -1;
           *ipl_trf = (gps_table.req_ipl_tr) ? gps_table.req_ipl_tr : 4;
 
+          if (tr_par != NULL) {
+            *(tr_par +0) += X;
+            *(tr_par +1) += Y;
+            *(tr_par +2) += Z;
+          }
 /*
 (void) fprintf(stdout, "\n*ipl : %-8.6f  %-8.6f   %-8.6f;", X, Y, Z);
 */
@@ -487,6 +506,16 @@ shp->rx, shp->ry, shp->rz);
           N += X;
           E += Y;
           H += Z;
+
+          if (tr_par != NULL) {
+            *(tr_par +0) += shp->tx;
+            *(tr_par +1) += shp->ty;
+            *(tr_par +2) += shp->tz;
+            *(tr_par +3) += shp->rx;
+            *(tr_par +4) += shp->ry;
+            *(tr_par +5) += shp->rz;
+            *(tr_par +6) += shp->sc;
+          }
         }
         if (act == ipl_tr) {
 /*
@@ -502,6 +531,12 @@ B*180/M_PI, L*180/M_PI);
           H       += Z;
           ipl_tr   = -1;
           *ipl_trf = (gps_table.req_ipl_tr) ? gps_table.req_ipl_tr : 4;
+
+          if (tr_par != NULL) {
+            *(tr_par +0) += X;
+            *(tr_par +1) += Y;
+            *(tr_par +2) += Z;
+          }
 /*
 (void) fprintf(stdout, "\n*ipl : %-8.6f  %-8.6f   %-8.6f;", X, Y, Z);
 */
@@ -542,6 +577,12 @@ plm_tr.rz*180*60*60/M_PI, gps_table.plm_yy);
             N     += X;
             E     += Y;
             H     += Z;
+
+            if (tr_par != NULL) {
+              *(tr_par +0) += X;
+              *(tr_par +1) += Y;
+              *(tr_par +2) += Z;
+            }
           }
           else res = PLATE_NO_VEL_;
         } else {

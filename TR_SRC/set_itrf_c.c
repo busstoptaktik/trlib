@@ -277,7 +277,7 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
       return(s_status(err_str, "set_itrf_c", TRF_ILLEG_));
 
   if (inkg_ii || onkg_ii) {
-    if (*plm_nam == '\0' || (!strcmp(plm_nam, "nnr_std"))
+    if (*plm_nam == '\0' || (!strcmp(plm_nam, "std"))
       || (!strcmp(plm_nam, "nnr_std")))
                  (void) strcpy(plm_nam, "nnr_itrf00");
     if (*ipl_nam == '\0'  || (!strcmp(ipl_nam, "std")))
@@ -710,7 +710,7 @@ from_str, to___str, run_JD / 365.25);
               (void) sprintf(err_str,
                 "\n*** pla_adm_f: ERROR at f_poly read of info");
               (void) sprintf(err_str,
-                "\n plate_info_adr %8ld nmb = %4d size = %4d i = %d;",
+                "\n plate_info_adr %8ld nmb = %4ld size = %4ld i = %d;",
                 ftell(plm_lb->f_poly), p_pl_inf - pl_inf, size, i);
               return(s_status(err_str,
                               "set_itrf_c f_poly", PLATE_OUT_));
