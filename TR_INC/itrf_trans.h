@@ -30,11 +30,22 @@
 
 #include              "gd_trans.h"
 #include              "conv_lab.h"
-
+#include              "trlib_intern.h"
 
 extern int               itrf_trans(
 /*________________________________*/
-struct itrf_str         *itrf_inf
+union geo_lab            *i_lab,
+union geo_lab            *o_lab,
+int                       stn_vel,      /* velocity for stn in i_vel */
+double                   *i_crd,        /* input coords:: 0:2 */
+double                   *i_vel,        /* velocity to coords:: 0:2 */
+double                    i_JD,         /* Julian Day from 2000.0 */
+double                   *o_crd,        /* output coords:: 0:2 */
+double                   *o_vel,        /* NOT calculated:: 0:2 (==0.0) */
+struct PLATE             *plate_info,   /* call and return info on plates */
+double                   *tr_par,       /* 7-par describing the transf. */
+char                     *usertxt,
+char                     *err_str
 );
 
 /* itrf_trans initialize the tables needed or closes the tables */
@@ -78,6 +89,8 @@ struct itrf_str         *itrf_inf
 
 
 /* tab_name strategy ::                                             */
+/* tab_t = plate_info->plate_model         to be used               */
+/* tab_i = plate_info->intra_plate_model   to be used               */
 /* stn_vel == 1  :  pl_tr i_JD to    o_JD i_vel                     */
 /* stn_vel == 0  ::                                                 */
 /*     tab_t == nnr_std : pl_tr i_JD to o_JD STD:newest nnr_itrfYY  */
@@ -85,7 +98,7 @@ struct itrf_str         *itrf_inf
 /*     tab_t != '\0':  pl_tr    i_JD to o_JD table tab_t vel        */
 /*     tab_t == '\0':  NO pl_tr                                     */
 /*     tab_i == std :  ipl_tr   i_JD to o_JD SDT:ipl model for area */
-/*     tab_i != '\0':  ipl_tr   i_JD to o_JD table tab_t vel        */
+/*     tab_i != '\0':  ipl_tr   i_JD to o_JD table tab_i vel        */
 /*     tab_i == '\0':  NO ipl_tr                                    */
 
 /* Exceptions:                                                      */
@@ -112,17 +125,18 @@ struct itrf_str         *itrf_inf
 /* RETURN PARAMETERS:                                        */
 /* o_crd[3] : Transformed i_crd[3]                           */
 /* o_vel[3] : Transformed i_vel[3]: NOT ASSIGNED: 0.0        */
-/* plm_trf = 1/0: nnr plate model used/(not used)            */
-/* ipl_trf : {1,2,3} : std gates using:                      */
-/*                    {ipl_iJD, ipl_oJD, ipl_iJD & ipl_oJD}  */ 
-/*         : {4, 0} : intra plate model {used, not used}     */
-/*                    (ipl_iJD & ipl_oJD = -10000000.0)      */
-/* plm_JD   : gate date for Plate Model                      */
-/* ipl_iJD  : ipl_dt of input National  (INTRA Plate)        */
-/* ipl_oJD  : ipl_dt of output National (INTRA Plate)        */
-/* plm_nam is the name of the actual nnr plate model         */
-/* plt_nam is the name of the actual plate                   */
-/* ipl_nam is tha name of the actual intra plate model       */
+/* plate_info-> ::                                           */
+/*   plm_trf = 1/0: nnr plate model used/(not used)          */
+/*   ipl_trf : {1,2,3} : std gates using:                    */
+/*                      {ipl_iJD, ipl_oJD, ipl_iJD & ipl_oJD}*/ 
+/*           : {4, 0} : intra plate model {used, not used}   */
+/*                      (ipl_iJD & ipl_oJD = -10000000.0)    */
+/*   plm_dt   : gate Julian date for Plate Model             */
+/*   ipl_idt  : Julian date of input National  (INTRA Plate) */
+/*   ipl_odt  : Julian date of output National (INTRA Plate) */
+/*   plm_nam is the name of the actual nnr plate model       */
+/*   plt_nam is the name of the actual plate                 */
+/*   ipl_nam is tha name of the actual intra plate model     */
 
 /* err_str: at ERROR: user_txt cat ERROR description         */
 
