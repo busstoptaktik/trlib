@@ -50,6 +50,7 @@ double                   *o_crd,        /* output coords:: 0:2 */
 double                   *o_vel,        /* NOT calculated:: 0:2 (==0.0) */
 struct PLATE             *plate_info,   /* call and return info on plates */
 double                   *tr_par,       /* 7-par describing the transf. */
+double                   *tr_par,       /* 7-par describing the transformation */
 char                     *usertxt,
 char                     *err_str
 )
@@ -169,7 +170,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   /*   ipl_oJD  : ipl_dt of output National (INTRA Plate)      */
   /*   plm_nam is the name of the actual nnr plate model       */
   /*   plt_nam is the name of the actual plate                 */
-  /*   ipl_nam is tha name of the actual intra plate model     */
+  /*   ipl_nam is the name of the actual intra plate model     */
   /* err_str: at ERROR: user_txt cat ERROR description         */
 
   /* tr_par == NULL gives transformations only                 */
@@ -257,7 +258,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
       b_lev                = -49;
       gps_table.req_plm_tr = -2;
       gps_table.req_ipl_tr = 0;
-      *s_u_plm_nam      = *s_u_ipl_nam = '\0';
+      *s_u_plm_nam         = *s_u_ipl_nam = '\0';
       return(0);
     } else
     return(-999);
@@ -265,7 +266,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   if (b_lev == -99) {
     b_lev            = -49;
     ipl_table.init   = 0;
-    *s_u_plm_nam  = *s_u_ipl_nam = '\0';
+    *s_u_plm_nam     = *s_u_ipl_nam = '\0';
   }
 
 /* itrf_trans  ver 2007.02          # page 4    10 Oct 2008 11 57 */
@@ -344,7 +345,7 @@ if (TU)
     /* save checksums */
     i_chsum   = i_clb->ch_sum;
     o_chsum   = o_clb->ch_sum;
-    stn_vel   = stn_vel;
+    s_stn_vel = stn_vel;
     sate_in   = i_JD;
     sate_out  = o_clb->JD;  
     (void) strcpy(s_tab_t, tab_t);
