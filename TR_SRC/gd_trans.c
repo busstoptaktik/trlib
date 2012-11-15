@@ -528,8 +528,7 @@ FILE                     *tr_error
           (void) sprintf(dstr, "gd_trans %s -> %s illegal",
                  i_clb->mlb, w_oclb->mlb);
           return((tr_error==NULL) ? TRF_ILLEG_ :
-                  t_status(tr_error, "",
-                  tr_error, usertxt, dstr, TRF_ILLEG_));
+                  t_status(tr_error, usertxt, dstr, TRF_ILLEG_));
         }
         break;
       } /* end switch(R_N) */
