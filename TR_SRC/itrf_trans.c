@@ -49,7 +49,6 @@ double                    i_JD,         /* Julian Day from 2000.0 */
 double                   *o_crd,        /* output coords:: 0:2 */
 double                   *o_vel,        /* NOT calculated:: 0:2 (==0.0) */
 struct PLATE             *plate_info,   /* call and return info on plates */
-double                   *tr_par,       /* 7-par describing the transf. */
 double                   *tr_par,       /* 7-par describing the transformation */
 char                     *usertxt,
 char                     *err_str
