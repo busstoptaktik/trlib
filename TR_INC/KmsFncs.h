@@ -113,6 +113,7 @@ extern "C" {
 #include "kmsshp_tr.h"
 #include "labchsum.h"
 #include "ng_trans.h"
+#include "parse_def_file.h"
 #include "pla_adm_f.h"
 #include "prn_cho.h"
 #include "ptg.h"
