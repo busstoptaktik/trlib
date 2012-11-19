@@ -514,6 +514,7 @@ int TR_itrf(
     int err, ERR = 0, i, stn_vel=0;
 
     if(n_vel>0) stn_vel=1;
+    i_JD=JD_in[0];
 
     for (i = 0;  i < n;  i++) {
         if(n_JD==n) i_JD=JD_in[i];

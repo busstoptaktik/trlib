@@ -277,7 +277,7 @@ int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
       return(s_status(err_str, "set_itrf_c", TRF_ILLEG_));
 
   if (inkg_ii || onkg_ii) {
-    if (*plm_nam == '\0' || (!strcmp(plm_nam, "nnr_std"))
+    if (*plm_nam == '\0' || (!strcmp(plm_nam, "std"))
       || (!strcmp(plm_nam, "nnr_std")))
                  (void) strcpy(plm_nam, "nnr_itrf00");
     if (*ipl_nam == '\0'  || (!strcmp(ipl_nam, "std")))
