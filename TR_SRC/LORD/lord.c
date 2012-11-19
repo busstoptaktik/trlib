@@ -22,7 +22,7 @@ set_lord_type_mode(FILE * stream, char *verbosity)
 then output each call by using 
 lord_type(int tr_lib_error_code, char *frmt, ...)
 Possible types are debug, info, warning, error and critical*/
-// muligheder for output_mode
+// muligheder for output
 // stdout, stderr, FILE, NULL
 
 
@@ -316,10 +316,48 @@ void init_lord()
 
 void set_lord_file(char *fullfilename)
 {
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
 	stream_debug = fopen (fullfilename , "w");
 	stream_info = stream_debug;
 	stream_warning = stream_debug;
 	stream_error = stream_debug;
 	stream_critical = stream_debug;
+}
+
+void open_lord_modes(int debug, int info, int warning, int error, int critical)
+{
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
+	if (debug == 0 || debug == 1)
+	{
+		use_debug = debug;
+	}
+
+	if (info == 0 || info == 1)
+	{
+		use_info = info;
+	}
+
+	if (warning == 0 || warning == 1)
+	{
+		use_warning = warning;
+	}
+
+	if (error == 0 || error == 1)
+	{
+		use_error = error;
+	}
+
+	if (critical == 0 || critical == 1)
+	{
+		use_critical = critical;
+	}
 }
 
