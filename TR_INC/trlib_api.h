@@ -47,6 +47,7 @@ KMSTR_API int TR_GetLocalGeometry(char *mlb, double x, double y, double *m, doub
 typedef struct  TR TR;
 KMSTR_API void TR_GeoidInfo(TR *tr);
 KMSTR_API TR  *TR_Open (char *label_in, char *label_out, char *geoid_name);
+KMSTR_API TR  *TR_Compose (TR *tr1, TR *tr2);
 KMSTR_API  int  TR_Transform(TR *tr, double *X, double *Y, double *Z, int n);
 KMSTR_API int   TR_InverseTransform(TR *tr, double *X, double *Y, double *Z, int n);
 KMSTR_API int   TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_out, double *Y_out, double *Z_out, int n);
