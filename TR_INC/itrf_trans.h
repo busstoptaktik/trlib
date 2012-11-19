@@ -30,28 +30,20 @@
 
 #include              "gd_trans.h"
 #include              "conv_lab.h"
-
+#include              "trlib_intern.h"
 
 extern int               itrf_trans(
 /*________________________________*/
-union geo_lab           *i_lab,
-union geo_lab           *o_lab,
+union geo_lab            *i_lab,
+union geo_lab            *o_lab,
 int                       stn_vel,      /* velocity for stn in i_vel */
-char                     *tab_t,        /* name of plate model requested */
-char                     *tab_i,        /* name of intra plate model requested */
 double                   *i_crd,        /* input coords:: 0:2 */
 double                   *i_vel,        /* velocity to coords:: 0:2 */
 double                    i_JD,         /* Julian Day from 2000.0 */
 double                   *o_crd,        /* output coords:: 0:2 */
 double                   *o_vel,        /* NOT calculated:: 0:2 (==0.0) */
-int                      *plm_trf,      /* plates model used :      0/1 */
-int                      *ipl_trf,      /* intra plate model used : 0/1 */
-double                   *plm_JD,       /* Plate model gate date */
-double                   *ipl_iJD,      /* input INTRA plate gate date */
-double                   *ipl_oJD,      /*       INTRA plate gate date output */
-char                     *used_plm_nam, /* name of plate used */
-char                     *used_plt_nam, /* name of plate used */
-char                     *used_ipt_nam, /* name of intra plate used */
+struct PLATE             *plate_info,   /* call and return info on plates */
+double                   *tr_par,       /* 7-par describing the transf. */
 char                     *usertxt,
 char                     *err_str
 );
@@ -90,12 +82,15 @@ char                     *err_str
 /*  -30000 ITRF_NON_     : NO entries found             (TRF_PROGR_) */
 /*  -40000 ITRF_SEQ_     : entries are NOT consequtive  (TRF_PROGR_) */
 /*  -50000 ITRF_DTM_     : Illegal datum in from_lb/to_lb            */
+/*  -60000               : tr_par != NULL && stn_vel !=0 : ILLEGAL   */
 /*  -70000 ITRF_NAM_     : manager.gps table_name (gpstab) not found */
 /*  -90000 ITRF_SYS_     : manager.gps file not found                */
 /* -100000 PLATE_NO_VEL_ : Plate has no velocity                     */
 
 
 /* tab_name strategy ::                                             */
+/* tab_t = plate_info->plate_model         to be used               */
+/* tab_i = plate_info->intra_plate_model   to be used               */
 /* stn_vel == 1  :  pl_tr i_JD to    o_JD i_vel                     */
 /* stn_vel == 0  ::                                                 */
 /*     tab_t == nnr_std : pl_tr i_JD to o_JD STD:newest nnr_itrfYY  */
@@ -103,7 +98,7 @@ char                     *err_str
 /*     tab_t != '\0':  pl_tr    i_JD to o_JD table tab_t vel        */
 /*     tab_t == '\0':  NO pl_tr                                     */
 /*     tab_i == std :  ipl_tr   i_JD to o_JD SDT:ipl model for area */
-/*     tab_i != '\0':  ipl_tr   i_JD to o_JD table tab_t vel        */
+/*     tab_i != '\0':  ipl_tr   i_JD to o_JD table tab_i vel        */
 /*     tab_i == '\0':  NO ipl_tr                                    */
 
 /* Exceptions:                                                      */
@@ -130,23 +125,31 @@ char                     *err_str
 /* RETURN PARAMETERS:                                        */
 /* o_crd[3] : Transformed i_crd[3]                           */
 /* o_vel[3] : Transformed i_vel[3]: NOT ASSIGNED: 0.0        */
-/* plm_trf = 1/0: nnr plate model used/(not used)            */
-/* ipl_trf : {1,2,3} : std gates using:                      */
-/*                    {ipl_iJD, ipl_oJD, ipl_iJD & ipl_oJD}  */ 
-/*         : {4, 0} : intra plate model {used, not used}     */
-/*                    (ipl_iJD & ipl_oJD = -10000000.0)      */
-/* plm_JD   : gate date for Plate Model                      */
-/* ipl_iJD  : ipl_dt of input National  (INTRA Plate)        */
-/* ipl_oJD  : ipl_dt of output National (INTRA Plate)        */
-/* plm_nam is the name of the actual nnr plate model         */
-/* plt_nam is the name of the actual plate                   */
-/* ipl_nam is tha name of the actual intra plate model       */
+/* plate_info-> ::                                           */
+/*   plm_trf = 1/0: nnr plate model used/(not used)          */
+/*   ipl_trf : {1,2,3} : std gates using:                    */
+/*                      {ipl_iJD, ipl_oJD, ipl_iJD & ipl_oJD}*/ 
+/*           : {4, 0} : intra plate model {used, not used}   */
+/*                      (ipl_iJD & ipl_oJD = -10000000.0)    */
+/*   plm_dt   : gate Julian date for Plate Model             */
+/*   ipl_idt  : Julian date of input National  (INTRA Plate) */
+/*   ipl_odt  : Julian date of output National (INTRA Plate) */
+/*   plm_nam is the name of the actual nnr plate model       */
+/*   plt_nam is the name of the actual plate                 */
+/*   ipl_nam is tha name of the actual intra plate model     */
 
 /* err_str: at ERROR: user_txt cat ERROR description         */
 
 
 /* itrf_trans  ver 2007.02          # page 3    10 Oct 2008 11 57 */
 
+
+/* tr_par == NULL gives transformations only                 */
+/* tr_par != NULL && stn_vel !=0 gives -6000: ILLEGAL        */
+/* tr_par != NULL && stn_vel ==0                             */
+/*           gives transformations and 7-par values          */
+/*           in tr_par: T1, T2, T3, R1, R2, R3, D            */
+/*           se formula below                                */
 
 /*         TRANSFORMATION PRODUCTION LINE   */
 /*         <--UP-HILL--> <--DOWN-HILL-->    */
@@ -155,7 +158,7 @@ char                     *err_str
 /* action:       0      1       2           */
 
 /* basic transformation formula (Molodensky) ::                   */
-/* (XS) = (X) + (T1) + ( D  -R3  R2) (X)                          */
-/* (YS) = (Y) + (T2) + ( R3  D  -R1) (Y)                          */
-/* (ZS) = (Z) + (T3) + (-R2  R1  D ) (Z)                          */
+/* (XS)   (X)   (T1)   ( D  -R3  R2) (X)                          */
+/* (YS) = (Y) + (T2) + ( R3  D  -R1)*(Y)                          */
+/* (ZS)   (Z)   (T3)   (-R2  R1  D ) (Z)                          */
 

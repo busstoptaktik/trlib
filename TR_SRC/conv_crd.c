@@ -259,7 +259,7 @@ struct coord_lab        *c_lab,
       case    9: /* tsu**   Time Series utm zone ** */
       case   13: /* ETRS-TM, ETRS89 transverse mercator zone ** */
         if (p_lb->cha_str > 0) {
-          if (isdigit(*(p_sys+p_lb->cha_str))) {                   // C_DIGIT udskiftet med isdigit  20120529 stl
+          if (isdigit(*(p_sys+p_lb->cha_str))) {   // C_DIGIT udskiftet med isdigit  20120529 stl
             if ((sscanf(p_sys+p_lb->cha_str, "%d", &zone) == 1)
                 && (1 <= zone && zone <= 60)) {
               c_lab->B0     = 0.0;
@@ -276,7 +276,7 @@ struct coord_lab        *c_lab,
 
       case 8: /* tm**  */
         if (p_lb->cha_str > 0) {
-          if (isdigit(*(p_sys+p_lb->cha_str))) {					// C_DIGIT udskiftet med isdigit  20120529 stl
+          if (isdigit(*(p_sys+p_lb->cha_str))) {	// C_DIGIT udskiftet med isdigit  20120529 stl
             (void) sscanf(p_sys+p_lb->cha_str, "%d", &zone);
             c_lab->N0 = 0.0;
             c_lab->B0 = 0.0;
@@ -395,7 +395,10 @@ struct coord_lab        *c_lab,
         /* datum shift params (from set_dtm) */
         c_lab->p_dtm = (short) par_dtm;
 
-       }
+        /* set trf. constants for completed systems */
+        (void) set_trc(c_lab);
+  
+      }
       else
         /* unintelligible ellipsoid */
         if (c_lab->cstm != 11 /* crt2 */) c_lab->lab_type = ILL_LAB;
@@ -524,8 +527,6 @@ struct coord_lab        *c_lab,
       }  /* ste */
     }  /* end input of additional params */
      
-     /* set trf. constants for completed systems */
-     (void) set_trc(c_lab);
 
 
 /* conv_crd    ver 2012.01          # page  9    31 May 2012 10 19 */

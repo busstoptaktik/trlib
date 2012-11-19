@@ -16,10 +16,14 @@
  * 
  */
  
+#if !defined(H_TRLIB_INTERN)
+#define      H_TRLIB_INTERN
+
 /* Intern API header som definerer TR-objektet, thokn, simlk, sep. 2011 */
 #include <stdio.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
+
 struct TR {
     union geo_lab *plab_in, *plab_out;
     struct mgde_str *geoid_pt;
@@ -56,3 +60,5 @@ int TR_tr(union geo_lab* ,union geo_lab*, double*, double*, double*, double*, do
 int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
 union geo_lab *TR_OpenProjection(char *mlb);
 void TR_GetGeoidName(struct TR *tr,char *name);
+
+#endif

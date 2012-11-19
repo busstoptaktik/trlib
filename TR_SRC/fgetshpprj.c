@@ -16,7 +16,7 @@
  * 
  */
  
- #include "fgetshpprj.h"
+ #include "sgetshpprj.h"
 
  int fgetshpprj(FILE *fh_in, union geo_lab   *g_lab){
 	char wkt[4096];

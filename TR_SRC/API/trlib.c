@@ -45,6 +45,7 @@
 #define GEO_SYS_CODE 2
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
+// R2D equals the geo_lab define DOUT = (180.0/M_PI)
 #define R2D 57.295779513082323 
 #define D2R 0.017453292519943295
 /*various global state variables */
@@ -508,20 +509,20 @@ int TR_itrf(
  {
 
     double i_crd[3], i_vel[3], i_JD=-36525.0;
-    double o_crd[3], o_vel[3];
+    double o_crd[3], o_vel[3], tr_par[7];
     char *err_str=NULL;
-
     int err, ERR = 0, i, stn_vel=0;
 
     if(n_vel>0) stn_vel=1;
+    i_JD=JD_in[0];
 
     for (i = 0;  i < n;  i++) {
-        if(n_JD==1) i_JD=JD_in[0]; else if(n_JD==n) i_JD=JD_in[i];
+        if(n_JD==n) i_JD=JD_in[i];
         i_crd[0]=x_in[i]; i_crd[1]=y_in[i]; i_crd[2]=z_in[i];
         if(n_vel==n){
             i_vel[0]=velx_in[i]; i_vel[1]=vely_in[i]; i_vel[2]=velz_in[i];
         }
-        err = itrf_trans(plab_in, plab_out, stn_vel, plate_info->plate_model, plate_info->intra_plate_model, i_crd, i_vel, i_JD, o_crd, o_vel, plate_info->plm_trf, plate_info->ipl_trf, plate_info->plm_dt, plate_info->ipl_idt, plate_info->ipl_odt, plate_info->plm_nam, plate_info->plt_nam, plate_info->ipl_nam, "", err_str);
+        err = itrf_trans(plab_in, plab_out, stn_vel, i_crd, i_vel, i_JD, o_crd, o_vel, plate_info, tr_par, "", err_str);
         x_out[i]=o_crd[0]; y_out[i]=o_crd[1]; z_out[i]=o_crd[2];
         if(n_vel==n){
             velx_out[i]=o_vel[0]; vely_out[i]=o_vel[1]; velz_out[i]=o_vel[2];

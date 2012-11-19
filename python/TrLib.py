@@ -17,8 +17,8 @@
  */
  """
 #########################
-## Python bindings for simple test api to KmsTrLib/KMSTrans
-## simlk, may->sep 2011                
+## Python bindings for (Kms) TrLib
+## simlk, 2011,2012            
 #########################
 try:
 	import numpy as np
@@ -32,8 +32,10 @@ import os
 import sys
 import time
 IS_INIT=False
-if "win" in sys.platform:
+if sys.platform.startswith("win"):
 	STD_LIB="KMSTRLIB.dll"
+elif "darwin" in sys.platform:
+	STD_LIB="KMSTRLIB.dylib"
 else:
 	STD_LIB="KMSTRLIB.so"
 STD_DIRNAME=os.path.dirname(__file__)
@@ -226,6 +228,9 @@ def GetVersion():
 	ver=buf.replace("\0","").strip()
 	return ver
 
+#######################
+## Minilabel conversion methods 
+#######################
 def GetEsriText(label):
 	if IS_INIT:
 		wkt=" "*2048;
@@ -240,6 +245,8 @@ def FromEsriText(wkt):
 		retval=tr_lib.sgetshpprj(wkt,None,out)
 		if retval==0:
 			return GetString(out)
+		elif DEBUG:
+			print retval
 	return None
 
 def FromProj4(proj4def):
@@ -250,6 +257,9 @@ def FromProj4(proj4def):
 	else:
 		return GetString(mlb)
 
+###########################
+## Geometry analysis methods
+###########################
 def GetLocalGeometry(label,x,y):
 	#out param determines wheteher prj_in or prj_out is used#
 	if IS_INIT:
@@ -284,6 +294,10 @@ def InverseBesselHelmert(axis,flat,lon1,lat1,a1,dist):
 			return lon2.value*R2D,lat2.value*R2D,a2.value*R2D
 	return None,None,None
 
+#############################
+## 'Documentation' methods
+#############################
+
 def GetEllipsoidParameters(ell_name):
         if IS_INIT:
                 arr=ctypes.c_double*9
@@ -292,6 +306,16 @@ def GetEllipsoidParameters(ell_name):
                 if ret>0:
                         return ell_par[0],ell_par[1]
         return None,None
+
+def GetEllipsoidParametersFromDatum(mlb_dtm):
+	if IS_INIT:
+		ell_name=" "*128
+		rc=tr_lib.doc_dtm(mlb_dtm,ell_name,-1)
+		if (rc==TR_OK):
+			a,f=GetEllipsoidParameters(ell_name)
+			return GetString(ell_name),a,f
+	return None,None,None
+		
 
 def DescribeProjection(mlb_prj):
 	if IS_INIT:
@@ -317,14 +341,6 @@ def DescribeDatum(mlb_dtm):
 			return GetString(descr).replace("@","")
 	return None
 
-def GetEllipsoidParametersFromDatum(mlb_dtm):
-	if IS_INIT:
-		ell_name=" "*128
-		rc=tr_lib.doc_dtm(mlb_dtm,ell_name,-1)
-		if (rc==TR_OK):
-			a,f=GetEllipsoidParameters(ell_name)
-			return GetString(ell_name),a,f
-	return None,None,None
 
 def DescribeLabel(mlb):
 	try:
@@ -354,7 +370,7 @@ def DescribeLabel(mlb):
 
 
 ######################
-## Minilabel analasys methods #
+## Minilabel analysis methods 
 ######################
 def SplitMLB(mlb):
 	mlb=mlb.split()[0].replace("L","_")
@@ -396,6 +412,32 @@ def IsGeographic(mlb):
 	except:
 		return False
 	return proj=="geo"
+
+#Will throw an exception if datum is implicit and library is not initialized
+def GetDatum(mlb):
+	region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
+	if len(dtm)>0:
+		return dtm
+	if (not IS_INIT):
+		raise Exception("Initliaze library first!")
+	descr_prj,impl_dtm=DescribeProjection(prj)
+	if descr_prj is None or len(impl_dtm)==0:
+		raise LabelException("Label not OK!")
+	return impl_dtm
+
+#Will throw an exception if datum is implicit and library is not initialized
+#Converts mlb to 2d-geographic projection based on same datum
+def Convert2Geo(mlb):
+	region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
+	if len(dtm)>0:
+		dtm=GetDatum(mlb)
+	return "geo_"+dtm
+
+
+################################
+## Main Transformation Class
+################################
+
 
 class CoordinateTransformation(object):
 	def __init__(self,mlb_in,mlb_out,geoid_name=""):

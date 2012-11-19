@@ -15,7 +15,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
+
+
+#if !defined(H_TRLIB_API)
+#define      H_TRLIB_API
+
 /* API header til eksterne brugere og til internt 'sanity' check, simlk, thokn sep. 2011 */
 
 #define TR_OK 0
@@ -29,6 +33,7 @@
 #else 
 #define KMSTR_API
 #endif 
+
 KMSTR_API int   TR_InitLibrary(char *path);
 KMSTR_API int   TR_SetGeoidDir(char *path);
 KMSTR_API int   TR_GetLastError(void);
@@ -52,4 +57,4 @@ KMSTR_API void TR_Close (TR *tr);
 KMSTR_API  int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
 
 
-
+#endif

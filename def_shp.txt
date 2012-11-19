@@ -95,6 +95,7 @@ WGS1984        wgs84        World Geodetic System 1984
 ETRS89         etrs89       European Terrestrial Ref Frame 1989
 ETRF89         etrs89       European Terrestrial Ref Frame 1989
 EUREF89        etrs89       European Terrestrial Ref Frame 1989
+ETRS1989       etrs89       European Terrestrial Ref Frame 1989
 SWEREF99       etrs89
 GR96           gr96         Greenland Reference Frame 1996
 ED87           ed87         European Datum 1987
