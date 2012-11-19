@@ -15,7 +15,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
+
+
+#if !defined(H_TRLIB_API)
+#define      H_TRLIB_API
+
 /* API header til eksterne brugere og til internt 'sanity' check, simlk, thokn sep. 2011 */
 
 #define TR_OK 0
@@ -29,6 +33,9 @@
 #else 
 #define KMSTR_API
 #endif 
+
+#include "trlib_intern.h"
+
 KMSTR_API int   TR_InitLibrary(char *path);
 KMSTR_API int   TR_SetGeoidDir(char *path);
 KMSTR_API int   TR_GetLastError(void);
@@ -39,7 +46,6 @@ KMSTR_API void TR_TerminateThread(void);
 KMSTR_API void TR_AllowUnsafeTransformations(void);
 KMSTR_API void TR_ForbidUnsafeTransformations(void);
 KMSTR_API int TR_GetLocalGeometry(char *mlb, double x, double y, double *m, double *c);
-typedef struct  TR TR;
 KMSTR_API void TR_GeoidInfo(TR *tr);
 KMSTR_API TR  *TR_Open (char *label_in, char *label_out, char *geoid_name);
 KMSTR_API  int  TR_Transform(TR *tr, double *X, double *Y, double *Z, int n);
@@ -52,4 +58,4 @@ KMSTR_API void TR_Close (TR *tr);
 KMSTR_API  int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
 
 
-
+#endif

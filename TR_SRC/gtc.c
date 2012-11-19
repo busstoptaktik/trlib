@@ -203,7 +203,7 @@ errors    KE JAN 2001.
   else res = TRF_PROGR_;
 
   return((tr_error==NULL || res == 0) ? res :
-          t_status(tr_error, "gtc", res,
+          t_status(tr_error, "", "gtc", res,
           (direct > 0) ? "sx" : "m ", "m ",
           B, L, H, dCx, dCy, dCz));
 

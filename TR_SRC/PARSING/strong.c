@@ -79,7 +79,7 @@ void string_tolower(char *text){
 
 /* gets a number - if it has a unit sgetg is used */
 double get_number(char *item){
-	int n_chars=strlen(item);
+	int n_chars = (int) strlen(item);
 	int used;
 	struct typ_dec type;
 	char term[2];
