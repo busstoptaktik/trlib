@@ -394,10 +394,6 @@ struct coord_lab        *c_lab,
         c_lab->f = *(ell_p+1);
         /* datum shift params (from set_dtm) */
         c_lab->p_dtm = (short) par_dtm;
-
-        /* set trf. constants for completed systems */
-        (void) set_trc(c_lab);
-  
       }
       else
         /* unintelligible ellipsoid */
@@ -526,6 +522,9 @@ struct coord_lab        *c_lab,
         }
       }  /* ste */
     }  /* end input of additional params */
+
+    /* set trf. constants for completed systems */
+    (void) set_trc(c_lab);
      
 
 
