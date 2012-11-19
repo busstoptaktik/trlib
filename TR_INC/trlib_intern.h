@@ -33,7 +33,6 @@ struct TR {
     int use_geoids;
     int   err;
 };
-typedef struct  TR TR;
 
 struct XYZ {
     double x, y, z;
@@ -54,12 +53,12 @@ struct PLATE {
 };
 
 /* 'Internal' functions not meant to be exposed in API */
-int TR_GeoidTable(TR*);
+int TR_GeoidTable(struct TR*);
 int TR_IsMainThread(void);
 int TR_IsThreadSafe(union geo_lab*, union geo_lab*);
 int TR_tr(union geo_lab* ,union geo_lab*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 
 int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
 union geo_lab *TR_OpenProjection(char *mlb);
-void TR_GetGeoidName(TR *tr,char *name);
+void TR_GetGeoidName(struct TR *tr,char *name);
 
 #endif
