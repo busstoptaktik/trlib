@@ -45,7 +45,7 @@
 #define GEO_SYS_CODE 2
 #define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE "def_lab.txt"
-// R2D equals the geo_lab define DOUT = (180.0/M_PI)
+/* R2D equals the geo_lab define DOUT = (180.0/M_PI) */
 #define R2D 57.295779513082323 
 #define D2R 0.017453292519943295
 /*various global state variables */
@@ -66,16 +66,21 @@ int TR_GetLastError(void){
     return TR_LAST_ERROR;
 }
 
-/* not used at the moment- but could be useful */
+/* only used in InitLibrary at the moment- but could be useful */
 int TR_IsMainThread(void){
 	return ((MAIN_THREAD_ID==&THREAD_ID) || (!MAIN_THREAD_ID));
 }
 
-/* A function  which checks whether input is in list of transformations deemed thread unsafe */
+/* A function  which checks whether input is in list of transformations deemed thread unsafe 
+* Really it checks whether one of the input systems is in a list deemed unsafe - however this is an implementation detail.
+*/
 
 int TR_IsThreadSafe(union geo_lab *plab_in, union geo_lab *plab_out){
 	int i;
 	int n=sizeof(UNSAFE)/sizeof(int);
+	/* Seems to be only gd_trans which does unsafe things on geoids - thus if the correpsponding  TR-object is not fully composed we deem it safe */
+	if (plab_in==NULL || plab_out==NULL)
+		return 1;
 	for (i=0;i<n;i++){
 		if (UNSAFE[i]==(plab_in->u_c_lab).imit || UNSAFE[i]==(plab_out->u_c_lab).imit)
 			return 0;
@@ -96,12 +101,12 @@ void TR_ForbidUnsafeTransformations(void){
 /* Need to let KMSTrans parse the def-files, before any transformation */
 int TR_InitLibrary(char *path) {
     int ok=-1,rc;
-    double x=512200.0,y=6143200.0,z=0.0;
+    double x,y,z;
     TR* trf;
     
     if (!TR_IsMainThread()) /*Only one thread can succesfully initialise the library*/
 	    return TR_ERROR;
-    init_lord();  // initialise the lord (logging, report and debugging) module with default values
+    init_lord();  /* initialise the lord (logging, report and debugging) module with default values */
     
     #ifdef _ROUT
     ERR_LOG=fopen("TR_errlog.log","wt");
@@ -127,29 +132,39 @@ int TR_InitLibrary(char *path) {
     trf=TR_Open("utm32_ed50","utm32_wgs84","");
     if (!trf){
 	    lord_error(TR_LABEL_ERROR,"TR_InitLibrary: Failed to open first transformation!\n");
+	    return TR_LABEL_ERROR;
     }
     else{
-	    ok=TR_Transform(trf,&x,&y,&z,1);
+	    ok=TR_TransformPoint(trf,512200.1,6143200.1,0,&x,&y,&z);
 	    TR_Close(trf);
     }
+    
     trf=TR_Open("utm32_wgs84","fotm","");
+    
     if (0!=trf){
-	    rc=TR_Transform(trf,&x,&y,&z,1);
-	    TR_Close(trf);}
+	    rc=TR_TransformPoint(trf,652142,6058737,0, &x, &y,&z);
+	    TR_Close(trf);
+    }
+    
     trf=TR_Open("utm32_wgs84","s34j","");
 	    if (0!=trf){
-	    rc=TR_Transform(trf,&x,&y,&z,1);
-	    TR_Close(trf);}
+	    rc=TR_TransformPoint(trf,512200.1,6143200.1,0,&x,&y,&z);
+	    TR_Close(trf);
+    }
+    
     trf=TR_Open("FO_fotm","GR_utm22_gr96","");
     if (0!=trf){
-	    rc=TR_Transform(trf,&x,&y,&z,1);
-	    TR_Close(trf);}
+	    rc=TR_TransformPoint(trf,200000.0,876910.0,0,&x,&y,&z);
+	    TR_Close(trf);
+    }
+    
     trf=TR_Open("utm32_wgs84","fcsH_h_fcsvr10","");
     if (0!=trf){
-	    rc=TR_Transform(trf,&x,&y,&z,1);
-	    TR_Close(trf);}
+	    rc=TR_TransformPoint(trf,652142.0,6058737.0,0, &x, &y,&z);
+	    TR_Close(trf);
+    }
 
-    if (0!=ERR_LOG)
+    if (ERR_LOG)
 	    fprintf(ERR_LOG,"Is init: %d\n************ end initialisation **************\n",(ok==TR_OK));
     /* Set the main thread id */
     if (ok==TR_OK)
@@ -214,9 +229,11 @@ void TR_GeoidInfo(TR *tr) {
     strcat(req,geoid_name);
     res=tab_doc_f(req,stdout);
     #ifdef _ROUT
-    printf("Request: %s, res: %d\n",req,res);
+    lord_debug(0,"Request: %s, res: %d\n",req,res);
     #endif
     }
+
+/*Function which copies the last used geoid name to input buffer.*/    
 
 void TR_GetGeoidName(TR *tr,char *name) {
 	struct gde_lab *g_lab;
@@ -226,6 +243,7 @@ void TR_GetGeoidName(TR *tr,char *name) {
 }
 	
 
+/*Return the version info */
 
 void TR_GetVersion(char *buffer,int BufSize) {
     char version[256];
@@ -291,7 +309,8 @@ union geo_lab *TR_OpenProjection(char *mlb){
 	if (plab)
 		label_check = conv_lab(mlb,plab,"");
 	else
-	if ((0==plab) || (label_check==0) || (label_check==-1)) {
+		return 0;
+	if ((label_check==0) || (label_check==-1)) {
 		free(plab);
 		TR_LAST_ERROR=TR_LABEL_ERROR;
 		return 0;
@@ -302,15 +321,44 @@ union geo_lab *TR_OpenProjection(char *mlb){
 
 /* Compose input and output systems of two TR-objects into a 'new' TR-object.
 The old objects are now 'invalidated' and it is the returned object which should be closed!
-Well, really it is the first of the old ones that is modified and the user gets back -
-however this is an implementation detail.
 */
 
 TR *TR_Compose (TR *tr1, TR *tr2){
-	tr1->plab_out=tr2->plab_out;
-	tr2->plab_out=NULL;
+	TR *tr_out;
+	union geo_lab *plab_out;
+	/*Test if tr1==tr2! */
+	if (tr1==tr2)
+		return tr1;
+	/*Discuss: should we really close input in case of error, when we return NULL, or should that be up to the user?*/
+	tr_out=malloc(sizeof(TR));
+	if (tr_out==NULL){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space!\n"));
+		TR_Close(tr1);
+		TR_Close(tr2);
+		return NULL;
+	}
+	/*if output label in tr2 is NULL we take the input label*/
+	if (tr2->plab_out!=NULL){
+		plab_out=tr2->plab_out;
+		tr2->plab_out=NULL;
+	}
+	else{
+		plab_out=tr2->plab_in;
+		tr2->plab_in=NULL;
+	}
+	if (!TR_IsThreadSafe(tr1->plab_in,plab_out) && !ALLOW_UNSAFE){
+		lord_error(TR_LABEL_ERROR,"%s->%s not allowed in multithreaded mode.\n",(tr1->plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb);
+		TR_Close(tr1);
+		TR_Close(tr2);
+		free(tr_out);
+		return NULL;
+	}
+	*tr_out=*tr1;
+	tr1->plab_in=NULL;
+	tr_out->plab_out=plab_out;
+	TR_Close(tr1);
 	TR_Close(tr2);
-	return tr1;
+	return tr_out;
 }
 
 
@@ -327,14 +375,14 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     TR *tr=NULL;
     union geo_lab *plab_in=NULL, *plab_out=NULL;
     /* initialize the plab_in object member */
-    if (label_in){
+    if (label_in && strlen(label_in)>0){
 	    plab_in= TR_OpenProjection(label_in);
 	    if (!plab_in){
 		return 0;
 	    }
     }
     /* initialize the plab_out object member */
-    if (label_out){
+    if (label_out && strlen(label_out)>0){
 	    plab_out=TR_OpenProjection(label_out);
 	    if (!plab_out){
 		goto TR_OPEN_CLEANUP;
@@ -690,24 +738,23 @@ int TR_GetEsriText(char *mlb, char *wkt_out){
 }
     
 /* out must be an array of length 2*/
-int TR_GetLocalGeometry(char *mlb, double x, double y, double *s, double *mc){
+int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc){
 	double xo,yo,out[2],dgo[4];
 	int direct=1,ret;
-	union geo_lab  *TC=TR_OpenProjection(mlb);
-	if (!TC)
+	/*Use the input lab of the TR-object*/
+	union geo_lab *plab=trf->plab_in;
+	if (plab==NULL)
 		return TR_LABEL_ERROR;
-	if (((TC->u_c_lab).cstm)==CRT_SYS_CODE){
-		free(TC);
+	if (((plab->u_c_lab).cstm)==CRT_SYS_CODE){
 		return TR_ERROR;
-		}
-	direct=(((TC->u_c_lab).cstm)!=GEO_SYS_CODE)?1:-1;
+	}
+	direct=(((plab->u_c_lab).cstm)!=GEO_SYS_CODE)?1:-1;
 	#ifdef _ROUT
-	lord_debug(0,LORD("TR_GetLocalGeometry: init: %d, %.2f %.2f\n"),(TC->u_c_lab).init,x,y);
+	lord_debug(0,LORD("TR_GetLocalGeometry: init: %d, %.2f %.2f\n"),(plab->u_c_lab).init,x,y);
 	#endif
-	ret=ptg_d(TC,direct,y,x,&yo,&xo,"",ERR_LOG,out,dgo);
+	ret=ptg_d(plab,direct,y,x,&yo,&xo,"",ERR_LOG,out,dgo);
 	*s=out[0];
 	*mc=out[1];
-	free(TC);
 	return (ret==0)?TR_OK:TR_ERROR;
 }
         

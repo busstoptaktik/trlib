@@ -105,7 +105,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetEsriText.restype=ctypes.c_int
 		tr_lib.TR_GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.TR_GetLocalGeometry.restype=ctypes.c_int
-		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_char_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double] #todo get type of last arg
+		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_void_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double] #todo get type of last arg
 		tr_lib.TR_GeoidInfo.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_GeoidInfo.restype=None
 		tr_lib.TR_GetGeoidName.argtypes=[ctypes.c_void_p,ctypes.c_char_p]
@@ -149,7 +149,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.proj4_to_mlb.argtypes=[ctypes.c_char_p]*2
 		tr_lib.proj4_to_mlb.restype=ctypes.c_int
 		tr_lib.set_lord_file.argtypes=[ctypes.c_char_p]
-		tr_lib.set_lord_file.restypes=None
+		tr_lib.set_lord_file.restype=None
 
 	except Exception, msg:
 		print repr(msg)
@@ -260,17 +260,7 @@ def FromProj4(proj4def):
 ###########################
 ## Geometry analysis methods
 ###########################
-def GetLocalGeometry(label,x,y):
-	#out param determines wheteher prj_in or prj_out is used#
-	if IS_INIT:
-		if (IsGeographic(label)):
-			return 1,0
-		mc=ctypes.c_double(0)
-		s=ctypes.c_double(0)
-		ok=tr_lib.TR_GetLocalGeometry(label,x,y,ctypes.byref(s),ctypes.byref(mc))
-		if ok==TR_OK:
-			return s.value,(mc.value)*R2D
-	return 0,0
+
 
 def BesselHelmert(axis,flat,lon1,lat1,lon2,lat2):
 	if IS_INIT:
@@ -433,6 +423,31 @@ def Convert2Geo(mlb):
 		dtm=GetDatum(mlb)
 	return "geo_"+dtm
 
+
+################################
+## Projection Class
+################################
+class CoordinateSystem(object):
+	def __init__(self,mlb):
+		if not IS_INIT:
+			raise Exception("Initialise Library first!")
+		self.mlb=mlb
+		self.tr=tr_lib.TR_Open(mlb,"","")
+		if self.tr is None:
+			raise LabelException()
+		self.is_geo=IsGeographic(mlb)
+	def GetLocalGeometry(self,x,y):
+		#out param determines wheteher prj_in or prj_out is used#
+		if self.is_geo:
+			return 1,0
+		mc=ctypes.c_double(0)
+		s=ctypes.c_double(0)
+		ok=tr_lib.TR_GetLocalGeometry(self.tr,x,y,ctypes.byref(s),ctypes.byref(mc))
+		if ok==TR_OK:
+			return s.value,(mc.value)*R2D
+		return 0,0
+	def Close(self):
+		tr_lib.TR_Close(self.tr)
 
 ################################
 ## Main Transformation Class
