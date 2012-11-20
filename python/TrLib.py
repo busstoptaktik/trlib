@@ -436,8 +436,13 @@ class CoordinateSystem(object):
 		if self.tr is None:
 			raise LabelException()
 		self.is_geo=IsGeographic(mlb)
+	#Destructor - if we have forgotten to close#
+	def __del__(self):
+		self.Close()	
 	def GetLocalGeometry(self,x,y):
 		#out param determines wheteher prj_in or prj_out is used#
+		if self.tr is None:
+			raise Exception("This system has been invalidated!")
 		if self.is_geo:
 			return 1,0
 		mc=ctypes.c_double(0)
@@ -447,7 +452,10 @@ class CoordinateSystem(object):
 			return s.value,(mc.value)*R2D
 		return 0,0
 	def Close(self):
-		tr_lib.TR_Close(self.tr)
+		if self.tr is not None:
+			tr_lib.TR_Close(self.tr)
+		self.tr=None
+		
 
 ################################
 ## Main Transformation Class
@@ -455,26 +463,42 @@ class CoordinateSystem(object):
 
 
 class CoordinateTransformation(object):
-	def __init__(self,mlb_in,mlb_out,geoid_name=""):
-		self.mlb_in=mlb_in
-		self.mlb_out=mlb_out
-		self.geoid_name=geoid_name
-		self.tr=None
-		self.rc=None #return code object
-		self.forward_method=None
-		self.inverse_method=None
-		self.is_geo_in=False
-		self.is_geo_out=False
-		if IS_INIT:
-			self.tr=tr_lib.TR_Open(mlb_in,mlb_out,geoid_name)
-			if self.tr is None:
-				raise LabelException()
-			self.is_geo_in=IsGeographic(self.mlb_in) #convert2radians?
-			self.is_geo_out=IsGeographic(self.mlb_out) #convert2radians?
-			self.forward_method=tr_lib.TR_Transform
-			self.inverse_method=tr_lib.TR_InverseTransform
-		else:
+	"""Main transformation object. 
+	The constructer accepts string input as well as input of type CoordinateSystem.
+	A CoordinateSystem used as input will be invalidated by the constructer. 
+	Pointers to structures in the underlying c-library are now owned by the CoordinateTransformation class.
+	"""
+	def __init__(self,system_in,system_out,geoid_name=""):
+		if not IS_INIT:
 			raise Exception("Initialise Library first!")
+		
+		_systems=[]
+		for system in [system_in,system_out]:
+			if isinstance(system,CoordinateSystem):
+				_systems.append(system)
+				
+			elif isinstance(system,str):
+				_systems.append(CoordinateSystem(system))
+				
+			else: 
+				raise ValueError("Wrong type of input system.")
+		self.tr=tr_lib.TR_Compose(_systems[0].tr,_systems[1].tr)
+		#Invalidate the input systems#
+		_systems[0].tr=None
+		_systems[1].tr=None
+		if self.tr is None:
+			raise LabelException("Failed to compose transformation.")
+		self.mlb_in=_systems[0].mlb
+		self.mlb_out=_systems[1].mlb
+		self.geoid_name=geoid_name
+		self.rc=None #return code object
+		self.forward_method=tr_lib.TR_Transform
+		self.inverse_method=tr_lib.TR_InverseTransform
+		self.is_geo_in=IsGeographic(self.mlb_in) #convert2radians?
+		self.is_geo_out=IsGeographic(self.mlb_out) #convert2radians?
+	#Destructor - if we have forgotten to close#
+	def __del__(self):
+		self.Close()	
 	def Transform(self,*args,**kwargs):
 		#thus inverse 'switch' must be given as a keyword!#
 		if "inverse" in kwargs and kwargs["inverse"]:
@@ -507,7 +531,7 @@ class CoordinateTransformation(object):
 		return self.Transform(*args,inverse=True)
 	def TransformPoint(self,x,y,z=0.0,inverse=False):
 		if self.tr is None:
-			raise LabelException()
+			raise Exception("This transformation has been invalidated")
 		if not inverse:
 			tr_method=self.forward_method
 		else:
@@ -532,7 +556,7 @@ class CoordinateTransformation(object):
 		if not HAS_NUMPY:
 			raise Exception("This method needs numpy.")
 		if self.tr is None:
-			raise LabelException()
+			raise Exception("This transformation has been invalidated")
 		if not inverse:
 			tr_method=self.forward_method
 		else:
@@ -591,6 +615,7 @@ class CoordinateTransformation(object):
 		if self.tr is not None:
 			tr_lib.TR_Close(self.tr)
 			self.tr=None
+	
 		
 	
 		
