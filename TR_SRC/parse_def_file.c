@@ -145,7 +145,7 @@ int set_datum(char **tokens,  def_datum *dtm, int n_items, char *descr){
 	strncpy(dtm->p_datum,tokens[2],MLBLNG);
 	strncpy(dtm->ellipsoid,tokens[3],MLBLNG);
 	dtm->imit= atoi(tokens[4]);
-	strncpy(dtm->rgn,tokens[5],2);
+	strncpy(dtm->rgn,tokens[5],3);
 	dtm->type=atoi(tokens[6]);
 	dtm->scale=get_number(tokens[10]);
 	for (i=0;i<3;i++){
