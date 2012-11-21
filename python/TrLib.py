@@ -112,6 +112,8 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetGeoidName.restype=None
 		tr_lib.TR_Open.restype=ctypes.c_void_p
 		tr_lib.TR_Open.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_Compose.restype=ctypes.c_void_p
+		tr_lib.TR_Compose.argtypes=[ctypes.c_void_p,ctypes.c_void_p]
 		tr_lib.TR_Close.restype=None
 		tr_lib.TR_Close.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_Transform.restype=ctypes.c_int
@@ -471,7 +473,7 @@ class CoordinateTransformation(object):
 	def __init__(self,system_in,system_out,geoid_name=""):
 		if not IS_INIT:
 			raise Exception("Initialise Library first!")
-		
+		self.tr=None
 		_systems=[]
 		for system in [system_in,system_out]:
 			if isinstance(system,CoordinateSystem):
@@ -483,9 +485,6 @@ class CoordinateTransformation(object):
 			else: 
 				raise ValueError("Wrong type of input system.")
 		self.tr=tr_lib.TR_Compose(_systems[0].tr,_systems[1].tr)
-		#Invalidate the input systems#
-		_systems[0].tr=None
-		_systems[1].tr=None
 		if self.tr is None:
 			raise LabelException("Failed to compose transformation.")
 		self.mlb_in=_systems[0].mlb
