@@ -298,7 +298,29 @@ int TR_GeoidTable(TR *tr){
 	tr->close_table=0;
 	return TR_OK;
 }
-		
+
+int TR_SpecialGeoidTable(TR *tr, char *geoid_name){
+	int has_geoids;
+	struct mgde_str *special_geoid_table;
+	special_geoid_table=malloc(sizeof(struct mgde_str));
+	special_geoid_table->init=0;
+	has_geoids= geoid_i(geoid_name, GDE_LAB, special_geoid_table,NULL);
+	#ifdef _ROUT
+	lord_debug(0,LORD("has geoids: %d, name: %s\n"),has_geoids,geoid_name);
+	#endif
+	if (has_geoids<0){  /*on error return null */
+		geoid_c(special_geoid_table,0,NULL);
+		free(special_geoid_table);
+		lord_error(TR_ALLOCATION_ERROR,LORD("SpecialGeoidTable: Failed to allocate space."));
+		return TR_ALLOCATION_ERROR;
+	}
+	tr->geoid_pt=special_geoid_table;
+	tr->close_table=1;
+	tr->ngeoids=has_geoids;
+	tr->use_geoids=(has_geoids>0)?0:-1;
+	strncpy(tr->geoid_name,geoid_name,FILENAME_MAX);
+	return TR_OK;
+}
 
 /*Function which returns a geo_lab pointer from a minilabel - allocates room which should be freed afterwards*/
        
@@ -319,46 +341,87 @@ union geo_lab *TR_OpenProjection(char *mlb){
 }
 
 
+TR *TR_Clone( TR *tr){
+	TR *tr_out=NULL;
+	union geo_lab *plab_in=NULL,*plab_out=NULL;
+	tr_out=malloc(sizeof(TR));
+	if (!tr_out)
+		goto TR_CLONE_CLEANUP;
+	/*copy contents*/
+	memcpy(tr_out,tr,sizeof(TR));
+	if (tr->plab_in){
+		plab_in=malloc(sizeof(union geo_lab));
+		if (!plab_in)
+			goto TR_CLONE_CLEANUP;
+		memcpy(plab_in,tr->plab_in,sizeof(union geo_lab));
+		tr_out->plab_in=plab_in;
+	}
+	if (tr->plab_out){
+		plab_out=malloc(sizeof(union geo_lab));
+		if (!plab_out)
+			goto TR_CLONE_CLEANUP;
+		memcpy(plab_out,tr->plab_out,sizeof(union geo_lab));
+		tr_out->plab_out=plab_out;
+	}
+	/*Check if we have allocated a special geod table - if so open a new copy*/
+	if (tr->close_table){
+		int err=TR_SpecialGeoidTable(tr_out,tr->geoid_name);
+		if (err!=TR_OK)
+			goto TR_CLONE_CLEANUP;
+	}
+	
+	return tr_out;
+	
+	/*clean up on error*/
+	TR_CLONE_CLEANUP:
+		if (plab_in)
+			free(plab_in);
+		if (plab_out)
+			free(plab_out);
+		if (tr_out)
+			free(tr_out);
+		return NULL;
+}
+	
+
 /* Compose input and output systems of two TR-objects into a 'new' TR-object.
 The old objects are now 'invalidated' and it is the returned object which should be closed!
 */
 
 TR *TR_Compose (TR *tr1, TR *tr2){
-	TR *tr_out;
-	union geo_lab *plab_out;
+	TR *tr_out=NULL;
+	union geo_lab *plab_out=NULL;
 	/*Test if tr1==tr2! */
+	tr_out=TR_Clone(tr1);
+	if (!tr_out)
+		return NULL;
 	if (tr1==tr2)
-		return tr1;
-	/*Discuss: should we really close input in case of error, when we return NULL, or should that be up to the user?*/
-	tr_out=malloc(sizeof(TR));
-	if (tr_out==NULL){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space!\n"));
-		TR_Close(tr1);
-		TR_Close(tr2);
-		return NULL;
+		return tr_out;
+	tr_out->plab_out=NULL;
+	if (tr2->plab_in || tr2->plab_out){
+		plab_out=malloc(sizeof(union geo_lab));
+		if (!plab_out){
+			TR_Close(tr_out);
+			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space!\n"));
+			return NULL;
+		}
+	
+		/*if output label in tr2 is NULL we take the input label*/
+		if (tr2->plab_out!=NULL){
+			memcpy(plab_out,tr2->plab_out,sizeof(union geo_lab));
+		}
+		else if (tr2->plab_in!=NULL){
+			memcpy(plab_out,tr2->plab_in,sizeof(union geo_lab));
+		}
+		tr_out->plab_out=plab_out;
 	}
-	/*if output label in tr2 is NULL we take the input label*/
-	if (tr2->plab_out!=NULL){
-		plab_out=tr2->plab_out;
-		tr2->plab_out=NULL;
-	}
-	else{
-		plab_out=tr2->plab_in;
-		tr2->plab_in=NULL;
-	}
-	if (!TR_IsThreadSafe(tr1->plab_in,plab_out) && !ALLOW_UNSAFE){
+	 if (!TR_IsThreadSafe(tr_out->plab_in,tr_out->plab_out) && !ALLOW_UNSAFE){
 		lord_error(TR_LABEL_ERROR,"%s->%s not allowed in multithreaded mode.\n",(tr1->plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb);
-		TR_Close(tr1);
-		TR_Close(tr2);
-		free(tr_out);
+		TR_Close(tr_out);
 		return NULL;
 	}
-	*tr_out=*tr1;
-	tr1->plab_in=NULL;
-	tr_out->plab_out=plab_out;
-	TR_Close(tr1);
-	TR_Close(tr2);
 	return tr_out;
+	
 }
 
 
@@ -370,8 +433,6 @@ TR *TR_Compose (TR *tr1, TR *tr2){
 
 TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     int err;
-    struct mgde_str *special_geoid_table=NULL;
-    int has_geoids=0;
     TR *tr=NULL;
     union geo_lab *plab_in=NULL, *plab_out=NULL;
     /* initialize the plab_in object member */
@@ -406,29 +467,16 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     
     /*Set geoid info */
     if (0!=geoid_name && strlen(geoid_name)>0){
-	   special_geoid_table=malloc(sizeof(struct mgde_str));
-	   special_geoid_table->init=0;
-	   has_geoids= geoid_i(geoid_name, GDE_LAB, special_geoid_table,NULL);
-	   #ifdef _ROUT
-	   lord_debug(0,LORD("has geoids: %d, name: %s\n"),has_geoids,geoid_name);
-	   #endif
-	   if (has_geoids<0){  /*on error return null */
-		   geoid_c(special_geoid_table,0,NULL);
-		   free(special_geoid_table);
-		   TR_LAST_ERROR=TR_ALLOCATION_ERROR;
-		   goto TR_OPEN_CLEANUP;
-	   }
-	   tr->geoid_pt=special_geoid_table;
-	   tr->close_table=1;
-	   tr->ngeoids=has_geoids;
-	   tr->use_geoids=(has_geoids>0)?0:-1;
-	   strncpy(tr->geoid_name,geoid_name,FILENAME_MAX);
-	    }
+	err=TR_SpecialGeoidTable(tr,geoid_name);
+	if (err!=TR_OK)
+		goto TR_OPEN_CLEANUP;
+    }
     else {  /*insert standard geoids */
-	   err =TR_GeoidTable(tr);
-	   tr->use_geoids=(HAS_GEOIDS)?0:-1;
-	   /* TODO: check error! */
-	    }
+	err =TR_GeoidTable(tr);
+	if (err!=TR_OK)
+		goto TR_OPEN_CLEANUP;
+	tr->use_geoids=(HAS_GEOIDS)?0:-1;
+    }
     
     /* transfer everything into the TR object */
     tr->plab_in   = plab_in;
@@ -459,7 +507,7 @@ void TR_Close (TR *tr) {
     /*if using special geoid, close it down */
     if (tr->close_table){
 	    #ifdef _ROUT
-	    lord_debug(0,"Closing special geoid!\n");
+	    lord_debug(0,LORD("Closing special geoid!\n"));
 	    #endif
 	    geoid_c(tr->geoid_pt,0,NULL);
 	    free(tr->geoid_pt);}
