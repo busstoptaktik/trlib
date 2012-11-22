@@ -27,6 +27,7 @@
 #include "geoid_d.h"
 #include "geoid_c.h"
 #include "geoid_i.h"
+#include "setDtrc.h"
 #include "ptg_d.h"
 #include "sputshpprj.h"
 #include "c_tabdir_file.h"
@@ -75,12 +76,15 @@ int TR_IsMainThread(void){
 * Really it checks whether one of the input systems is in a list deemed unsafe - however this is an implementation detail.
 */
 
-int TR_IsThreadSafe(union geo_lab *plab_in, union geo_lab *plab_out){
+int TR_IsThreadSafe(PR *proj_in, PR *proj_out){
 	int i;
 	int n=sizeof(UNSAFE)/sizeof(int);
+	union geo_lab *plab_in=NULL, *plab_out=NULL;
 	/* Seems to be only gd_trans which does unsafe things on geoids - thus if the correpsponding  TR-object is not fully composed we deem it safe */
-	if (plab_in==NULL || plab_out==NULL)
+	if (proj_in==NULL || proj_out==NULL)
 		return 1;
+	plab_in=proj_in->plab;
+	plab_out=proj_out->plab;
 	for (i=0;i<n;i++){
 		if (UNSAFE[i]==(plab_in->u_c_lab).imit || UNSAFE[i]==(plab_out->u_c_lab).imit)
 			return 0;
@@ -292,7 +296,7 @@ int TR_GeoidTable(TR *tr){
 		init=1;
 		}
 	/*insert stuff into the TR object */
-	tr->ngeoids=ngeoids;
+	tr->use_geoids=(HAS_GEOIDS)?0:-1;
 	strcpy(tr->geoid_name,"STD");
 	tr->geoid_pt=GeoidTable;
 	tr->close_table=0;
@@ -316,110 +320,108 @@ int TR_SpecialGeoidTable(TR *tr, char *geoid_name){
 	}
 	tr->geoid_pt=special_geoid_table;
 	tr->close_table=1;
-	tr->ngeoids=has_geoids;
 	tr->use_geoids=(has_geoids>0)?0:-1;
 	strncpy(tr->geoid_name,geoid_name,FILENAME_MAX);
 	return TR_OK;
 }
 
-/*Function which returns a geo_lab pointer from a minilabel - allocates room which should be freed afterwards*/
+/*Function which returns a PR pointer from a minilabel - allocates room which should be freed afterwards*/
        
-union geo_lab *TR_OpenProjection(char *mlb){
+PR *TR_OpenProjection(char *mlb){
 	int label_check;
-	union geo_lab *plab;
+	union geo_lab *plab=NULL;
+	PR *proj=NULL;
 	plab= malloc(sizeof(union geo_lab));
-	if (plab)
-		label_check = conv_lab(mlb,plab,"");
-	else
+	if (!plab){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space\n"));
 		return 0;
+	}
+	label_check = conv_lab(mlb,plab,"");
 	if ((label_check==0) || (label_check==-1)) {
 		free(plab);
-		TR_LAST_ERROR=TR_LABEL_ERROR;
+		lord_error(TR_LABEL_ERROR,"Failed to open projection %s\n",mlb);
 		return 0;
-		}
-	return plab;
+	}
+	proj= malloc(sizeof(PR));
+	if (!proj){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space\n"));
+		free(plab);
+		return 0;
+	}
+	/*This only does something for TM-projections - the space could be used for something else for other types*/
+	if ((plab->u_c_lab).cstm==3)
+		setDtrc(&(plab->u_c_lab),proj->dgo);
+	proj->plab=plab;
+	proj->n_references=1;
+	return proj;
+}
+
+/*Destructor of a PR-object. Decreases reference count and closes if zero.*/
+
+void TR_CloseProjection(PR *proj){
+	if (!proj)
+		return;
+	proj->n_references--;
+	if (proj->n_references==0){
+		free(proj->plab);
+		free(proj);
+	}
 }
 
 
-TR *TR_Clone( TR *tr){
-	TR *tr_out=NULL;
-	union geo_lab *plab_in=NULL,*plab_out=NULL;
-	tr_out=malloc(sizeof(TR));
-	if (!tr_out)
-		goto TR_CLONE_CLEANUP;
-	/*copy contents*/
-	memcpy(tr_out,tr,sizeof(TR));
-	if (tr->plab_in){
-		plab_in=malloc(sizeof(union geo_lab));
-		if (!plab_in)
-			goto TR_CLONE_CLEANUP;
-		memcpy(plab_in,tr->plab_in,sizeof(union geo_lab));
-		tr_out->plab_in=plab_in;
-	}
-	if (tr->plab_out){
-		plab_out=malloc(sizeof(union geo_lab));
-		if (!plab_out)
-			goto TR_CLONE_CLEANUP;
-		memcpy(plab_out,tr->plab_out,sizeof(union geo_lab));
-		tr_out->plab_out=plab_out;
-	}
-	/*Check if we have allocated a special geod table - if so open a new copy*/
-	if (tr->close_table){
-		int err=TR_SpecialGeoidTable(tr_out,tr->geoid_name);
-		if (err!=TR_OK)
-			goto TR_CLONE_CLEANUP;
-	}
 	
-	return tr_out;
-	
-	/*clean up on error*/
-	TR_CLONE_CLEANUP:
-		if (plab_in)
-			free(plab_in);
-		if (plab_out)
-			free(plab_out);
-		if (tr_out)
-			free(tr_out);
-		return NULL;
-}
-	
-
-/* Compose input and output systems of two TR-objects into a 'new' TR-object.
-The old objects are now 'invalidated' and it is the returned object which should be closed!
+/* 
+*Compose input and output systems of two TR-objects into a 'new' TR-object.
 */
 
 TR *TR_Compose (TR *tr1, TR *tr2){
 	TR *tr_out=NULL;
-	union geo_lab *plab_out=NULL;
-	/*Test if tr1==tr2! */
-	tr_out=TR_Clone(tr1);
-	if (!tr_out)
+	PR *proj_in=NULL,*proj_out=NULL;
+	int err;
+	if (tr1->proj_in){
+		proj_in=tr1->proj_in;
+	}
+	else if (tr1->proj_out){
+		proj_in=tr1->proj_out;
+	}
+	if (tr2->proj_out){
+		proj_out=tr2->proj_out;
+	}
+	else if (tr2->proj_in){
+		proj_out=tr2->proj_in;
+	}
+	 if (!TR_IsThreadSafe(proj_in,proj_out) && !ALLOW_UNSAFE){
+		lord_error(TR_LABEL_ERROR,"%s->%s not allowed in multithreaded mode.\n",(proj_in->plab->u_c_lab).mlb,(proj_out->plab->u_c_lab).mlb);
 		return NULL;
-	if (tr1==tr2)
-		return tr_out;
-	tr_out->plab_out=NULL;
-	if (tr2->plab_in || tr2->plab_out){
-		plab_out=malloc(sizeof(union geo_lab));
-		if (!plab_out){
-			TR_Close(tr_out);
-			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space!\n"));
-			return NULL;
-		}
+	}
+	if (!proj_in)
+		lord_debug(1,LORD("TR_Compose: PROJ in is NULL\n"));
+	if (!proj_out)
+		lord_debug(1,LORD("TR_Compose: PROJ out is NULL\n"));
+	tr_out=malloc(sizeof(TR));
+	if (!tr_out){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space.\n"));
+		return NULL;
+	}
+	/*Insert geoid table */
+	if (tr1->close_table)
+		err=TR_SpecialGeoidTable(tr_out,tr1->geoid_name);
+	else
+		err=TR_GeoidTable(tr_out);
+	if (err!=TR_OK){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to insert geoid table.\n"));
+		free(tr_out);
+		return NULL;
+	}
+	/*if all went well - transfer objects and increase reference counts*/
 	
-		/*if output label in tr2 is NULL we take the input label*/
-		if (tr2->plab_out!=NULL){
-			memcpy(plab_out,tr2->plab_out,sizeof(union geo_lab));
-		}
-		else if (tr2->plab_in!=NULL){
-			memcpy(plab_out,tr2->plab_in,sizeof(union geo_lab));
-		}
-		tr_out->plab_out=plab_out;
-	}
-	 if (!TR_IsThreadSafe(tr_out->plab_in,tr_out->plab_out) && !ALLOW_UNSAFE){
-		lord_error(TR_LABEL_ERROR,"%s->%s not allowed in multithreaded mode.\n",(tr1->plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb);
-		TR_Close(tr_out);
-		return NULL;
-	}
+	tr_out->proj_in=proj_in;
+	if (proj_in)
+		proj_in->n_references++;
+	tr_out->proj_out=proj_out;
+	if (proj_out)
+		proj_out->n_references++;
+	
 	return tr_out;
 	
 }
@@ -434,26 +436,24 @@ TR *TR_Compose (TR *tr1, TR *tr2){
 TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     int err;
     TR *tr=NULL;
-    union geo_lab *plab_in=NULL, *plab_out=NULL;
+    PR *proj_in=NULL, *proj_out=NULL;
     /* initialize the plab_in object member */
     if (label_in && strlen(label_in)>0){
-	    plab_in= TR_OpenProjection(label_in);
-	    if (!plab_in){
+	    proj_in= TR_OpenProjection(label_in);
+	    if (!proj_in){
 		return 0;
 	    }
     }
     /* initialize the plab_out object member */
     if (label_out && strlen(label_out)>0){
-	    plab_out=TR_OpenProjection(label_out);
-	    if (!plab_out){
+	    proj_out=TR_OpenProjection(label_out);
+	    if (!proj_out){
 		goto TR_OPEN_CLEANUP;
 	    }
     }
     /* test for allowed transformation */
-    if (!TR_IsThreadSafe(plab_in,plab_out) && !ALLOW_UNSAFE){
-	#ifdef _ROUT
-	lord_error(TR_LABEL_ERROR,"%s-> %s not allowed in multithreaded mode!\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb);
-	#endif
+    if (!TR_IsThreadSafe(proj_in,proj_out) && !ALLOW_UNSAFE){
+	lord_error(TR_LABEL_ERROR,"%s-> %s not allowed in multithreaded mode!\n",(proj_in->plab->u_c_lab).mlb,(proj_out->plab->u_c_lab).mlb);
 	TR_LAST_ERROR=TR_LABEL_ERROR;
 	goto TR_OPEN_CLEANUP;
     }
@@ -461,34 +461,39 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     /* make room for the TR object proper */
     tr = malloc(sizeof(TR));
     if (0==tr){
-	TR_LAST_ERROR=TR_ALLOCATION_ERROR;
+	lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space\n"));
 	goto TR_OPEN_CLEANUP;
     }
     
     /*Set geoid info */
     if (0!=geoid_name && strlen(geoid_name)>0){
 	err=TR_SpecialGeoidTable(tr,geoid_name);
-	if (err!=TR_OK)
+	
+	if (err!=TR_OK){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed open geoid table\n"));
 		goto TR_OPEN_CLEANUP;
+	}
     }
     else {  /*insert standard geoids */
 	err =TR_GeoidTable(tr);
-	if (err!=TR_OK)
+	if (err!=TR_OK){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed open geoid table\n"));
 		goto TR_OPEN_CLEANUP;
-	tr->use_geoids=(HAS_GEOIDS)?0:-1;
+	}
+	
     }
     
     /* transfer everything into the TR object */
-    tr->plab_in   = plab_in;
-    tr->plab_out  = plab_out;
+    tr->proj_in   = proj_in;
+    tr->proj_out  = proj_out;
     return tr;
 	    
     /*escape on error, common clean up code.*/
     TR_OPEN_CLEANUP:
-	    if (plab_in)
-		    free(plab_in);
-	    if (plab_out)
-		    free(plab_out);
+	    if (proj_in)
+		    TR_CloseProjection(proj_in);
+	    if (proj_out)
+		    TR_CloseProjection(proj_out);
 	    if (tr)
 		    free(tr);
 	    return 0;
@@ -500,10 +505,9 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
 void TR_Close (TR *tr) {
     if (0==tr)
         return;
-    if (tr->plab_in)    
-	free (tr->plab_in);
-    if (tr->plab_out)
-	free (tr->plab_out);
+    /*decrease reference count*/
+    TR_CloseProjection(tr->proj_in);
+    TR_CloseProjection(tr->proj_out);
     /*if using special geoid, close it down */
     if (tr->close_table){
 	    #ifdef _ROUT
@@ -521,7 +525,7 @@ int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
 	int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_in,tr->plab_out, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_in,tr->proj_out, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
  
@@ -529,7 +533,7 @@ int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
 	 int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_out,tr->plab_in, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_out,tr->proj_in, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
 
@@ -537,7 +541,7 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 int err;
 	 if ((0==tr)||(0==X_in)||(0==Y_in)||(0==X_out)||(0==Y_out))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_in,tr->plab_out, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_in,tr->proj_out, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
  
@@ -545,7 +549,7 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 int err;
 	 if ((0==tr)||(0==X_in)||(0==Y_in)||(0==X_out)||(0==Y_out))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_out,tr->plab_in, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_out,tr->proj_in, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
 
@@ -563,8 +567,8 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
  
 /* transform one or more xyz-tables */
 int TR_tr(
-   union geo_lab *plab_in,
-   union geo_lab *plab_out, 
+   PR *proj_in,
+   PR *proj_out, 
    double *X_in, 
    double *Y_in, 
    double *Z_in,
@@ -577,14 +581,17 @@ int TR_tr(
    ) 
  {
 	 
-   
+    union geo_lab *plab_in,*plab_out;
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i; /*use_geoids; */
 	 
     /*escape if the underlying TR-object is not fully composed....*/
-    if (!plab_in || !plab_out)
+    if (!proj_in || !proj_out){
+	    lord_error(TR_LABEL_ERROR,"TR_tr: TR-object not fully composed.\n");
 	    return TR_LABEL_ERROR;
-   
+    }
+    plab_in=proj_in->plab;
+    plab_out=proj_out->plab;
     if ((plab_in->u_c_lab).cstm==CRT_SYS_CODE){
         x_in=Y_in;
         y_in=X_in;}
@@ -681,8 +688,8 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
     char buf[BUFSIZE];
     if ((0==trf) || (0==f_in) || (0==f_out))
         return TR_ERROR;
-    is_geo_in=(((trf->plab_in->u_c_lab).cstm)==GEO_SYS_CODE);
-    is_geo_out=(((trf->plab_out->u_c_lab).cstm)==GEO_SYS_CODE);
+    is_geo_in=(((trf->proj_in->plab->u_c_lab).cstm)==GEO_SYS_CODE);
+    is_geo_out=(((trf->proj_in->plab->u_c_lab).cstm)==GEO_SYS_CODE);
     while (0 != fgets(buf, BUFSIZE, f_in)) {
         int    argc, err;
         double x,y,z;
@@ -777,20 +784,21 @@ DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
 /* Translates mlb to ESRI wkt*/
 int TR_GetEsriText(char *mlb, char *wkt_out){
     int err;
-    union geo_lab  *TC=TR_OpenProjection(mlb);
+    PR *TC=TR_OpenProjection(mlb);
     if (!TC)
 	return TR_LABEL_ERROR;
-    err=sputshpprj(wkt_out,TC); /* See fputshpprj.h for details on return value */
+    err=sputshpprj(wkt_out,TC->plab); /* See fputshpprj.h for details on return value */
     free(TC);
     return err;
 }
     
 /* out must be an array of length 2*/
 int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc){
-	double xo,yo,out[2],dgo[4];
+	double xo,yo,out[2];
 	int direct=1,ret;
 	/*Use the input lab of the TR-object*/
-	union geo_lab *plab=trf->plab_in;
+	union geo_lab *plab;
+	plab=trf->proj_in->plab;
 	if (plab==NULL)
 		return TR_LABEL_ERROR;
 	if (((plab->u_c_lab).cstm)==CRT_SYS_CODE){
@@ -800,7 +808,7 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc){
 	#ifdef _ROUT
 	lord_debug(0,LORD("TR_GetLocalGeometry: init: %d, %.2f %.2f\n"),(plab->u_c_lab).init,x,y);
 	#endif
-	ret=ptg_d(plab,direct,y,x,&yo,&xo,"",ERR_LOG,out,dgo);
+	ret=ptg_d(plab,direct,y,x,&yo,&xo,"",ERR_LOG,out,trf->proj_in->dgo);
 	*s=out[0];
 	*mc=out[1];
 	return (ret==0)?TR_OK:TR_ERROR;

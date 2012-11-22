@@ -30,6 +30,7 @@
 
 #include    <stdio.h>
 #include    "geo_lab.h"
+#include    "trlib_api.h"
 
 int                 setDtrc(
 /*________________________*/
@@ -78,10 +79,11 @@ Springer-Verlag, Berlin/Goettingen/Heidelberg 1951.
     case 7: /* pseudo-equivalent projections */
       break;
     default: /* Programme error */
-#ifndef _WIN32
+	    lord_error(TR_LABEL_ERROR,"setDtrc: Should only be used on TM-projection input.\n");
+/*#ifndef _WIN32
       (void) fprintf(stderr, 
           "\n***setDtrc: Program- eller maskinfejl  - ak ak");
-#endif
+#endif */
       c_lab->lab_type = 0;
       break;
     } /* switch(c_lab->cstm) */

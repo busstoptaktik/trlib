@@ -24,20 +24,30 @@
 #include "geo_lab.h"
 #include "geoid_d.h"
 
+struct PR {
+   union geo_lab *plab;
+   int n_references;
+   double dgo[4]; /*space to be used by ptg_d for TM-projections. For other projections, see space can be used for other purposes.*/
+};
+
+typedef struct PR PR;
+
+
 struct TR {
-    union geo_lab *plab_in, *plab_out;
+    PR *proj_in, *proj_out;
     struct mgde_str *geoid_pt;
     char geoid_name[FILENAME_MAX];
-    int ngeoids;
     int close_table;
     int use_geoids;
-    int   err;
+    int err;
 };
 
 struct XYZ {
     double x, y, z;
     int err;
 };
+
+
 
 struct PLATE {
     char *plate_model;           /* Name of plate model to use */
@@ -56,11 +66,12 @@ struct PLATE {
 int TR_GeoidTable(struct TR*);
 int TR_SpecialGeoidTable(struct TR *tr, char *geoid_name);
 int TR_IsMainThread(void);
-int TR_IsThreadSafe(union geo_lab*, union geo_lab*);
-int TR_tr(union geo_lab* ,union geo_lab*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 
+int TR_IsThreadSafe(PR*, PR*);
+int TR_tr(PR*,PR*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 
 int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
-union geo_lab *TR_OpenProjection(char *mlb);
-struct TR *TR_Clone( struct TR *tr);
+PR *TR_OpenProjection(char *mlb);
+void TR_CloseProjection(PR *proj);
 void TR_GetGeoidName(struct TR *tr,char *name);
+
 
 #endif
