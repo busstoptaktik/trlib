@@ -19,19 +19,42 @@
 /* This module is a logging, reporting and debugging module....*/
 /* For use, first initialise and open each type by using
 set_lord_type_mode(FILE * stream, char *verbosity)
-then output each call by using 
-lord_type(int tr_lib_error_code, char *frmt, ...)
-Possible types are debug, info, warning, error and critical*/
-// muligheder for output_mode
-// stdout, stderr, FILE, NULL
 
+Possible types are debug, info, warning, error and critical
+Possible output streams are stdout, stderr, FILE, NULL
+Possible verbosity chars are few, some and all
+
+Example code for initialising the warning module with some output modes to a file would be
+set_lord_warning_mode(file, ) .... not finished yet
+
+Then output each call by using
+lord_type(int lord_code, char *frmt, ...)
+
+Example code for outputting the lord code 0 and the text filenotfound to the error module
+(void) lord_error(0, "filenotfound"));
+The c code line number will also be outputted if written like this
+(void) lord_error(0, LORD("filenotfound")));
+
+
+The lord_code has different meaning:
+
+for the debug, info and warning messages different verbosity level exist
+	lord_code 0 is a default value and means that a level has not been assigned, the message is outputtet
+	lord_code 1 means not a very important messages, only output if verbosity level is all
+	lord_code 2 means a little important message, output if verbosity is some or all
+	lord_code 3 means important, output no matter what the verbosity level is
+
+for error and critical messages 
+	The value of the lord_code is outputtet in the same line just after the message.
+*/
+
+// Maybe implement get_last_error_type
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 #include "trlib_intern.h"
 
-// tr_lib_error_code not outputted yet
 
 // Flag whether type is on or off
 int use_debug;
@@ -54,43 +77,90 @@ FILE * stream_warning;
 FILE * stream_error;
 FILE * stream_critical;
 
-void lord_debug(int tr_lib_error_code, char *frmt, ...)
+
+// Output debug messages
+void lord_debug(int lord_code, char *frmt, ...)
 {
 	if (use_debug)
 	{
-		va_list ap;
-		fprintf(stream_debug, "\nDEBUG:\t");
-		va_start(ap, frmt);
-		(void) vfprintf(stream_debug, frmt,ap);
-		va_end(ap);
+		// Determine if the message shall be outputted according to verbosity level
+		int output = 0;
+		if (lord_code == 3 || lord_code == 0) {
+			output = 1; }
+		else if (lord_code == 2 && verbosity_debug >= 2) {
+			output = 1; }
+		else if (lord_code == 1 && verbosity_debug == 3) {
+			output = 1; }
+		else {
+			output = 0; }
+
+		if (output)
+		{
+			va_list ap;
+			fprintf(stream_debug, "\nDEBUG:\t");
+			va_start(ap, frmt);
+			(void) vfprintf(stream_debug, frmt,ap);
+			va_end(ap);
+		}
 	}
 }
 
-void lord_info(int tr_lib_error_code, char *frmt, ...)
+// Output info messages
+void lord_info(int lord_code, char *frmt, ...)
 {
 	if (use_info)
 	{
-		va_list ap;
-		fprintf(stream_info, "\nINFO:\t");
-		va_start(ap, frmt);
-		(void) vfprintf(stream_info, frmt,ap);
-		va_end(ap);
+		// Determine if the message shall be outputted according to verbosity level
+		int output = 0;
+		if (lord_code == 3 || lord_code == 0) {
+			output = 1; }
+		else if (lord_code == 2 && verbosity_info >= 2) {
+			output = 1; }
+		else if (lord_code == 1 && verbosity_info == 3) {
+			output = 1; }
+		else {
+			output = 0; }
+
+		if (output)
+		{
+			va_list ap;
+			fprintf(stream_info, "\nINFO:\t");
+			va_start(ap, frmt);
+			(void) vfprintf(stream_info, frmt,ap);
+			va_end(ap);
+		}
 	}
 }
 	
-void lord_warning(int tr_lib_error_code, char *frmt, ...)
+// Output warning messages
+void lord_warning(int lord_code, char *frmt, ...)
 {
 	if (use_warning)
 	{
-		va_list ap;
-		fprintf(stream_warning, "\nWARNING:\t");
-		va_start(ap, frmt);
-		(void) vfprintf(stream_warning, frmt,ap);
-		va_end(ap);
+			// Determine if the message shall be outputted according to verbosity level
+		int output = 0;
+		if (lord_code == 3 || lord_code == 0) {
+			output = 1; }
+		else if (lord_code == 2 && verbosity_warning >= 2) {
+			output = 1; }
+		else if (lord_code == 1 && verbosity_warning == 3) {
+			output = 1; }
+		else {
+			output = 0; }
+
+		if (output)
+		{
+			va_list ap;
+			fprintf(stream_warning, "\nWARNING:\t");
+			va_start(ap, frmt);
+			(void) vfprintf(stream_warning, frmt,ap);
+			va_end(ap);
+		}
 	}
 }
 
-void lord_error(int tr_lib_error_code, char *frmt, ...)
+// Output error messages
+void lord_error(int lord_code, char *frmt, ...)
 {
 	if (use_error)
 	{
@@ -99,10 +169,12 @@ void lord_error(int tr_lib_error_code, char *frmt, ...)
 		va_start(ap, frmt);
 		(void) vfprintf(stream_error, frmt,ap);
 		va_end(ap);
+		fprintf(stream_warning, "\tLORD_CODE:\t %d", lord_code);
 	}
 }
 
-void lord_critical(int tr_lib_error_code, char *frmt, ...)
+// Output critical mesaages
+void lord_critical(int lord_code, char *frmt, ...)
 {
 	if (use_critical)
 	{
@@ -111,9 +183,11 @@ void lord_critical(int tr_lib_error_code, char *frmt, ...)
 		va_start(ap, frmt);
 		(void) vfprintf(stream_critical, frmt,ap);
 		va_end(ap);
+		fprintf(stream_critical, "\tLORD_CODE:\t %d", lord_code);
 	}
 }
 
+// Set and initialise the debug module
 void set_lord_debug_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -145,6 +219,7 @@ void set_lord_debug_mode(FILE * stream, char *verbosity)
 	}
 }
 
+// Set and initialise the info module
 void set_lord_info_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -176,6 +251,7 @@ void set_lord_info_mode(FILE * stream, char *verbosity)
 	}
 }
 
+// Set and initialise the warning module
 void set_lord_warning_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -207,6 +283,7 @@ void set_lord_warning_mode(FILE * stream, char *verbosity)
 	}
 }
 
+// Set and initialise the error module
 void set_lord_error_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -224,20 +301,11 @@ void set_lord_error_mode(FILE * stream, char *verbosity)
 		use_error = 0;
 	}
 
-	if(strcmp (verbosity,"few") == 0)
-	{
-		verbosity_error = 1;
-	}
-	else if (strcmp (verbosity,"some") == 0)
-	{
-		verbosity_error = 2;
-	}
-	else if (strcmp (verbosity,"all") == 0)
-	{
-		verbosity_error = 3;
-	}
+	// All error messages shall be outputted if the module is turned on
+	verbosity_error = 3;
 }
 
+// Set and initialise the critical module
 void set_lord_critical_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -255,35 +323,11 @@ void set_lord_critical_mode(FILE * stream, char *verbosity)
 		use_critical = 0;
 	}
 
-	if(strcmp (verbosity,"few") == 0)
-	{
-		verbosity_critical = 1;
-	}
-	else if (strcmp (verbosity,"some") == 0)
-	{
-		verbosity_critical = 2;
-	}
-	else if (strcmp (verbosity,"all") == 0)
-	{
-		verbosity_critical = 3;
-	}
+	// All critical messages shall be outputted if the module is turned on
+	verbosity_critical = 3;
 }
 
-void lord_set_parameters(int debug)
-{
-	//implement that these parameters shall only be corrected from the main thread
-	if (!TR_IsMainThread())
-	{
-		return;
-	}
-	use_debug = debug;
-}
-
-/*void lord_setQuitError(int tr_lib_error_code, char *frmt, ...)
-{
-	(void) fprintf(stdout, frmt);
-}*/
-
+// Initialise the lord module with default values
 void init_lord()
 {
 	if (!TR_IsMainThread())
@@ -298,7 +342,7 @@ void init_lord()
 	use_critical = 1;
 
 	verbosity_debug = 3;
-	verbosity_info = 2;
+	verbosity_info = 3;
 	verbosity_warning = 3;
 	verbosity_error = 3;
 	verbosity_critical = 3;
@@ -310,16 +354,91 @@ void init_lord()
 	stream_critical = stdout;
 }
 
-//void set_lord_file_all(char *fullfilename)
+// Turn the lord modes on or off, an output stream must be specified or the mode cannot be turned on
+void set_lord_modes(int debug, int info, int warning, int error, int critical)
+{
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
 
-// implement it so only one file when implemented in pythin binding
+	if (stream_debug != NULL)
+	{
+		if (debug == 0 || debug == 1)
+		{
+			use_debug = debug;
+		}
+	}
 
+	if (stream_info != NULL)
+	{
+		if (info == 0 || info == 1)
+		{
+			use_info = info;
+		}
+	}
+
+	if (stream_warning != NULL)
+	{
+		if (warning == 0 || warning == 1)
+		{
+			use_warning = warning;
+		}
+	}
+
+	if (stream_error != NULL)
+	{
+		if (error == 0 || error == 1)
+		{
+			use_error = error;
+		}
+	}
+
+	if (stream_critical != NULL)
+	{
+		if (critical == 0 || critical == 1)
+		{
+			use_critical = critical;
+		}
+	}
+}
+
+// Set the output pointers for each lord_type
+void set_lord_outputs(FILE * stream_debug_outside, FILE * stream_info_outside, FILE * stream_warning_outside, FILE * stream_error_outside, FILE * stream_critical_outside)
+{
+	stream_debug = stream_debug_outside;
+	stream_info = stream_info_outside;
+	stream_warning = stream_warning_outside;
+	stream_error = stream_error_outside;
+	stream_critical = stream_critical_outside;
+}
+
+// Set the verbosity level for the modes
+void set_lord_verbosity_levels(int verb_debug, int verb_info, int verb_warning, int verb_error, int verb_critical)
+{
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
+	verbosity_debug = verb_debug;
+	verbosity_info = verb_info;
+	verbosity_warning = verb_warning;
+}
+
+// implement it so only one file when implemented in python binding
 void set_lord_file(char *fullfilename)
 {
+	if (!TR_IsMainThread())
+	{
+		return;
+	}
+
 	stream_debug = fopen (fullfilename , "w");
 	stream_info = stream_debug;
 	stream_warning = stream_debug;
 	stream_error = stream_debug;
 	stream_critical = stream_debug;
 }
+
 
