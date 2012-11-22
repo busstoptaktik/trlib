@@ -18,21 +18,22 @@
  
 #include  <stdio.h>
 
+
 /* Pepper the format string with file(line) information */
 #define STRINGIFY(x)  #x
 #define TOSTRING(x)   STRINGIFY(x)
 #define LORD(x)        __FILE__ "(" TOSTRING(__LINE__) "): " x
 
 
-extern void lord_debug(int tr_lib_error_code, char *frmt, ...);
+extern void lord_debug(int lord_code, char *frmt, ...);
 
-extern void lord_info(int tr_lib_error_code, char *frmt, ...);
+extern void lord_info(int lord_code, char *frmt, ...);
 	
-extern void lord_warning(int tr_lib_error_code, char *frmt, ...);
+extern void lord_warning(int lord_code, char *frmt, ...);
 
-extern void lord_error(int tr_lib_error_code, char *frmt, ...);
+extern void lord_error(int lord_code, char *frmt, ...);
 
-extern void lord_critical(int tr_lib_error_code, char *frmt, ...);
+extern void lord_critical(int lord_code, char *frmt, ...);
 
 extern void set_lord_debug_mode(FILE * stream, char *verbosity);
 
@@ -44,8 +45,10 @@ extern void set_lord_error_mode(FILE * stream, char *verbosity);
 
 extern void set_lord_critical_mode(FILE * stream, char *verbosity);
 
-extern void lord_set_parameters(FILE * stream, char *verbosity);
+extern void init_lord();
+
+extern void set_lord_modes(int debug, int info, int warning, int error, int critical);
+
+extern void set_lord_outputs(FILE * stream_debug, FILE * stream_info, FILE * stream_warning, FILE * stream_error, FILE * stream_critical);
 
 extern void set_lord_file(char *fullfilename);
-
-extern void init_lord();
