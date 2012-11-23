@@ -23,11 +23,17 @@
 #include <stdio.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
+/*Utility macros for determining the type of a system  - implemented in order the hide the detailed composition of a PR-object (which may change) */
+#define IS_CARTESIC(pr)           ((pr->plab->u_c_lab).cstm==1)
+#define IS_GEOGRAPHIC(pr)       ((pr->plab->u_c_lab).cstm==2)
+#define IS_TM(pr)                    ((pr->plab->u_c_lab).cstm==3)
+
+
 
 struct PR {
    union geo_lab *plab;
    int n_references;
-   double dgo[4]; /*space to be used by ptg_d for TM-projections. For other projections, see space can be used for other purposes.*/
+   double dgo[4]; /*space to be used by ptg_d for TM-projections. For other projections, the space can be used for other purposes.*/
 };
 
 typedef struct PR PR;

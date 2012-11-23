@@ -349,10 +349,10 @@ PR *TR_OpenProjection(char *mlb){
 		return 0;
 	}
 	/*This only does something for TM-projections - the space could be used for something else for other types*/
-	if ((plab->u_c_lab).cstm==3)
-		setDtrc(&(plab->u_c_lab),proj->dgo);
 	proj->plab=plab;
 	proj->n_references=1;
+	if (IS_TM(proj))
+		setDtrc(&(plab->u_c_lab),proj->dgo);
 	return proj;
 }
 
@@ -592,13 +592,13 @@ int TR_tr(
     }
     plab_in=proj_in->plab;
     plab_out=proj_out->plab;
-    if ((plab_in->u_c_lab).cstm==CRT_SYS_CODE){
+    if (IS_CARTESIC(proj_in)){
         x_in=Y_in;
         y_in=X_in;}
     else{
         x_in=X_in;
         y_in=Y_in;}
-    if ((plab_out->u_c_lab).cstm==CRT_SYS_CODE){
+    if (IS_CARTESIC(proj_out)){
         x_out=Y_out;
         y_out=X_out;}
    else{
@@ -688,8 +688,8 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
     char buf[BUFSIZE];
     if ((0==trf) || (0==f_in) || (0==f_out))
         return TR_ERROR;
-    is_geo_in=(((trf->proj_in->plab->u_c_lab).cstm)==GEO_SYS_CODE);
-    is_geo_out=(((trf->proj_in->plab->u_c_lab).cstm)==GEO_SYS_CODE);
+    is_geo_in=(IS_GEOGRAPHIC(trf->proj_in));
+    is_geo_out=(IS_GEOGRAPHIC(trf->proj_out));
     while (0 != fgets(buf, BUFSIZE, f_in)) {
         int    argc, err;
         double x,y,z;
@@ -795,20 +795,29 @@ int TR_GetEsriText(char *mlb, char *wkt_out){
 /* out must be an array of length 2*/
 int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc){
 	double xo,yo,out[2];
-	int direct=1,ret;
+	int ret;
 	/*Use the input lab of the TR-object*/
-	union geo_lab *plab;
-	plab=trf->proj_in->plab;
-	if (plab==NULL)
+	PR *proj=NULL;
+	if (trf->proj_in)
+		proj=trf->proj_in;
+	else if (trf->proj_out)
+		proj=trf->proj_out;
+	else
 		return TR_LABEL_ERROR;
-	if (((plab->u_c_lab).cstm)==CRT_SYS_CODE){
+	if (IS_CARTESIC(proj)){
 		return TR_ERROR;
 	}
-	direct=(((plab->u_c_lab).cstm)!=GEO_SYS_CODE)?1:-1;
+	if (IS_GEOGRAPHIC(proj)){
+		*s=1;
+		*mc=0;
+		return TR_OK;
+	}
+	/*
 	#ifdef _ROUT
 	lord_debug(0,LORD("TR_GetLocalGeometry: init: %d, %.2f %.2f\n"),(plab->u_c_lab).init,x,y);
 	#endif
-	ret=ptg_d(plab,direct,y,x,&yo,&xo,"",ERR_LOG,out,trf->proj_in->dgo);
+	*/
+	ret=ptg_d(proj->plab,1,y,x,&yo,&xo,"",ERR_LOG,out,proj->dgo);
 	*s=out[0];
 	*mc=out[1];
 	return (ret==0)?TR_OK:TR_ERROR;
