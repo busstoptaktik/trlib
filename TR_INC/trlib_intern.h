@@ -23,16 +23,16 @@
 #include <stdio.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
-/*Utility macros for determining the type of a system  - implemented in order the hide the detailed composition of a PR-object (which may change) */
+/*Utility macros implemented in order the hide the detailed composition of a PR-object (which may change) */
 #define IS_CARTESIC(pr)           ((pr->plab->u_c_lab).cstm==1)
 #define IS_GEOGRAPHIC(pr)       ((pr->plab->u_c_lab).cstm==2)
 #define IS_TM(pr)                    ((pr->plab->u_c_lab).cstm==3)
+#define GET_MLB(pr)                ((pr->plab->u_c_lab).mlb)
 
 
-
+/*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */
 struct PR {
    union geo_lab *plab;
-   int n_references;
    double dgo[4]; /*space to be used by ptg_d for TM-projections. For other projections, the space can be used for other purposes.*/
 };
 
@@ -68,11 +68,14 @@ struct PLATE {
     char *ipl_nam;               /* Name of used intra plate */
 };
 
-/* 'Internal' functions not meant to be exposed in API */
+/* 'Internal' functions not meant to be exposed in API 
+* Could consider implementing TR *TR_Compose(PR*,PR*) and  void TR_CloseContainer(TR*)  functions for maximal performance and internal use.
+* This would not require any reference counting in constructors and desctructors, as long as TR_CloseProjection is not called before TR_CloseContainer.
+*/
 int TR_GeoidTable(struct TR*);
 int TR_SpecialGeoidTable(struct TR *tr, char *geoid_name);
 int TR_IsMainThread(void);
-int TR_IsThreadSafe(PR*, PR*);
+int TR_IsThreadSafe(union geo_lab *plab);
 int TR_tr(PR*,PR*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 
 int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
 PR *TR_OpenProjection(char *mlb);

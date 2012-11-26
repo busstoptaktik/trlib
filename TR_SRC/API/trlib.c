@@ -72,21 +72,15 @@ int TR_IsMainThread(void){
 	return ((MAIN_THREAD_ID==&THREAD_ID) || (!MAIN_THREAD_ID));
 }
 
-/* A function  which checks whether input is in list of transformations deemed thread unsafe 
-* Really it checks whether one of the input systems is in a list deemed unsafe - however this is an implementation detail.
-*/
+/* A function  which checks whether input is in list of coordinate systems deemed thread unsafe */
 
-int TR_IsThreadSafe(PR *proj_in, PR *proj_out){
+int TR_IsThreadSafe(union geo_lab *plab){
 	int i;
 	int n=sizeof(UNSAFE)/sizeof(int);
-	union geo_lab *plab_in=NULL, *plab_out=NULL;
-	/* Seems to be only gd_trans which does unsafe things on geoids - thus if the correpsponding  TR-object is not fully composed we deem it safe */
-	if (proj_in==NULL || proj_out==NULL)
+	if (!plab)
 		return 1;
-	plab_in=proj_in->plab;
-	plab_out=proj_out->plab;
 	for (i=0;i<n;i++){
-		if (UNSAFE[i]==(plab_in->u_c_lab).imit || UNSAFE[i]==(plab_out->u_c_lab).imit)
+		if (UNSAFE[i]==(plab->u_c_lab).imit)
 			return 0;
 	}
 	return 1;
@@ -342,6 +336,11 @@ PR *TR_OpenProjection(char *mlb){
 		lord_error(TR_LABEL_ERROR,"Failed to open projection %s\n",mlb);
 		return 0;
 	}
+	if (!TR_IsThreadSafe(plab) && !ALLOW_UNSAFE){
+		lord_error(TR_LABEL_ERROR,"%s not allowed in multithreaded mode!",mlb);
+		free(plab);
+		return 0;
+	}
 	proj= malloc(sizeof(PR));
 	if (!proj){
 		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space\n"));
@@ -350,7 +349,10 @@ PR *TR_OpenProjection(char *mlb){
 	}
 	/*This only does something for TM-projections - the space could be used for something else for other types*/
 	proj->plab=plab;
-	proj->n_references=1;
+	/*If implementing reference counting: proj->n_references=1;*/
+	/* test for allowed transformation - can only fail for non null input*/
+       
+		
 	if (IS_TM(proj))
 		setDtrc(&(plab->u_c_lab),proj->dgo);
 	return proj;
@@ -361,69 +363,11 @@ PR *TR_OpenProjection(char *mlb){
 void TR_CloseProjection(PR *proj){
 	if (!proj)
 		return;
-	proj->n_references--;
-	if (proj->n_references==0){
-		free(proj->plab);
-		free(proj);
-	}
-}
-
-
-	
-/* 
-*Compose input and output systems of two TR-objects into a 'new' TR-object.
-*/
-
-TR *TR_Compose (TR *tr1, TR *tr2){
-	TR *tr_out=NULL;
-	PR *proj_in=NULL,*proj_out=NULL;
-	int err;
-	if (tr1->proj_in){
-		proj_in=tr1->proj_in;
-	}
-	else if (tr1->proj_out){
-		proj_in=tr1->proj_out;
-	}
-	if (tr2->proj_out){
-		proj_out=tr2->proj_out;
-	}
-	else if (tr2->proj_in){
-		proj_out=tr2->proj_in;
-	}
-	 if (!TR_IsThreadSafe(proj_in,proj_out) && !ALLOW_UNSAFE){
-		lord_error(TR_LABEL_ERROR,"%s->%s not allowed in multithreaded mode.\n",(proj_in->plab->u_c_lab).mlb,(proj_out->plab->u_c_lab).mlb);
-		return NULL;
-	}
-	if (!proj_in)
-		lord_debug(1,LORD("TR_Compose: PROJ in is NULL\n"));
-	if (!proj_out)
-		lord_debug(1,LORD("TR_Compose: PROJ out is NULL\n"));
-	tr_out=malloc(sizeof(TR));
-	if (!tr_out){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space.\n"));
-		return NULL;
-	}
-	/*Insert geoid table */
-	if (tr1->close_table)
-		err=TR_SpecialGeoidTable(tr_out,tr1->geoid_name);
-	else
-		err=TR_GeoidTable(tr_out);
-	if (err!=TR_OK){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to insert geoid table.\n"));
-		free(tr_out);
-		return NULL;
-	}
-	/*if all went well - transfer objects and increase reference counts*/
-	
-	tr_out->proj_in=proj_in;
-	if (proj_in)
-		proj_in->n_references++;
-	tr_out->proj_out=proj_out;
-	if (proj_out)
-		proj_out->n_references++;
-	
-	return tr_out;
-	
+	/* Implement reference counting like this: 
+	proj->n_references--
+	if (proj->n_references==0){*/
+	free(proj->plab);
+	free(proj);
 }
 
 
@@ -451,17 +395,11 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
 		goto TR_OPEN_CLEANUP;
 	    }
     }
-    /* test for allowed transformation */
-    if (!TR_IsThreadSafe(proj_in,proj_out) && !ALLOW_UNSAFE){
-	lord_error(TR_LABEL_ERROR,"%s-> %s not allowed in multithreaded mode!\n",(proj_in->plab->u_c_lab).mlb,(proj_out->plab->u_c_lab).mlb);
-	TR_LAST_ERROR=TR_LABEL_ERROR;
-	goto TR_OPEN_CLEANUP;
-    }
     
     /* make room for the TR object proper */
     tr = malloc(sizeof(TR));
     if (0==tr){
-	lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space\n"));
+	lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
 	goto TR_OPEN_CLEANUP;
     }
     
@@ -470,14 +408,14 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
 	err=TR_SpecialGeoidTable(tr,geoid_name);
 	
 	if (err!=TR_OK){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Failed open geoid table\n"));
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed open geoid table."));
 		goto TR_OPEN_CLEANUP;
 	}
     }
     else {  /*insert standard geoids */
 	err =TR_GeoidTable(tr);
 	if (err!=TR_OK){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Failed open geoid table\n"));
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed open geoid table."));
 		goto TR_OPEN_CLEANUP;
 	}
 	
@@ -499,19 +437,34 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
 	    return 0;
 }
 
+int TR_Insert(TR *tr, char *mlb, int is_out){
+	PR *proj=NULL, *to_be_replaced=NULL;
+	if (!mlb)
+		return TR_LABEL_ERROR;
+	proj=TR_OpenProjection(mlb);
+	if (!proj){
+		return TR_LABEL_ERROR;
+	}
+	to_be_replaced=(is_out)  ?  (tr->proj_out)  : (tr->proj_in);
+	if (to_be_replaced)
+		TR_CloseProjection(to_be_replaced);
+	(is_out) ? (tr->proj_out=proj) : (tr->proj_in=proj);
+	return TR_OK;
+}
+
 
 /*Free space associated with a TR-object and its contents */
 
 void TR_Close (TR *tr) {
     if (0==tr)
         return;
-    /*decrease reference count*/
+    /*release projections*/
     TR_CloseProjection(tr->proj_in);
     TR_CloseProjection(tr->proj_out);
     /*if using special geoid, close it down */
     if (tr->close_table){
 	    #ifdef _ROUT
-	    lord_debug(0,LORD("Closing special geoid!\n"));
+	    lord_debug(0,LORD("Closing special geoid!"));
 	    #endif
 	    geoid_c(tr->geoid_pt,0,NULL);
 	    free(tr->geoid_pt);}
