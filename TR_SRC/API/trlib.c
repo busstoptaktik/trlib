@@ -126,19 +126,19 @@ int TR_InitLibrary(char *path) {
     
     ok=TR_SetGeoidDir(path);
     if (ok!=TR_OK){
-	    lord_error(TR_ERROR,"Failed to parse def-file!\n");
+	    lord_error(TR_ERROR,"Failed to parse def-file!");
 	    return TR_ERROR;
     }
     #ifdef _ROUT
     if (DEF_DATA && ERR_LOG){
-	    fprintf(ERR_LOG,"Contents of %s:\n",TR_DEF_FILE);
+	    fprintf(ERR_LOG,"\nContents of %s:\n",TR_DEF_FILE);
 	    present_data(ERR_LOG,DEF_DATA);
     }
     #endif
     /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
     trf=TR_Open("utm32_ed50","utm32_wgs84","");
     if (!trf){
-	    lord_error(TR_LABEL_ERROR,"TR_InitLibrary: Failed to open first transformation!\n");
+	    lord_error(TR_LABEL_ERROR,"TR_InitLibrary: Failed to open first transformation!");
 	    return TR_LABEL_ERROR;
     }
     else{
@@ -170,9 +170,9 @@ int TR_InitLibrary(char *path) {
 	    rc=TR_TransformPoint(trf,652142.0,6058737.0,0, &x, &y,&z);
 	    TR_Close(trf);
     }
-
+    lord_debug(0,"Is initialised: %d",(ok==TR_OK));
     if (ERR_LOG)
-	    fprintf(ERR_LOG,"Is init: %d\n************ end initialisation **************\n",(ok==TR_OK));
+	    fprintf(ERR_LOG,"\n*************** end initialisation *****************\n");
     /* Set the main thread id */
     if (ok==TR_OK)
 	    MAIN_THREAD_ID=&THREAD_ID;
@@ -221,10 +221,10 @@ int TR_SetGeoidDir(char *path){
 	strcat(fname,TR_EPSG_FILE);
 	fp=fopen(fname,"r");
 	if (0==fp)
-		lord_warning(0,"Failed to open epsg def file: %s",fname);
+		lord_warning(0,"Failed to open epsg_def_file: %s",fname);
 	else{
 		int n=setup_epsg_table(fp);
-		lord_debug(0,"Parsed epsg def file with %d entries.",n);
+		lord_debug(0,"Parsed epsg_def_file with %d entries.",n);
 		fclose(fp);
 	}
 	lord_debug(0,"Parsed def_lab , errs: %d",rc);

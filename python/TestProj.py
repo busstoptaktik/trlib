@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #######################################
 ##Skeleton of a test suite for trlib using python 'bindings'
-## This script performs some translations of proj4 definitions to kms-minilabels
+## This script performs some translations of proj4 definitions and EPSG codes to kms-minilabels
 ## simlk, oct. 2012
 #######################################
 import sys,os,time
@@ -20,13 +20,16 @@ TESTS=["+proj=utm +zone=32 +units=m +ellps=GRS80 +nodefs",
 "+proj=utm +zone=32 +datum=wgs84 +vdatum=dnn +units=m",
 "+proj=merc +lat_ts=0 +y_0=0 +lon_0=0 +x_0=0 +k=1 +datum=WGS84 +units=m +nodefs",
 "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +y_0=0 +lon_0=0 +x_0=0 +k=1 +datum=WGS84 +units=m +nadgrids=@null",
-"+proj=merc +lat_ts=10 +y_0=100000 +lon_0=0 +x_0=200000 +k=1 +datum=ed50 +units=m +nodefs"
+"+proj=merc +lat_ts=10 +y_0=100000 +lon_0=0 +x_0=200000 +k=1 +datum=ed50 +units=m +nodefs",
+"EPSG:25832",
+"EPSG:4093",
+"EPSG:7416"
 ]
 
 def test():
 	nerr=0
 	for text in TESTS:
-		mlb=TrLib.FromProj4(text)
+		mlb=TrLib.ImportLabel(text)
 		if mlb is None:
 			mlb="Unable to translate..."
 			nerr+=1

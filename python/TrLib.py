@@ -138,10 +138,9 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_CloseProjection.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_CloseProjection.restype=None
 		tr_lib.TR_ImportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
-		tr_lib.TR_ImportLabel.restype=None
+		tr_lib.TR_ImportLabel.restype=ctypes.c_int
 		tr_lib.TR_SetGeoidDir.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_SetGeoidDir.restype=ctypes.c_int
-		tr_lib.TR_
 		tr_lib.set_grs.argtypes=[ctypes.c_int,ctypes.c_char_p,LP_c_double]
 		tr_lib.bshlm1.restype=ctypes.c_int
 		tr_lib.bshlm1.argtypes=[ctypes.c_double]*3+[LP_c_double,ctypes.c_double]*3
@@ -268,9 +267,11 @@ def FromProj4(proj4def):
 def ImportLabel(extern_def):
 	if IS_INIT:
 		mlb=" "*256
-		retval=tr_lib.ImportLabel(extern_def,mlb)
+		retval=tr_lib.TR_ImportLabel(extern_def,mlb)
 		if retval==TR_OK:
 			return GetString(mlb)
+		elif DEBUG:
+			print retval
 	return None
 ###########################
 ## Geometry analysis methods
@@ -486,22 +487,11 @@ class CoordinateTransformation(object):
 	def __init__(self,system_in,system_out,geoid_name=""):
 		if not IS_INIT:
 			raise Exception("Initialise Library first!")
-		self.tr=None
-		_systems=[]
-		for system in [system_in,system_out]:
-			if isinstance(system,CoordinateSystem):
-				_systems.append(system)
-				
-			elif isinstance(system,str):
-				_systems.append(CoordinateSystem(system))
-				
-			else: 
-				raise ValueError("Wrong type of input system.")
-		self.tr=tr_lib.TR_Compose(_systems[0].tr,_systems[1].tr)
+		self.tr=tr_lib.TR_Open(system_in,system_out,geoid_name)
 		if self.tr is None:
 			raise LabelException("Failed to compose transformation.")
-		self.mlb_in=_systems[0].mlb
-		self.mlb_out=_systems[1].mlb
+		self.mlb_in=system_in
+		self.mlb_out=system_out
 		self.geoid_name=geoid_name
 		self.rc=None #return code object
 		self.forward_method=tr_lib.TR_Transform
@@ -511,6 +501,14 @@ class CoordinateTransformation(object):
 	#Destructor - if we have forgotten to close#
 	def __del__(self):
 		self.Close()	
+	def Insert(self,mlb,is_in=False):
+		if self.tr is None:
+			raise Exception("This transformation has been invalidated")
+		is_in=int(is_in)
+		rc=tr_lib.TR_Insert(self.tr,mlb,is_in)
+		if (rc!=TR_OK):
+			raise LabelError("Failed to insert %s" %mlb)
+			
 	def Transform(self,*args,**kwargs):
 		#thus inverse 'switch' must be given as a keyword!#
 		if "inverse" in kwargs and kwargs["inverse"]:

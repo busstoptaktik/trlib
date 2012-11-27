@@ -31,6 +31,7 @@
 #include    <stdio.h>
 #include    "geo_lab.h"
 #include    "trlib_api.h"
+#include    "lord.h"
 
 int                 setDtrc(
 /*________________________*/
