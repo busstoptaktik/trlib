@@ -30,6 +30,7 @@
 #include "setDtrc.h"
 #include "ptg_d.h"
 #include "sputshpprj.h"
+#include "sgetshpprj.h"
 #include "c_tabdir_file.h"
 #include "tab_doc_f.h"
 #include "trlib_intern.h"
@@ -38,17 +39,25 @@
 #include "doc_def_data.h"
 #include "trthread.h"
 #include "lord.h"
-#define TRLIB_VERSION "dev v1.0 2012-09-21"
+#include "epsg_to_mlb.h"
+#include "proj4_to_mlb.h"
+/*   
+* Defines
+*/
+#define TRLIB_VERSION "dev v1.0 2012-11-26"
 #ifndef TRLIB_REVISION
 #define TRLIB_REVISION "hg revison not specified"
 #endif
-#define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
-#define GEO_SYS_CODE 2
-#define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
-#define TR_DEF_FILE "def_lab.txt"
+
+#define TR_TABDIR_ENV  "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
+#define TR_DEF_FILE      "def_lab.txt"
+#define TR_EPSG_FILE    "def_epsg.txt"
+
 /* R2D equals the geo_lab define DOUT = (180.0/M_PI) */
+
 #define R2D 57.295779513082323 
 #define D2R 0.017453292519943295
+
 /*various global state variables */
 
 static int ALLOW_UNSAFE=0; /*do we allow transformations which are not thread safe?*/
@@ -195,7 +204,7 @@ int TR_SetGeoidDir(char *path){
 	strcpy(fname,init_path);
 	strcat(fname,TR_DEF_FILE);
 	#ifdef _ROUT
-	lord_debug(0,"%s %s\n",init_path,fname); /*just debugging */
+	lord_debug(0,"tabdir: %s  def_lab: %s",init_path,fname); /*just debugging */
 	#endif
 	fp=fopen(fname,"r");
 	if (0==fp)
@@ -207,9 +216,18 @@ int TR_SetGeoidDir(char *path){
 	c_tabdir_file(0,NULL);
 	DEF_DATA=open_def_data(fp,&rc);
 	fclose(fp);
-	#ifdef _ROUT
-	lord_debug(0,"Parsed def_lab.txt, errs: %d\n",rc);
-	#endif
+	/*init epsg table*/
+	strcpy(fname,init_path);
+	strcat(fname,TR_EPSG_FILE);
+	fp=fopen(fname,"r");
+	if (0==fp)
+		lord_warning(0,"Failed to open epsg def file: %s",fname);
+	else{
+		int n=setup_epsg_table(fp);
+		lord_debug(0,"Parsed epsg def file with %d entries.",n);
+		fclose(fp);
+	}
+	lord_debug(0,"Parsed def_lab , errs: %d",rc);
 	settabdir(init_path);
 	return (DEF_DATA ? TR_OK: TR_ERROR);
 }
@@ -692,6 +710,7 @@ void TR_TerminateLibrary(void) {
 	TR_TerminateThread(); /*terminate the 'main' thread - assuming this haven't been done already (perhaps check for this??) */
 	if (DEF_DATA)
 		close_def_data(DEF_DATA);
+	release_epsg_table();
      
 }
 
@@ -775,4 +794,30 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc){
 	*mc=out[1];
 	return (ret==0)?TR_OK:TR_ERROR;
 }
-        
+
+/* Import a mlb from other projection specifications */
+int TR_ImportLabel(char *text, char *mlb){
+	int ok=0;
+	/*case proj4*/
+	if (strchr(text,'+'))
+		ok=proj4_to_mlb(text,mlb);
+	/*case epsg*/
+	else if (strstr(text,"EPSG")){
+		char *pos=strchr(text,':');
+		int code;
+		if (pos){
+			code=atoi(pos+1);
+			ok=import_from_epsg(code,0,mlb);
+		}
+		else
+			lord_warning(1,"EPSG: invalid format of EPSG code specification.");  
+	}
+	/*case wkt*/
+	else{
+		ok=sgetshpprj(text,NULL,mlb);
+		ok=(ok==0)?(TR_OK):(TR_LABEL_ERROR);
+	}
+	if (ok!=TR_OK)
+		*mlb='\0';
+	return ok;
+}

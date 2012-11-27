@@ -33,8 +33,8 @@
 static int ALLOW_KMS_DATUMS=1; 
 
 struct translation_entry{
-	char *proj4_name;
-	char *kms_name;
+	char *key;
+	char *value;
 };
 
 struct towgs84_translation{
@@ -84,13 +84,24 @@ COMMON_PROJ4_DEFINITIONS[]={
 };
 
 /* Some KMS aliases for etrs89 - possibly others as well*/
-static struct translation_entry
-KMS_DATUM_ALIAS[]={
+
+static struct translation_entry KMS_DATUM_ALIAS[]={
 {"etrf89","etrs89"},
 {"euref89","etrs89"},
 {NULL,NULL}
 };
 
+
+void normalise_datum(char *datum){
+	struct translation_entry *look_up=KMS_DATUM_ALIAS;
+	while (look_up->key){
+		if (!strcmp(datum,look_up->key)){
+			strcpy(datum,look_up->value);
+			break;
+		}
+		look_up++;
+	}
+}
 
 
 /*setter function for allowing/disallowing KMS-datum extensions */
@@ -227,9 +238,9 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 			}
 			else{/*look for a default translation of ellipsoid name to datum */
 				struct translation_entry *current_try=ELLIPSOID_TO_DATUM;
-				while (current_try->proj4_name!=NULL){
-					if (!strcmp(current_try->proj4_name,proj_entry->ellps)){
-						strcpy(datum,current_try->kms_name);
+				while (current_try->key!=NULL){
+					if (!strcmp(current_try->key,proj_entry->ellps)){
+						strcpy(datum,current_try->value);
 						break;
 					}
 					current_try++;
@@ -263,9 +274,9 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 	else{ /*datum token is given and we look for a translation */
 		/*First check the proj4->kms datum translations*/
 		struct translation_entry *current_try=PROJ4_TO_KMS_DATUM;
-		while (current_try->proj4_name!=NULL){
-			if (!strcmp(current_try->proj4_name,proj_entry->datum)){
-				strcpy(datum,current_try->kms_name);
+		while (current_try->key!=NULL){
+			if (!strcmp(current_try->key,proj_entry->datum)){
+				strcpy(datum,current_try->value);
 				break;
 			}
 			current_try++;
@@ -292,17 +303,7 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 		}
 	}/* end else datum is given */
 	/*normalise datum - i.e. if given as an alias name return the standard name*/
-	{
-		struct translation_entry *look_up=KMS_DATUM_ALIAS;
-		/*yes: the field names are misleading, todo: change field names.... */
-		while (look_up->proj4_name!=NULL){
-			if (!strcmp(datum,look_up->proj4_name)){
-				strcpy(datum,look_up->kms_name);
-				break;
-			}
-			look_up++;
-		}
-	}
+	normalise_datum(datum);
 	return TR_OK;
 }
 /*the actual conversion of proj4 text to mlb */
