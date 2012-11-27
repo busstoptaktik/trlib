@@ -112,8 +112,8 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetGeoidName.restype=None
 		tr_lib.TR_Open.restype=ctypes.c_void_p
 		tr_lib.TR_Open.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
-		tr_lib.TR_Compose.restype=ctypes.c_void_p
-		tr_lib.TR_Compose.argtypes=[ctypes.c_void_p,ctypes.c_void_p]
+		tr_lib.TR_Insert.restype=ctypes.c_int
+		tr_lib.TR_Insert.argtypes=[ctypes.c_void_p,ctypes.c_char_p,ctypes.c_int]
 		tr_lib.TR_Close.restype=None
 		tr_lib.TR_Close.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_Transform.restype=ctypes.c_int
@@ -135,8 +135,13 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		#Some extra functions which might get exposed in the API#
 		tr_lib.TR_OpenProjection.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_OpenProjection.restype=ctypes.c_void_p
+		tr_lib.TR_CloseProjection.argtypes=[ctypes.c_void_p]
+		tr_lib.TR_CloseProjection.restype=None
+		tr_lib.TR_ImportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_ImportLabel.restype=None
 		tr_lib.TR_SetGeoidDir.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_SetGeoidDir.restype=ctypes.c_int
+		tr_lib.TR_
 		tr_lib.set_grs.argtypes=[ctypes.c_int,ctypes.c_char_p,LP_c_double]
 		tr_lib.bshlm1.restype=ctypes.c_int
 		tr_lib.bshlm1.argtypes=[ctypes.c_double]*3+[LP_c_double,ctypes.c_double]*3
@@ -258,7 +263,15 @@ def FromProj4(proj4def):
 		return None
 	else:
 		return GetString(mlb)
-
+		
+#Import a label from wkt, proj4 or epsg definitions...
+def ImportLabel(extern_def):
+	if IS_INIT:
+		mlb=" "*256
+		retval=tr_lib.ImportLabel(extern_def,mlb)
+		if retval==TR_OK:
+			return GetString(mlb)
+	return None
 ###########################
 ## Geometry analysis methods
 ###########################
