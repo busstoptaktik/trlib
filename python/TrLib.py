@@ -507,7 +507,7 @@ class CoordinateTransformation(object):
 		is_in=int(is_in)
 		rc=tr_lib.TR_Insert(self.tr,mlb,is_in)
 		if (rc!=TR_OK):
-			raise LabelError("Failed to insert %s" %mlb)
+			raise LabelException("Failed to insert %s" %mlb)
 			
 	def Transform(self,*args,**kwargs):
 		#thus inverse 'switch' must be given as a keyword!#

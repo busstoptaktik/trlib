@@ -342,7 +342,7 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 	}
 	else if (!strcmp(proj_entry->proj,"latlong") || !(strcmp(proj_entry->proj,"longlat"))){
 		strcpy(proj,"geo");
-		mlb+=3;
+		
 	}
 	else if (!strcmp(proj_entry->proj,"tmerc") || !(strcmp(proj_entry->proj,"etmerc"))){
 		is_transverse_mercator=1;
@@ -441,11 +441,13 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 			
 	}
 	if (!found_exact_alias){
-		mlb+=sprintf(mlb,"%s%c%s",proj,sep_char,datum);
+		char *pt=mlb;
+		pt+=sprintf(pt,"%s%c%s",proj,sep_char,datum);
+		/*lord_debug(0,"Proj4: proj - %s %s",proj,mlb);*/
 		if (sep_char!='E' && sep_char!='_' && strlen(vdatum)>0)
-			mlb+=sprintf(mlb,"_h_%s",vdatum);
+			pt+=sprintf(pt,"_h_%s",vdatum);
 		if (strlen(param_string)>0)
-			sprintf(mlb,"  %s",param_string);
+			sprintf(pt,"  %s",param_string);
 	}
 	free(proj_entry);
 	return TR_OK;

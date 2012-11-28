@@ -23,11 +23,13 @@
 #include <stdio.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
+
 /*Utility macros implemented in order the hide the detailed composition of a PR-object (which may change) */
 #define IS_CARTESIC(pr)           ((pr->plab->u_c_lab).cstm==1)
 #define IS_GEOGRAPHIC(pr)       ((pr->plab->u_c_lab).cstm==2)
 #define IS_TM(pr)                    ((pr->plab->u_c_lab).cstm==3)
-#define GET_MLB(pr)                ((pr->plab->u_c_lab).mlb)
+#define GET_MLB(pr)                 ((pr->plab->u_c_lab).mlb)
+#define HAS_HEIGHTS(pr)          ((pr->plab->u_c_lab).h_dtm>200)
 
 
 /*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */
@@ -81,6 +83,7 @@ int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, 
 PR *TR_OpenProjection(char *mlb);
 void TR_CloseProjection(PR *proj);
 void TR_GetGeoidName(struct TR *tr,char *name);
+int TR_ImportLabel(char *text, char *mlb);
 
 
 #endif

@@ -133,6 +133,7 @@ int TR_InitLibrary(char *path) {
     if (DEF_DATA && ERR_LOG){
 	    fprintf(ERR_LOG,"\nContents of %s:\n",TR_DEF_FILE);
 	    present_data(ERR_LOG,DEF_DATA);
+	    fflush(ERR_LOG);
     }
     #endif
     /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
@@ -142,6 +143,10 @@ int TR_InitLibrary(char *path) {
 	    return TR_LABEL_ERROR;
     }
     else{
+	    #ifdef _ROUT
+	    lord_debug(0,"Successfully opened first transformation.");
+	    fflush(ERR_LOG);
+	    #endif
 	    ok=TR_TransformPoint(trf,512200.1,6143200.1,0,&x,&y,&z);
 	    TR_Close(trf);
     }
@@ -154,7 +159,7 @@ int TR_InitLibrary(char *path) {
     }
     
     trf=TR_Open("utm32_wgs84","s34j","");
-	    if (0!=trf){
+     if (0!=trf){
 	    rc=TR_TransformPoint(trf,512200.1,6143200.1,0,&x,&y,&z);
 	    TR_Close(trf);
     }
@@ -171,8 +176,10 @@ int TR_InitLibrary(char *path) {
 	    TR_Close(trf);
     }
     lord_debug(0,"Is initialised: %d",(ok==TR_OK));
-    if (ERR_LOG)
+    if (ERR_LOG){
 	    fprintf(ERR_LOG,"\n*************** end initialisation *****************\n");
+	    fflush(ERR_LOG);
+    }
     /* Set the main thread id */
     if (ok==TR_OK)
 	    MAIN_THREAD_ID=&THREAD_ID;
@@ -345,13 +352,13 @@ PR *TR_OpenProjection(char *mlb){
 	PR *proj=NULL;
 	plab= malloc(sizeof(union geo_lab));
 	if (!plab){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space\n"));
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
 		return 0;
 	}
 	label_check = conv_lab(mlb,plab,"");
 	if ((label_check==0) || (label_check==-1)) {
 		free(plab);
-		lord_error(TR_LABEL_ERROR,"Failed to open projection %s\n",mlb);
+		lord_error(TR_LABEL_ERROR,"Failed to open projection %s.",mlb);
 		return 0;
 	}
 	if (!TR_IsThreadSafe(plab) && !ALLOW_UNSAFE){
@@ -361,7 +368,7 @@ PR *TR_OpenProjection(char *mlb){
 	}
 	proj= malloc(sizeof(PR));
 	if (!proj){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space\n"));
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
 		free(plab);
 		return 0;
 	}
