@@ -105,13 +105,15 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetEsriText.restype=ctypes.c_int
 		tr_lib.TR_GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.TR_GetLocalGeometry.restype=ctypes.c_int
-		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_char_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double] #todo get type of last arg
+		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_void_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double] #todo get type of last arg
 		tr_lib.TR_GeoidInfo.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_GeoidInfo.restype=None
 		tr_lib.TR_GetGeoidName.argtypes=[ctypes.c_void_p,ctypes.c_char_p]
 		tr_lib.TR_GetGeoidName.restype=None
 		tr_lib.TR_Open.restype=ctypes.c_void_p
 		tr_lib.TR_Open.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_Insert.restype=ctypes.c_int
+		tr_lib.TR_Insert.argtypes=[ctypes.c_void_p,ctypes.c_char_p,ctypes.c_int]
 		tr_lib.TR_Close.restype=None
 		tr_lib.TR_Close.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_Transform.restype=ctypes.c_int
@@ -133,6 +135,10 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		#Some extra functions which might get exposed in the API#
 		tr_lib.TR_OpenProjection.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_OpenProjection.restype=ctypes.c_void_p
+		tr_lib.TR_CloseProjection.argtypes=[ctypes.c_void_p]
+		tr_lib.TR_CloseProjection.restype=None
+		tr_lib.TR_ImportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_ImportLabel.restype=ctypes.c_int
 		tr_lib.TR_SetGeoidDir.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_SetGeoidDir.restype=ctypes.c_int
 		tr_lib.set_grs.argtypes=[ctypes.c_int,ctypes.c_char_p,LP_c_double]
@@ -149,7 +155,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.proj4_to_mlb.argtypes=[ctypes.c_char_p]*2
 		tr_lib.proj4_to_mlb.restype=ctypes.c_int
 		tr_lib.set_lord_file.argtypes=[ctypes.c_char_p]
-		tr_lib.set_lord_file.restypes=None
+		tr_lib.set_lord_file.restype=None
 
 	except Exception, msg:
 		print repr(msg)
@@ -228,6 +234,9 @@ def GetVersion():
 	ver=buf.replace("\0","").strip()
 	return ver
 
+#######################
+## Minilabel conversion methods 
+#######################
 def GetEsriText(label):
 	if IS_INIT:
 		wkt=" "*2048;
@@ -253,18 +262,21 @@ def FromProj4(proj4def):
 		return None
 	else:
 		return GetString(mlb)
-
-def GetLocalGeometry(label,x,y):
-	#out param determines wheteher prj_in or prj_out is used#
+		
+#Import a label from wkt, proj4 or epsg definitions...
+def ImportLabel(extern_def):
 	if IS_INIT:
-		if (IsGeographic(label)):
-			return 1,0
-		mc=ctypes.c_double(0)
-		s=ctypes.c_double(0)
-		ok=tr_lib.TR_GetLocalGeometry(label,x,y,ctypes.byref(s),ctypes.byref(mc))
-		if ok==TR_OK:
-			return s.value,(mc.value)*R2D
-	return 0,0
+		mlb=" "*256
+		retval=tr_lib.TR_ImportLabel(extern_def,mlb)
+		if retval==TR_OK:
+			return GetString(mlb)
+		elif DEBUG:
+			print retval
+	return None
+###########################
+## Geometry analysis methods
+###########################
+
 
 def BesselHelmert(axis,flat,lon1,lat1,lon2,lat2):
 	if IS_INIT:
@@ -288,6 +300,10 @@ def InverseBesselHelmert(axis,flat,lon1,lat1,a1,dist):
 			return lon2.value*R2D,lat2.value*R2D,a2.value*R2D
 	return None,None,None
 
+#############################
+## 'Documentation' methods
+#############################
+
 def GetEllipsoidParameters(ell_name):
         if IS_INIT:
                 arr=ctypes.c_double*9
@@ -296,6 +312,16 @@ def GetEllipsoidParameters(ell_name):
                 if ret>0:
                         return ell_par[0],ell_par[1]
         return None,None
+
+def GetEllipsoidParametersFromDatum(mlb_dtm):
+	if IS_INIT:
+		ell_name=" "*128
+		rc=tr_lib.doc_dtm(mlb_dtm,ell_name,-1)
+		if (rc==TR_OK):
+			a,f=GetEllipsoidParameters(ell_name)
+			return GetString(ell_name),a,f
+	return None,None,None
+		
 
 def DescribeProjection(mlb_prj):
 	if IS_INIT:
@@ -321,14 +347,6 @@ def DescribeDatum(mlb_dtm):
 			return GetString(descr).replace("@","")
 	return None
 
-def GetEllipsoidParametersFromDatum(mlb_dtm):
-	if IS_INIT:
-		ell_name=" "*128
-		rc=tr_lib.doc_dtm(mlb_dtm,ell_name,-1)
-		if (rc==TR_OK):
-			a,f=GetEllipsoidParameters(ell_name)
-			return GetString(ell_name),a,f
-	return None,None,None
 
 def DescribeLabel(mlb):
 	try:
@@ -358,7 +376,7 @@ def DescribeLabel(mlb):
 
 
 ######################
-## Minilabel analasys methods #
+## Minilabel analysis methods 
 ######################
 def SplitMLB(mlb):
 	mlb=mlb.split()[0].replace("L","_")
@@ -401,27 +419,96 @@ def IsGeographic(mlb):
 		return False
 	return proj=="geo"
 
-class CoordinateTransformation(object):
-	def __init__(self,mlb_in,mlb_out,geoid_name=""):
-		self.mlb_in=mlb_in
-		self.mlb_out=mlb_out
-		self.geoid_name=geoid_name
-		self.tr=None
-		self.rc=None #return code object
-		self.forward_method=None
-		self.inverse_method=None
-		self.is_geo_in=False
-		self.is_geo_out=False
-		if IS_INIT:
-			self.tr=tr_lib.TR_Open(mlb_in,mlb_out,geoid_name)
-			if self.tr is None:
-				raise LabelException()
-			self.is_geo_in=IsGeographic(self.mlb_in) #convert2radians?
-			self.is_geo_out=IsGeographic(self.mlb_out) #convert2radians?
-			self.forward_method=tr_lib.TR_Transform
-			self.inverse_method=tr_lib.TR_InverseTransform
-		else:
+#Will throw an exception if datum is implicit and library is not initialized
+def GetDatum(mlb):
+	region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
+	if len(dtm)>0:
+		return dtm
+	if (not IS_INIT):
+		raise Exception("Initliaze library first!")
+	descr_prj,impl_dtm=DescribeProjection(prj)
+	if descr_prj is None or len(impl_dtm)==0:
+		raise LabelException("Label not OK!")
+	return impl_dtm
+
+#Will throw an exception if datum is implicit and library is not initialized
+#Converts mlb to 2d-geographic projection based on same datum
+def Convert2Geo(mlb):
+	region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
+	if len(dtm)>0:
+		dtm=GetDatum(mlb)
+	return "geo_"+dtm
+
+
+################################
+## Projection Class
+################################
+class CoordinateSystem(object):
+	def __init__(self,mlb):
+		if not IS_INIT:
 			raise Exception("Initialise Library first!")
+		self.mlb=mlb
+		self.tr=tr_lib.TR_Open(mlb,"","")
+		if self.tr is None:
+			raise LabelException()
+		self.is_geo=IsGeographic(mlb)
+	#Destructor - if we have forgotten to close#
+	def __del__(self):
+		self.Close()	
+	def GetLocalGeometry(self,x,y):
+		#out param determines wheteher prj_in or prj_out is used#
+		if self.tr is None:
+			raise Exception("This system has been invalidated!")
+		if self.is_geo:
+			return 1,0
+		mc=ctypes.c_double(0)
+		s=ctypes.c_double(0)
+		ok=tr_lib.TR_GetLocalGeometry(self.tr,x,y,ctypes.byref(s),ctypes.byref(mc))
+		if ok==TR_OK:
+			return s.value,(mc.value)*R2D
+		return 0,0
+	def Close(self):
+		if self.tr is not None:
+			tr_lib.TR_Close(self.tr)
+		self.tr=None
+		
+
+################################
+## Main Transformation Class
+################################
+
+
+class CoordinateTransformation(object):
+	"""Main transformation object. 
+	The constructer accepts string input as well as input of type CoordinateSystem.
+	A CoordinateSystem used as input will be invalidated by the constructer. 
+	Pointers to structures in the underlying c-library are now owned by the CoordinateTransformation class.
+	"""
+	def __init__(self,system_in,system_out,geoid_name=""):
+		if not IS_INIT:
+			raise Exception("Initialise Library first!")
+		self.tr=tr_lib.TR_Open(system_in,system_out,geoid_name)
+		if self.tr is None:
+			raise LabelException("Failed to compose transformation.")
+		self.mlb_in=system_in
+		self.mlb_out=system_out
+		self.geoid_name=geoid_name
+		self.rc=None #return code object
+		self.forward_method=tr_lib.TR_Transform
+		self.inverse_method=tr_lib.TR_InverseTransform
+		self.is_geo_in=IsGeographic(self.mlb_in) #convert2radians?
+		self.is_geo_out=IsGeographic(self.mlb_out) #convert2radians?
+	#Destructor - if we have forgotten to close#
+	def __del__(self):
+		self.Close()	
+	def Insert(self,mlb,is_in=False):
+		if self.tr is None:
+			raise Exception("This transformation has been invalidated")
+		is_in=int(is_in)
+		rc=tr_lib.TR_Insert(self.tr,mlb,is_in)
+		if (rc!=TR_OK):
+			raise LabelException("Failed to insert %s" %mlb)
+			
 	def Transform(self,*args,**kwargs):
 		#thus inverse 'switch' must be given as a keyword!#
 		if "inverse" in kwargs and kwargs["inverse"]:
@@ -454,7 +541,7 @@ class CoordinateTransformation(object):
 		return self.Transform(*args,inverse=True)
 	def TransformPoint(self,x,y,z=0.0,inverse=False):
 		if self.tr is None:
-			raise LabelException()
+			raise Exception("This transformation has been invalidated")
 		if not inverse:
 			tr_method=self.forward_method
 		else:
@@ -479,7 +566,7 @@ class CoordinateTransformation(object):
 		if not HAS_NUMPY:
 			raise Exception("This method needs numpy.")
 		if self.tr is None:
-			raise LabelException()
+			raise Exception("This transformation has been invalidated")
 		if not inverse:
 			tr_method=self.forward_method
 		else:
@@ -538,6 +625,7 @@ class CoordinateTransformation(object):
 		if self.tr is not None:
 			tr_lib.TR_Close(self.tr)
 			self.tr=None
+	
 		
 	
 		

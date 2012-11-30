@@ -24,21 +24,38 @@
 #include "geo_lab.h"
 #include "geoid_d.h"
 
+/*Utility macros implemented in order the hide the detailed composition of a PR-object (which may change) */
+#define IS_CARTESIC(pr)           ((pr->plab->u_c_lab).cstm==1)
+#define IS_GEOGRAPHIC(pr)       ((pr->plab->u_c_lab).cstm==2)
+#define IS_TM(pr)                    ((pr->plab->u_c_lab).cstm==3)
+#define GET_MLB(pr)                 ((pr->plab->u_c_lab).mlb)
+#define HAS_HEIGHTS(pr)          ((pr->plab->u_c_lab).h_dtm>200)
+
+
+/*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */
+struct PR {
+   union geo_lab *plab;
+   double dgo[4]; /*space to be used by ptg_d for TM-projections. For other projections, the space can be used for other purposes.*/
+};
+
+typedef struct PR PR;
+
+
 struct TR {
-    union geo_lab *plab_in, *plab_out;
+    PR *proj_in, *proj_out;
     struct mgde_str *geoid_pt;
     char geoid_name[FILENAME_MAX];
-    int ngeoids;
     int close_table;
     int use_geoids;
-    int   err;
+    int err;
 };
-typedef struct  TR TR;
 
 struct XYZ {
     double x, y, z;
     int err;
 };
+
+
 
 struct PLATE {
     char *plate_model;           /* Name of plate model to use */
@@ -53,13 +70,20 @@ struct PLATE {
     char *ipl_nam;               /* Name of used intra plate */
 };
 
-/* 'Internal' functions not meant to be exposed in API */
-int TR_GeoidTable(TR*);
+/* 'Internal' functions not meant to be exposed in API 
+* Could consider implementing TR *TR_Compose(PR*,PR*) and  void TR_CloseContainer(TR*)  functions for maximal performance and internal use.
+* This would not require any reference counting in constructors and desctructors, as long as TR_CloseProjection is not called before TR_CloseContainer.
+*/
+int TR_GeoidTable(struct TR*);
+int TR_SpecialGeoidTable(struct TR *tr, char *geoid_name);
 int TR_IsMainThread(void);
-int TR_IsThreadSafe(union geo_lab*, union geo_lab*);
-int TR_tr(union geo_lab* ,union geo_lab*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 
+int TR_IsThreadSafe(union geo_lab *plab);
+int TR_tr(PR*,PR*, double*, double*, double*, double*, double*,double*, int , int , struct mgde_str*); 
 int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
-union geo_lab *TR_OpenProjection(char *mlb);
-void TR_GetGeoidName(TR *tr,char *name);
+PR *TR_OpenProjection(char *mlb);
+void TR_CloseProjection(PR *proj);
+void TR_GetGeoidName(struct TR *tr,char *name);
+int TR_ImportLabel(char *text, char *mlb);
+
 
 #endif

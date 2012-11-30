@@ -21,7 +21,10 @@ EXPORTS
 	TR_ForbidUnsafeTransformations
 	TR_GetLocalGeometry
 	TR_OpenProjection
+	TR_CloseProjection
 	TR_GetGeoidName
+	TR_ImportLabel
+	TR_Insert
 	bh_lat
 	bh_lmb
 	bshlm1
@@ -98,6 +101,7 @@ EXPORTS
 	ng_trans
 	pla_adm_f
 	prn_cho
+	proj4_to_mlb
 	ptg
 	ptg_d
 	putsinexval
@@ -144,6 +148,18 @@ EXPORTS
 	utsb
 	v_red
 	v_std
-
-	
+	lord_debug
+	lord_info
+	lord_warning
+	lord_error
+	lord_critical
+	set_lord_debug_mode
+	set_lord_info_mode
+	set_lord_warning_mode
+	set_lord_error_mode
+	set_lord_critical_mode
+	init_lord
+	set_lord_modes
+	set_lord_outputs
+	set_lord_file
 	

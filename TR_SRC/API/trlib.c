@@ -27,8 +27,10 @@
 #include "geoid_d.h"
 #include "geoid_c.h"
 #include "geoid_i.h"
+#include "setDtrc.h"
 #include "ptg_d.h"
 #include "sputshpprj.h"
+#include "sgetshpprj.h"
 #include "c_tabdir_file.h"
 #include "tab_doc_f.h"
 #include "trlib_intern.h"
@@ -37,17 +39,25 @@
 #include "doc_def_data.h"
 #include "trthread.h"
 #include "lord.h"
-#define TRLIB_VERSION "dev v1.0 2012-09-21"
+#include "epsg_to_mlb.h"
+#include "proj4_to_mlb.h"
+/*   
+* Defines
+*/
+#define TRLIB_VERSION "dev v1.0 2012-11-26"
 #ifndef TRLIB_REVISION
 #define TRLIB_REVISION "hg revison not specified"
 #endif
-#define CRT_SYS_CODE 1 /*really defined in def_lab.txt, so perhaps we should first parse this with a conv_lab call */
-#define GEO_SYS_CODE 2
-#define TR_TABDIR_ENV "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
-#define TR_DEF_FILE "def_lab.txt"
-// R2D equals the geo_lab define DOUT = (180.0/M_PI)
+
+#define TR_TABDIR_ENV  "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
+#define TR_DEF_FILE      "def_lab.txt"
+#define TR_EPSG_FILE    "def_epsg.txt"
+
+/* R2D equals the geo_lab define DOUT = (180.0/M_PI) */
+
 #define R2D 57.295779513082323 
 #define D2R 0.017453292519943295
+
 /*various global state variables */
 
 static int ALLOW_UNSAFE=0; /*do we allow transformations which are not thread safe?*/
@@ -66,18 +76,20 @@ int TR_GetLastError(void){
     return TR_LAST_ERROR;
 }
 
-/* not used at the moment- but could be useful */
+/* only used in InitLibrary at the moment- but could be useful */
 int TR_IsMainThread(void){
 	return ((MAIN_THREAD_ID==&THREAD_ID) || (!MAIN_THREAD_ID));
 }
 
-/* A function  which checks whether input is in list of transformations deemed thread unsafe */
+/* A function  which checks whether input is in list of coordinate systems deemed thread unsafe */
 
-int TR_IsThreadSafe(union geo_lab *plab_in, union geo_lab *plab_out){
+int TR_IsThreadSafe(union geo_lab *plab){
 	int i;
 	int n=sizeof(UNSAFE)/sizeof(int);
+	if (!plab)
+		return 1;
 	for (i=0;i<n;i++){
-		if (UNSAFE[i]==(plab_in->u_c_lab).imit || UNSAFE[i]==(plab_out->u_c_lab).imit)
+		if (UNSAFE[i]==(plab->u_c_lab).imit)
 			return 0;
 	}
 	return 1;
@@ -96,57 +108,78 @@ void TR_ForbidUnsafeTransformations(void){
 /* Need to let KMSTrans parse the def-files, before any transformation */
 int TR_InitLibrary(char *path) {
     int ok=-1,rc;
-    double x=512200.0,y=6143200.0,z=0.0;
+    double x,y,z;
     TR* trf;
     
     if (!TR_IsMainThread()) /*Only one thread can succesfully initialise the library*/
 	    return TR_ERROR;
+    init_lord();  /* initialise the lord (logging, report and debugging) module with default values */
+    
     #ifdef _ROUT
     ERR_LOG=fopen("TR_errlog.log","wt");
+    set_lord_debug_mode(ERR_LOG,"all");
+    set_lord_info_mode(ERR_LOG,"all");
+    set_lord_warning_mode(ERR_LOG,"all");
+    set_lord_error_mode(ERR_LOG,"all");
+    set_lord_critical_mode(ERR_LOG,"all");
     #endif
-    init_lord();  // initialise the lord (logging, report and debugging) module with default values
-	ok=TR_SetGeoidDir(path);
-	
-    if (ERR_LOG && ok!=TR_OK)
-	    fprintf(ERR_LOG,"Failed to parse def-file!\n");
-    if (ok!=TR_OK)
+    
+    ok=TR_SetGeoidDir(path);
+    if (ok!=TR_OK){
+	    lord_error(TR_ERROR,"Failed to parse def-file!");
 	    return TR_ERROR;
+    }
     #ifdef _ROUT
     if (DEF_DATA && ERR_LOG){
-	    fprintf(ERR_LOG,"Contents of %s:\n",TR_DEF_FILE);
+	    fprintf(ERR_LOG,"\nContents of %s:\n",TR_DEF_FILE);
 	    present_data(ERR_LOG,DEF_DATA);
-	}
+	    fflush(ERR_LOG);
+    }
     #endif
     /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
     trf=TR_Open("utm32_ed50","utm32_wgs84","");
-    #ifdef _ROUT
     if (!trf){
-	    fprintf(ERR_LOG,"Failed to open first transformation!\n");
+	    lord_error(TR_LABEL_ERROR,"TR_InitLibrary: Failed to open first transformation!");
+	    return TR_LABEL_ERROR;
     }
-    #endif
-    if (0!=trf){
-	    ok=TR_Transform(trf,&x,&y,&z,1);
+    else{
+	    #ifdef _ROUT
+	    lord_debug(0,"Successfully opened first transformation.");
+	    fflush(ERR_LOG);
+	    #endif
+	    ok=TR_TransformPoint(trf,512200.1,6143200.1,0,&x,&y,&z);
 	    TR_Close(trf);
-	    }
+    }
+    
     trf=TR_Open("utm32_wgs84","fotm","");
+    
     if (0!=trf){
-	    rc=TR_Transform(trf,&x,&y,&z,1);
-	    TR_Close(trf);}
+	    rc=TR_TransformPoint(trf,652142,6058737,0, &x, &y,&z);
+	    TR_Close(trf);
+    }
+    
     trf=TR_Open("utm32_wgs84","s34j","");
-	    if (0!=trf){
-	    rc=TR_Transform(trf,&x,&y,&z,1);
-	    TR_Close(trf);}
+     if (0!=trf){
+	    rc=TR_TransformPoint(trf,512200.1,6143200.1,0,&x,&y,&z);
+	    TR_Close(trf);
+    }
+    
     trf=TR_Open("FO_fotm","GR_utm22_gr96","");
     if (0!=trf){
-	    rc=TR_Transform(trf,&x,&y,&z,1);
-	    TR_Close(trf);}
+	    rc=TR_TransformPoint(trf,200000.0,876910.0,0,&x,&y,&z);
+	    TR_Close(trf);
+    }
+    
     trf=TR_Open("utm32_wgs84","fcsH_h_fcsvr10","");
     if (0!=trf){
-	    rc=TR_Transform(trf,&x,&y,&z,1);
-	    TR_Close(trf);}
-
-    if (0!=ERR_LOG)
-	    fprintf(ERR_LOG,"Is init: %d\n************ end initialisation **************\n",(ok==TR_OK));
+	    rc=TR_TransformPoint(trf,652142.0,6058737.0,0, &x, &y,&z);
+	    TR_Close(trf);
+    }
+    lord_debug(0,"Is initialised: %d",(ok==TR_OK));
+    if (ERR_LOG){
+	    fprintf(ERR_LOG,"\n*************** end initialisation *****************\n");
+	    fflush(ERR_LOG);
+    }
     /* Set the main thread id */
     if (ok==TR_OK)
 	    MAIN_THREAD_ID=&THREAD_ID;
@@ -178,7 +211,7 @@ int TR_SetGeoidDir(char *path){
 	strcpy(fname,init_path);
 	strcat(fname,TR_DEF_FILE);
 	#ifdef _ROUT
-	lord_debug(0,"%s %s\n",init_path,fname); /*just debugging */
+	lord_debug(0,"tabdir: %s  def_lab: %s",init_path,fname); /*just debugging */
 	#endif
 	fp=fopen(fname,"r");
 	if (0==fp)
@@ -190,9 +223,18 @@ int TR_SetGeoidDir(char *path){
 	c_tabdir_file(0,NULL);
 	DEF_DATA=open_def_data(fp,&rc);
 	fclose(fp);
-	#ifdef _ROUT
-	lord_debug(0,"Parsed def_lab.txt, errs: %d\n",rc);
-	#endif
+	/*init epsg table*/
+	strcpy(fname,init_path);
+	strcat(fname,TR_EPSG_FILE);
+	fp=fopen(fname,"r");
+	if (0==fp)
+		lord_warning(0,"Failed to open epsg_def_file: %s",fname);
+	else{
+		int n=setup_epsg_table(fp);
+		lord_debug(0,"Parsed epsg_def_file with %d entries.",n);
+		fclose(fp);
+	}
+	lord_debug(0,"Parsed def_lab , errs: %d",rc);
 	settabdir(init_path);
 	return (DEF_DATA ? TR_OK: TR_ERROR);
 }
@@ -210,9 +252,11 @@ void TR_GeoidInfo(TR *tr) {
     strcat(req,geoid_name);
     res=tab_doc_f(req,stdout);
     #ifdef _ROUT
-    printf("Request: %s, res: %d\n",req,res);
+    lord_debug(0,"Request: %s, res: %d\n",req,res);
     #endif
     }
+
+/*Function which copies the last used geoid name to input buffer.*/    
 
 void TR_GetGeoidName(TR *tr,char *name) {
 	struct gde_lab *g_lab;
@@ -222,6 +266,7 @@ void TR_GetGeoidName(TR *tr,char *name) {
 }
 	
 
+/*Return the version info */
 
 void TR_GetVersion(char *buffer,int BufSize) {
     char version[256];
@@ -250,12 +295,12 @@ int TR_GeoidTable(TR *tr){
 	static THREAD_SAFE int ngeoids=0;
 	/*if called with NULL close evrything down */
 	if (0==tr && init){
-			geoid_c(GeoidTable,0,NULL);
-		        if (GeoidTable)
-				free(GeoidTable);
-			GeoidTable=NULL;
-			init=0;
-			return TR_OK;
+		geoid_c(GeoidTable,0,NULL);
+		if (GeoidTable)
+			free(GeoidTable);
+		GeoidTable=NULL;
+		init=0;
+		return TR_OK;
 		}
 	/*Initialise on first call, makes geoid table thread local */
 	if (!init){
@@ -270,119 +315,184 @@ int TR_GeoidTable(TR *tr){
 		init=1;
 		}
 	/*insert stuff into the TR object */
-	tr->ngeoids=ngeoids;
+	tr->use_geoids=(HAS_GEOIDS)?0:-1;
 	strcpy(tr->geoid_name,"STD");
 	tr->geoid_pt=GeoidTable;
 	tr->close_table=0;
 	return TR_OK;
 }
-		
-		
-       
-union geo_lab *TR_OpenProjection(char *mlb){
-	int label_check;
-	union geo_lab *plab;
-	plab= malloc(sizeof(union geo_lab));
-	if (plab)
-		label_check = conv_lab(mlb,plab,"");
-	if ((0==plab) || (label_check==0) || (label_check==-1)) {
-		free(plab);
-		TR_LAST_ERROR=TR_LABEL_ERROR;
-		return 0;
-		}
-	return plab;
-}
-	
 
+int TR_SpecialGeoidTable(TR *tr, char *geoid_name){
+	int has_geoids;
+	struct mgde_str *special_geoid_table;
+	special_geoid_table=malloc(sizeof(struct mgde_str));
+	special_geoid_table->init=0;
+	has_geoids= geoid_i(geoid_name, GDE_LAB, special_geoid_table,NULL);
+	#ifdef _ROUT
+	lord_debug(0,LORD("has geoids: %d, name: %s\n"),has_geoids,geoid_name);
+	#endif
+	if (has_geoids<0){  /*on error return null */
+		geoid_c(special_geoid_table,0,NULL);
+		free(special_geoid_table);
+		lord_error(TR_ALLOCATION_ERROR,LORD("SpecialGeoidTable: Failed to allocate space."));
+		return TR_ALLOCATION_ERROR;
+	}
+	tr->geoid_pt=special_geoid_table;
+	tr->close_table=1;
+	tr->use_geoids=(has_geoids>0)?0:-1;
+	strncpy(tr->geoid_name,geoid_name,FILENAME_MAX);
+	return TR_OK;
+}
+
+/*Function which returns a PR pointer from a minilabel - allocates room which should be freed afterwards*/
+       
+PR *TR_OpenProjection(char *mlb){
+	int label_check;
+	union geo_lab *plab=NULL;
+	PR *proj=NULL;
+	plab= malloc(sizeof(union geo_lab));
+	if (!plab){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
+		return 0;
+	}
+	label_check = conv_lab(mlb,plab,"");
+	if ((label_check==0) || (label_check==-1)) {
+		free(plab);
+		lord_error(TR_LABEL_ERROR,"Failed to open projection %s.",mlb);
+		return 0;
+	}
+	if (!TR_IsThreadSafe(plab) && !ALLOW_UNSAFE){
+		lord_error(TR_LABEL_ERROR,"%s not allowed in multithreaded mode!",mlb);
+		free(plab);
+		return 0;
+	}
+	proj= malloc(sizeof(PR));
+	if (!proj){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
+		free(plab);
+		return 0;
+	}
+	/*This only does something for TM-projections - the space could be used for something else for other types*/
+	proj->plab=plab;
+	/*If implementing reference counting: proj->n_references=1;*/
+	/* test for allowed transformation - can only fail for non null input*/
+       
+		
+	if (IS_TM(proj))
+		setDtrc(&(plab->u_c_lab),proj->dgo);
+	return proj;
+}
+
+/*Destructor of a PR-object. Decreases reference count and closes if zero.*/
+
+void TR_CloseProjection(PR *proj){
+	if (!proj)
+		return;
+	/* Implement reference counting like this: 
+	proj->n_references--
+	if (proj->n_references==0){*/
+	free(proj->plab);
+	free(proj);
+}
+
+
+/*
+* Open a TR-object from minilabel (s),
+* This should eventually be freed using TR_Close!
+* Geoid table info is appended to the TR-object.
+*/
 
 TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     int err;
-    union geo_lab *plab_in, *plab_out;
-    struct mgde_str *special_geoid_table=NULL;
-    int has_geoids=0;
-    TR *tr;
-   /* make room for the TR object proper */
-    tr = malloc(sizeof(TR));
-    if (0==tr){
-	TR_LAST_ERROR=TR_ALLOCATION_ERROR;
-        return 0;
-    }
-    
+    TR *tr=NULL;
+    PR *proj_in=NULL, *proj_out=NULL;
     /* initialize the plab_in object member */
-    plab_in= TR_OpenProjection(label_in);
-    if (!plab_in){
-	    free(tr);
-	    return 0;
+    if (label_in && strlen(label_in)>0){
+	    proj_in= TR_OpenProjection(label_in);
+	    if (!proj_in){
+		return 0;
+	    }
     }
     /* initialize the plab_out object member */
-    plab_out=TR_OpenProjection(label_out);
-    if (!plab_out){
-	    free(plab_in);
-	    free(tr);
-	    return 0;
+    if (label_out && strlen(label_out)>0){
+	    proj_out=TR_OpenProjection(label_out);
+	    if (!proj_out){
+		goto TR_OPEN_CLEANUP;
+	    }
     }
-    /* test for allowed transformation */
-    if (!TR_IsThreadSafe(plab_in,plab_out) && !ALLOW_UNSAFE){
-	#ifdef _ROUT
-	fprintf(ERR_LOG,"%s-> %s not allowed in multithreaded mode!\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb);
-	#endif
-	free(plab_in);
-        free(plab_out);
-	free(tr);
-	TR_LAST_ERROR=TR_LABEL_ERROR;
-	
-        return 0;
+    
+    /* make room for the TR object proper */
+    tr = malloc(sizeof(TR));
+    if (0==tr){
+	lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
+	goto TR_OPEN_CLEANUP;
     }
+    
     /*Set geoid info */
     if (0!=geoid_name && strlen(geoid_name)>0){
-	   special_geoid_table=malloc(sizeof(struct mgde_str));
-	   special_geoid_table->init=0;
-	   has_geoids= geoid_i(geoid_name, GDE_LAB, special_geoid_table,NULL);
-	   #ifdef _ROUT
-	   fprintf(ERR_LOG,"has geoids: %d, name: %s\n",has_geoids,geoid_name);
-	   #endif
-	   if (has_geoids<0){  /*on error return null */
-		   free(plab_in);
-		   free(plab_out);
-		   free(tr);
-		   geoid_c(special_geoid_table,0,NULL);
-		   free(special_geoid_table);
-		   TR_LAST_ERROR=TR_ALLOCATION_ERROR;
-		   return 0;
-	   }
-	   tr->geoid_pt=special_geoid_table;
-	   tr->close_table=1;
-	   tr->ngeoids=has_geoids;
-	   tr->use_geoids=(has_geoids>0)?0:-1;
-	   strncpy(tr->geoid_name,geoid_name,FILENAME_MAX);
-	    }
+	err=TR_SpecialGeoidTable(tr,geoid_name);
+	
+	if (err!=TR_OK){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed open geoid table."));
+		goto TR_OPEN_CLEANUP;
+	}
+    }
     else {  /*insert standard geoids */
-	   err =TR_GeoidTable(tr);
-	   tr->use_geoids=(HAS_GEOIDS)?0:-1;
-	   /* TODO: check error! */
-	    }
+	err =TR_GeoidTable(tr);
+	if (err!=TR_OK){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed open geoid table."));
+		goto TR_OPEN_CLEANUP;
+	}
+	
+    }
     
     /* transfer everything into the TR object */
-    tr->plab_in   = plab_in;
-    tr->plab_out  = plab_out;
-   
+    tr->proj_in   = proj_in;
+    tr->proj_out  = proj_out;
     return tr;
-
+	    
+    /*escape on error, common clean up code.*/
+    TR_OPEN_CLEANUP:
+	    if (proj_in)
+		    TR_CloseProjection(proj_in);
+	    if (proj_out)
+		    TR_CloseProjection(proj_out);
+	    if (tr)
+		    free(tr);
+	    return 0;
 }
+
+int TR_Insert(TR *tr, char *mlb, int is_out){
+	PR *proj=NULL, *to_be_replaced=NULL;
+	if (!mlb)
+		return TR_LABEL_ERROR;
+	proj=TR_OpenProjection(mlb);
+	if (!proj){
+		return TR_LABEL_ERROR;
+	}
+	to_be_replaced=(is_out)  ?  (tr->proj_out)  : (tr->proj_in);
+	if (to_be_replaced)
+		TR_CloseProjection(to_be_replaced);
+	(is_out) ? (tr->proj_out=proj) : (tr->proj_in=proj);
+	return TR_OK;
+}
+
+
+/*Free space associated with a TR-object and its contents */
 
 void TR_Close (TR *tr) {
     if (0==tr)
-        return;    
-    free (tr->plab_in);
-    free (tr->plab_out);
+        return;
+    /*release projections*/
+    TR_CloseProjection(tr->proj_in);
+    TR_CloseProjection(tr->proj_out);
     /*if using special geoid, close it down */
     if (tr->close_table){
 	    #ifdef _ROUT
-	    fprintf(ERR_LOG,"Closing special geoid!\n");
+	    lord_debug(0,LORD("Closing special geoid!"));
 	    #endif
 	    geoid_c(tr->geoid_pt,0,NULL);
 	    free(tr->geoid_pt);}
-    /*gd_trans(NULL,NULL,0,0,0,NULL,NULL,NULL,NULL,0,NULL,"",0);  might not be needed! WANT TO close hgrid static in gd_trans  */
     free (tr);
     return;
 }
@@ -393,7 +503,7 @@ int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
 	int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_in,tr->plab_out, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_in,tr->proj_out, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
  
@@ -401,7 +511,7 @@ int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
 	 int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_out,tr->plab_in, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_out,tr->proj_in, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
 
@@ -409,7 +519,7 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 int err;
 	 if ((0==tr)||(0==X_in)||(0==Y_in)||(0==X_out)||(0==Y_out))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_in,tr->plab_out, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_in,tr->proj_out, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
  
@@ -417,7 +527,7 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 int err;
 	 if ((0==tr)||(0==X_in)||(0==Y_in)||(0==X_out)||(0==Y_out))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->plab_out,tr->plab_in, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_out,tr->proj_in, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
 
@@ -435,8 +545,8 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
  
 /* transform one or more xyz-tables */
 int TR_tr(
-   union geo_lab *plab_in,
-   union geo_lab *plab_out, 
+   PR *proj_in,
+   PR *proj_out, 
    double *X_in, 
    double *Y_in, 
    double *Z_in,
@@ -449,17 +559,24 @@ int TR_tr(
    ) 
  {
 	 
-   
+    union geo_lab *plab_in,*plab_out;
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i; /*use_geoids; */
-   
-    if ((plab_in->u_c_lab).cstm==CRT_SYS_CODE){
+	 
+    /*escape if the underlying TR-object is not fully composed....*/
+    if (!proj_in || !proj_out){
+	    lord_error(TR_LABEL_ERROR,"TR_tr: TR-object not fully composed.\n");
+	    return TR_LABEL_ERROR;
+    }
+    plab_in=proj_in->plab;
+    plab_out=proj_out->plab;
+    if (IS_CARTESIC(proj_in)){
         x_in=Y_in;
         y_in=X_in;}
     else{
         x_in=X_in;
         y_in=Y_in;}
-    if ((plab_out->u_c_lab).cstm==CRT_SYS_CODE){
+    if (IS_CARTESIC(proj_out)){
         x_out=Y_out;
         y_out=X_out;}
    else{
@@ -471,10 +588,10 @@ int TR_tr(
         err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z_out? Z_out+i: &z2), &GH,use_geoids,geoid_pt, "", ERR_LOG);
 	#ifdef _ROUT
 	if (err)
-		fprintf(ERR_LOG,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,x_in[i],y_in[i],z);
+		lord_debug(0,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,x_in[i],y_in[i],z);
 	#endif
         /*err = gd_trans(tr->plab_in, tr->plab_out,  x,y,z,  X+i,Y+i, (Z? Z+i: &z2), &GH, -1, &GeoidTable, 0, 0);
-         *   KE siger at arg 0 før GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
+         *   KE siger at arg 0 for GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
         if (err)
            ERR = err;
    }
@@ -514,6 +631,7 @@ int TR_itrf(
     int err, ERR = 0, i, stn_vel=0;
 
     if(n_vel>0) stn_vel=1;
+    i_JD=JD_in[0];
 
     for (i = 0;  i < n;  i++) {
         if(n_JD==n) i_JD=JD_in[i];
@@ -548,8 +666,8 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
     char buf[BUFSIZE];
     if ((0==trf) || (0==f_in) || (0==f_out))
         return TR_ERROR;
-    is_geo_in=(((trf->plab_in->u_c_lab).cstm)==GEO_SYS_CODE);
-    is_geo_out=(((trf->plab_out->u_c_lab).cstm)==GEO_SYS_CODE);
+    is_geo_in=(IS_GEOGRAPHIC(trf->proj_in));
+    is_geo_out=(IS_GEOGRAPHIC(trf->proj_out));
     while (0 != fgets(buf, BUFSIZE, f_in)) {
         int    argc, err;
         double x,y,z;
@@ -599,6 +717,7 @@ void TR_TerminateLibrary(void) {
 	TR_TerminateThread(); /*terminate the 'main' thread - assuming this haven't been done already (perhaps check for this??) */
 	if (DEF_DATA)
 		close_def_data(DEF_DATA);
+	release_epsg_table();
      
 }
 
@@ -644,32 +763,68 @@ DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
 /* Translates mlb to ESRI wkt*/
 int TR_GetEsriText(char *mlb, char *wkt_out){
     int err;
-    union geo_lab  *TC=TR_OpenProjection(mlb);
+    PR *TC=TR_OpenProjection(mlb);
     if (!TC)
 	return TR_LABEL_ERROR;
-    err=sputshpprj(wkt_out,TC); /* See fputshpprj.h for details on return value */
+    err=sputshpprj(wkt_out,TC->plab); /* See fputshpprj.h for details on return value */
     free(TC);
-    return err;}
+    return err;
+}
     
 /* out must be an array of length 2*/
-int TR_GetLocalGeometry(char *mlb, double x, double y, double *s, double *mc){
-	double xo,yo,out[2],dgo[4];
-	int direct=1,ret;
-	union geo_lab  *TC=TR_OpenProjection(mlb);
-	if (!TC)
+int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc){
+	double xo,yo,out[2];
+	int ret;
+	/*Use the input lab of the TR-object*/
+	PR *proj=NULL;
+	if (trf->proj_in)
+		proj=trf->proj_in;
+	else if (trf->proj_out)
+		proj=trf->proj_out;
+	else
 		return TR_LABEL_ERROR;
-	if (((TC->u_c_lab).cstm)==CRT_SYS_CODE){
-		free(TC);
+	if (IS_CARTESIC(proj)){
 		return TR_ERROR;
-		}
-	direct=(((TC->u_c_lab).cstm)!=GEO_SYS_CODE)?1:-1;
+	}
+	if (IS_GEOGRAPHIC(proj)){
+		*s=1;
+		*mc=0;
+		return TR_OK;
+	}
+	/*
 	#ifdef _ROUT
-	fprintf(ERR_LOG,"init: %d, %.2f %.2f\n",(TC->u_c_lab).init,x,y);
+	lord_debug(0,LORD("TR_GetLocalGeometry: init: %d, %.2f %.2f\n"),(plab->u_c_lab).init,x,y);
 	#endif
-	ret=ptg_d(TC,direct,y,x,&yo,&xo,"",ERR_LOG,out,dgo);
+	*/
+	ret=ptg_d(proj->plab,1,y,x,&yo,&xo,"",ERR_LOG,out,proj->dgo);
 	*s=out[0];
 	*mc=out[1];
-	free(TC);
 	return (ret==0)?TR_OK:TR_ERROR;
 }
-        
+
+/* Import a mlb from other projection specifications */
+int TR_ImportLabel(char *text, char *mlb){
+	int ok=0;
+	/*case proj4*/
+	if (strchr(text,'+'))
+		ok=proj4_to_mlb(text,mlb);
+	/*case epsg*/
+	else if (strstr(text,"EPSG")){
+		char *pos=strchr(text,':');
+		int code;
+		if (pos){
+			code=atoi(pos+1);
+			ok=import_from_epsg(code,0,mlb);
+		}
+		else
+			lord_warning(1,"EPSG: invalid format of EPSG code specification.");  
+	}
+	/*case wkt*/
+	else{
+		ok=sgetshpprj(text,NULL,mlb);
+		ok=(ok==0)?(TR_OK):(TR_LABEL_ERROR);
+	}
+	if (ok!=TR_OK)
+		*mlb='\0';
+	return ok;
+}

@@ -15,6 +15,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
+ 
+#if !defined(H_PARSE_DEF_FILE)
+#define      H_PARSE_DEF_FILE
+
+
  #include "geo_lab.h"
  #define MAX_TABLE_LEN (32)
  #define MAX_DSCR_LEN (128)
@@ -102,3 +107,5 @@ typedef struct def_data def_data;
 double get_number(char *item);
 def_data *open_def_data(FILE *fp, int *n_err);
 void close_def_data(def_data *data); 
+
+#endif

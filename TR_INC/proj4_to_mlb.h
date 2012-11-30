@@ -49,3 +49,6 @@
  /* setter function for flag to allow kms-datum extensions */
  void set_kms_datums_allowed(int is_allowed);
  
+ /*normalise datum (use specific etrs89 alias)*/
+ void normalise_datum(char *datum);
+ 

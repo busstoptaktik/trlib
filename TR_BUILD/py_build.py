@@ -161,7 +161,7 @@ def BuildLibrary(compiler,linker,outname,source,include,defines,options,link_opt
 		implib=IMPLIB_SWITCH+implib
 	else:
 		implib=""
-	outname=LINK_OUTPUT_SWITCH+" "+outname
+	outname=LINK_OUTPUT_SWITCH+outname
 	#TODO: check gcc linker option like -g -O etc...
 	if (IS_MSVC):
 		link="%s %s %s %s %s %s %s" %(linker,link_options,outname,implib,def_file,LINK_LIBRARIES,OBJ_FILES)

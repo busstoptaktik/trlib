@@ -34,8 +34,6 @@
 #define KMSTR_API
 #endif 
 
-#include "trlib_intern.h"
-
 KMSTR_API int   TR_InitLibrary(char *path);
 KMSTR_API int   TR_SetGeoidDir(char *path);
 KMSTR_API int   TR_GetLastError(void);
@@ -45,17 +43,19 @@ KMSTR_API void TR_TerminateLibrary(void);
 KMSTR_API void TR_TerminateThread(void);
 KMSTR_API void TR_AllowUnsafeTransformations(void);
 KMSTR_API void TR_ForbidUnsafeTransformations(void);
-KMSTR_API int TR_GetLocalGeometry(char *mlb, double x, double y, double *m, double *c);
+typedef struct  TR TR;
 KMSTR_API void TR_GeoidInfo(TR *tr);
+KMSTR_API int   TR_GetLocalGeometry(TR *tr, double x, double y, double *m, double *c);
 KMSTR_API TR  *TR_Open (char *label_in, char *label_out, char *geoid_name);
-KMSTR_API  int  TR_Transform(TR *tr, double *X, double *Y, double *Z, int n);
+KMSTR_API int   TR_Insert (TR *tr, char *mlb, int is_out);
+KMSTR_API int   TR_Transform(TR *tr, double *X, double *Y, double *Z, int n);
 KMSTR_API int   TR_InverseTransform(TR *tr, double *X, double *Y, double *Z, int n);
 KMSTR_API int   TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_out, double *Y_out, double *Z_out, int n);
 KMSTR_API int   TR_InverseTransform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_out, double *Y_out, double *Z_out, int n);
 KMSTR_API int   TR_TransformPoint(TR *tr, double X_in, double Y_in, double Z_in, double *X_out, double *Y_out, double *Z_out);
 KMSTR_API int   TR_InverseTransformPoint(TR *tr, double X_in, double Y_in, double Z_in, double *X_out, double *Y_out, double *Z_out);
 KMSTR_API void TR_Close (TR *tr);
-KMSTR_API  int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
+KMSTR_API int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
 
 
 #endif

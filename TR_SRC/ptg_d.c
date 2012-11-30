@@ -33,7 +33,7 @@
 #include <math.h>
 #include "geo_lab.h"
 #include "trthread.h"
-
+#include "lord.h"
 #ifndef    M_PI
 #include   "kms_math.h"
 #endif
