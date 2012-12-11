@@ -107,14 +107,15 @@ void TR_ForbidUnsafeTransformations(void){
 
 /* Need to let KMSTrans parse the def-files, before any transformation */
 int TR_InitLibrary(char *path) {
-    int ok=-1,rc;
+    int ok=-1,rc,unsafe_allowed=ALLOW_UNSAFE;
     double x,y,z;
     TR* trf;
     
     if (!TR_IsMainThread()) /*Only one thread can succesfully initialise the library*/
 	    return TR_ERROR;
-    
-    init_lord();  /* initialise the lord (logging, report and debugging) module with default values */
+    /*only initialise if not already done*/
+    if (!is_lord_initialised())
+	    init_lord();  /* initialise the lord (logging, report and debugging) module with default values */
     
     #ifdef _ROUT
     ERR_LOG=fopen("TR_errlog.log","wt");
@@ -135,7 +136,11 @@ int TR_InitLibrary(char *path) {
 	    fflush(ERR_LOG);
     }
     #endif
-    /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below */
+    /* Perform some transformations in order to initialse global statics in transformation functions. TODO: add all relevant transformations below 
+     * Allow unsafe projections ONLY in initialisation!
+    */
+    ALLOW_UNSAFE=1;
+    
     trf=TR_Open("utm32_ed50","utm32_wgs84","");
     if (!trf){
 	    lord_error(TR_LABEL_ERROR,"TR_InitLibrary: Failed to open first transformation!");
@@ -179,6 +184,8 @@ int TR_InitLibrary(char *path) {
 	    fprintf(ERR_LOG,"\n*************** end initialisation *****************\n");
 	    fflush(ERR_LOG);
     }
+    /*set the ALLOW_UNSAFE flag to what it was*/
+    ALLOW_UNSAFE=unsafe_allowed;
     /* Set the main thread id */
     if (ok==TR_OK)
 	    MAIN_THREAD_ID=&THREAD_ID;
@@ -759,11 +766,6 @@ DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
 }
 */
 
-
-
-
-
-
 /* Translates mlb to ESRI wkt*/
 int TR_GetEsriText(char *mlb, char *wkt_out){
     int err;
@@ -771,23 +773,26 @@ int TR_GetEsriText(char *mlb, char *wkt_out){
     if (!TC)
 	return TR_LABEL_ERROR;
     err=sputshpprj(wkt_out,TC->plab); /* See fputshpprj.h for details on return value */
-    free(TC);
+    TR_CloseProjection(TC);
     return err;
 }
     
 /* out must be an array of length 2*/
-int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc){
+int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc, int is_proj_out){
 	double xo,yo,out[2];
 	int ret;
 	/*Use the input lab of the TR-object*/
 	PR *proj=NULL;
-	if (trf->proj_in)
+	/*if is_proj_out is <=0 default to taking proj_in */
+	if (!is_proj_out)
 		proj=trf->proj_in;
-	else if (trf->proj_out)
-		proj=trf->proj_out;
 	else
+		proj=trf->proj_out;
+	if (proj==NULL){
+		lord_error(TR_LABEL_ERROR,"GetLocalGeometry: specified projection not set!");
 		return TR_LABEL_ERROR;
 	if (IS_CARTESIC(proj)){
+		lord_warning(0,"Local scale and convergence not defined for cartesic systems.");
 		return TR_ERROR;
 	}
 	if (IS_GEOGRAPHIC(proj)){
@@ -795,11 +800,6 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc){
 		*mc=0;
 		return TR_OK;
 	}
-	/*
-	#ifdef _ROUT
-	lord_debug(0,LORD("TR_GetLocalGeometry: init: %d, %.2f %.2f\n"),(plab->u_c_lab).init,x,y);
-	#endif
-	*/
 	ret=ptg_d(proj->plab,1,y,x,&yo,&xo,"",ERR_LOG,out,proj->dgo);
 	*s=out[0];
 	*mc=out[1];

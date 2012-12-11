@@ -70,7 +70,11 @@ class LabelException(Exception):
 		self.msg=msg
 	def __str__(self):
 		return self.msg
-		
+
+
+MESSAGE_HANDLER = ctypes.CFUNCTYPE(None,ctypes.c_int, ctypes.c_int, ctypes.c_char_p)
+
+
 ###################
 ##Call this initializtion FIRST!
 ###################
@@ -105,7 +109,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetEsriText.restype=ctypes.c_int
 		tr_lib.TR_GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.TR_GetLocalGeometry.restype=ctypes.c_int
-		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_void_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double] #todo get type of last arg
+		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_void_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double,ctypes.c_int] #todo get type of last arg
 		tr_lib.TR_GeoidInfo.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_GeoidInfo.restype=None
 		tr_lib.TR_GetGeoidName.argtypes=[ctypes.c_void_p,ctypes.c_char_p]
@@ -156,6 +160,8 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.proj4_to_mlb.restype=ctypes.c_int
 		tr_lib.set_lord_file.argtypes=[ctypes.c_char_p]
 		tr_lib.set_lord_file.restype=None
+		tr_lib.set_lord_callback.argtypes=[MESSAGE_HANDLER]
+		tr_lib.set_lord_callback.restype=None
 
 	except Exception, msg:
 		print repr(msg)
@@ -181,12 +187,6 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 	IS_INIT=(rc==TR_OK)
 	return IS_INIT
 
-#Convenience method for getting a proper python string out of a string returned from c-function
-def GetString(cstring):
-	i=cstring.find("\0")
-	if (i!=-1):
-		return cstring[:i].strip()
-	return cstring.strip()
 
 def GetLastError():
 	return tr_lib.TR_GetLastError()
@@ -204,12 +204,17 @@ def AllowUnsafeTransformations():
 def ForbidUnsafeTransformations():
 	tr_lib.TR_ForbidUnsafeTransformations()
 
+
 #Set multithread mode on/off here,,,
 def SetThreadMode(on=True):
 	if on:
 		ForbidUnsafeTransformations()
 	else:
 		AllowUnsafeTransformations()
+		
+#Use a python function as a callback for messages from trlib
+def SetMessageHandler(fct):
+	tr_lib.set_lord_callback(MESSAGE_HANDLER(fct))
 
 def SetGeoidDir(geoid_dir):
 	global GEOIDS
@@ -229,47 +234,46 @@ def SetGeoidDir(geoid_dir):
 
 
 def GetVersion():
-	buf=" "*100;
-	tr_lib.TR_GetVersion(buf,100)
-	ver=buf.replace("\0","").strip()
-	return ver
+	buf=ctypes.create_string_buffer(256)
+	tr_lib.TR_GetVersion(buf,256)
+	return buf.value
 
 #######################
 ## Minilabel conversion methods 
 #######################
 def GetEsriText(label):
 	if IS_INIT:
-		wkt=" "*2048;
+		wkt=ctypes.create_string_buffer(2048);
 		retval=tr_lib.TR_GetEsriText(label,wkt)
 		if retval==0:
-			return GetString(wkt)
+			return wkt.value
 	return None
 	
 def FromEsriText(wkt):
 	if IS_INIT:
-		out=" "*256;
+		out=ctypes.create_string_buffer(128)
 		retval=tr_lib.sgetshpprj(wkt,None,out)
 		if retval==0:
-			return GetString(out)
+			return out.value
 		elif DEBUG:
 			print retval
 	return None
 
 def FromProj4(proj4def):
-	mlb=" "*256
+	mlb=ctypes.create_string_buffer(128)
 	retval=tr_lib.proj4_to_mlb(proj4def,mlb)
 	if retval!=TR_OK:
 		return None
 	else:
-		return GetString(mlb)
+		return mlb.value
 		
 #Import a label from wkt, proj4 or epsg definitions...
 def ImportLabel(extern_def):
 	if IS_INIT:
-		mlb=" "*256
+		mlb=ctypes.create_string_buffer(128)
 		retval=tr_lib.TR_ImportLabel(extern_def,mlb)
 		if retval==TR_OK:
-			return GetString(mlb)
+			return mlb.value
 		elif DEBUG:
 			print retval
 	return None
@@ -315,24 +319,24 @@ def GetEllipsoidParameters(ell_name):
 
 def GetEllipsoidParametersFromDatum(mlb_dtm):
 	if IS_INIT:
-		ell_name=" "*128
+		ell_name=ctypes.create_string_buffer(128)
 		rc=tr_lib.doc_dtm(mlb_dtm,ell_name,-1)
 		if (rc==TR_OK):
 			a,f=GetEllipsoidParameters(ell_name)
-			return GetString(ell_name),a,f
+			return ell_name.value,a,f
 	return None,None,None
 		
 
 def DescribeProjection(mlb_prj):
 	if IS_INIT:
-		descr=" "*512
-		impl_dtm=" "*64
+		descr=ctypes.create_string_buffer(128)
+		impl_dtm=ctypes.create_string_buffer(128)
 		type=ctypes.c_int(0)
 		rc=tr_lib.doc_prj(mlb_prj,descr,impl_dtm,ctypes.byref(type),0)
 		if (rc==TR_OK):
 			if ("(" in descr):
 				descr=descr[:descr.find("(")]
-			return GetString(descr),GetString(impl_dtm)
+			return descr.value,impl_dtm.value
 	return None,None
 
 def DescribeDatum(mlb_dtm):
@@ -341,10 +345,10 @@ def DescribeDatum(mlb_dtm):
 			return "Ellipsoidal heights"
 		if (mlb_dtm=="N"):
 			mlb_dtm="Normal heights"
-		descr=" "*512
+		descr=ctypes.create_string_buffer(512)
 		rc=tr_lib.doc_dtm(mlb_dtm,descr,0)
 		if (rc==TR_OK):
-			return GetString(descr).replace("@","")
+			return descr.value.replace("@","")
 	return None
 
 
@@ -463,7 +467,7 @@ class CoordinateSystem(object):
 			return 1,0
 		mc=ctypes.c_double(0)
 		s=ctypes.c_double(0)
-		ok=tr_lib.TR_GetLocalGeometry(self.tr,x,y,ctypes.byref(s),ctypes.byref(mc))
+		ok=tr_lib.TR_GetLocalGeometry(self.tr,x,y,ctypes.byref(s),ctypes.byref(mc),0)
 		if ok==TR_OK:
 			return s.value,(mc.value)*R2D
 		return 0,0
@@ -617,19 +621,17 @@ class CoordinateTransformation(object):
 			tr_lib.TR_GeoidInfo(self.tr)
 	def GetGeoidName(self):
 		if self.tr is not None:
-			name=" "*256
+			name=ctypes.create_string_buffer(256)
 			tr_lib.TR_GetGeoidName(self.tr,name)
-			return name.replace("\0","").strip()
+			return name.value
 		return ""
-	def GetLocalGeometry(self,x,y,is_out=True):
+	def GetLocalGeometry(self,x,y,is_proj_out=True):
 		#out param determines wheteher prj_in or prj_out is used#
 		if self.tr is None:
 			raise Exception("This system has been invalidated!")
-		if self.is_geo:
-			return 1,0
 		mc=ctypes.c_double(0)
 		s=ctypes.c_double(0)
-		ok=tr_lib.TR_GetLocalGeometry(self.tr,x,y,ctypes.byref(s),ctypes.byref(mc))
+		ok=tr_lib.TR_GetLocalGeometry(self.tr,x,y,ctypes.byref(s),ctypes.byref(mc), int(is_proj_out))
 		if ok==TR_OK:
 			return s.value,(mc.value)*R2D
 		return 0,0

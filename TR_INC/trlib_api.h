@@ -45,7 +45,7 @@ KMSTR_API void TR_AllowUnsafeTransformations(void);
 KMSTR_API void TR_ForbidUnsafeTransformations(void);
 typedef struct  TR TR;
 KMSTR_API void TR_GeoidInfo(TR *tr);
-KMSTR_API int   TR_GetLocalGeometry(TR *tr, double x, double y, double *m, double *c);
+KMSTR_API int   TR_GetLocalGeometry(TR *tr, double x, double y, double *m, double *c, int is_proj_out);
 KMSTR_API TR  *TR_Open (char *label_in, char *label_out, char *geoid_name);
 KMSTR_API int   TR_Insert (TR *tr, char *mlb, int is_out);
 KMSTR_API int   TR_Transform(TR *tr, double *X, double *Y, double *Z, int n);

@@ -435,8 +435,8 @@ void init_lord()
 	stream_debug = NULL;
 	stream_info = NULL;
 	stream_warning = stdout;
-	stream_error = stdout;
-	stream_critical = stdout;
+	stream_error = stderr;
+	stream_critical = stderr;
 }
 
 // Turn the lord modes on or off, an output stream must be specified or the mode cannot be turned on
