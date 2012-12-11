@@ -161,5 +161,10 @@ EXPORTS
 	init_lord
 	set_lord_modes
 	set_lord_outputs
+	set_lord_verbosity_levels
 	set_lord_file
+	reset_lord
+	lord_get_last_error
+	set_lord_callback
+	
 	

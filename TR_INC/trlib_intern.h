@@ -30,6 +30,7 @@
 #define IS_TM(pr)                    ((pr->plab->u_c_lab).cstm==3)
 #define GET_MLB(pr)                 ((pr->plab->u_c_lab).mlb)
 #define HAS_HEIGHTS(pr)          ((pr->plab->u_c_lab).h_dtm>200)
+#define IS_3D(pr)                     ((pr->plab->u_c_lab).h_dtm>=200)
 
 
 /*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */

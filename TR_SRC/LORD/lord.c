@@ -48,12 +48,16 @@ for error and critical messages
 	The value of the lord_code is outputtet in the same line just after the message.
 */
 
-// Maybe implement get_last_error_type
+/* TODO: implement call back mechanism AND implement some max for logged messages - say if you are transforming a zillion points with some kind of wrong input 
+* and don't want a HUGE log file.... */
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 #include "trlib_intern.h"
+#include "trlib_api.h"
+#include "trthread.h"
+#include "lord.h"
 
 
 // Flag whether type is on or off
@@ -64,7 +68,7 @@ int use_error;
 int use_critical;
 
 // The level output for each type
-int verbosity_debug;
+int    verbosity_debug;
 int	verbosity_info;
 int	verbosity_warning;
 int	verbosity_error;
@@ -77,7 +81,87 @@ FILE * stream_warning;
 FILE * stream_error;
 FILE * stream_critical;
 
+/* Log last error */
+THREAD_SAFE int last_error=TR_OK;
 
+/*message overflow protection*/
+#define MAX_MESSAGES (5000)
+THREAD_SAFE int n_logged=0;
+
+/*call back function*/
+static LORD_CALLBACK lord_call_back=NULL;
+
+/*declare the wrapper function*/
+static void lord_wrapper(LORD_CLASS report_class, int err_code, FILE *stream, char *frmt, va_list args);
+
+
+/*returns last (thread local) error*/
+int lord_get_last_error(){
+	return last_error;
+}
+
+int is_lord_initialised(){
+	int is_init=(stream_error!=NULL || stream_critical!=NULL || lord_call_back!=NULL);
+	return is_init;
+}
+
+/*function which resets message count and last error*/
+void reset_lord(){
+	last_error=TR_OK;
+	n_logged=0;
+}
+
+void set_lord_callback(LORD_CALLBACK fct){
+	lord_call_back=fct;
+}
+
+
+static void lord_wrapper(LORD_CLASS report_class, int err_code, FILE *stream, char *frmt, va_list args){
+	char buf[1024], *tmp=buf;
+	n_logged++;
+	if (n_logged>MAX_MESSAGES)
+		return;
+	/*use special message in case of overflow....*/
+	if (n_logged==MAX_MESSAGES){
+		sprintf(buf,"%d messages logged - nothing will be reported from now on.",MAX_MESSAGES);
+	}
+	else{
+		/*compose message identifier*/
+		switch (report_class){
+			case LORD_DEBUG:
+				tmp+=sprintf(tmp,"DEBUG:\t");
+				break;
+			case LORD_INFO:
+				tmp+=sprintf(tmp,"INFO:\t");
+				break;
+			case LORD_WARNING:
+				tmp+=sprintf(tmp,"WARNING:\t");
+				break;
+			case LORD_ERROR:
+				tmp+=sprintf(tmp,"ERROR:\t");
+				break;
+			case LORD_CRITICAL:
+				tmp+=sprintf(tmp,"CRITICAL:\t");
+				break;
+			default:
+				tmp+=sprintf(tmp,"UNKNOWN ERROR:\t");
+		}
+		/*compose message*/
+		tmp+=vsnprintf(tmp,512,frmt,args);
+		if (report_class>LORD_WARNING)
+			tmp+=sprintf(tmp,"\tLORD_CODE:\t %d", err_code);
+		strcat(tmp,"\n");
+	}
+	/*if  call_back  set - use that*/
+	if (lord_call_back!=NULL){
+		lord_call_back(report_class, err_code, buf);
+	}
+	else if (stream!=NULL){
+		fputs(buf,stream);
+	}
+	return;
+}
+		
 // Output debug messages
 void lord_debug(int lord_code, char *frmt, ...)
 {
@@ -96,10 +180,10 @@ void lord_debug(int lord_code, char *frmt, ...)
 
 		if (output)
 		{
+			
 			va_list ap;
-			fprintf(stream_debug, "\nDEBUG:\t");
 			va_start(ap, frmt);
-			(void) vfprintf(stream_debug, frmt,ap);
+			lord_wrapper(LORD_DEBUG,0,stream_debug,frmt,ap);
 			va_end(ap);
 		}
 	}
@@ -124,9 +208,8 @@ void lord_info(int lord_code, char *frmt, ...)
 		if (output)
 		{
 			va_list ap;
-			fprintf(stream_info, "\nINFO:\t");
 			va_start(ap, frmt);
-			(void) vfprintf(stream_info, frmt,ap);
+			lord_wrapper(LORD_INFO,0,stream_info,frmt,ap);
 			va_end(ap);
 		}
 	}
@@ -151,9 +234,8 @@ void lord_warning(int lord_code, char *frmt, ...)
 		if (output)
 		{
 			va_list ap;
-			fprintf(stream_warning, "\nWARNING:\t");
 			va_start(ap, frmt);
-			(void) vfprintf(stream_warning, frmt,ap);
+			lord_wrapper(LORD_WARNING,0,stream_warning,frmt,ap);
 			va_end(ap);
 		}
 	}
@@ -161,29 +243,31 @@ void lord_warning(int lord_code, char *frmt, ...)
 
 // Output error messages
 void lord_error(int lord_code, char *frmt, ...)
-{
+{      
+	/*buffer last error*/
+	last_error=lord_code;
 	if (use_error)
 	{
 		va_list ap;
-		fprintf(stream_error, "\nERROR:\t");
 		va_start(ap, frmt);
-		(void) vfprintf(stream_error, frmt,ap);
+		lord_wrapper(LORD_ERROR,0,stream_error,frmt,ap);
 		va_end(ap);
-		fprintf(stream_warning, "\tLORD_CODE:\t %d", lord_code);
+		
 	}
 }
 
 // Output critical mesaages
 void lord_critical(int lord_code, char *frmt, ...)
 {
+	/*buffer last error*/
+	last_error=lord_code;
 	if (use_critical)
 	{
 		va_list ap;
-		fprintf(stream_critical, "\nCRITICAL:\t");
 		va_start(ap, frmt);
-		(void) vfprintf(stream_critical, frmt,ap);
+		lord_wrapper(LORD_ERROR,0,stream_critical,frmt,ap);
 		va_end(ap);
-		fprintf(stream_critical, "\tLORD_CODE:\t %d", lord_code);
+		
 	}
 }
 
@@ -334,7 +418,8 @@ void init_lord()
 	{
 		return;
 	}
-
+        n_logged=0;
+	last_error=TR_OK;
 	use_debug = 0;
 	use_info = 0;
 	use_warning = 1;

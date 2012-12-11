@@ -501,11 +501,11 @@ class CoordinateTransformation(object):
 	#Destructor - if we have forgotten to close#
 	def __del__(self):
 		self.Close()	
-	def Insert(self,mlb,is_in=False):
+	def Insert(self,mlb,is_in=True):
 		if self.tr is None:
 			raise Exception("This transformation has been invalidated")
-		is_in=int(is_in)
-		rc=tr_lib.TR_Insert(self.tr,mlb,is_in)
+		index=int(not is_in)
+		rc=tr_lib.TR_Insert(self.tr,mlb,index)
 		if (rc!=TR_OK):
 			raise LabelException("Failed to insert %s" %mlb)
 			
@@ -621,6 +621,18 @@ class CoordinateTransformation(object):
 			tr_lib.TR_GetGeoidName(self.tr,name)
 			return name.replace("\0","").strip()
 		return ""
+	def GetLocalGeometry(self,x,y,is_out=True):
+		#out param determines wheteher prj_in or prj_out is used#
+		if self.tr is None:
+			raise Exception("This system has been invalidated!")
+		if self.is_geo:
+			return 1,0
+		mc=ctypes.c_double(0)
+		s=ctypes.c_double(0)
+		ok=tr_lib.TR_GetLocalGeometry(self.tr,x,y,ctypes.byref(s),ctypes.byref(mc))
+		if ok==TR_OK:
+			return s.value,(mc.value)*R2D
+		return 0,0
 	def Close(self):
 		if self.tr is not None:
 			tr_lib.TR_Close(self.tr)
@@ -630,14 +642,19 @@ class CoordinateTransformation(object):
 	
 		
 #Transforms a numpy array or a list of coordinates [(x,y,z),.....]
-def Transform(label_in,label_out,xyz_in,geoid=""):
+def Transform(label_in,label_out,X_yz,y=None,z=0,geoid=""):
 	TR=CoordinateTransformation(label_in,label_out,geoid)
-	xyz_out=TR.Transform(xyz_in)
-	if DEBUG:
-		rc=TR.GetReturnCode()
-		print("rc: %d" %rc)
-	TR.Close()
-	return xyz_out
+	if y is not None:
+		x=X_yz
+		try:
+			x=float(x)
+			y=float(y)
+		except:
+			raise ValueError("Wrong input: accepts x,y,(z) or an interable...")
+		else:
+			return TR.Transform(x,y,z)
+	return TR.Transform(X_yz)
+
 ##Files to be transformed must follow the format:
 ## #Label_in        -Remember the hashes in front 
 ## #Additional comments can be placed below, preceeded by a '#'

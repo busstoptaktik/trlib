@@ -66,14 +66,14 @@ static int HAS_GEOIDS=0; /*global flag which signals if we have geoids available
 static THREAD_SAFE int THREAD_ID=0; /*used to distinguish the thread that initialised the library from other threads.*/
 static int *MAIN_THREAD_ID=0; /* same as above - also signals whether the library has been succesfully initialised.*/
 
-THREAD_SAFE int TR_LAST_ERROR=TR_OK; /*Last error msg (int) from gd_trans - also set in TR_Open and TR_GeoidTable on allocation errors.*/
+
 FILE *ERR_LOG=0;
 
 def_data *DEF_DATA=0;
 
 /*return last buffered error code from gd_trans */
 int TR_GetLastError(void){
-    return TR_LAST_ERROR;
+    return lord_get_last_error();
 }
 
 /* only used in InitLibrary at the moment- but could be useful */
@@ -113,15 +113,14 @@ int TR_InitLibrary(char *path) {
     
     if (!TR_IsMainThread()) /*Only one thread can succesfully initialise the library*/
 	    return TR_ERROR;
+    
     init_lord();  /* initialise the lord (logging, report and debugging) module with default values */
     
     #ifdef _ROUT
     ERR_LOG=fopen("TR_errlog.log","wt");
-    set_lord_debug_mode(ERR_LOG,"all");
-    set_lord_info_mode(ERR_LOG,"all");
-    set_lord_warning_mode(ERR_LOG,"all");
-    set_lord_error_mode(ERR_LOG,"all");
-    set_lord_critical_mode(ERR_LOG,"all");
+    set_lord_outputs(ERR_LOG,ERR_LOG,ERR_LOG,ERR_LOG,ERR_LOG);
+    set_lord_modes(1,1,1,1,1);
+    set_lord_verbosity_levels(3,3,3,3,3);
     #endif
     
     ok=TR_SetGeoidDir(path);
@@ -306,7 +305,7 @@ int TR_GeoidTable(TR *tr){
 	if (!init){
 		GeoidTable=malloc(sizeof(struct mgde_str));
 		if (0==GeoidTable){
-			TR_LAST_ERROR=TR_ALLOCATION_ERROR;
+			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
 			return TR_ALLOCATION_ERROR;
 			}
 		GeoidTable->init=0;
@@ -572,31 +571,35 @@ int TR_tr(
     plab_out=proj_out->plab;
     if (IS_CARTESIC(proj_in)){
         x_in=Y_in;
-        y_in=X_in;}
+        y_in=X_in;
+    }
     else{
         x_in=X_in;
-        y_in=Y_in;}
+        y_in=Y_in;
+    }
     if (IS_CARTESIC(proj_out)){
         x_out=Y_out;
-        y_out=X_out;}
+        y_out=X_out;
+   }
    else{
         x_out=X_out;
-        y_out=Y_out;}
+        y_out=Y_out;
+   }
   
     for (i = 0;  i < n;  i++) {
 	z = Z_in? Z_in[i]: z1;
         err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z_out? Z_out+i: &z2), &GH,use_geoids,geoid_pt, "", ERR_LOG);
 	#ifdef _ROUT
 	if (err)
-		lord_debug(0,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,x_in[i],y_in[i],z);
+		lord_debug(0,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",GET_MLB(proj_in),GET_MLB(proj_out),err,x_in[i],y_in[i],z);
 	#endif
         /*err = gd_trans(tr->plab_in, tr->plab_out,  x,y,z,  X+i,Y+i, (Z? Z+i: &z2), &GH, -1, &GeoidTable, 0, 0);
          *   KE siger at arg 0 for GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
         if (err)
            ERR = err;
    }
-   TR_LAST_ERROR=ERR;
-   
+   if (ERR)
+	   lord_error(ERR,"Error in transformation.");
    return ERR? TR_ERROR: TR_OK;
     
 }
@@ -646,12 +649,13 @@ int TR_itrf(
         }
     #ifdef _ROUT
     if (err)
-        fprintf(ERR_LOG,"\nProj: %s->%s, last err: %d, error str: %s, out: %.3f %.3f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,err_str,x_in[i],y_in[i],z_in[i]);
+        lord_debug(0,"\nProj: %s->%s, last err: %d, error str: %s, out: %.3f %.3f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,err_str,x_in[i],y_in[i],z_in[i]);
     #endif
         if (err)
            ERR = err;
    }
-   TR_LAST_ERROR=ERR;
+   if (ERR)
+	   lord_error(ERR,"Error in itrf transformation.");
 
    return ERR? TR_ERROR: TR_OK;
 
