@@ -73,7 +73,8 @@ class LabelException(Exception):
 
 
 MESSAGE_HANDLER = ctypes.CFUNCTYPE(None,ctypes.c_int, ctypes.c_int, ctypes.c_char_p)
-
+#we will keep a reference to the callback here...
+CALL_BACK=None
 
 ###################
 ##Call this initializtion FIRST!
@@ -214,7 +215,9 @@ def SetThreadMode(on=True):
 		
 #Use a python function as a callback for messages from trlib
 def SetMessageHandler(fct):
-	tr_lib.set_lord_callback(MESSAGE_HANDLER(fct))
+	global CALL_BACK #keep this reference ....
+	CALL_BACK=MESSAGE_HANDLER(fct)
+	tr_lib.set_lord_callback(CALL_BACK)
 
 def SetGeoidDir(geoid_dir):
 	global GEOIDS
@@ -334,9 +337,11 @@ def DescribeProjection(mlb_prj):
 		type=ctypes.c_int(0)
 		rc=tr_lib.doc_prj(mlb_prj,descr,impl_dtm,ctypes.byref(type),0)
 		if (rc==TR_OK):
+			descr=descr.value.strip()
+			impl_dtm=impl_dtm.value.strip()
 			if ("(" in descr):
 				descr=descr[:descr.find("(")]
-			return descr.value,impl_dtm.value
+			return descr,impl_dtm
 	return None,None
 
 def DescribeDatum(mlb_dtm):
@@ -451,6 +456,7 @@ class CoordinateSystem(object):
 	def __init__(self,mlb):
 		if not IS_INIT:
 			raise Exception("Initialise Library first!")
+		self.tr=None
 		self.mlb=mlb
 		self.tr=tr_lib.TR_Open(mlb,"","")
 		if self.tr is None:
@@ -491,6 +497,7 @@ class CoordinateTransformation(object):
 	def __init__(self,system_in,system_out,geoid_name=""):
 		if not IS_INIT:
 			raise Exception("Initialise Library first!")
+		self.tr=None
 		self.tr=tr_lib.TR_Open(system_in,system_out,geoid_name)
 		if self.tr is None:
 			raise LabelException("Failed to compose transformation.")

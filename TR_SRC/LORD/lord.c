@@ -250,7 +250,7 @@ void lord_error(int lord_code, char *frmt, ...)
 	{
 		va_list ap;
 		va_start(ap, frmt);
-		lord_wrapper(LORD_ERROR,0,stream_error,frmt,ap);
+		lord_wrapper(LORD_ERROR,lord_code,stream_error,frmt,ap);
 		va_end(ap);
 		
 	}
@@ -265,7 +265,7 @@ void lord_critical(int lord_code, char *frmt, ...)
 	{
 		va_list ap;
 		va_start(ap, frmt);
-		lord_wrapper(LORD_ERROR,0,stream_critical,frmt,ap);
+		lord_wrapper(LORD_ERROR,lord_code,stream_critical,frmt,ap);
 		va_end(ap);
 		
 	}

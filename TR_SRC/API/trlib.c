@@ -791,6 +791,7 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc, int 
 	if (proj==NULL){
 		lord_error(TR_LABEL_ERROR,"GetLocalGeometry: specified projection not set!");
 		return TR_LABEL_ERROR;
+	}
 	if (IS_CARTESIC(proj)){
 		lord_warning(0,"Local scale and convergence not defined for cartesic systems.");
 		return TR_ERROR;
