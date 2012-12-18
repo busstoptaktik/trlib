@@ -60,21 +60,21 @@ for error and critical messages
 #include "lord.h"
 
 
-// Flag whether type is on or off
-int use_debug;
-int use_info;
-int use_warning;
-int use_error;
-int use_critical;
+/* Flag whether type is on or off -deafult assigned */
+int use_debug=0;
+int use_info=0;
+int use_warning=1;
+int use_error=1;
+int use_critical=1;
 
-// The level output for each type
-int    verbosity_debug;
-int	verbosity_info;
-int	verbosity_warning;
-int	verbosity_error;
-int	verbosity_critical;
+/* The level output for each type -defaults to very verbose */
+int    verbosity_debug=3;
+int	verbosity_info=3;
+int	verbosity_warning=3;
+int	verbosity_error=3;
+int	verbosity_critical=3;
 
-// The output stream used for each type
+/* The output stream used for each type -NULLS assigned automatically*/
 FILE * stream_debug;
 FILE * stream_info;
 FILE * stream_warning;

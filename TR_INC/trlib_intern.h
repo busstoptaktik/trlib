@@ -30,7 +30,8 @@
 #define IS_TM(pr)                    ((pr->plab->u_c_lab).cstm==3)
 #define GET_MLB(pr)                 ((pr->plab->u_c_lab).mlb)
 #define HAS_HEIGHTS(pr)          ((pr->plab->u_c_lab).h_dtm>200)
-#define IS_3D(pr)                     ((pr->plab->u_c_lab).h_dtm>=200)
+#define IS_3D(pr)                     (pr!=NULL && (pr->plab->u_c_lab).ncoord==3)
+#define COORD_ORDER(pr)          ((pr->plab->u_c_lab).p_seq)
 
 
 /*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */

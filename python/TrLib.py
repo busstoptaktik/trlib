@@ -17,7 +17,7 @@
  */
  """
 #########################
-## Python bindings for (Kms) TrLib
+## Python bindings for (Kms/GST) TrLib
 ## simlk, 2011,2012            
 #########################
 try:
@@ -40,9 +40,10 @@ else:
 	STD_LIB="KMSTRLIB.so"
 STD_DIRNAME=os.path.dirname(__file__)
 REQUIRED_FILES=["def_lab.txt","def_shp.txt"]
+tr_lib=None
 #define return codes, really define in trlib_api.h
 TR_OK=0
-LABEL_ERROR=1
+TR_LABEL_ERROR=1
 TR_ERROR=2
 TR_ALLOCATION_ERROR=3
 #special return code for this module
@@ -79,23 +80,17 @@ CALL_BACK=None
 ###################
 ##Call this initializtion FIRST!
 ###################
-#TODO: change prints to raise some Exception
-#Or: stdout must be mapped to some other logging method....
-def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
+
+def LoadLibrary(lib=STD_LIB,lib_dir=STD_DIRNAME):
 	global tr_lib
-	global IS_INIT
-	global GEOIDS
-	
-	IS_INIT=False
 	if len(lib_dir)==0:
-		lib_dir="."
+		lib_dir=os.curdir
 	lib_path=os.path.join(lib_dir,lib)
 	if not os.path.exists(lib_path):
-		print("%s does not exist!" %lib_path)
-		return False
+		return False, "%s does not exist!" %lib_path
 	#to be able to find extra runtime dlls on windows#
 	if "win" in sys.platform.lower():
-		os.environ["PATH"]+=";"+os.path.realpath(os.path.dirname(lib_path))
+		os.environ["PATH"]+=os.pathsep+os.path.realpath(os.path.dirname(lib_path))
 	try:
 		tr_lib=ctypes.cdll.LoadLibrary(lib_path) #Loads the simple API exported on top of the KMS transformation library.
 		#Setup API, corresponds to header file of the API#
@@ -165,8 +160,19 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.set_lord_callback.restype=None
 
 	except Exception, msg:
-		print repr(msg)
-		print("Unable to load library %s in directory %s." %(lib,lib_dir))
+		return False, "Unable to load library %s in directory %s: %s" %(lib,lib_dir,repr(msg))
+	return True,""
+
+
+#The library loading has been split out in a more fine grained method.
+#Enables the programmer to see what went wrong from another app.  Call with lib=None or "" if the library is already loaded....
+def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
+	global GEOIDS
+	global IS_INIT
+	ok=True
+	if lib is not None and lib!="":
+		ok,msg=LoadLibrary(lib,lib_dir)
+	if not ok or tr_lib is None:
 		return False
 	if len(geoid_dir)==0:
 		if os.environ.has_key(TABDIR_ENV):
@@ -353,7 +359,7 @@ def DescribeDatum(mlb_dtm):
 		descr=ctypes.create_string_buffer(512)
 		rc=tr_lib.doc_dtm(mlb_dtm,descr,0)
 		if (rc==TR_OK):
-			return descr.value.replace("@","")
+			return descr.value.replace("@","").strip()
 	return None
 
 
