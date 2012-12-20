@@ -28,6 +28,7 @@ OPTIONS={"-thread_safe": "Compile a thread safe library.",
 "-kmsfncs":"(DEPRECATED) Expose KE's functions (windows).",
 "-gprof":"Include symbols for gprof.",
 "-compiler_version":"Echo compiler selection.",
+"-cc":"Override default compiler - e.g. 'gcc' - for example to use a gcc-like cross compiler.",
 "-java":"Build java (jni) bindings.",
 "-java_external":"Build and link a separate library for jni-bindings.",
 "-build_java":"Build java source (not implemented)."}
@@ -249,6 +250,8 @@ def main(args):
 		build_dir=BUILD_DIR
 		lib_dir=LIB_DIR
 		linker=LINKER
+	if "-cc" in args:
+		compiler=args[args.index("-cc")+1]
 	if "-compiler_version" in args:
 		print GetCompiler(compiler)
 	#ALWAYS PUT LIBRARY IN LIBDIR#
