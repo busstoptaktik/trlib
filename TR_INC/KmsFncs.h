@@ -112,6 +112,7 @@ extern "C" {
 #include "itrf_trans.h"
 #include "kmsshp_tr.h"
 #include "labchsum.h"
+#include "lord.h"
 #include "ng_trans.h"
 #include "parse_def_file.h"
 #include "pla_adm_f.h"

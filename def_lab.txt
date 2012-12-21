@@ -860,6 +860,9 @@ European Terrestrial Ref Frame 1989
 European Terrestrial Ref Frame 1989
 * this DATUM number may NOT be change (used in ctc)  ;
 
+European Terrestrial Ref Frame 1989
+* this DATUM number may NOT be change (used in ctc)  ;
+
 #euref89
  4    wgs84     GRS80    0  ZZ
  0                  0.0000 m      0.0000 m      0.0000 m
@@ -1773,8 +1776,8 @@ DNN OLD to DNN 1950 (NEW)
 
 #FO_geoHetrs89_h_fvr09
                foldmsl   1  54 30 nt  11 20 nt
-dhfvroldmsl.09
-FVR90 to MSL (old Fo Heeight System)
+dhfvr09oldmsl.12
+FVR09 to MSL (old FO Height System)
 
 #DK_geoHfeh10_h_dvr90
                fcsvr10   2  54 30 nt  11 20 nt
