@@ -15,9 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- #if !defined(H_LORD)
-#define      H_LORD
- 
 
 #if !defined(H_LORD)
 #define      H_LORD
