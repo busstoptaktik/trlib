@@ -257,7 +257,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
       b_lev                = -49;
       gps_table.req_plm_tr = -2;
       gps_table.req_ipl_tr = 0;
-      *s_u_plm_nam      = *s_u_ipl_nam = '\0';
+      *s_u_plm_nam         = *s_u_ipl_nam = '\0';
       return(0);
     } else
     return(-999);
@@ -265,7 +265,7 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
   if (b_lev == -99) {
     b_lev            = -49;
     ipl_table.init   = 0;
-    *s_u_plm_nam  = *s_u_ipl_nam = '\0';
+    *s_u_plm_nam     = *s_u_ipl_nam = '\0';
   }
 
 /* itrf_trans  ver 2007.02          # page 4    10 Oct 2008 11 57 */

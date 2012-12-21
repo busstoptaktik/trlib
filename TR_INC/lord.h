@@ -18,7 +18,11 @@
  #if !defined(H_LORD)
 #define      H_LORD
  
- 
+
+#if !defined(H_LORD)
+#define      H_LORD
+
+
 #include  <stdio.h>
 
 

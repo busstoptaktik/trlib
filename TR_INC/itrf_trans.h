@@ -43,7 +43,7 @@ double                    i_JD,         /* Julian Day from 2000.0 */
 double                   *o_crd,        /* output coords:: 0:2 */
 double                   *o_vel,        /* NOT calculated:: 0:2 (==0.0) */
 struct PLATE             *plate_info,   /* call and return info on plates */
-double                   *tr_par,       /* 7-par describing the transf. */
+double                   *tr_par,       /* 7-par describing the transformation */
 char                     *usertxt,
 char                     *err_str
 );
@@ -136,7 +136,7 @@ char                     *err_str
 /*   ipl_odt  : Julian date of output National (INTRA Plate) */
 /*   plm_nam is the name of the actual nnr plate model       */
 /*   plt_nam is the name of the actual plate                 */
-/*   ipl_nam is tha name of the actual intra plate model     */
+/*   ipl_nam is the name of the actual intra plate model       */
 
 /* err_str: at ERROR: user_txt cat ERROR description         */
 

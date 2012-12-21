@@ -18,6 +18,8 @@
  
 /* int get_ellipsoid_data(union geo_lab *plab_in, double *data);*/
 
+#include "parse_def_file.h"
+
 int doc_rgn(char *rgn_name, char *descr, int detail);
 int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail);
 int doc_dtm(char *dtm_name, char *descr, int detail);
