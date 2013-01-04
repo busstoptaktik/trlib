@@ -252,6 +252,7 @@ def main(args):
 		linker=LINKER
 	if "-cc" in args:
 		compiler=args[args.index("-cc")+1]
+		linker=compiler
 	if "-compiler_version" in args:
 		print GetCompiler(compiler)
 	#ALWAYS PUT LIBRARY IN LIBDIR#
