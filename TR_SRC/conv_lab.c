@@ -393,8 +393,10 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
         i_lab->region   = p_lb->region;
 
         if ((!p_lb->region) && p_lb->lab_type == IDT_LAB) {
-          (void) fprintf(stdout,
-                 "\n***Illegal IDT-label - missing region");
+       		
+			lord_error(0,"Illegal IDT-label - missing region");
+			/*		(void) fprintf(stdout,
+                 "\n***Illegal IDT-label - missing region");*/
           p_lb->lab_type = ILL_LAB;
         }
         break;
