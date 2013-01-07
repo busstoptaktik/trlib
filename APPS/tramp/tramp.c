@@ -169,7 +169,7 @@ static char help_message[] = {
     "  -v         Set verbose mode. Repeat option for more verbosity\n"
     "\n"
     "\n"
-    "The default operation is to transform to geographic to UTM zone 32.\n"
+    "The default operation is to transform from geographic to UTM zone 32.\n"
     "Exit status is 0 if OK, 1 if minor problems, 2 if serious trouble.\n"
     "\n"
     "Report bugs through https://bitbucket.org/KMS/trlib\n"
