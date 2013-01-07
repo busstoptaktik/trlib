@@ -119,7 +119,7 @@ int TR_InitLibrary(char *path) {
     
     ok=TR_SetGeoidDir(path);
     if (ok!=TR_OK){
-	    lord_error(TR_ERROR,"Failed to parse def-file!\n");
+	    lord_error(TR_ERROR,"Failed to parse def-file!");
 	    return TR_ERROR;
     }
     #ifdef _ROUT
@@ -507,7 +507,7 @@ void TR_Close (TR *tr) {
     /*if using special geoid, close it down */
     if (tr->close_table){
 	    #ifdef _ROUT
-	    lord_debug(0,LORD("Closing special geoid!\n"));
+	    lord_debug(0,LORD("Closing special geoid!"));
 	    #endif
 	    geoid_c(tr->geoid_pt,0,NULL);
 	    free(tr->geoid_pt);}

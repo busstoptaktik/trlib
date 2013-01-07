@@ -169,7 +169,7 @@ void lord_error(int lord_code, char *frmt, ...)
 		va_start(ap, frmt);
 		(void) vfprintf(stream_error, frmt,ap);
 		va_end(ap);
-		fprintf(stream_warning, "\tLORD_CODE:\t %d", lord_code);
+		fprintf(stream_error, "\tLORD_CODE:\t %d", lord_code);
 	}
 }
 

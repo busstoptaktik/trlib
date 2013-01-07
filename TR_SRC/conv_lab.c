@@ -192,9 +192,8 @@ union geo_lab    *u_lab,
       p_tp = (char *) i_lab;
       for (i = sizeof(*i_lab) -1; i >= 0; i--) *(p_tp+i) = 0;
       if (res != EOF) {
-        (void) lord_error(0, LORD("***conv_lab: error in label input"));
-		//(void) fprintf(stdout, "\n***conv_lab: error in label input");
-        i_lab->lab_type = ILL_LAB;
+        (void) lord_error(0, "***conv_lab: error in label input");
+		i_lab->lab_type = ILL_LAB;
         return(ILL_LAB);
       }
     }
@@ -258,8 +257,9 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
             }
           }
           if (!sep_ok) {
-            (void) fprintf(stdout,
-                   "\nconv_lab: illegal separator %c", p_lb->sepch);
+				lord_error(0,"conv_lab: illegal separator %c", p_lb->sepch);
+			  /*(void) fprintf(stdout,
+                   "\nconv_lab: illegal separator %c", p_lb->sepch);*/
             return (ILL_LAB);
           }
         }
