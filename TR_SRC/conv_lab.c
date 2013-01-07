@@ -424,15 +424,8 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
         if (!recurs) {
           recurs = 1;
           if ((fc = fopen(t_info, "r")) == NULL) {
-            FILE * pFile = fopen ("myfile.txt" , "w");
-			set_lord_error_mode(pFile, "all");
-			(void) lord_error(0, LORD("*** conv_lab: ILLEGAL or FILE %s not found;"), t_info);
-			set_lord_error_mode(stdout, "all");
-			fclose(pFile);
-			
-			(void) fprintf(stdout,
-               "\n*** conv_lab: ILLEGAL or FILE %s not found;", t_info);
-            recurs = 0;
+            (void) lord_error(0, LORD("conv_lab: ILLEGAL or FILE %s not found;"), t_info);
+			recurs = 0;
             return(UNDEFSYS);
           }
 
@@ -441,8 +434,9 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
           recurs = 0;
           if (p_lb->lab_type > ILL_LAB) return(p_lb->lab_type);
           else {
-            (void) fprintf(stdout,
-                   "\n*** conv_lab: %s not a label;", p_sys);
+			  (void) lord_error(0, LORD("conv_lab: %s not a label"), p_sys);
+/*			  (void) fprintf(stdout,
+                   "\n*** conv_lab: %s not a label;", p_sys);*/
             return(UNDEFSYS);
           }
         } /* ! recurs */
