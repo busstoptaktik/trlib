@@ -20,3 +20,5 @@
  double get_number(char *item);
  char **append_items(char **items1, char **items2, int n_items1, int n_items2);
  void string_tolower(char *text);
+ char *path_basename(char *full_path);
+ 
