@@ -42,6 +42,7 @@
 #include <math.h>
 
 #include "geo_lab.h"
+#include "lord.h"
 
 int                      conv_obs(
 /*___________________________*/
@@ -209,8 +210,7 @@ struct obs_lab          *o_lab,
   va_end(o_p);
 
   if (p_lb->lab_type != OBS_LAB) {
-    (void) fprintf(stdout,
-         "\nconv_obs called with wrong lab_type %d", p_lb->lab_type);
+    lord_error(0,LORD("conv_obs called with wrong lab_type %d"), p_lb->lab_type);
     o_lab->lab_type = ILL_LAB;
     return(ILL_LAB);
   }
@@ -278,14 +278,12 @@ struct obs_lab          *o_lab,
             "%s%n", t_lab, &used) == 1) {
           if (strcmp(t_lab, "xxx")) {
             if (conv_lab(t_lab, &lab1, "") != CRD_LAB) {
-              (void) fprintf(stdout,
-                  "\n***conv_obs: MONO Unknown coordsys %s", t_lab);
+              lord_error(0,LORD("MONO Unknown coordsys %s"), t_lab);
               return(STP_LAB);
             }
           }
           if (strlen(t_lab) > 23) {
-            (void) fprintf(stdout,
-                "\n***conv_obs: MONO too many chars in coordsys %s",
+            lord_error(0,LORD("MONO too many chars in coordsys %s"),
                 t_lab);
               return(STP_LAB);
           }
@@ -300,8 +298,7 @@ struct obs_lab          *o_lab,
 
 
     default: /* unknown kind */
-      (void) fprintf(stdout,
-          "\n***conv_obs : %s : Unknown observation kind %d",
+      lord_error(0,LORD("conv_obs : %s : Unknown observation kind %d"),
           o_lab->mlb, o_lab->obs_kind);
       return(ILL_LAB);
     } /* end switch(o_lab->obs_kind) */
@@ -333,8 +330,7 @@ struct obs_lab          *o_lab,
     }
 
     if (!o_lab->obs_type) {
-      (void) fprintf(stdout,
-          "\n***conv_obs unknown observation type %d",
+      lord_error(0,LORD("unknown observation type %d"),
           o_lab->obs_type);
       o_lab->lab_type = ILL_LAB;
       return(ILL_LAB);
@@ -460,8 +456,7 @@ struct obs_lab          *o_lab,
       break; /* monocomparator */
 
     default: /* unknown kind */
-      (void) fprintf(stdout,
-          "\n***conv_obs : %s : Unknown observation kind %d",
+      lord_error(0,LORD("conv_obs : %s : Unknown observation kind %d"),
           o_lab->mlb, o_lab->obs_kind);
       return(ILL_LAB);
     } /* end switch(o_lab->obs_kind) */
@@ -516,8 +511,7 @@ struct obs_lab          *o_lab,
     if (conv_mode == 4) {
 
       if (!o_lab->obs_type) {
-        (void) fprintf(stdout,
-            "\n***conv_obs %s : unknown observation type %d",
+        lord_error(0,LORD("conv_obs %s : unknown observation type %d"),
             p_lb->text, o_lab->obs_type);
         return(ILL_LAB);
       }

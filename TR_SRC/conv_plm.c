@@ -39,6 +39,7 @@
 #include <math.h>
 #include "geo_lab.h"
 #include "trthread.h"
+#include "lord.h"
 
 int                      conv_plm(
 /*______________________________*/
@@ -309,16 +310,15 @@ extern THREAD_SAFE size_t              init_gps_pos;
     case PLM_LAB:
       if (p_lab->ch_sum != labchsum(
                          (union geo_lab *) p_lab, &p_lab->ch_sum)) {
-        (void) fprintf(stdout, "\n***conv_plm: file %s of type %d",
+        lord_error(0,LORD("file %s of type %d has sum fault"),
                        p_lab->mlb, p_lab->lab_type);
-        (void) fprintf(stdout, "\n             has sum fault;");
-        return (ILL_LAB);
+		return (ILL_LAB);
       }
       break;
-    default: 
-      (void) fprintf(stdout, "\n***conv_plm: file %s of type %d",
+
+	default: 
+      lord_error(0,LORD("file %s of type %d is not a plm"),
                      p_lab->mlb, p_lab->lab_type);
-      (void) fprintf(stdout, "\n             is not a plm;");
     }
 
     (void) fprintf(o_file, "\n %s\n ", p_lab->mlb);

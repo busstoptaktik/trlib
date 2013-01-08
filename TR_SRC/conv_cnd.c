@@ -42,6 +42,7 @@
 #include <stdarg.h>
 #include <math.h>
 #include "geo_lab.h"
+#include "lord.h"
 
 int                      conv_cnd(
 /*___________________________*/
@@ -111,9 +112,7 @@ struct obs_lab          *o_lab,
   va_end(o_p);
 
   if (p_lb->lab_type != CND_LAB) {
-    (void) fprintf(stdout,
-         "\nconv_cnd called with wrong lab_type %d", p_lb->lab_type);
-    o_lab->lab_type = ILL_LAB;
+    lord_error(0,LORD("conv_cnd called with wrong lab_type %d"), p_lb->lab_type);
     return(ILL_LAB);
   }
 
@@ -164,10 +163,9 @@ struct obs_lab          *o_lab,
       break;
 
     default: /* unknown kind */
-      (void) fprintf(stdout,
-          "\n***conv_cnd : %s : Unknown observation kind %d",
+      lord_error(0,LORD("\n***conv_cnd : %s : Unknown observation kind %d"),
           o_lab->mlb, o_lab->obs_kind);
-      return(ILL_LAB);
+	  return(ILL_LAB);
     } /* end switch(o_lab->obs_kind) */
 
     for ( ; p_otype->obs_type; p_otype++) {
@@ -178,8 +176,7 @@ struct obs_lab          *o_lab,
     }
 
     if (!o_lab->obs_type) {
-      (void) fprintf(stdout,
-          "\n***conv_cnd unknown observation type %d",
+      lord_error(0,LORD("conv_cnd unknown observation type %d"),
           o_lab->obs_type);
       o_lab->lab_type = ILL_LAB;
       return(ILL_LAB);
@@ -294,8 +291,7 @@ struct obs_lab          *o_lab,
       break;
 
     default: /* unknown kind */
-      (void) fprintf(stdout,
-          "\n***conv_cnd : %s : Unknown observation kind %d",
+      lord_error(0,LORD("conv_cnd : %s : Unknown observation kind %d"),
           o_lab->mlb, o_lab->obs_kind);
       return(ILL_LAB);
     } /* end switch(o_lab->obs_kind) */
@@ -339,8 +335,7 @@ struct obs_lab          *o_lab,
     if (conv_mode == 4) {
 
       if (!o_lab->obs_type) {
-        (void) fprintf(stdout,
-            "\n***conv_cnd %s : unknown observation type %d",
+        lord_error(0,LORD("conv_cnd %s : unknown observation type %d"),
             p_lb->text, o_lab->obs_type);
         return(ILL_LAB);
       }
