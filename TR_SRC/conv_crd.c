@@ -45,6 +45,7 @@
 
 #include "geo_lab.h"
 #include "trthread.h"
+#include "lord.h"
 
 int                      conv_crd(
 /*______________________________*/
@@ -140,9 +141,7 @@ struct coord_lab        *c_lab,
   va_end(o_p);
 
   if (p_lb->lab_type != CRD_LAB) {
-    (void) fprintf(stdout,
-           "\nconv_crd called with wrong lab_type %d",
-           p_lb->lab_type);
+    lord_error(0,LORD("conv_crd called with wrong lab_type %d"), p_lb->lab_type);
     c_lab->lab_type = ILL_LAB;
     return(ILL_LAB);
   }
@@ -560,8 +559,7 @@ struct coord_lab        *c_lab,
   case 4:  /* output of minilabel, expand */
 
     if (c_lab->lab_type != CRD_LAB) {
-      (void) fprintf(stdout,
-             "\nconv_crd called with wrong lab_type %d",
+      lord_error(0,LORD("conv_crd called with wrong lab_type %d"),
              c_lab->lab_type);
       return(ILL_LAB);
     }
@@ -719,8 +717,7 @@ struct coord_lab        *c_lab,
   case 5:   /* DOCUMENTATION OF THE LABEL */
 
     if (c_lab->lab_type != CRD_LAB) {
-      (void) fprintf(stdout,
-             "\nconv_crd called with wrong lab_type %d",
+      lord_error(0,LORD("\nconv_crd called with wrong lab_type %d"),
              c_lab->lab_type);
       c_lab->lab_type = ILL_LAB;
       return(ILL_LAB);
