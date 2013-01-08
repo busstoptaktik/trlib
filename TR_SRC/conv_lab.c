@@ -257,9 +257,7 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
             }
           }
           if (!sep_ok) {
-				lord_error(0,"conv_lab: illegal separator %c", p_lb->sepch);
-			  /*(void) fprintf(stdout,
-                   "\nconv_lab: illegal separator %c", p_lb->sepch);*/
+				lord_error(0,LORD("conv_lab: illegal separator %c"), p_lb->sepch);
             return (ILL_LAB);
           }
         }
@@ -394,9 +392,7 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
 
         if ((!p_lb->region) && p_lb->lab_type == IDT_LAB) {
        		
-			lord_error(0,"Illegal IDT-label - missing region");
-			/*		(void) fprintf(stdout,
-                 "\n***Illegal IDT-label - missing region");*/
+			lord_error(0,LORD("Illegal IDT-label - missing region"));
           p_lb->lab_type = ILL_LAB;
         }
         break;
@@ -424,7 +420,7 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
         if (!recurs) {
           recurs = 1;
           if ((fc = fopen(t_info, "r")) == NULL) {
-            (void) lord_error(0, LORD("conv_lab: ILLEGAL or FILE %s not found;"), t_info);
+            (void) lord_error(0, LORD("ILLEGAL or FILE %s not found;"), t_info);
 			recurs = 0;
             return(UNDEFSYS);
           }
@@ -435,8 +431,6 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
           if (p_lb->lab_type > ILL_LAB) return(p_lb->lab_type);
           else {
 			  (void) lord_error(0, LORD("conv_lab: %s not a label"), p_sys);
-/*			  (void) fprintf(stdout,
-                   "\n*** conv_lab: %s not a label;", p_sys);*/
             return(UNDEFSYS);
           }
         } /* ! recurs */

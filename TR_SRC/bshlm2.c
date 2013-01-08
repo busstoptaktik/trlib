@@ -31,6 +31,7 @@
 #include  <math.h>
 #include  <stdio.h>
 #include  "geo_lab.h"
+#include "lord.h"
 
 #ifndef    M_PI
 #include   "kms_math.h"
@@ -152,17 +153,17 @@ Prog: Knud Poder NOV 1990
 #ifdef  BHTEST
     {
       double oms = 180.0/M_PI;
-      (void) fprintf(stdout, "\nA1 = %-8.3f", *A1*oms);
-      (void) fprintf(stdout, "\ns1 = %-8.3f", s1*oms);
-      (void) fprintf(stdout, "\nb_max = %-8.3f", b_max*oms);
-      (void) fprintf(stdout, "\nd_lmb = %-8.3f", d_lmb*oms);
-      (void) fprintf(stdout, "\nA2 = %-8.3f", *A2*oms);
+      lord_debug(0,LORD("\nA1 = %-8.3f"), *A1*oms);
+      lord_debug(0,LORD("\ns1 = %-8.3f"), s1*oms);
+      lord_debug(0,LORD("\nb_max = %-8.3f"), b_max*oms);
+      lord_debug(0,LORD("\nd_lmb = %-8.3f"), d_lmb*oms);
+      lord_debug(0,LORD("\nA2 = %-8.3f"), *A2*oms);
     }
 #endif
 
   }
   else {
-    (void) fprintf(stderr,"\n***BESSEL-HELMERT no convergency");
+    lord_error(0,LORD("BESSEL-HELMERT no convergency"));
     *A1 = *A2 = *S = a1 = 0.0;
     return(2);
   }
