@@ -44,10 +44,11 @@
 /*   
 * Defines
 */
-#define TRLIB_VERSION "dev v1.0 2012-11-26"
-#ifndef TRLIB_REVISION
-#define TRLIB_REVISION "hg revison not specified"
+#ifndef  TRLIB_REVISION
+#define TRLIB_REVISION "not specified"
 #endif
+
+#define TRLIB_VERSION ( "dev v1.0 (rev: " TRLIB_REVISION  ", " __DATE__ ", " __TIME__ ")" )
 
 #define TR_TABDIR_ENV  "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE      "def_lab.txt"
@@ -275,11 +276,7 @@ void TR_GetGeoidName(TR *tr,char *name) {
 /*Return the version info */
 
 void TR_GetVersion(char *buffer,int BufSize) {
-    char version[256];
-    strcpy(version,TRLIB_VERSION);
-    strcat(version," rev: ");
-    strcat(version,TRLIB_REVISION);
-    strncpy(buffer,version,BufSize);
+	strncpy(buffer,TRLIB_VERSION,BufSize);
 }
 	
 /* A simple wrapper for tr - deprecated!*/

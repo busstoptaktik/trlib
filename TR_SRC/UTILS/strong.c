@@ -86,4 +86,16 @@ double get_number(char *item){
 	if (isalpha(item[n_chars-1]))
 		return sgetg(item,&type,&used,term);
 	return atof(item);
-}	
+}
+
+
+/*extracts basename/filename from a full path*/
+char *path_basename(char *full_path){
+	char *pos=full_path;
+	while (*full_path){
+		if (*full_path=='/' || *full_path=='\\')
+			pos=full_path+1;
+		full_path++;
+	}
+	return pos;
+}
