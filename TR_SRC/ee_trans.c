@@ -38,6 +38,7 @@
 #include <ctype.h>
 #include "geo_lab.h"
 #include "trthread.h"
+#include "lord.h"
 
 /* ACTION NUMBERS */
 /* termination action */
@@ -276,7 +277,7 @@ FILE                *tr_error
         outgr = pml->trgr;
         outnr = pml->trnr;
 #ifdef DEBUGEETRANS
-(void) printf("\n*OUT  grp = %4d    nr = %4d   navn = %s, call = %s;",
+lord_debug(0,LORD("OUT  grp = %4d    nr = %4d   navn = %s, call = %s"),
 pml->trgr, pml->trnr, pml->s_lab, outcs);
 #endif
         break;
@@ -331,7 +332,7 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
         in_gr = pml->trgr;
         in_nr = pml->trnr;
 #ifdef DEBUGEETRANS
-(void) printf("\n*IN   grp = %4d    nr = %4d   navn = %s;",
+lord_debug(0,LORD("IN   grp = %4d    nr = %4d   navn = %s"),
 pml->trgr, pml->trnr, pml->s_lab);
 #endif
         break;
@@ -381,8 +382,8 @@ pml->trgr, pml->trnr, pml->s_lab);
       in_nr = outnr = 0;
     }
 #ifdef  DEBUGEETRANS
-(void) fprintf(stdout, "\n* in = %s, out = %s", in_cs, outcs);
-(void) fprintf(stdout, "\n ee_trans in_nr     %d  outnr      %d;",
+lord_debug(0,LORD(" in = %s, out = %s"), in_cs, outcs);
+lord_debug(0,LORD(" ee_trans in_nr     %d  outnr      %d"),
 in_nr, outnr);
 #endif
 
@@ -434,8 +435,7 @@ in_nr, outnr);
       nst = (ptab+nst)->nstate;
 
 #ifdef  DEBUGEETRANS
-(void) fprintf(stdout,
-"\n*EE_TRANS ACTION  %-6s: STATE %2d -> %2d, LEVEL = %d",
+lord_debug(0,LORD("EE_TRANS ACTION  %-6s: STATE %2d -> %2d, LEVEL = %d"),
 ACTION[act], gst, nst, level);
 #endif
 

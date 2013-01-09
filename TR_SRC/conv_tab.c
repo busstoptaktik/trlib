@@ -53,6 +53,7 @@
 #include <math.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
+#include "lord.h"
 
 #ifndef    M_PI
 #include   "kms_math.h"
@@ -172,8 +173,7 @@ struct gde_lab          *t_lab,
     tab_file = i_tabdir_file(4, t_lab->mlb, &r, pth_mlb);
     if (r) {
       if (all_out)
-         (void) fprintf(stdout, 
-                        "\n*** table: %s NOT FOUND;\n", t_lab->mlb);
+         lord_error(0,LORD("table: %s NOT FOUND"), t_lab->mlb);
       return (-1);
     }
 
@@ -181,18 +181,16 @@ struct gde_lab          *t_lab,
     pos = 0;
     if ((qr = fread((void *) &f777, sizeof (int),
                     1, tab_file)) - 1) {
-      (void) fprintf(stdout,
-                "\n*** conv_tab: FEJL ved input af table-mark");
-      (void) fprintf(stdout,
-                "\n blokaddr %8ld antal  = %4lu size = %4d ;",
+      lord_error(0,LORD("The error is at the input of table-mark blokaddr %8ld number = %4lu size = %4d"),
                 pos, (unsigned long) qr, sizeof (int));
       fclose(tab_file);
       return (-1);
     }
     if (f777 < 768 || 777 < f777) {
-      if (all_out) (void) fprintf(stdout,
-         "\n*** conv_tab: %s not a table_file ;\n", t_lab->mlb);
-      fclose(tab_file);
+      if (all_out) {
+		lord_error(0,LORD("%s not a table_file"), t_lab->mlb);  
+	  }
+	  fclose(tab_file);
       return (-2);
     }
     /* table file detected */
@@ -205,11 +203,8 @@ struct gde_lab          *t_lab,
     pos = pos + (long) qr;
     if ((qr = fread((void *) BL, 6 * sizeof (double),
                     1, tab_file)) - 1) {
-      (void) fprintf(stdout,
-                "\n*** conv_tab: FEJL ved input af table-limits");
-      (void) fprintf(stdout,
-                "\n blokaddr %8ld antal  = %4lu size = %4d ;\n",
-                pos, (unsigned long) qr, 6 * sizeof (double));
+      lord_error(0,LORD("Error at input of table-limits blokaddr %8ld number = %4lu size = %4d"), 
+		  pos, (unsigned long) qr, 6 * sizeof (double));
       fclose(tab_file);
       return (-2);
     }
@@ -218,10 +213,7 @@ struct gde_lab          *t_lab,
     pos = pos + (long) qr;
     if ((qr = fread((void *) ezf, sizeof (ezf),
                     1, tab_file)) - 1) {
-      (void) fprintf(stdout,
-                "\n*** conv_tab: FEJL ved input af table-params");
-      (void) fprintf(stdout,
-                "\n blokaddr %8ld antal  = %4lu size = %4u ;\n",
+      lord_error(0,LORD("Error at input of table-params blokaddr %8ld number  = %4lu size = %4u"),
                 pos, (unsigned long) qr, sizeof (ezf));
       fclose(tab_file);
       return (-2);
@@ -229,8 +221,7 @@ struct gde_lab          *t_lab,
 
     /* ezf[1] == 0  => geographical coord grid */
     if (ezf[1] != 0 && f777 == 777) {
-      (void) fprintf(stdout,
-                "\n*** conv_tab: %s not geogr. grid ;\n", pth_mlb);
+      lord_error(0,LORD("%s not geogr. grid"), pth_mlb);
       fclose(tab_file);
       return (ILL_LAB);
     }
@@ -300,10 +291,11 @@ struct gde_lab          *t_lab,
     } 
 
     if (t_lab->lab_type != lab_tp || t_lab->f777 != f777) {
-      if (all_out) (void) fprintf(stdout,
-         "\n*** conv_tab: label inconsistent to table_file %s;\n",
-         pth_mlb);
-      fclose(tab_file);
+      if (all_out) {
+		lord_error(0,LORD("label inconsistent to table_file %s"), pth_mlb);
+	  }
+
+	  fclose(tab_file);
       return (-2);
     }
 
@@ -327,9 +319,8 @@ struct gde_lab          *t_lab,
       }
       else r = 1;
       if (r) {
-        (void) fprintf(stdout,
-               "\n***conv_tab: Unknown coordsys %s", d_name);
-        fclose(tab_file);
+        lord_error(0,LORD("Unknown coordsys %s"), d_name);
+		fclose(tab_file);
         return(ILL_LAB);
       }
       (void) strcpy(t_lab->clb, d_name);
@@ -391,16 +382,14 @@ struct gde_lab          *t_lab,
     case TDD_LAB: 
       if (t_lab->ch_sum != labchsum(
                          (union geo_lab *) t_lab, &t_lab->ch_sum)) {
-        (void) fprintf(stdout, "\n***conv_tab: file %s of type %d",
+        lord_error(0,LORD("file %s of type %d has sum fault"),
                        t_lab->mlb, t_lab->lab_type);
-        (void) fprintf(stdout, "\n             has sum fault;");
-        return (ILL_LAB);
+		return (ILL_LAB);
       }
       break;
     default: 
-      (void) fprintf(stdout, "\n***conv_tab: file %s of type %d",
+      lord_error(0,LORD("file %s of type %d is not a table"),
                      t_lab->mlb, t_lab->lab_type);
-      (void) fprintf(stdout, "\n             is not a table;");
     }
 
     (void) fprintf(iofile, "\n %s\n ", t_lab->mlb);

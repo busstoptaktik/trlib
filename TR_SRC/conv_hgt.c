@@ -41,6 +41,7 @@
 #include <stdarg.h>
 
 #include "geo_lab.h"
+#include "lord.h"
 
 int                      conv_hgt(
 /*______________________________*/
@@ -97,8 +98,7 @@ struct hgt_lab          *h_lab,
   va_end(o_p);
 
   if (p_lb_ex->lab_type != HGT_LAB) {
-    (void) fprintf(stdout,
-      "\nconv_hgt called with wrong lab_type %d", p_lb_ex->lab_type);
+    lord_error(0,LORD("conv_hgt called with wrong lab_type %d"), p_lb_ex->lab_type);
     h_lab->lab_type = ILL_LAB;
     return(ILL_LAB);
   }
@@ -140,8 +140,7 @@ struct hgt_lab          *h_lab,
         (void) strcpy(p_lb_ex->mlb2, "msl");
       } else
       if (sepch != '_') {
-        (void) fprintf(stdout,
-                       "\nconv_hgt: illegal separator %c", sepch);
+        lord_error(0,LORD("illegal separator %c"), sepch);
         h_lab->lab_type = ILL_LAB;
         return(ILL_LAB);
       }

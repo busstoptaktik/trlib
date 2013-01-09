@@ -34,6 +34,7 @@
 #include <ctype.h>
 #include "geo_lab.h"
 #include "trthread.h"
+#include "lord.h"
 
 /* ACTION NUMBERS */
 #define  IDNT    0
@@ -347,9 +348,8 @@ FILE                *tr_error
         outgr = pml->trgr;
         outnr = pml->trnr;
 #ifdef DEBUGDKTRANS
-(void) fprintf(stdout,
-"\n*OUT  grp = %4d    nr = %4d   navn = %s, call = %s;",
-pml->trgr, pml->trnr, pml->s_lab, outcs);
+		lord_debug(0,LORD("OUT  grp = %4d    nr = %4d   navn = %s, call = %s"),
+			pml->trgr, pml->trnr, pml->s_lab, outcs);
 #endif
         break;
       }
@@ -367,8 +367,7 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
         outnr = 4;
 #ifdef DEBUGDKTRANS
 pml = mlab +8;
-(void) fprintf(stdout,
-"\n*OUT  grp = %4d    nr = %4d   navn = %s, call = %s;",
+lord_debug(0,LORD("OUT  grp = %4d    nr = %4d   navn = %s, call = %s"),
 outgr, outnr, pml->s_lab, outcs);
 #endif
       } else
@@ -394,8 +393,7 @@ outgr, outnr, pml->s_lab, outcs);
         in_gr = pml->trgr;
         in_nr = pml->trnr;
 #ifdef DEBUGDKTRANS
-(void) fprintf(stdout,
-"\n*IN   grp = %4d    nr = %4d   navn = %s, call = %s;",
+		lord_debug(0,LORD("IN   grp = %4d    nr = %4d   navn = %s, call = %s"),
 pml->trgr, pml->trnr, pml->s_lab, in_cs);
 #endif
         break;
@@ -414,8 +412,7 @@ pml->trgr, pml->trnr, pml->s_lab, in_cs);
         in_nr = 4;
 #ifdef DEBUGDKTRANS
 pml = mlab +8;
-(void) fprintf(stdout,
-"\n*IN   grp = %4d    nr = %4d   navn = %s, call = %s;",
+lord_debug(0,LORD("IN   grp = %4d    nr = %4d   navn = %s, call = %s"),
 outgr, outnr, pml->s_lab, in_cs);
 #endif
       } else
@@ -447,9 +444,9 @@ outgr, outnr, pml->s_lab, in_cs);
     proj_proj = in_gr == 0 && outgr == 0
              && in_nr == 4 && outnr == 4;
 #ifdef  DEBUGDKTRANS
-(void) fprintf(stdout, "\n* in = %s, in_gr,nr %d, %d,",
+lord_debug(0,LORD(" in = %s, in_gr,nr %d, %d,"),
 in_cs, in_gr, in_nr);
-(void) fprintf(stdout, "\n out = %s, outgr,nr %d, %d, proj_proj = %d",
+lord_debug(0,LORD(" out = %s, outgr,nr %d, %d, proj_proj = %d"),
 outcs, outgr, outnr, proj_proj);
 #endif
 
@@ -500,8 +497,7 @@ outcs, outgr, outnr, proj_proj);
       nst = (ptab+nst)->nstate;
 
 #ifdef  DEBUGDKTRANS
-(void) fprintf(stdout,
-"\n*DK_TRANS ACTION  %-6s: STATE -> %2d, LEVEL = %d",
+lord_debug(0,LORD("DK_TRANS ACTION  %-6s: STATE -> %2d, LEVEL = %d"),
 ACTION[act], nst, level);
 #endif
 
@@ -700,12 +696,12 @@ ACTION[act], nst, level);
                 "dk_trans(prog error)", TRF_PROGR_));
       }
 #ifdef  DEBUGDKTRANS
-(void) fprintf(stdout, ", res = %d", res);
+	  lord_debug(0,LORD(", res = %d"), res);
 #endif
 
       if (res < result) result = res;
 #ifdef  DEBUGDKTRANS
-(void) fprintf(stdout, ", act = %d;", act);
+	  lord_debug(0,LORD(", act = %d;"), act);
 #endif
     }    while (act && result >= TRF_TOLLE_);
   }

@@ -42,6 +42,7 @@
 #include <sys/stat.h>
 
 #include "geo_lab.h"
+#include "lord.h"
 
 int                      conv_spc(
 /*______________________________*/
@@ -102,15 +103,14 @@ union  geo_lab          *u_lab,
 
   switch (conv_mode) {
   case 0: /* char input */
-    (void) fprintf(stdout, "\nconv_spc may take input from files only");
+    lord_error(0,LORD("conv_spc may take input from files only"));
     h_lab->lab_type = ILL_LAB;
     return(ILL_LAB);
 
   case 1: /* file input */
 
     if (p_lb->lab_type != WOR_LAB && p_lb->lab_type != POC_LAB) {
-      (void) fprintf(stdout,
-             "\nconv_spc called with wrong lab_type %d",
+      lord_error(0,LORD("conv_spc called with wrong lab_type %d"),
              p_lb->lab_type);
       h_lab->lab_type = ILL_LAB;
       return(ILL_LAB);
@@ -184,8 +184,7 @@ union  geo_lab          *u_lab,
         h_lab->bnorm = (short) r_wrk;
         h_lab->cmplt = 2;
       } else {
-        (void) fprintf(stdout,
-               "\n***conv_spc: %s Unknown coordsys/kotesys %s",
+        lord_error(0,LORD("conv_spc: %s Unknown coordsys/kotesys %s"),
                h_lab->mlb, c_lab->mlb);
         return(ILL_LAB);
       }
@@ -203,8 +202,7 @@ union  geo_lab          *u_lab,
         (void) strcpy(p_lab->c_mlb, c_lab->mlb);
         p_lab->cmplt = 2;
       } else {
-        (void) fprintf(stdout,
-               "\n***conv_spc: %s Unknown coordsys %s",
+        lord_error(0,LORD("conv_spc: %s Unknown coordsys %s"),
                p_lab->mlb, c_lab->mlb);
       }
       break; /* end POC_LAB */
@@ -246,8 +244,7 @@ union  geo_lab          *u_lab,
       }  /* complete lab */
       else {
         (void) fprintf(iofile, "   UNCOMPLETED +++\n");
-        (void) fprintf(stdout,
-               "\nconv_spc : %s UNCOMPLETED +++\n", h_lab->mlb);
+        lord_error(0,LORD("conv_spc : %s UNCOMPLETED"), h_lab->mlb);
       }
       break; /* WOR_LAB */
 
@@ -257,8 +254,7 @@ union  geo_lab          *u_lab,
       }  /* complete lab */
       else {
         (void) fprintf(iofile, "   UNCOMPLETED +++\n");
-        (void) fprintf(stdout,
-             "\nconv_spc : %s UNCOMPLETED +++\n", h_lab->mlb);
+        lord_error(0,LORD("conv_spc : %s UNCOMPLETED"), h_lab->mlb);
       }
       break; /* WOR_LAB */
 
@@ -267,8 +263,7 @@ union  geo_lab          *u_lab,
       break; /* IDT_LAB */
 
     default : /* unintelligible label */
-      (void) fprintf(stdout,
-             "\nconv_spc : %s not programmed +++\n", h_lab->mlb);
+      lord_error(0,LORD("conv_spc : %s not programmed"), h_lab->mlb);
     } /* end switch(lab_type) */
 
     break; /* end case 3 & 4 */
@@ -296,8 +291,7 @@ union  geo_lab          *u_lab,
       }  /* complete lab */
       else {
         (void) fprintf(iofile, "   UNCOMPLETED +++\n");
-        (void) fprintf(stdout,
-             "\nconv_spc : %s UNCOMPLETED +++\n", h_lab->mlb);
+        lord_error(0,LORD("conv_spc : %s UNCOMPLETED"), h_lab->mlb);
       }
 
       /* General info */
@@ -333,8 +327,7 @@ union  geo_lab          *u_lab,
         (void) fprintf(iofile, "   %s\n", p_lab->c_mlb);
       else {
         (void) fprintf(iofile, "  UNCOMPLETED +++\n");
-        (void) fprintf(stdout,
-             "\nconv_spc : %s UNCOMPLETED +++\n", h_lab->mlb);
+        lord_error(0,LORD("conv_spc : %s UNCOMPLETED"), h_lab->mlb);
       }
 
       /* General info */
@@ -382,8 +375,7 @@ union  geo_lab          *u_lab,
 
 
     default : /* unintelligible label */
-      (void) fprintf(stdout,
-             "\nconv_spc : %s not programmed +++\n", h_lab->mlb);
+      lord_error(0,LORD("conv_spc : %s not programmed"), h_lab->mlb);
     } /* end switch(lab_type) */
 
     break; /* end case 5 */
