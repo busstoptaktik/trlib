@@ -101,6 +101,7 @@ def main(args): #progname, test_lib
 	print LS
 	print("Tests finished at %s" %time.asctime())
 	print("Errors: %i" %nerr)
+	return nerr
 
 if __name__=="__main__":
 	sys.exit(main(sys.argv))
