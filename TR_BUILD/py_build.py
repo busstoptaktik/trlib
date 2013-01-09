@@ -91,10 +91,13 @@ def GetRev(trlib):
 	except:
 		print "Identify failed - trlib is: %s" %trlib
 		return "Could not get hg-rev"
-	if (rc==0):
-		return rev.strip()
-	print "Identify failed - trlib is: %s" %trlib
-	return "Could not get hg-rev"
+	lines=rev.splitlines()
+	if len(lines)>1:
+		print "Identify failed - trlib is: %s" %trlib
+		return "Could not get hg-rev"
+	return rev.strip()
+	
+	
 def RunCMD(cmd):
 	if IS_WINDOWS:
 		shell=False
