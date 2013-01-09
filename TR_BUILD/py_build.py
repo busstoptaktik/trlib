@@ -50,10 +50,10 @@ TEST_DIR="APPS" #relative to trlib path
 #THIS IS WHERE YOURE JAVA STUFF IS (SDK INCLUDE FILES ETC)  IS, IF AVAILABLE
 JAVA_INC=["C:\\Programmer\\Java\\jdk1.7.0_07\\include","C:\\Programmer\\Java\\jdk1.7.0_07\\include\\win32"]
 JAVA_COMPILER="javac"
-JAVA_JNI_SRC="java/Interface.c"
+JAVA_JNI_SRC=["java/Interface.c"]
 JAVA_SRC="java/*.java"
 #DEFINES#
-DEFINES=""
+DEFINES=[]
 #LOGFILE FOR BUILD
 BUILD_LOG="py_build.log"
 #ONLY FOR COMPILING THREAD TESTS - PUT YOUR THREAD LIBRARIES AND HEADERS IN THE LIB-DIR#
@@ -86,14 +86,11 @@ def TestOptions(opts):
 	return True
 
 def GetRev(trlib):
-	cwd=os.getcwd()
-	os.chdir(trlib)
 	try:
-		rc,rev=RunCMD("hg identify -i")
+		rc,rev=RunCMD(["hg","identify","-i",trlib])
 	except:
 		print "Identify failed - trlib is: %s" %trlib
 		rev="undefined"
-	os.chdir(cwd)
 	lines=rev.splitlines()
 	if len(lines)>1:
 		print "Identify failed - trlib is: %s" %trlib
@@ -102,11 +99,15 @@ def GetRev(trlib):
 	
 	
 def RunCMD(cmd):
-	if IS_WINDOWS:
-		shell=False
-	else:
-		shell=True
-	s=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=shell)
+	new_cmd=[]
+	out=""
+	for item in cmd:
+		item=item.strip()
+		if len(item)>0:
+			new_cmd.append(item)
+			out+=item+" "
+	print out
+	s=subprocess.Popen(new_cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=False)
 	out=""
 	while s.poll() is None:
 		line=s.stdout.readline()
@@ -117,7 +118,7 @@ def RunCMD(cmd):
 	return rc, out
 
 def GetModified(src_dirs,build_dir):
-	source=""
+	source=[]
 	for dir in src_dirs:
 		files=glob.glob(os.path.join(dir,"*.c"))
 		for fname in files:
@@ -128,7 +129,7 @@ def GetModified(src_dirs,build_dir):
 			else:
 				t_obj=-1
 			if t_src>t_obj:
-				source+=fname+" "
+				source.append(fname)
 	return source
 	
 
@@ -148,7 +149,7 @@ def GetCompiler(compiler=None,cross=False):
 			compiler=CROSS_COMPILER
 		else:
 			compiler=COMPILER
-	rc,ver=RunCMD("%s %s" %(compiler,VERSION_SWITCH))
+	rc,ver=RunCMD([compiler,VERSION_SWITCH])
 	if rc==0:
 		return ver.splitlines()[0]
 	else:
@@ -161,10 +162,8 @@ def BuildLibrary(compiler,linker,outname,source,include,defines,options,link_opt
 	if not os.path.exists(build_dir):
 		os.mkdir(build_dir)
 	os.chdir(build_dir)
-	include_str=""
-	for inc_dir in include:
-		include_str+="%s%s" %(INCLUDE_SWITCH,inc_dir)
-	compile="%s %s %s %s %s" %(compiler,defines,options,include_str,source)
+	includes=map(lambda x:INCLUDE_SWITCH+x,include)
+	compile=[compiler]+defines+options.split()+includes+source
 	implib=os.path.splitext(outname)[0]+IMPLIB_EXT
 	def_file=DEF_FILE_SWITCH+def_file
 	if IS_WINDOWS:
@@ -174,17 +173,15 @@ def BuildLibrary(compiler,linker,outname,source,include,defines,options,link_opt
 	outname=LINK_OUTPUT_SWITCH+outname
 	#TODO: check gcc linker option like -g -O etc...
 	if (IS_MSVC):
-		link="%s %s %s %s %s %s %s" %(linker,link_options,outname,implib,def_file,LINK_LIBRARIES,OBJ_FILES)
+		link=[linker]+link_options.split()+[outname,implib,def_file]+LINK_LIBRARIES.split()+[OBJ_FILES]
 	else:
-		link="%s %s %s %s %s %s %s" %(linker,link_options,outname,LINK_LIBRARIES,implib,def_file,OBJ_FILES)
+		link=[linker]+link_options.split()+[outname]+LINK_LIBRARIES.split()+[implib,def_file,OBJ_FILES]
 	if len(source)>0:
-		print compile
 		rc,text=RunCMD(compile)
 	else: #No modified files, I s'pose :-)
 		print "No modified source files... linking..."
 		rc=0
 	if rc==0:
-		print link
 		rc,text=RunCMD(link)
 	else:
 		return False
@@ -197,27 +194,20 @@ def BuildTest(compiler,outname,cfiles,include,link="",build_dir="."):
 	if not os.path.exists(build_dir):
 		os.mkdir(build_dir)
 	os.chdir(build_dir)
-	include_str=""
-	for inc_dir in include:
-		include_str+="%s%s " %(INCLUDE_SWITCH,inc_dir)
+	includes=map(lambda x:INCLUDE_SWITCH+x,include)
 	print("Compiling test program(s)...")
-	print("Executables placed in build dir: %s" %build_dir)
+	print("Executables placed in: %s" %os.path.dirname(outname))
 	for fname in cfiles:
-		if not IS_MSVC:
-			pname=LINK_OUTPUT_SWITCH+" "+os.path.splitext(os.path.basename(fname))[0]+EXE_EXT
-		else:
-			pname=""
+		pname=os.path.join(os.path.dirname(outname),os.path.splitext(os.path.basename(fname))[0]+EXE_EXT)
+		oswitch=EXE_OUTPUT_SWITCH+pname
 		if "thread" in fname.lower() and os.path.exists(link_libs):
 			link_libs=link
 		else:
-			link_libs=""
-		compile="%s %s %s %s %s %s %s" %(compiler,pname,DEBUG_OPTIONS_TEST,include_str,link_libs,fname,outname) 
-		print compile
+			link_libs=[]
+		compile=[compiler,oswitch]+DEBUG_OPTIONS_TEST.split()+includes+link_libs+[fname,outname] 
 		rc,text=RunCMD(compile)
 		if rc==0:
 			tests.append(pname)
-	
-	
 	return tests
 
 	
@@ -290,29 +280,25 @@ def main(args):
 		defines=DEFINES
 		print("Building source in %s at revision:" %TRLIB)
 		rev=GetRev(TRLIB)
-		defines+=""" %sTRLIB_REVISION=\\"%s\\" """ %(DEFINE_SWITCH,rev)
+		defines.append("%sTRLIB_REVISION=%s"%(DEFINE_SWITCH,rev))
 		if "-debuggd" in args:
-			defines+=" %sDEBUGGDTRANS" %DEFINE_SWITCH
+			defines.append("%sDEBUGGDTRANS" %DEFINE_SWITCH)
 		if "-pattern" in args:
 			pat=args[args.index("-pattern")+1]
-			source=""
+			source=[]
 			for dir in src_dirs:
-				s_files=glob.glob(os.path.join(dir,pat))
-				for name in s_files:
-					source+=name+" "
+				source.extend(glob.glob(os.path.join(dir,pat)))
 		else:
-			source=""
 			if "-all" in args:
-				for dir in src_dirs:
-					source+=" "+os.path.join(dir,"*.c")
+				source=map(lambda x:os.path.join(x,"*.c"),src_dirs)
 			else:
 				source=GetModified(src_dirs,build_dir)
 			if "-java" in args:
-				source+=" "+os.path.join(TRLIB,JAVA_JNI_SRC)
+				source+=map(lambda x:os.path.join(TRLIB,x),JAVA_JNI_SRC)
 				inc_dirs+=JAVA_INC
 			
 		if "-thread_safe" in args:
-			defines+=" %sTHREAD_SAFE" %DEFINE_SWITCH
+			defines.append("%sTHREAD_SAFE" %DEFINE_SWITCH)
 		
 		if IS_MSVC:
 			if "-kmsfncs" in args:
@@ -327,11 +313,11 @@ def main(args):
 			print("Error, exiting")
 			log_fp.close()
 			sys.exit(1)
-	
-	if "-java_external" in args:
-		base,ext=os.path.splitext(outname)
-		java_out=base+"_java"+ext
-		BuildJNI(compiler,java_out,outname,options,os.path.join(TRLIB,JAVA_JNI_SRC),JAVA_INC+inc_dirs) 
+	#TODO:
+	#if "-java_external" in args:
+	#	base,ext=os.path.splitext(outname)
+	#	java_out=base+"_java"+ext
+	#	BuildJNI(compiler,java_out,outname,options,os.path.join(TRLIB,JAVA_JNI_SRC),JAVA_INC+inc_dirs) 
 	if ("-buildtest" in args):
 		if not os.path.exists(test_dir):
 			print("%s does not exist!" %test_dir)
@@ -349,7 +335,7 @@ def main(args):
 			libname=os.path.splitext(outname)[0]+IMPLIB_EXT
 		else:
 			libname=outname
-		TESTS.extend(BuildTest(compiler,libname,cfiles,inc_dirs,thread_lib,test_build))
+		TESTS.extend(BuildTest(compiler,libname,cfiles,inc_dirs,[thread_lib],test_build))
 		os.chdir(CWD)
 	if "-test" in args:
 		for test in TESTS:
