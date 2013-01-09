@@ -100,14 +100,17 @@ def GetRev(trlib):
 	
 def RunCMD(cmd):
 	new_cmd=[]
-	out=""
+	cmd_str=""
 	for item in cmd:
 		item=item.strip()
 		if len(item)>0:
 			new_cmd.append(item)
-			out+=item+" "
-	print out
-	s=subprocess.Popen(new_cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=False)
+			cmd_str+=item+" "
+	print cmd_str
+	if IS_WINDOWS:
+		s=subprocess.Popen(new_cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=False)
+	else:
+		s=subprocess.Popen(cmd_str,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
 	out=""
 	while s.poll() is None:
 		line=s.stdout.readline()
