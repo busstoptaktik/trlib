@@ -111,8 +111,9 @@ def RunCMD(cmd):
 	out=""
 	while s.poll() is None:
 		line=s.stdout.readline()
-		print line
-		out+=line
+		if len(line.strip())>0:
+			print line
+			out+=line
 	rc=s.poll()
 	s.stdout.close()
 	return rc, out
