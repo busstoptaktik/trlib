@@ -56,7 +56,7 @@ def main(args): #progname, test_lib
 	print("Initialising with shared-library: %s" %(lib))
 	ok=TrLib.InitLibrary(geoids,lib_obj,lib_dir)
 	if not ok:
-		return
+		return 1
 	print("Files in geoid-dir %s:\n%s" %(TrLib.GEOIDS,repr(os.listdir(TrLib.GEOIDS))))
 	print LS
 	mlb="utm32_ed50"
