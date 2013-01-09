@@ -89,6 +89,7 @@ def GetRev(trlib):
 	try:
 		rc,rev=RunCMD("hg identify -i %s" % trlib)
 	except:
+		print "Identify failed - trlib is: %s" %trlib
 		return "Could not get hg-rev"
 	return rev.strip()
 
@@ -317,7 +318,7 @@ def main(args):
 		if not ok:
 			print("Error, exiting")
 			log_fp.close()
-			sys.exit()
+			sys.exit(1)
 	
 	if "-java_external" in args:
 		base,ext=os.path.splitext(outname)
@@ -349,7 +350,7 @@ def main(args):
 	if "-clean" in args:
 		Clean(build_dir)
 	log_fp.close()	
-	sys.exit()
+	sys.exit(0)
 	
 
 if __name__=="__main__":
