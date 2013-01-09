@@ -86,15 +86,18 @@ def TestOptions(opts):
 	return True
 
 def GetRev(trlib):
+	cwd=os.getcwd()
+	os.chdir(trlib)
 	try:
-		rc,rev=RunCMD("hg identify -i %s" % trlib)
+		rc,rev=RunCMD("hg identify -i")
 	except:
 		print "Identify failed - trlib is: %s" %trlib
-		return "Could not get hg-rev"
+		rev="undefined"
+	os.chdir(cwd)
 	lines=rev.splitlines()
 	if len(lines)>1:
 		print "Identify failed - trlib is: %s" %trlib
-		return "Could not get hg-rev"
+		return "undefined"
 	return rev.strip()
 	
 	
