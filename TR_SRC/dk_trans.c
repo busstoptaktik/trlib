@@ -28,13 +28,12 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <ctype.h>
-#include "geo_lab.h"
-#include "trthread.h"
-#include "lord.h"
+#include    <stdio.h>
+#include    <math.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 /* ACTION NUMBERS */
 #define  IDNT    0
@@ -95,17 +94,7 @@ double              *Hout,
 char                *usertxt,
 FILE                *tr_error
 )
-
 {
-#include        "conv_lab.h"
-#include        "tcts_u.h"
-#include        "ptg.h"
-#include        "utgs.h"
-#include        "utsb.h"
-#include        "s34stkk.h"
-#include        "s34jtos.h"
-#include        "dks_tr.h"
-#include        "t_status.h"
 
   static THREAD_SAFE  int               in_chsum = 0;
   static THREAD_SAFE  int               outchsum = 0, proj_proj = 0;

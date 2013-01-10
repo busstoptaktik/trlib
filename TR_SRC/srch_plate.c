@@ -28,10 +28,10 @@
 /* National Space Research Institute, Denmark. This copyright    */
 /* claim does not indicate an intention of publishing this code. */
 
-#include <stdio.h>
-#include <string.h>
-#include "geo_lab.h"
-#include "trthread.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                       srch_plate(
 /*_________________________________*/
@@ -51,9 +51,6 @@ char                     *err_txt
 /*          -2   :: i/o error on binary model */
 
 /* progr. K. Engsager. Feb. 2003, 2008 */
-
-#include              "inpoly.h"
-#include              "v_red.h"
 
   /* search plate containing coordinates */
 

@@ -28,11 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <math.h>
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <math.h>
+#include    "KmsFncs.h"
 
 double             v_red(
 /*_____________________*/

@@ -26,8 +26,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include      <stdio.h>
-#include      "trthread.h"
+#include    <stdio.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 char                *f_nxt(
 /*_______________________*/
@@ -36,9 +37,7 @@ int                 *items,
 FILE                *infile,
 int                 used
 )
-
 {
-#include         "fgetln_kms.h"
 
   static THREAD_SAFE  char      *cp;
 

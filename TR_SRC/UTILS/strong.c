@@ -15,13 +15,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "geo_lab.h"
-#include "sgetg.h"
-#include "strong.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    "KmsFncs.h"
  
 /* splits string into items */
 /*remember to free stuff afterwards */

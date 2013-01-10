@@ -16,31 +16,15 @@
  * 
  */
  
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include    <stdlib.h>
+#include    <stdio.h>
+#include    <string.h>
 /*#include <windows.h>* enable if we want to define our dllMain under windows */
-#include "conv_lab.h"
-#include "gd_trans.h"
-#include "itrf_trans.h"
-#include "gettabdir.h"
-#include "geoid_d.h"
-#include "geoid_c.h"
-#include "geoid_i.h"
-#include "setDtrc.h"
-#include "ptg_d.h"
-#include "sputshpprj.h"
-#include "sgetshpprj.h"
-#include "c_tabdir_file.h"
-#include "tab_doc_f.h"
-#include "trlib_intern.h"
-#include "trlib_api.h"
-#include "parse_def_file.h"
-#include "doc_def_data.h"
-#include "trthread.h"
-#include "lord.h"
-#include "epsg_to_mlb.h"
-#include "proj4_to_mlb.h"
+#include    "KmsFncs.h"
+#include    "trthread.h"
+#include    "epsg_to_mlb.h"
+#include    "proj4_to_mlb.h"
+#include    "sgetshpprj.h"
 /*   
 * Defines
 */
@@ -592,8 +576,8 @@ int TR_tr(
         y_out=Y_out;
    }
   
-    for (i = 0;  i < n;  i++) {
-	z = Z_in? Z_in[i]: z1;
+   for (i = 0;  i < n;  i++) {
+      	z = Z_in? Z_in[i]: z1;
         err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z_out? Z_out+i: &z2), &GH,use_geoids,geoid_pt, "", ERR_LOG);
 	#ifdef _ROUT
 	if (err)

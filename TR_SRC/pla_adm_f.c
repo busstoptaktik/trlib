@@ -28,17 +28,15 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <math.h>
+#include    <ctype.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
 #include    <fcntl.h>
-#include    "geo_lab.h"
-#include    "typ_dec.h"
+#include    "KmsFncs.h"
 
 /* pla_adm_f is a maintenance tool for ITRF plates boundaries */
 /* the plate boundaries are used to decide which plate is     */
@@ -83,14 +81,7 @@ FILE                *d_fd,
 FILE                *o_fd,
 char                *err_txt
 )
-
 {
-#include    "conv_lab.h"
-#include    "fgetln_kms.h"
-#include    "sgetg.h"
-#include    "fputg.h"
-#include    "set_tpd.h"
-#include    "v_red.h"
 
 /* progr.:  Karsten Engsager, feb. 2003                       */
 

@@ -29,6 +29,7 @@
 /* indicate an intention of publishing this code.             */
 
 #include <stdio.h>
+#include    "KmsFncs.h"
 
 int              fputcw(
 /*____________________*/
@@ -64,7 +65,6 @@ MD            1 00045 89 02 3 012    max < 900 00000 00 00 0 000
 
 
 {
-#include    "sputcw.h"
   char       str[24];
   int        ch;
 

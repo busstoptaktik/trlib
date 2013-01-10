@@ -29,7 +29,7 @@
 /* indicate an intention of publishing this code.              */
 
 #include <stdio.h>
-#include "geo_lab.h"
+#include    "KmsFncs.h"
 
 int                      fputg(
 /*___________________________*/
@@ -38,9 +38,7 @@ double                  val,
 struct typ_dec          *typ,
 char                    *layout
 )
-
 {
-#include          "sputg.h"
 
   char            outstr[80];
   int             i;

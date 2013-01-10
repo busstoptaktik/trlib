@@ -28,9 +28,10 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
-#include   <math.h>
-#include   <stdio.h>
-#include   <string.h>
+#include    <math.h>
+#include    <stdio.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 double                sgetdt(
 /*_________________________*/
@@ -78,8 +79,6 @@ char array must not hold 'spaces'. Use fgetln_kms to this end.
 
 /* sgetdt   ver 2003.01           # page 2   19 Dec 2002 13 18 */
 
-
-#include    "cwtJD.h"
 
   /* first try readning with format as double, if this         */
   /* is an succes and no comma is met, then return date.       */

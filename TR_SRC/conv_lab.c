@@ -56,18 +56,18 @@
 /* ... must be either: ""  or *file                            */
 /* when converting string or input from file (NULL is leagal)  */
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <sys/stat.h>
-#include <stdarg.h>
-#include <math.h>
+#include    <stdio.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    <sys/stat.h>
+#include    <stdarg.h>
+#include    <math.h>
 
-#include "geo_lab.h"
-#include "fgetlhtx.h"
-#include "trthread.h"
-#include "parse_def_file.h"
-#include "lord.h"
+#include    "KmsFncs.h"
+#include    "trthread.h"
+
+int srch_def(int mode, char *p_sys, char *w_sys, int s_type,
+             int s_cstm, int s_mode, struct lab_def_str *p_lb);
 
 int               conv_lab(
 /*________________________*/
@@ -75,24 +75,11 @@ char             *lab_name,
 union geo_lab    *u_lab,
 ...
 )
-
 {
-#include              "conv_cnd.h"
-#include              "conv_crd.h"
-#include              "conv_hgt.h"
-#include              "conv_obs.h"
-#include              "conv_plm.h"
-#include              "conv_tab.h"
-#include              "conv_spc.h"
-#include              "get_mlb.h"
-#include              "labchsum.h"
 
 
 /* conv_lab  ver 2010.01            # page 2     5 Jan 2010 15 35 */
 
-
-  int srch_def(int mode, char *p_sys, char *w_sys, int s_type,
-               int s_cstm, int s_mode, struct lab_def_str *p_lb);
 
   FILE                      *fc;
   FILE                      *iofile = (FILE *) NULL;
@@ -670,7 +657,7 @@ int srch_def(
 		p_lb->d_kind   = (short) l_cstm;
 		p_lb->d_type   = (short) l_mode;
 		p_lb->cha_str  = (short) cha_str;
-		p_lb->mask= prj->mask;
+		p_lb->mask     = (short) prj->mask;
 		strcpy(rgn_pref.prfx,prj->seq);
 		if (dum_rgn.r_nr[0] != rgn_pref.r_nr[0])
 			(void) strcpy(p_lb->a_seq, rgn_pref.prfx);

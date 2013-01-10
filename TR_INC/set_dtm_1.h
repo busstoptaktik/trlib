@@ -28,8 +28,8 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
-#ifndef       _SET_DTM_FNC_
-#define       _SET_DTM_FNC_
+#ifndef       _SET_DTM_FNC_1_
+#define       _SET_DTM_FNC_1_
 
 #include    "geo_lab.h"
 

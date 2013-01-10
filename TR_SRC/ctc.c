@@ -28,10 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
-#include <math.h>
-#include <stdio.h>
-#include "geo_lab.h"
-#include "trthread.h"
+#include    <math.h>
+#include    <stdio.h>
+#include    "KmsFncs.h"
 
 #define   ID   0
 #define   EW   1
@@ -51,12 +50,7 @@ double                *Zo,
 char                  *usertxt,
 FILE                  *tr_error
 )
-
 {
-
-#include          "cic.h"
-#include          "set_dtm_1.h"
-#include          "t_status.h"
 
   struct coord_lab   *i_lab = &(i_lab_u->u_c_lab);
   struct coord_lab   *o_lab = &(o_lab_u->u_c_lab);

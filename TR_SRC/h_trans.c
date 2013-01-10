@@ -28,13 +28,11 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "geo_lab.h"
-#include "kms_math.h"
-#include "trthread.h"
-
+#include    <stdio.h>
+#include    <string.h>
+#include    <math.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                      h_trans(
 /*_____________________________*/
@@ -46,17 +44,6 @@ double                  *dh,
 char                    *tr_str
 )
 {
-
-/*
-#include              "erad.h"
-*/
-#include              "conv_lab.h"
-#include              "fgetlhtx.h"
-#include              "fgetln_kms.h"
-#include              "i_tabdir_file.h"
-#include              "s_status.h"
-#include              "set_dtm.h"
-#include              "sgetg.h"
 
   extern THREAD_SAFE FILE               *def_lab_file;
   extern THREAD_SAFE size_t              init_prj_pos, init_hth_pos;

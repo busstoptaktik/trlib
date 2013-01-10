@@ -29,12 +29,12 @@
 /* does not indicate an intention of publishing this code.     */
 
 
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <ctype.h>
-#include "geo_lab.h"
-#include "trthread.h"
+#include    <stdio.h>
+#include    <math.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 /* ACTION NUMBERS */
 
@@ -59,17 +59,10 @@ double              *Hout,
 char                *usertxt,
 FILE                *tr_error
 )
-
 {
 
   /* Fehmarn Bridge Projection test of AREA */
   /* and transf to/from geo                 */
-
-#include        "gtc.h"
-#include        "ptg.h"
-#include        "sgetg.h"
-#include        "typ_dec.h"
-#include        "t_status.h"
 
 
 /* fh_trans  ver 2010.1        # page 2    12 Jan 2010 13 55 */

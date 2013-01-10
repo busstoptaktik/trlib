@@ -38,7 +38,7 @@ double                    N_in,
 double                    E_in,
 double                   *X,
 double                   *Y,
-char                     *err_txt
+FILE                     *tr_error
 );
 
   /* etrs89_trans is a tiny version of gd_trans having        */

@@ -28,11 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <math.h>
-#include "geo_lab.h"
-#include "trthread.h"
-
+#include    <stdio.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 int                      eetmtu_g(
 /*______________________________*/
@@ -49,8 +47,6 @@ FILE                    *tr_error
 /* Definition of the permissible area for the transformation */
 #define COORLIM     (2.0e5)        /* +/- 200 km */
 #define MAP_LIM     (3.0e5)        /* +/- 300 km */
-
-#include         "t_status.h"
 
   double           N, E, n, e, u, v, tol = 0.001;
   double          *cb = NULL, *cw = NULL;

@@ -57,12 +57,12 @@
 /*                 : else the name of the file to be opened    */
 /*   *dir_name     : path to the file ( == "" when local)      */
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <sys/stat.h>
-#include "trthread.h"
-
+#include    <stdio.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    <sys/stat.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 THREAD_SAFE    FILE               *def_lab_file = (FILE *) NULL;
 THREAD_SAFE    FILE               *man_tab_file = (FILE *) NULL;
@@ -85,8 +85,6 @@ int              *result,
 char             *dir_name
 )
 {
-#include              "fgetlhtx.h"
-#include              "gettabdir.h"
 
   char               *global_dir = NULL;
   char                pth_mlb[512], *p_c;

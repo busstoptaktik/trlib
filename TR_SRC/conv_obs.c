@@ -36,13 +36,12 @@
 /* an unrecognized name is considered a filename containing a  */
 /* genuine label                                               */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <math.h>
+#include    <stdio.h>
+#include    <string.h>
+#include    <stdarg.h>
+#include    <math.h>
 
-#include "geo_lab.h"
-#include "lord.h"
+#include    "KmsFncs.h"
 
 int                      conv_obs(
 /*___________________________*/
@@ -51,17 +50,7 @@ struct lab_def_str      *p_lb,
 struct obs_lab          *o_lab,
 ...
 )
-
 {
-
-#include              "conv_lab.h"
-#include              "conv_rgn.h"
-#include              "f_nxt.h"
-#include              "fputg.h"
-#include              "labchsum.h"
-#include              "set_dtm_1.h"
-#include              "sgetg.h"
-#include              "sputg.h"
 
   FILE                      *iofile = (FILE *) NULL;
   char                      *io_str = (char *) NULL;

@@ -28,10 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include     <stdio.h>
-#include     <math.h>
-#include     "geo_lab.h"
-
+#include    <stdio.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 /*
 Transformation items
 ____________________
@@ -78,8 +77,6 @@ FILE           *tr_error
 
 /* hlm_tr                         # page 2   03 Mar 1995 13 29 */
 
-
-#include         "t_status.h"
 
   double              N, E, n, e;
   double              a, b, A, B, D;

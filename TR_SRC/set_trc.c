@@ -30,22 +30,13 @@
 
 #include    <stdio.h>
 #include    <math.h>
-#include    "geo_lab.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    "KmsFncs.h"
 
 int                     set_trc(
 /*____________________________*/
 struct coord_lab         *c_lab
 )
-
 {
-
-#include            "clenshaw.h"
-#include            "erad.h"
-#include            "gatg.h"
 
   double                 n, np;
   double                 *gb = c_lab->tcgg, *bg = gb + 5;

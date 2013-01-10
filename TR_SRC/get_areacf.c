@@ -33,12 +33,7 @@
 #include    <math.h>
 #include    <string.h>
 
-#include   "geo_lab.h"
-#include   "geoid_d.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    "KmsFncs.h"
 
 int              get_areacf(
 /*________________________*/
@@ -53,16 +48,7 @@ char            *wrk_path,
 char            *usertxt,
 FILE            *tr_error
 )
-
 {
-
-#include            "conv_lab.h"
-#include            "ptg.h"
-#include            "set_dtm_1.h"
-#include            "sftr.h"
-#include            "gd_trans.h"
-#include            "get_ha_s.h"
-#include            "v_red.h"
 
   struct  ne          {
     double              n;

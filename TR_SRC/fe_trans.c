@@ -32,12 +32,12 @@
 #define  DEBUGFETRANS
 */
 
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <ctype.h>
-#include "geo_lab.h"
-#include "trthread.h"
+#include    <stdio.h>
+#include    <math.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 /* ACTION NUMBERS */
 
@@ -76,11 +76,6 @@ FILE                *tr_error
 
 /* fe_trans  ver 2012.03        # page 2   18 dec 2012 13 55 */
 
-
-#include        "conv_lab.h"
-#include        "ptg.h"
-#include        "fo_g_tr.h"
-#include        "t_status.h"
 
   static THREAD_SAFE int   in_chsum = 0L;
   static THREAD_SAFE int   outchsum = 0L;

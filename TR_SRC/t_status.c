@@ -31,7 +31,7 @@
 #include    <stdio.h>
 #include    <stdarg.h>
 #include    <string.h>
-#include    "geo_lab.h"
+#include    "KmsFncs.h"
 
 int                      t_status(
 /*______________________________*/
@@ -50,8 +50,6 @@ double                   dN, dE, dH;
 */
 
 {
-
-#include             "s_status.h"
 
   va_list              cp;
 

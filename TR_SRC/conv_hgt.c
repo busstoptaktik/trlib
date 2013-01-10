@@ -36,12 +36,11 @@
 /* an unrecognized name is considered a filename containing a  */
 /* genuine label                                               */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
+#include    <stdio.h>
+#include    <string.h>
+#include    <stdarg.h>
 
-#include "geo_lab.h"
-#include "lord.h"
+#include    "KmsFncs.h"
 
 int                      conv_hgt(
 /*______________________________*/
@@ -50,15 +49,7 @@ struct lab_def_str      *p_lb_ex,
 struct hgt_lab          *h_lab,
 ...
 )
-
 {
-
-#include              "conv_rgn.h"
-#include              "labchsum.h"
-#include              "set_grs.h"
-#include              "set_dtm_1.h"
-#include              "set_tpd.h"
-#include              "sputg.h"
 
   FILE                      *iofile = (FILE *) NULL;
   va_list                    o_p;

@@ -27,13 +27,11 @@
 #include    <stdlib.h>
 #include    <string.h>
 #include    <sys/types.h>
-//#include    <sys/stat.h>
 #include    <ctype.h>
 #include    <fcntl.h>
 #include    <math.h>
-#include    "geo_lab.h"
-#include    "parse_def_file.h"
-
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int             set_dtm_1(
 /*______________________*/

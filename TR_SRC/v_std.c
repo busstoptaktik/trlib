@@ -28,18 +28,13 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <math.h>
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <math.h>
+#include    "KmsFncs.h"
 
 double        v_std(
 double        v
 )
-
 {
-#include       "v_red.h"
 
   v = v_red(v);
   if (v < 0.0) v += 2.0*M_PI;

@@ -28,12 +28,11 @@
 /* indicate an intention of publishing this code.              */
   
 
-#include           <string.h>
-#include           <stdio.h>
-#include           <ctype.h>
-#include           <stddef.h> /*included here to be able to build on linux and mac osx */
-#include           "geo_lab.h"
-
+#include    <string.h>
+#include    <stdio.h>
+#include    <ctype.h>
+#include    <stddef.h> /*included here to be able to build on linux and mac osx */
+#include    "KmsFncs.h"
 
 int                  get_mlb(
 /*_________________________*/
@@ -44,9 +43,7 @@ short               *sepch,
 char                *mlb2,
 char               **h_mlb
 )
-
 {
-#include      "conv_rgn.h"
 
   char                tx[4*MLBLNG], *ptx = tx;
   int                 tx_lng, i, res;

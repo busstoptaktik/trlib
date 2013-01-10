@@ -28,15 +28,15 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
-#include <stdio.h>
-#include <string.h>
-#include "geo_lab.h"
-#include "geoid_d.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
-#include "conv_lab.h"
-#include "trlib_intern.h"
-#include "trthread.h"
-
+int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
+             double tr_yy, double B, double L,
+             double *dX, double *dY, double *dZ, char *used_ipl_nam,
+             char *err_str);
 
 int                      itrf_trans(
 /*________________________________*/
@@ -55,13 +55,6 @@ char                     *err_str
 )
 {
 
-#include              "gtc.h"
-#include              "ptg.h"
-#include              "set_itrf_c.h"
-#include              "srch_plate.h"
-#include              "s_status.h"
-#include              "tab3d_c.h"
-
 char           *tab_t     = plate_info->plate_model;
 char           *tab_i     = plate_info->intra_plate_model;
 int            *plm_trf   = plate_info->plm_trf;
@@ -72,11 +65,6 @@ double         *ipl_oJD   = plate_info->ipl_odt;
 char           *u_plm_nam = plate_info->plm_nam;
 char           *u_plt_nam = plate_info->plt_nam;
 char           *u_ipl_nam = plate_info->ipl_nam;
-
-int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
-             double tr_yy, double B, double L,
-             double *dX, double *dY, double *dZ, char *used_ipl_nam,
-             char *err_str);
 
 
 /* itrf_trans  ver 2007.02          # page 2    10 Oct 2008 11 57 */

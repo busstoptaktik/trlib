@@ -28,10 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <math.h>
-#include "geo_lab.h"
-
+#include    <stdio.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 int                         s34jtos(
 /*________________________________*/
@@ -80,7 +79,6 @@ Note the operator & on Y and X.
 
 /* s34jtos  ver 1999.01           # page 2   10 Sep 1998 12 54 */
 
-#include             "t_status.h"
 
   double               N = 0.0, E = 0.0, n, e, w, tol = 0.0005;
   double               *c, *cb = NULL, *cw = NULL;

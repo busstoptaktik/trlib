@@ -42,7 +42,9 @@
 #include "trlib_api.h"
 
 
-extern "C" {
+#if defined __cplusplus
+extern "C" { 
+#endif
 #include "bh_lat.h"
 #include "bh_lmb.h"
 #include "bshlm1.h"
@@ -126,7 +128,6 @@ extern "C" {
 #include "s_status.h"
 #include "sand_afst.h"
 #include "sand_areal.h"
-#include "scn_cho.h"
 #include "set_dtm.h"
 #include "set_dtm_1.h"
 #include "set_grs.h"
@@ -141,7 +142,6 @@ extern "C" {
 #include "sputcw.h"
 #include "sputg.h"
 #include "sputshpprj.h"
-#include "sputst.h"
 #include "srch_plate.h"
 #include "srch_tab_typ.h"
 #include "t_status.h"
@@ -162,7 +162,9 @@ extern "C" {
 #include "utsb.h"
 #include "v_red.h"
 #include "v_std.h"
+#if defined __cplusplus
 }
+#endif
 
 #endif
 

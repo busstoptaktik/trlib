@@ -28,14 +28,11 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include "geo_lab.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <math.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                    ptg(
 /*_______________________*/
@@ -48,14 +45,7 @@ double                 *Eout,
 char                   *usertxt,
 FILE                   *tr_error
 )
-
 {
-#include          "clenshaw.h"
-#include          "gatg.h"
-#include          "v_red.h"
-#include          "erad.h"
-#include          "sftr.h"
-#include          "t_status.h"
 
   struct coord_lab  *TC = &(TC_u->u_c_lab);
   int               res = 0, i, s, h, cstm, mode, ell_trf, auth = 0;

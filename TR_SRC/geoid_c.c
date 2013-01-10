@@ -28,11 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include        <stdio.h>
-#include        <string.h>
-#include        "geo_lab.h"
-#include        "geoid_d.h"
-
+#include    <stdio.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 int                       geoid_c(
 /*______________________________*/
@@ -41,8 +39,6 @@ int                       info,
 FILE                     *out
 )
 {
-#include        "gettabdir.h"
-#include        "c_tabdir_file.h"
 
 int                         g, res = 0;
   struct gde_lab             *t_lab;

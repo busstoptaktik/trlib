@@ -28,14 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include  <math.h>
-#include  <stdio.h>
-#include  "geo_lab.h"
-#include "lord.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <math.h>
+#include    <stdio.h>
+#include    "KmsFncs.h"
 
 int                     bshlm2(
 /*___________________________*/
@@ -89,12 +84,6 @@ Prog: Knud Poder NOV 1990
 
 
 {
-#include        "bh_lat.h"
-#include        "bh_lmb.h"
-#include        "clenshaw.h"
-#include        "sftr.h"
-#include        "v_red.h"
-
   double     em2, V1, V2, b0, PF;
   double     dL, d_lmb, d_lmb1;
   double     b1, b2, dl, a1, a2, b_max, s, s1, mp;

@@ -28,9 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <math.h>
-#include "geo_lab.h"
+#include    <stdio.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 #define  GSTOLMS   0.010
 
@@ -82,8 +82,6 @@ in Sealand or Jutland. Note the & operator on N1, E1.
 
 /*  utgs   ver 1999.01            # page 2   12 Jan 1999 12 54 */
 
-
-#include       "t_status.h"
 
   double        N, E, n, e, w, tol = GSTOLMS;
   double        N_max, N_min, E_max, E_min;

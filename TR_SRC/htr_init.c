@@ -28,14 +28,10 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "geo_lab.h"
-#include "kms_math.h"
-#include "trthread.h"
-#include "parse_def_file.h"
-
+#include    <stdio.h>
+#include    <string.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 int                      htr_init(
 /*______________________________*/
@@ -47,16 +43,6 @@ char                    *dh_table_name,
 char                    *dh_tr_info
 )
 {
-
-/*
-#include              "erad.h"
-*/
-#include              "conv_lab.h"
-#include              "set_dtm_1.h"
-
-
-
-
  
   //static THREAD_SAFE  short          sh_dtm = 0;
   union  geo_lab        test_lab;

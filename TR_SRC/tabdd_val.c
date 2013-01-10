@@ -31,11 +31,9 @@
 /* publishing this code.                                         */
 
 
-#include        <stdio.h>
-#include        <string.h>
-
-#include        "geo_lab.h"
-#include        "geoid_d.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 int                       tabdd_val(
 /*______________________________*/
@@ -47,9 +45,6 @@ double                   *val,
 char                     *err_str
 )
 {
-
-#include        "s_status.h"
-#include        "v_std.h"
 
   struct gde_lab             *t_lab;
   union  tdd_pages           *g_pg = &(tabdd_table->g_pg[0]), *g_pg_i;

@@ -28,16 +28,11 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include "geo_lab.h"
-#include "trthread.h"
-#include "lord.h"
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
-
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <math.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                    ptg_d(
 /*_________________________*/
@@ -63,15 +58,7 @@ Dgtu              double                           call
 The constants for the trig series to calc 1/m and c.
 */
 
-#include          "clenshaw.h"
-#include          "gatg.h"
-#include          "v_red.h"
-#include          "erad.h"
-#include          "sftr.h"
-#include          "t_status.h"
-#include          "setDtrc.h"
-  static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
-
+static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
 
   struct coord_lab  *TC = &(TC_u->u_c_lab);
   int               res = 0, i, s, h, cstm, mode, ell_trf, auth = 0;

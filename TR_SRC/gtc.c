@@ -28,9 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <math.h>
-#include <stdio.h>
-#include "geo_lab.h"
+#include    <math.h>
+#include    <stdio.h>
+#include    "KmsFncs.h"
 
 int                       gtc(
 /*__________________________*/
@@ -100,14 +100,6 @@ errors    KE JAN 2001.
 */
 
 {
-
-/*
-#include          "set_tpd.h"
-#include          "fputg.h"
-*/
-  
-#include          "v_red.h"
-#include          "t_status.h"
 
   struct coord_lab         *c_lab = &(g_lab->u_c_lab);
   double                   a, f, e2;
@@ -203,7 +195,7 @@ errors    KE JAN 2001.
   else res = TRF_PROGR_;
 
   return((tr_error==NULL || res == 0) ? res :
-          t_status(tr_error, "", "gtc", res,
+          t_status(tr_error, usertxt, "gtc", res,
           (direct > 0) ? "sx" : "m ", "m ",
           B, L, H, dCx, dCy, dCz));
 

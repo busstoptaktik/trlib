@@ -36,16 +36,15 @@
 /* an unrecognized name is considered a filename containing a  */
 /* genuine label                                               */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-#include <math.h>
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    <stdarg.h>
+#include    <math.h>
 
-#include "geo_lab.h"
-#include "trthread.h"
-#include "lord.h"
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                      conv_crd(
 /*______________________________*/
@@ -55,19 +54,6 @@ struct coord_lab        *c_lab,
 ...
 )
 {
-
-#include              "conv_rgn.h"
-#include              "set_grs.h"
-#include              "set_dtm_1.h"
-#include              "set_trc.h"
-#include              "fgetln_kms.h"
-#include              "sgetdt.h"
-#include              "sgetg.h"
-#include              "sputg.h"
-#include              "labchsum.h"
-#include              "fputg.h"
-#include              "fputcw.h"
-#include              "set_tpd.h"
 
 
 /* conv_crd    ver 2012.01          # page 2    31 May 2012 10 19 */

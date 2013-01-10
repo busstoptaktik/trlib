@@ -32,7 +32,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
-#include "geo_lab.h"
+#include "KmsFncs.h"
 
 #define  TOL    0.040   /* 40 mm */
 
@@ -109,9 +109,6 @@ Prog: Knud Poder, APR 1991
   int           r, c, i, g, sz;
   int           res = 0, ins = 0, ins_alarm = 1, pd;
   char         *ptx = NULL;
-
-#include    "inpoly.h"
-#include    "t_status.h"
 
   static  double      P_tcla[] = {
     /*ant*/  11.0,

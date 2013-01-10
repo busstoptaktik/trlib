@@ -28,10 +28,9 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
-#include <stdio.h>
-#include <math.h>
-#include "geo_lab.h"
-
+#include    <stdio.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 int                      fo_g_tr(
 /*______________________________*/
@@ -48,8 +47,6 @@ FILE                    *tr_error
 {
 /* Definition of the permissible area for the transformation */
 #define COORDLIM     (2.0e5)        /* +/- 200 km */
-
-#include         "t_status.h"
 
   double           N, E, n, e, u, v, tol = 0.080; /*m*/
   double          *cb = NULL, *cw = NULL;

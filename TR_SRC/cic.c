@@ -30,7 +30,7 @@
 
 #include          <stdio.h>
 #include          <math.h>
-#include          "geo_lab.h"
+#include          "KmsFncs.h"
 
 int                   cic(
 /*______________________*/
@@ -46,8 +46,6 @@ char                  *usertxt,
 FILE                  *tr_error
 )
 {
-
-#include             "t_status.h"
 
   int                i, b, s, e, d;
   double             X, Y, Z, Xw, Yw, Zw;

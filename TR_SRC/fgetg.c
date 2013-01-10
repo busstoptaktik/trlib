@@ -28,14 +28,14 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include "geo_lab.h"
+#include    <math.h>
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <ctype.h>
+#include    "KmsFncs.h"
 
 #ifdef _WIN32
-#include <process.h>
+#include    <process.h>
 #endif
 
 #define DG3    {1,3}
@@ -59,10 +59,7 @@ struct typ_dec              *tpd,
 int                         *used,
 char                        *udt
 )
-
 {
-#include             "set_tpd.h"
-#include             "get_tpd.h"
 
   int              gr, tp, cf = 0, dc = 0, sc = 0;
   double           factor = 1., val = 0.;

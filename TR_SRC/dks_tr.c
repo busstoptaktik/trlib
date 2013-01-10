@@ -31,8 +31,8 @@
 #include     <stdio.h>
 #include     <math.h>
 #include     <string.h>
-#include     "geo_lab.h"
-#include     "trthread.h"
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int              dks_tr(
 /*____________________*/
@@ -47,11 +47,6 @@ FILE           *tr_error
 )
 
 {
-
-#include     "gen_pol.h"
-#include     "hlm_tr.h"
-#include     "t_status.h"
-
 
 #define  TOL     0.002   /* 2 mm */
 

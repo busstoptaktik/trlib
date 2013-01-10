@@ -28,10 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <string.h>
-#include "geo_lab.h"
-#include "geoid_d.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 int                       gd_t_val(
 /*_______________________________*/
@@ -53,9 +52,6 @@ char                     *err_txt
 
 /* gd_t_val  ver 2001.01          # page 2   21 Dec 2001 11 57 */
 
-
-#include              "gd_trans.h"
-#include              "s_status.h"
 
   int                   res = 0;
   double                N_out, E_out, H_out;

@@ -28,12 +28,10 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include        <stdio.h>
-#include        <stdlib.h>
-#include        <string.h>
-
-#include        "geo_lab.h"
-#include        "geoid_d.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 int                       grid_val(
 /*_______________________________*/
@@ -45,9 +43,6 @@ double                   *g_v,
 char                     *err_str
 )
 {
-#include        "geoid_i.h"
-#include        "v_std.h"
-#include        "s_status.h"
 
   struct gde_lab             *t_lab;
   union  tab_pages           *g_pg = &(grid_table->g_pg[0]), *g_pg_i;

@@ -32,16 +32,14 @@
 #define  DEBUGNGTRANS
 */
 
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <ctype.h>
-#include "geo_lab.h"
-#include "geoid_d.h"
-#include "trthread.h"
+#include    <stdio.h>
+#include    <math.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 /* ACTION NUMBERS */
-
 #define  IDT    0
 #define  NTG    1
 #define  GTN    2
@@ -61,14 +59,7 @@ double              *Hout,
 char                *usertxt,
 FILE                *tr_error
 )
-
 {
-
-#include        "conv_lab.h"
-#include        "ptg.h"
-#include        "tab3d_i.h"
-#include        "tab3d_val.h"
-#include        "t_status.h"
 
   static THREAD_SAFE  int                 in_chsum = 0L;
   static THREAD_SAFE  int                 outchsum = 0L;
@@ -159,7 +150,7 @@ FILE                *tr_error
       init = (res > 0) && (ng_z == ng_w*ng_w);
       if (!init)
         return(t_status(
-               tr_error, "", "ng_trans(table)", res));
+               tr_error, usertxt, "ng_trans(table)", res));
     }
 
     /* Check i/o labels, init of actual transf. systems */
@@ -249,7 +240,7 @@ in_nr, outnr);
 
       if (outnr == -1 || in_nr == -1) {
         return(t_status(
-               tr_error, "", "ng_trans(table)", TRF_ILLEG_));
+               tr_error, usertxt, "ng_trans(table)", TRF_ILLEG_));
       }
 
       ptab = ngtab + ng_w*outnr;  /* output row */
@@ -299,7 +290,7 @@ N_g*180.0 / M_PI, E_g*180.0 / M_PI, ies);
         } else {
           if (ies < res) res = ies;
           if (tr_error != NULL)
-             (void) t_status(tr_error, "", "\nng_trans", ies,
+             (void) t_status(tr_error, usertxt, "\nng_trans", ies,
                              "sx", "", N_g, E_g, 0.0, 0.0);
         }
 #ifdef  DEBUGNGTRANS
@@ -344,7 +335,7 @@ N*180.0 / M_PI, E*180.0 / M_PI, ies);
               if (ies < res) res = ies;
               res = ies;
               if (tr_error != NULL)
-                 (void) t_status(tr_error, "", "\nng_trans", ies,
+                 (void) t_status(tr_error, usertxt, "\nng_trans", ies,
                                  "sx", "", N_g, E_g, 0.0, 0.0);
             }
           } else
@@ -356,7 +347,7 @@ N*180.0 / M_PI, E*180.0 / M_PI, ies);
             if (ies < res) res = ies;
             res = ies;
             if (tr_error != NULL)
-               (void) t_status(tr_error, "", "\nng_trans", ies,
+               (void) t_status(tr_error, usertxt, "\nng_trans", ies,
                                "sx", "", N_g, E_g, 0.0, 0.0);
           }
         } else
@@ -368,7 +359,7 @@ N*180.0 / M_PI, E*180.0 / M_PI, ies);
           if (ies < res) res = ies;
           res = ies;
           if (tr_error != NULL)
-             (void) t_status(tr_error, "", "\nng_trans", ies,
+             (void) t_status(tr_error, usertxt, "\nng_trans", ies,
                              "sx", "", N_g, E_g, 0.0, 0.0);
         }
         break;
@@ -406,7 +397,7 @@ outlab->mlb, ies);
 
       default: /* programme error */
         return(t_status(
-               tr_error, "", "ng_trans(prog error)", TRF_ILLEG_));
+               tr_error, usertxt, "ng_trans(prog error)", TRF_ILLEG_));
       } /* end switch(action) */
       if (ies < res) res = ies;
 
@@ -414,7 +405,7 @@ outlab->mlb, ies);
   }
   else {
     return(t_status(
-           tr_error, "", "ng_trans(i/o labels)", TRF_ILLEG_));
+           tr_error, usertxt, "ng_trans(i/o labels)", TRF_ILLEG_));
   }
 
   /* Return coord and result */

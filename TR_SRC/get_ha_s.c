@@ -31,9 +31,7 @@
 #include   <stdio.h>
 #include   <math.h>
 
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    "KmsFncs.h"
 
 double      get_ha_s(
 FILE                *fw,
@@ -44,10 +42,7 @@ int                  j,
 int                 *i,
 double               s_max)
 {
-#include           "bshlm1.h"
-#include           "gmb1.h"
-#include           "bshlm2g.h"
-#include           "v_red.h"
+
   double            A0, A1, S, a0m, circum = 0.0;
   int               res, k;
   struct ne        {

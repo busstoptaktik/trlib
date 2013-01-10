@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "geo_lab.h"
+#include "KmsFncs.h"
 
 #ifdef _WIN32
 #include <process.h>
@@ -61,12 +61,8 @@ struct typ_dec              *tpd,
 int                         *used,
 char                        *udt
 )
-
 {
 /* tpd is zero iff no number is read from str */
-
-#include             "set_tpd.h"
-#include             "get_tpd.h"
 
   int              gr, tp, cf = 0, dc = 0, sc = 0;
   double           factor = 1., val = 0.;

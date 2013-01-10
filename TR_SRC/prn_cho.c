@@ -29,8 +29,8 @@
 /* indicate an intention of publishing this code.              */
 
 #include   <stdio.h>
-#include   "geo_lab.h"
-#include   "trthread.h"
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 short                    prn_cho(
 /*_____________________________*/
@@ -42,11 +42,7 @@ char                    *o_str,
 double                  *cmt,
 double                  *old_cmt
 )
-
 {
-
-#include                 "fputg.h"
-#include                 "fputcw.h"
 
   struct coord_lab                *c_lab = &(d_lab->u_c_lab);
   static THREAD_SAFE  short                     oN, oE, q_c;
