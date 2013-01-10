@@ -39,15 +39,13 @@
 /*        "tabtab", "bagtab", "t3dtab", "t2dtab", "tddtab"     */
 /* *pos           : after "REC_TABLE" for next recursive call  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <sys/types.h>
-
-#include "geo_lab.h"
-#include "geoid_d.h"
-#include "trthread.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <fcntl.h>
+#include    <sys/types.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                      srch_tab_typ(
 /*__________________________________*/
@@ -57,8 +55,6 @@ long                    *pos
 )
 {
 
-#include              "fgetln_kms.h"
-#include              "fgetlhtx.h"
 extern THREAD_SAFE FILE               *man_tab_file;
 extern THREAD_SAFE size_t              init_tab_pos;
 

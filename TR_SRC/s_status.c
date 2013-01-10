@@ -32,7 +32,7 @@
 #include    <stdio.h>
 #include    <stdarg.h>
 #include    <string.h>
-#include    "geo_lab.h"
+#include    "KmsFncs.h"
 
 int                      s_status(
 /*______________________________*/
@@ -53,10 +53,7 @@ SPECIAL::  c_unit == "non"  ==>>  SKIPS add params writing
 
 {
 
-#include             "set_tpd.h"
-#include             "sputg.h"
-
-  va_list              cp;
+  va_list             cp;
 
   char               *c_unit, *h_unit;
   double              N, E, H, dN, dE, dH;

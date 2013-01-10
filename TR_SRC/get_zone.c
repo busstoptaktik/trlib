@@ -27,22 +27,17 @@
 /* an unrecognized name is considered a filename containing a  */
 /* genuine label                                               */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <math.h>
-#include "geo_lab.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <ctype.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 int                     get_zone(
 /*_____________________________*/
 union geo_lab          *u_lab
 )
 {
-#include "conv_rgn.h"
 
   struct coord_lab          *c_lab = &(u_lab->u_c_lab);
   int                        zone = -1, i;

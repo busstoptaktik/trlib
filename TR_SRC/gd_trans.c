@@ -28,12 +28,11 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "geo_lab.h"
-#include "geoid_d.h"
-#include "trthread.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 /*             Actions                     */
 #define PRE    0   /* crt_???? -> geoE???? */
@@ -79,23 +78,6 @@ FILE                     *tr_error
 
 /* gd_trans  ver 2010.1          # page 2   12 jan 2010 11 36 */
 
-
-#include              "conv_lab.h"
-#include              "conv_rgn.h"
-#include              "ctc.h"
-#include              "dk_trans.h"
-#include              "ee_trans.h"
-#include              "fe_trans.h"
-#include              "fh_trans.h"
-#include              "geoid_c.h"
-#include              "labchsum.h"
-#include              "ng_trans.h"
-#include              "geoid_i.h"
-#include              "grid_val.h"
-#include              "gtc.h"
-#include              "htr_init.h"
-#include              "ptg.h"
-#include              "t_status.h"
 
   static THREAD_SAFE  int      (*dfb_trf)(
     union geo_lab      *in_lab,

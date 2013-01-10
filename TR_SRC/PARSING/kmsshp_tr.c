@@ -28,13 +28,13 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-#include "geo_lab.h"
-#include "geoid_d.h"
-#include "geoid_d.h"
-#include "kms_shape.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    <sys/stat.h>
+#include    "KmsFncs.h"
+
+int copy_parts(FILE *fh_in, FILE *fh_out, int NumParts, double *Z);
+int swop_int(int i);
 
 int              kmsshp_tr(
 /*______________________*/
@@ -63,18 +63,7 @@ char            *err_txt)
       (.gf ==2 && .tf ==3) ? "rad" : "dg"
 */
 
-#include   "fgetlhtx.h"
-#include   "fgetln_kms.h"
-#include   "fputshpprj.h"
-#include   "gd_trans.h"
-#include   "s_status.h"
-
 #define          SHP_NOVAL   -1.0e+308
-
-  
-
-  int copy_parts(FILE *fh_in, FILE *fh_out, int NumParts, double *Z);
-  int swop_int(int i);
 
   int                  KMS_ShpFileHeaderInt[9], KMS_ShxFileHeaderInt[9];
   double               KMS_ShpFileHeaderBox[8], KMS_ShxFileHeaderBox[8];

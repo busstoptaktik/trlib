@@ -30,11 +30,9 @@
 /* This copyright claim does not indicate an intention of        */
 /* publishing this code.                                         */
 
-#include        <stdio.h>
-#include        <string.h>
-
-#include        "geo_lab.h"
-#include        "geoid_d.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 int                       tab3d_val(
 /*________________________________*/
@@ -47,8 +45,6 @@ char                     *err_str
 )
 {
 
-#include        "s_status.h"
-#include        "v_std.h"
 /* double N_b, E_b; */
 
   struct gde_lab             *t_lab;

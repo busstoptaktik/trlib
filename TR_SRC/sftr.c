@@ -28,7 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <math.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 double                   sftr(
 /*__________________________*/
@@ -38,9 +39,7 @@ double            b,
 double            *A,
 double            *B
 )
-
 {
-#include          "v_red.h"
 
   double  svscs, svdss, cvscs, cvdss;
   double  cosC, sinC, sum, dif, c;

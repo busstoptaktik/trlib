@@ -36,13 +36,12 @@
 /* an unrecognized name is considered a filename containing a  */
 /* genuine label                                               */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <sys/stat.h>
+#include    <stdio.h>
+#include    <string.h>
+#include    <stdarg.h>
+#include    <sys/stat.h>
 
-#include "geo_lab.h"
-#include "lord.h"
+#include    "KmsFncs.h"
 
 int                      conv_spc(
 /*______________________________*/
@@ -52,15 +51,6 @@ union  geo_lab          *u_lab,
 ...
 )
 {
-
-#include              "conv_lab.h"
-#include              "conv_rgn.h"
-#include              "fgetln_kms.h"
-#include              "f_nxt.h"
-#include              "fputcw.h"
-#include              "sgetg.h"
-#include              "sgetcw.h"
-#include              "labchsum.h"
 
   FILE                      *iofile = (FILE *) NULL;
   va_list                    o_p;

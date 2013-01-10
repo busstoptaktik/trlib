@@ -28,18 +28,17 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <stdarg.h>
-#include <ctype.h>
-#include <math.h>
-#include "geo_lab.h"
-#include "trthread.h"
-#include "lord.h"
+#include    <stddef.h>
+#include    <stdio.h>
+#include    <string.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
+#include    <fcntl.h>
+#include    <stdarg.h>
+#include    <ctype.h>
+#include    <math.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                      conv_plm(
 /*______________________________*/
@@ -85,13 +84,6 @@ struct plm_lab          *p_lab,
 /* conv_plm    ver 2010.01          # page 2     7 jan 2010 10 19 */
 
 
-#include     "fgetln_kms.h"
-#include     "fgetlhtx.h"
-#include     "gettabdir.h"
-#include     "i_tabdir_file.h"
-#include     "labchsum.h"
-#include     "sgetg.h"
-#include     "t_status.h"
 extern THREAD_SAFE FILE               *man_gps_file;
 extern THREAD_SAFE size_t              init_gps_pos;
 

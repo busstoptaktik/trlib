@@ -15,16 +15,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "geo_lab.h"
-#include "fgetln_kms.h"
-#include "parse_def_file.h"
-#include "trlib_api.h"
-#include "strong.h"
-#include "lord.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    "KmsFncs.h"
+#include    "strong.h"
+
 #define MODE_PRJ "def_prj"
 #define MODE_GRS "def_grs"
 #define MODE_RGN "def_rgn"
@@ -49,8 +46,8 @@
 
 int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
 	strncpy(ellip->mlb,items[0],MLBLNG);
-	ellip->no=atoi(items[1]);
-	ellip->mode=atoi(items[2]);
+	ellip->no=(short)atoi(items[1]);
+	ellip->mode=(short)atoi(items[2]);
 	ellip->axis=atof(items[3]);
 	ellip->flattening=atof(items[4]);
 	/* todo: implement +.-,* operators. * is problematic since fgetln_kms interprets it as the beginning of a comment! */

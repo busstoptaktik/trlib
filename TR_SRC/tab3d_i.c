@@ -27,15 +27,13 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include        <stdio.h>
-#include        <string.h>
-#include        <ctype.h>
-#include        <fcntl.h>
-#include        <sys/types.h>
-#include        <sys/stat.h>
-
-#include        "geo_lab.h"
-#include        "geoid_d.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    <fcntl.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
+#include    "KmsFncs.h"
 
 int                     tab3d_i(
 /*____________________________*/
@@ -45,9 +43,6 @@ struct mtab3d_str       *tab3d_table,
 char                    *err_str
 )
 {
-
-#include     "conv_tab.h"
-#include     "tab3d_c.h"
 
   int                        qr;
 

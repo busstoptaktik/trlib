@@ -40,7 +40,7 @@
 #include    <ctype.h>
 #include    <fcntl.h>
 #include    <math.h>
-#include    "geo_lab.h"
+#include    "KmsFncs.h"
 #include    "trthread.h"
 
 int             set_dtm(
@@ -52,12 +52,7 @@ char               *p_nm,
 char               *e_nm,
 struct dsh_str     *trp
 )
-
 {
-#include              "fgetln_kms.h"
-#include              "fgetlhtx.h"
-#include              "i_tabdir_file.h"
-#include              "sgetg.h"
 
 #define  MAS  (RHO*1000.0)
 

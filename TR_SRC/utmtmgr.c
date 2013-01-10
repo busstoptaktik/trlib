@@ -28,14 +28,10 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include   <stdio.h>
-#include   <math.h>
-#include   <string.h>
-#include   "geo_lab.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <stdio.h>
+#include    <math.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 int                 utmtmgr(
 /*________________________*/
@@ -48,10 +44,7 @@ double              *L,
 char                *mgref,
 int                  cif
 )
-
 {
-#include          "ptg.h"
-
   /*                       00        10        20    */
   /*                       012345678901234567890123  */
   char               *A = "ABCDEFGHJKLMNPQRSTUVWXYZ";

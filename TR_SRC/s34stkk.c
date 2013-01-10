@@ -28,9 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <math.h>
-#include "geo_lab.h"
+#include    <stdio.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 int                        s34stkk(
 /*_______________________________*/
@@ -75,8 +75,6 @@ direct, call by value indicating
 
 
 {
-
-#include        "t_status.h"
 
 double            N, E, n, e, w, tol = 0.005;
 double           *c, *cb = NULL, *cw = NULL;

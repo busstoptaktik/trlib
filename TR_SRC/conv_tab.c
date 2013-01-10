@@ -43,21 +43,15 @@
 /*    result == -2      : file is too short                    */
 /*    result == -3      : file table inconsistent              */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <stdarg.h>
-#include <math.h>
-#include "geo_lab.h"
-#include "geoid_d.h"
-#include "lord.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
+#include    <fcntl.h>
+#include    <stdarg.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 int                      conv_tab(
 /*______________________________*/
@@ -72,20 +66,6 @@ struct gde_lab          *t_lab,
 
 /* conv_tab    ver 2010.1          # page 2   12 jan 2010 10 19 */
 
-
-#include              "conv_lab.h"
-#include              "get_zone.h"
-#include              "fputg.h"
-#include              "geoid_t.h"
-#include              "gettabdir.h"
-#include              "i_tabdir_file.h"
-#include              "labchsum.h"
-#include              "set_dtm_1.h"
-#include              "set_grs.h"
-#include              "set_tpd.h"
-#include              "sgetg.h"
-#include              "sputg.h"
-#include              "v_std.h"
 
   FILE                      *iofile = (FILE *) NULL;
   char                      *io_str = (char *) NULL;

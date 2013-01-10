@@ -36,8 +36,7 @@
 #include        <sys/types.h>
 #include        <sys/stat.h>
 
-#include        "geo_lab.h"
-#include        "geoid_d.h"
+#include        "KmsFncs.h"
 #include        "trthread.h"
 
 int                     geoid_i(
@@ -48,12 +47,6 @@ struct mgde_str         *geoid_table,
 char                    *err_str
 )
 {
-
-#include     "conv_tab.h"
-#include     "fgetln_kms.h"
-#include     "geoid_c.h"
-#include     "i_tabdir_file.h"
-#include     "s_status.h"
 
 extern THREAD_SAFE  FILE               *man_tab_file;
 extern THREAD_SAFE size_t              init_tab_pos;

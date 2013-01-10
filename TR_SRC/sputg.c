@@ -28,14 +28,10 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include "geo_lab.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <stdio.h>
+#include    <math.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 int                      sputg(
 /*___________________________*/
@@ -44,10 +40,7 @@ double                   val,
 struct typ_dec          *typ,
 char                    *layout
 )
-
 {
-#include         "get_tpd.h"
-#include         "set_tpd.h"
 
   int             gr, tp, scf, cf, dc, fw;
   int             unit = 0, plus = 0, blnk = 0, zero = 0;

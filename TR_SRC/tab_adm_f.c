@@ -29,24 +29,16 @@
 /* This copyright claim does not indicate an intention of        */
 /* publishing this code.                                         */
 
-#include         <stdio.h>
-#include         <stdlib.h>
-#include         <limits.h>
-#include         <string.h>
-#include         <fcntl.h>
-#include         <math.h>
-#include         <sys/types.h>
-#include         <sys/stat.h>
-#include         "geo_lab.h"
-#include         "geoid_d.h"
-#include         "c_tabdir_file.h"
-#include         "i_tabdir_file.h"
-#include         "gettabdir.h"
-#include         "trthread.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <limits.h>
+#include    <string.h>
+#include    <fcntl.h>
+#include    <math.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 /* tab_adm_f is a maintenance tool for tables and geoids      */
 /*                                                           */
@@ -92,6 +84,7 @@
 
 /* tab_adm_f                       # page 2   27 Jun 2004 22 00 */
 
+void                 reset_dir();
 
 char                 sav_dir[256], in[256];
 
@@ -108,20 +101,8 @@ int                  tab_adm_f(
 )
 {
 
-#include         "conv_lab.h"
-#include         "fgetlhtx.h"
-#include         "fgetln_kms.h"
-#include         "fputg.h"
-#include         "geoid_t.h"
-#include         "get_zone.h"
-#include         "set_tpd.h"
-#include         "set_tpd.h"
-#include         "sgetg.h"
-#include         "sputg.h"
-
   extern THREAD_SAFE FILE           *man_tab_file;
 
-  void                   reset_dir();
   union geo_lab          t_lab_u;
   union geo_lab          x_lab_u;
   struct gde_lab        *t_lab = &(t_lab_u.u_g_lab);

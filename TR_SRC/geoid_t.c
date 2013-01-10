@@ -38,17 +38,16 @@
 /*  result == -1        : name is not found                    */
 /*  result == TAB_N_SYS : manager.tab not found                */
 
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include    <stddef.h>
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <fcntl.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
 
-#include "geo_lab.h"
-#include "geoid_d.h"
-#include "trthread.h"
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                      geoid_t(
 /*____________________________*/
@@ -59,11 +58,6 @@ char                    *descr
 )
 
 {
-
-#include              "fgetln_kms.h"
-#include              "i_tabdir_file.h"
-#include              "s_status.h"
-#include              "srch_tab_typ.h"
 
 extern THREAD_SAFE FILE               *man_tab_file;
 extern THREAD_SAFE size_t              init_tab_pos;

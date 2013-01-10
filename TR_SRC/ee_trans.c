@@ -32,13 +32,12 @@
 #define  DEBUGEETRANS
 */
 
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <ctype.h>
-#include "geo_lab.h"
-#include "trthread.h"
-#include "lord.h"
+#include    <stdio.h>
+#include    <math.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 /* ACTION NUMBERS */
 /* termination action */
@@ -84,12 +83,7 @@ double              *Hout,
 char                *usertxt,
 FILE                *tr_error
 )
-
 {
-#include        "conv_lab.h"
-#include        "ptg.h"
-#include        "eetmtu_g.h"
-#include        "t_status.h"
 
 
 /* ee_trans   version 2.0           # page 2   10 Sep 1998 11 36 */

@@ -29,11 +29,11 @@
 /* Institude DTU.  This copyright claim does not indicate an      */
 /* intention of publishing this code.                             */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "geo_lab.h"
-#include "trthread.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 /*             Actions                     */
 #define PTG    2   /* Proj     -> Geo      */
@@ -71,12 +71,6 @@ FILE                     *tr_error
 
 /* etrs89_trans  ver 2009.03          # page 2   04 Mar 2009 11 36 */
 
-
-#include              "conv_lab.h"
-#include              "get_mlb.h"
-#include              "gtc.h"
-#include              "ptg.h"
-#include              "t_status.h"
 
   static THREAD_SAFE  char                 si_lab_str[MLBLNG];
   static THREAD_SAFE  char                 so_lab_str[MLBLNG];

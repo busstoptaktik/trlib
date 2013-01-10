@@ -29,11 +29,7 @@
 /* indicate an intention of publishing this code.              */
 
 #include  <math.h>
-#include  "geo_lab.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    "KmsFncs.h"
 
 int                      bshlm1(
 /*____________________________*/
@@ -47,16 +43,7 @@ double                   A1,
 double                  *A2,
 double                   S
 )
-
 {
-
-#include             "bh_lat.h"
-#include             "bh_lmb.h"
-#include             "clenshaw.h"
-#include             "gmb1.h"
-#include             "sftr.h"
-#include             "v_red.h"
-
   double     em2, b0, PF;
   double     S1, a2, R, I;
   double     b1, b2, dl, d_lmb, b_max, s, s1, K1, K1sq;

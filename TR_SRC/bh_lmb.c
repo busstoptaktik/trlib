@@ -28,7 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include <math.h>
+#include    <string.h>
+#include    <math.h>
+#include    "KmsFncs.h"
 
 double           bh_lmb(
 /*____________________*/
@@ -37,10 +39,7 @@ double     f,
 double     bm,
 double     s1,
 double     s)
-
-
 {
-#include         "v_red.h"
   double            h, sr;
 
   s1 = v_red(2.0*s1 + s);

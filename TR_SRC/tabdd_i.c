@@ -30,15 +30,13 @@
 /* This copyright claim does not indicate an intention of        */
 /* publishing this code.                                         */
 
-#include        <stdio.h>
-#include        <string.h>
-#include        <ctype.h>
-#include        <fcntl.h>
-#include        <sys/types.h>
-#include        <sys/stat.h>
-
-#include        "geo_lab.h"
-#include        "geoid_d.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    <fcntl.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
+#include    "KmsFncs.h"
 
 int                     tabdd_i(
 /*____________________________*/
@@ -48,11 +46,6 @@ struct mtabdd_str       *tabdd_table,
 char                    *err_str
 )
 {
-
-#include     "conv_tab.h"
-#include     "fgetln_kms.h"
-#include     "tabdd_c.h"
-#include     "s_status.h"
 
   int                        qr;
 

@@ -28,14 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#include  <math.h>
-#include  <stdio.h>
-#include  "geo_lab.h"
-#include "lord.h"
-
-#ifndef    M_PI
-#include   "kms_math.h"
-#endif
+#include    <math.h>
+#include    <stdio.h>
+#include    "KmsFncs.h"
 
 int          bshlm2g(
 /*_________________*/

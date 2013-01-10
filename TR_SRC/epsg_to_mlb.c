@@ -129,10 +129,9 @@ int export_to_epsg(char *mlb, int *h_code, int *v_code){
 	get_mlb(mlb,&region,mlb1,&sepch,mlb2,&h_datum);
 	
 	/*first see if this is a utm system */
-        if ((utm_scan=strstr(mlb1,"utm"))){
+  if ((utm_scan=strstr(mlb1,"utm"))){
 		if ((utm_zone=atoi(mlb1+3)))
 			strcpy(mlb1,"utm");
-		
 	}
 	normalise_datum(mlb2);
 	strcpy(mlb_src,mlb1);

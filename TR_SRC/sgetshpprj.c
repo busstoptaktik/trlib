@@ -18,13 +18,10 @@
  
 
 
-#include <stdio.h>
-#include <stddef.h>
-#include <string.h>
-#include "sgetshpprj.h"
-#include "geoid_d.h"
-#include "typ_dec.h"
-
+#include    <stdio.h>
+#include    <stddef.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 int              sgetshpprj(
 /*______________________*/
@@ -49,13 +46,6 @@ char            *mlb_out)
       (.gf ==2 && .tf ==3) ? "rad" : "dg"
 
 */
-
-#include   "c_tabdir_file.h"
-#include   "conv_lab.h"
-#include   "fgetlhtx.h"
-#include   "fgetln_kms.h"
-#include   "i_tabdir_file.h"
-#include   "set_tpd.h"
 
   char   prj_txt[2048], temp[128], param[128], std_lat[16];
   char  *p_tmp, c, sep = '_';
@@ -315,6 +305,4 @@ char            *mlb_out)
     (void) c_tabdir_file(5, fp);
     return(i);
   } else return(-1);
-
-  return(0);
 }

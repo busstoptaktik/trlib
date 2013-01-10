@@ -27,21 +27,29 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
-#include        <stdio.h>
-#include        <stdlib.h>
-#include        <string.h>
-#include        <ctype.h>
-#include        <fcntl.h>
-#include        <sys/types.h>
-#include        <sys/stat.h>
-#include        "geo_lab.h"
-#include        "geoid_d.h"
-#include        "fgetln_kms.h"
-#include        "sgetdt.h"
-#include        "s_status.h"
-#include        "trthread.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <ctype.h>
+#include    <fcntl.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
+
 extern THREAD_SAFE FILE               *man_gps_file;
 extern THREAD_SAFE size_t              init_gps_pos;
+
+long get_tab_part(int type, char *pth_mlb);
+
+int get_tab_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
+    double i_JD, char *from_str, int fr_ch, char *to___str,
+    struct gps_c_str *D_gps, char *err_str);
+
+int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
+    struct gps_c_str *D_gps,
+    char *from_str, int fr_ch, int to_ch,
+    double *d1, double *d2);
 
 int                      set_itrf_c(
 /*________________________________*/
@@ -149,22 +157,6 @@ char                    *err_str
 
 
 #define YEAR(yy) ((yy) +(((yy)<88) ? 2000 : (((yy)<100) ? 1900 : 0)))
-#include     "c_tabdir_file.h"
-#include     "conv_lab.h"
-#include     "i_tabdir_file.h"
-#include     "tab3d_i.h"
-#include     "tab3d_c.h"
-
-long get_tab_part(int type, char *pth_mlb);
-
-int get_tab_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
-    double i_JD, char *from_str, int fr_ch, char *to___str,
-    struct gps_c_str *D_gps, char *err_str);
-
-int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
-     struct gps_c_str *D_gps,
-     char *from_str, int fr_ch, int to_ch,
-     double *d1, double *d2);
 
   union geo_lab           *geo_lb;
   struct gde_lab          *ipl_lb = &ipl_table->table_u;

@@ -54,16 +54,14 @@
 /*        "geoid", "dtmtab", "dhtab", "upltab", "demtab",      */
 /*        "tabtab", "bagtab", "t3dtab", "t2dtab", "tddtab"     */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include "geo_lab.h"
-#include "geoid_d.h"
-#include "trthread.h"
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
+#include    <fcntl.h>
+#include    <sys/types.h>
+#include    <sys/stat.h>
+#include    "KmsFncs.h"
+#include    "trthread.h"
 
 int                      tab_doc_f(
 /*____________________________*/
@@ -75,13 +73,6 @@ FILE                    *fh_out
 
 /* tab_doc_f     ver 2009.01          # page 2   26 Mar 2009 10 19 */
 
-
-#include              "conv_lab.h"
-#include              "fgetln_kms.h"
-#include              "fgetlhtx.h"
-#include              "s_status.h"
-#include              "i_tabdir_file.h"
-#include              "srch_tab_typ.h"
 
 extern THREAD_SAFE FILE               *man_tab_file;
 extern THREAD_SAFE size_t              init_tab_pos;

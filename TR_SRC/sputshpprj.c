@@ -20,18 +20,16 @@
 
 /* sputshpprj  based on previous fputshpprj by KE - with only obvious changes, simlk oct 2011       */
 
-
-	
-
-#include <stdio.h>
-#include <string.h>
-#include "geo_lab.h"
-#include "geoid_d.h"
+#include    <stdio.h>
+#include    <string.h>
+#include    "KmsFncs.h"
 
 /* Perhaps header for this fct. should really be included */
 
+int get_val_str(char* val_str, double val);
+
 int              sputshpprj(
-/*______________________*/
+/*________________________*/
 char            *wkt_out,
 union geo_lab   *g_lab)
 {
@@ -58,17 +56,6 @@ union geo_lab   *g_lab)
    The caller must ensure that *wkt_out is long enough to hold the output!
 
 */
-
-#include   "c_tabdir_file.h"
-#include   "fgetlhtx.h"
-#include   "fgetln_kms.h"
-#include   "get_mlb.h"
-#include   "i_tabdir_file.h"
-#include   "set_dtm_1.h"
-#include   "set_grs.h"
-
-
-  int get_val_str(char* val_str, double val);
 
   char              prj_txt1[MLBLNG], prj_txt2[2*MLBLNG];
   char              dtm_txt1[MLBLNG], dtm_txt2[2*MLBLNG];

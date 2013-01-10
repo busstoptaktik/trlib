@@ -29,8 +29,9 @@
 /* publishing this code.                                       */
 
 
-#include <stdio.h>
-#include <stddef.h>
+#include    <stdio.h>
+#include    <stddef.h>
+#include    "KmsFncs.h"
 
 double              fgetdt(
 /*_______________________*/
@@ -39,10 +40,8 @@ int                *used,
 int                *term_c,
 FILE               *fp
 )
-
 {
 
-#include    "sgetdt.h"
   double          cw;
   int             c, e, act, klasse, res;
   int             nst = 0, item = 0, n_item = 0, mode_ap = 0;
