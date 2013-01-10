@@ -26,21 +26,19 @@
 static unsigned int  first_byte_is_nonzero_if_little_endian = 1;
 static unsigned char *is_little_endian = (unsigned char *) &first_byte_is_nonzero_if_little_endian;
 
-// This is used when compiling in VS
-#ifdef _MSC_VER
+/* Define away inlines when compiling with MSVC */
+#if defined (_MSC_VER) && !defined (inline)
 #define inline
 #endif
 
-inline float swapfloatifneeded(float p) {
+
+inline void *util_swap_4 (void *p) {
     unsigned char *v;
     unsigned char  w;
-    
-    if (*is_little_endian)
-        return p;
+    puts("swap");    
+    v = (unsigned char *) p;
 
-    v = (unsigned char *) &p;
     w = v[0];
-
     v[0] = v[3];
     v[3] = w;
 
@@ -50,6 +48,17 @@ inline float swapfloatifneeded(float p) {
 
     return p;
 }
+
+
+inline float util_swap_float_if_needed (float p) {
+    if (*is_little_endian)
+        return p;
+    return *((float *) util_swap_4(&p));
+}
+
+
+
+
 
 #ifdef TEST_ME
 #include <stdio.h>
@@ -61,9 +70,20 @@ inline float swapfloatifneeded(float p) {
 int main (void) {
     float f;
     unsigned int u = *is_little_endian;
-    printf (LARG("is_little_endian = %u\n"), u);
-    f = swapfloatifneeded(7);
+    unsigned char *p;
+    p = &u;
+    
+    f = util_swap_float_if_needed(7);
 	printf ("f = %f\n", f);
+    printf (LARG("is_little_endian = %u\n"), u);
+    u = first_byte_is_nonzero_if_little_endian;
+    printf ("[%p]\n", p);
+    printf ("unswapped u[0..3]= %d.%d.%d.%d\n", (int)p[0], (int)p[1], (int)p[2], (int)p[3]);
+    p = util_swap_4 (p);
+    printf ("[%p]\n", p);
+    printf (LARG("is_little_endian = %u\n"), u);
+    puts("pap");
+    printf ("swapped   u[0..3]= %d.%d.%d.%d\n", (int)p[0], (int)p[1], (int)p[2], (int)p[3]);
 	
 	if (is_little_endian && (7==f))
 	    return 0;
