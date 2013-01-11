@@ -20,6 +20,7 @@
 #include    <stdio.h>
 #include    <string.h>
 /*#include <windows.h>* enable if we want to define our dllMain under windows */
+#include    "trlib_intern.h"
 #include    "KmsFncs.h"
 #include    "trthread.h"
 #include    "epsg_to_mlb.h"
