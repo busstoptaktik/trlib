@@ -17,7 +17,7 @@ OPTIONS={"-thread_safe": "Compile a thread safe library.",
 "-x86":"Default compiler (windows only).",
 "-build": "Build shared libaray- default: modified source only.",
 "-all":"Build all c-source.",
-"-buildtest":"Build test programs.",
+"-buildtest":"<path(s)> Build (single file) test programs in specified by <path(s)> (globbing allowed).",
 "-pattern":" <pattern>  : Build files matching pattern.",
 "-clean": "Delete objcet files.",
 "-test":"Run tests.",
@@ -42,7 +42,6 @@ INC_DIR="TR_INC"
 SRC_DIRS=["TR_SRC","TR_SRC/API","TR_SRC/LORD","TR_SRC/PARSING","TR_SRC/UTILS"]
 DEF_FILE_API="TR_BUILD/trlib.def"
 DEF_FILE_KMS_FNCS="KmsFncs.def"
-TEST_DIR="APPS" #relative to trlib path
 #THIS IS WHERE YOURE JAVA STUFF IS (SDK INCLUDE FILES ETC)  IS, IF AVAILABLE
 JAVA_INC=["C:\\Programmer\\Java\\jdk1.7.0_07\\include","C:\\Programmer\\Java\\jdk1.7.0_07\\include\\win32"]
 JAVA_JNI_SRC=["java/Interface.c"]
@@ -124,7 +123,7 @@ def BuildTest(compiler,outname,cfiles,include,link="",build_dir="."):
 	return []
 
 def GetSource(trlib):
-	return map(lambda x:os.path.join(trlib,x),SRC_DIRS), [os.path.join(trlib,INC_DIR)], os.path.join(trlib,TEST_DIR)
+	return map(lambda x:os.path.join(trlib,x),SRC_DIRS), [os.path.join(trlib,INC_DIR)]
 
 
 def main(args):
@@ -178,7 +177,7 @@ def main(args):
 	else:
 		debug=False
 	# #  # # # # # # # # # # # # # # #
-	src_dirs,inc_dirs,test_dir=GetSource(TRLIB)
+	src_dirs,inc_dirs=GetSource(TRLIB)
 	if "-build" in args:
 		outdir=os.path.dirname(outname)
 		if not os.path.exists(outdir):
@@ -219,25 +218,26 @@ def main(args):
 			return 1
 	#TODO: fix below here...
 	if ("-buildtest" in args):
-		if not os.path.exists(test_dir):
-			print("%s does not exist!" %test_dir)
+		src_pat=args[args.index("-buildtest")+1]
+		src_files=glob.glob(src_pat)
+		if len(src_files)==0:
+			print("No test input files to compile!")
 			log_fp.close()
 			return 1
 		test_build=os.path.join(build_dir,"TEST")
-		cfiles=glob.glob(os.path.join(test_dir,"*.c"))
-		if "-x64" in args:
-			thread_lib=THREAD_LIB_W64
-		else:
-			thread_lib=THREAD_LIB
+		for name in src_files:
+			src_name=os.path.realpath(name)
+			basename,ext=os.path.splitext(os.path.basename(src_name))
+			if (ext==".c"):
+				test_name=basename+EXE
+				ok=Build(compiler,test_name,[src_name],inc_dirs,is_debug=True,is_library=False,link_libraries=[outname],build_dir=test_build,link_all=False)
+				if ok:
+					TESTS.append(os.path.join(test_build,test_name))
+			else:
+				print("File: %s, bad extension %s" %basename,ext)
 		
-		#shutil.copy(outname,os.path.join(TEST_DIR,os.path.basename(outname)))
-		if IS_MSVC:
-			libname=os.path.splitext(outname)[0]+IMPLIB_EXT
-		else:
-			libname=outname
-		TESTS.extend(BuildTest(compiler,libname,cfiles,inc_dirs,[thread_lib],test_build))
-		os.chdir(CWD)
 	if "-test" in args:
+		#Well, outname should be findable by some ENV var.....
 		for test in TESTS:
 			print("Running %s" %test)
 			os.system(test)
