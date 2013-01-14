@@ -6,12 +6,8 @@
 ## simlk, sep. 2012
 ##############################
 import sys,os,glob,shutil,subprocess
-if "-msvc" in sys.argv:
-	from msvc_options import *
-	IS_MSVC=True
-else:
-	from gcc_options import *
-	IS_MSVC=False
+from cc import *
+from core import *
 OPTIONS={"-thread_safe": "Compile a thread safe library.",
 "-msvc":"Use MSVC compiler (windows only).",
 "-debug":"Include debug symbols.",
@@ -49,9 +45,7 @@ DEF_FILE_KMS_FNCS="KmsFncs.def"
 TEST_DIR="APPS" #relative to trlib path
 #THIS IS WHERE YOURE JAVA STUFF IS (SDK INCLUDE FILES ETC)  IS, IF AVAILABLE
 JAVA_INC=["C:\\Programmer\\Java\\jdk1.7.0_07\\include","C:\\Programmer\\Java\\jdk1.7.0_07\\include\\win32"]
-JAVA_COMPILER="javac"
 JAVA_JNI_SRC=["java/Interface.c"]
-JAVA_SRC="java/*.java"
 #DEFINES#
 DEFINES=[]
 #LOGFILE FOR BUILD
@@ -97,37 +91,13 @@ def GetRev(trlib):
 		return "undefined"
 	return rev.strip()
 	
-	
-def RunCMD(cmd):
-	new_cmd=[]
-	cmd_str=""
-	for item in cmd:
-		item=item.strip()
-		if len(item)>0:
-			new_cmd.append(item)
-			cmd_str+=item+" "
-	print cmd_str
-	if IS_WINDOWS:
-		s=subprocess.Popen(new_cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=False)
-	else:
-		s=subprocess.Popen(cmd_str,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
-	out=""
-	while s.poll() is None:
-		line=s.stdout.readline()
-		if len(line.strip())>0:
-			print line
-			out+=line
-	rc=s.poll()
-	s.stdout.close()
-	return rc, out
-
-def GetModified(src_dirs,build_dir):
+def GetModified(src_dirs,build_dir,obj_extension):
 	source=[]
 	for dir in src_dirs:
 		files=glob.glob(os.path.join(dir,"*.c"))
 		for fname in files:
 			t_src=os.path.getmtime(fname)
-			obj_name=os.path.join(build_dir,os.path.splitext(os.path.basename(fname))[0]+OBJ_FILES.replace("*",""))
+			obj_name=os.path.join(build_dir,os.path.splitext(os.path.basename(fname))[0]+obj_extension)
 			if os.path.exists(obj_name):
 				t_obj=os.path.getmtime(obj_name)
 			else:
@@ -147,87 +117,11 @@ class RedirectStdout(object):
 			sys.__stdout__.write(text)
 		
 
-def GetCompiler(compiler=None,cross=False):
-	if compiler is None:
-		if cross:
-			compiler=CROSS_COMPILER
-		else:
-			compiler=COMPILER
-	rc,ver=RunCMD([compiler,VERSION_SWITCH])
-	if rc==0:
-		return ver.splitlines()[0]
-	else:
-		return "error"
 
-def GetCrossCompiler():
-	return GetCompiler(cross=True)
-
-def BuildLibrary(compiler,linker,outname,source,include,defines,options,link_options,def_file="",build_dir="."):
-	if not os.path.exists(build_dir):
-		os.mkdir(build_dir)
-	os.chdir(build_dir)
-	includes=map(lambda x:INCLUDE_SWITCH+x,include)
-	compile=[compiler]+defines+options.split()+includes+source
-	implib=os.path.splitext(outname)[0]+IMPLIB_EXT
-	def_file=DEF_FILE_SWITCH+def_file
-	if IS_WINDOWS:
-		implib=IMPLIB_SWITCH+implib
-	else:
-		implib=""
-	outname=LINK_OUTPUT_SWITCH+outname
-	#TODO: check gcc linker option like -g -O etc...
-	if (IS_MSVC):
-		link=[linker]+link_options.split()+[outname,implib,def_file]+LINK_LIBRARIES.split()+[OBJ_FILES]
-	else:
-		link=[linker]+link_options.split()+[outname]+LINK_LIBRARIES.split()+[implib,def_file,OBJ_FILES]
-	if len(source)>0:
-		rc,text=RunCMD(compile)
-	else: #No modified files, I s'pose :-)
-		print "No modified source files... linking..."
-		rc=0
-	if rc==0:
-		rc,text=RunCMD(link)
-	else:
-		return False
-	if rc!=0:
-		return False
-	return True
 
 def BuildTest(compiler,outname,cfiles,include,link="",build_dir="."):
-	tests=[]
-	if not os.path.exists(build_dir):
-		os.mkdir(build_dir)
-	os.chdir(build_dir)
-	includes=map(lambda x:INCLUDE_SWITCH+x,include)
-	print("Compiling test program(s)...")
-	print("Executables placed in: %s" %os.path.dirname(outname))
-	for fname in cfiles:
-		pname=os.path.join(os.path.dirname(outname),os.path.splitext(os.path.basename(fname))[0]+EXE_EXT)
-		oswitch=EXE_OUTPUT_SWITCH+pname
-		if "thread" in fname.lower() and os.path.exists(link_libs):
-			link_libs=link
-		else:
-			link_libs=[]
-		compile=[compiler,oswitch]+DEBUG_OPTIONS_TEST.split()+includes+link_libs+[fname,outname] 
-		rc,text=RunCMD(compile)
-		if rc==0:
-			tests.append(pname)
-	return tests
-
-	
-	
-
-	
-def Clean(dir):
-	print("Cleaning...")
-	files=glob.glob(os.path.join(dir,OBJ_FILES))
-	if OBJ_FILES!="*.obj":
-		files.extend(glob.glob(os.path.join(dir,"*.obj")))
-	elif OBJ_FILES!="*.o":
-		files.extend(glob.glob(os.path.join(dir,"*.o")))
-	for fname in files:
-		os.remove(fname)
-	
+	#TODO
+	return []
 
 def GetSource(trlib):
 	return map(lambda x:os.path.join(trlib,x),SRC_DIRS), [os.path.join(trlib,INC_DIR)], os.path.join(trlib,TEST_DIR)
@@ -242,51 +136,58 @@ def main(args):
 		Usage()
 	log_fp=open(BUILD_LOG,"w")
 	sys.stdout=RedirectStdout(log_fp,True)
+	is_msvc="-msvc" in args
+	if is_msvc:
+		if "-x64" in args:
+			compiler=msvc64()
+		else:
+			compiler=msvc32()
+	else:
+		if "-x64" in args:
+			compiler=mingw64()
+		elif IS_WINDOWS:
+			compiler=mingw32()
+		elif IS_MAC:
+			compiler=macports_gcc()
+		else:
+			compiler=gcc_nix()
 	if "-x64" in args:
-		compiler=CROSS_COMPILER
 		build_dir=BUILD_DIR_CROSS
 		lib_dir=LIB_DIR_CROSS
-		linker=CROSS_LINKER
-		
 	else:
-		compiler=COMPILER
 		build_dir=BUILD_DIR
 		lib_dir=LIB_DIR
-		linker=LINKER
 	if "-cc" in args:
-		compiler=args[args.index("-cc")+1]
-		linker=compiler
+		override=args[args.index("-cc")+1]
+		compiler.overrideCompiler(override)
 	if "-compiler_version" in args:
 		print GetCompiler(compiler)
 	#ALWAYS PUT LIBRARY IN LIBDIR#
 	if "-o" in args:
-		outname=sys.argv[sys.argv.index("-o")+1]
-	else:
+		outname=args[args.index("-o")+1]
+	else: #improve here.... define extension in cc or core
 		if "win" in sys.platform:
 			outname=os.path.join(lib_dir,"TrLib.dll")
 		else:
 			outname=os.path.join(lib_dir,"TrLib.so")
 	outname=os.path.realpath(outname)
+	defines=DEFINES
 	if "-debug" in args:
-		options=DEBUG_OPTIONS
-		link_options=DEBUG_LINK
+		defines.append("_ROUT")
+		debug=True
 	else:
-		options=RELEASE_OPTIONS
-		link_options=RELEASE_LINK
-	if "-gprof" in args and not IS_MSVC:
-		options+=" -pg"
+		debug=False
 	# #  # # # # # # # # # # # # # # #
 	src_dirs,inc_dirs,test_dir=GetSource(TRLIB)
 	if "-build" in args:
 		outdir=os.path.dirname(outname)
 		if not os.path.exists(outdir):
 			os.mkdir(outdir)
-		defines=DEFINES
 		print("Building source in %s at revision:" %TRLIB)
 		rev=GetRev(TRLIB)
-		defines.append("%sTRLIB_REVISION=%s"%(DEFINE_SWITCH,rev))
+		defines.append("TRLIB_REVISION=%s"%(rev))
 		if "-debuggd" in args:
-			defines.append("%sDEBUGGDTRANS" %DEFINE_SWITCH)
+			defines.append("DEBUGGDTRANS")
 		if "-pattern" in args:
 			pat=args[args.index("-pattern")+1]
 			source=[]
@@ -296,15 +197,14 @@ def main(args):
 			if "-all" in args:
 				source=map(lambda x:os.path.join(x,"*.c"),src_dirs)
 			else:
-				source=GetModified(src_dirs,build_dir)
+				source=GetModified(src_dirs,build_dir,compiler.OBJ_EXTENSION)
 			if "-java" in args:
 				source+=map(lambda x:os.path.join(TRLIB,x),JAVA_JNI_SRC)
 				inc_dirs+=JAVA_INC
 			
 		if "-thread_safe" in args:
-			defines.append("%sTHREAD_SAFE" %DEFINE_SWITCH)
-		
-		if IS_MSVC:
+			defines.append("THREAD_SAFE")
+		if is_msvc:
 			if "-kmsfncs" in args:
 				print("DEPRECATED OPTION....")
 				def_file=os.path.join(TRLIB,DEF_FILE_KMS_FNCS)
@@ -312,21 +212,17 @@ def main(args):
 				def_file=os.path.join(TRLIB,DEF_FILE_API)
 		else:
 			def_file=""
-		ok=BuildLibrary(compiler,linker,outname,source,inc_dirs,defines,options,link_options,def_file,build_dir)
+		ok=Build(compiler,outname,source,inc_dirs,defines,debug,True,compiler.LINK_LIBRARIES,def_file,build_dir)
 		if not ok:
 			print("Error, exiting")
 			log_fp.close()
-			sys.exit(1)
-	#TODO:
-	#if "-java_external" in args:
-	#	base,ext=os.path.splitext(outname)
-	#	java_out=base+"_java"+ext
-	#	BuildJNI(compiler,java_out,outname,options,os.path.join(TRLIB,JAVA_JNI_SRC),JAVA_INC+inc_dirs) 
+			return 1
+	#TODO: fix below here...
 	if ("-buildtest" in args):
 		if not os.path.exists(test_dir):
 			print("%s does not exist!" %test_dir)
 			log_fp.close()
-			sys.exit()
+			return 1
 		test_build=os.path.join(build_dir,"TEST")
 		cfiles=glob.glob(os.path.join(test_dir,"*.c"))
 		if "-x64" in args:
@@ -348,11 +244,11 @@ def main(args):
 	if "-clean" in args:
 		Clean(build_dir)
 	log_fp.close()	
-	sys.exit(0)
+	return 0
 	
 
 if __name__=="__main__":
-	main(sys.argv)
+	sys.exit(main(sys.argv))
 
 	
 
