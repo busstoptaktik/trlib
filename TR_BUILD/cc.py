@@ -40,6 +40,9 @@ class ccompiler(object):
 				return self.COMPILE_EXE_DEBUG,self.LINK_EXE_DEBUG
 			else:
 				return self.COMPILE_EXE_RELEASE,self.LINK_EXE_RELEASE
+	def linkOutput(self,outname):
+		return [self.LINK_OUTPUT_SWITCH+outname] #works for everything but MAC gcc!
+		
 	
 #core gcc class
 class gcc(ccompiler):
@@ -84,6 +87,9 @@ class macports_gcc(gcc_nix):
 	COMPILER="/opt/local/bin/gcc-mp-4.6"
 	LINKER="/opt/local/bin/gcc-mp-4.6"
 
+class gcc_mac(gcc_nix):
+	def linkOutput(self,outname):
+		return [self.LINK_OUTPUT_SWITCH,outname] 
 
 class msvc(ccompiler):
 	COMPILER="cl"

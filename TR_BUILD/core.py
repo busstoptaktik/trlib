@@ -63,7 +63,7 @@ def Build(compiler,outname,source,include=[],define=[],is_debug=False,is_library
 		implib=""
 		def_file=""
 	
-	outname=compiler.LINK_OUTPUT_SWITCH+outname
+	outname=compiler.linkOutput(outname)
 	#link all obj-files - perhaps use option to only link those just made? - depends on how builddir is used...#
 	if link_all:
 		obj_files=["*"+compiler.OBJ_EXTENSION]
@@ -71,9 +71,9 @@ def Build(compiler,outname,source,include=[],define=[],is_debug=False,is_library
 		obj_files=[os.path.splitext(os.path.basename(fname))[0]+compiler.OBJ_EXTENSION for fname in source]
 	if compiler.IS_MSVC:
 		link_libraries=map(lambda x:x.replace(".dll",".lib"),link_libraries)
-		link=[compiler.LINKER]+link_options+[outname,implib,def_file]+link_libraries+obj_files
+		link=[compiler.LINKER]+link_options+outname+[implib,def_file]+link_libraries+obj_files
 	else:
-		link=[compiler.LINKER]+link_options+[outname,implib]+obj_files+link_libraries+[def_file]
+		link=[compiler.LINKER]+link_options+outname+[implib]+obj_files+link_libraries+[def_file]
 	if len(source)>0:
 		rc,text=RunCMD(compile)
 	else: #No modified files, I s'pose :-)
