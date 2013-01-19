@@ -147,7 +147,7 @@ def main(args):
 		elif IS_WINDOWS:
 			compiler=mingw32()
 		elif IS_MAC:
-			compiler=macports_gcc()
+			compiler=gcc_mac()
 		else:
 			compiler=gcc_nix()
 	if "-x64" in args:
