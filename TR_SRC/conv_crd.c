@@ -507,6 +507,7 @@ struct coord_lab        *c_lab,
         }
       }  /* ste */
     }  /* end input of additional params */
+    else p_tp = p_io;
 
     /* set trf. constants for completed systems */
     (void) set_trc(c_lab);
