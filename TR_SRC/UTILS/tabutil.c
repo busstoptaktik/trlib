@@ -50,7 +50,7 @@ inline void *util_swap_4 (void *p) {
 }
 
 
-inline float util_swap_float_if_needed (float p) {
+inline float util_swap_little_endian_float_if_needed (float p) {
     if (*is_little_endian)
         return p;
     return *((float *) util_swap_4(&p));
@@ -73,7 +73,7 @@ int main (void) {
     unsigned char *p;
     p = &u;
     
-    f = util_swap_float_if_needed(7);
+    f = util_swap_little_endian_float_if_needed(7);
 	printf ("f = %f\n", f);
     printf (LARG("is_little_endian = %u\n"), u);
     u = first_byte_is_nonzero_if_little_endian;
