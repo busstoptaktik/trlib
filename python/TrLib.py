@@ -297,7 +297,7 @@ def ExportLabel(mlb,type=FRMT_EPSG):
 		elif "WKT" in type:
 			type=FRMT_ESRI_WKT
 	if IS_INIT:
-		if type==FRMT_EPSG:
+		if type==FRMT_ESRI_WKT:
 			buf_len=2048
 		else:
 			buf_len=512

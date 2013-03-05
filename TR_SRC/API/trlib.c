@@ -758,7 +758,7 @@ int TR_GetEsriText(char *mlb, char *wkt_out){
 	return TR_LABEL_ERROR;
     err=sputshpprj(wkt_out,TC->plab); /* See fputshpprj.h for details on return value */
     TR_CloseProjection(TC);
-    return err;
+    return (err==0)?(TR_OK):(TR_LABEL_ERROR);
 }
     
 /* out must be an array of length 2*/
@@ -795,7 +795,7 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc, int 
 int TR_ImportLabel(char *text, char *mlb){
 	int ok=TR_LABEL_ERROR;
 	/*case proj4*/
-	if (strchr(text,'+'))
+	if (strstr(text,"+proj"))
 		ok=proj4_to_mlb(text,mlb);
 	/*case epsg*/
 	else if (strstr(text,"EPSG")){
@@ -826,7 +826,7 @@ int TR_ImportLabel(char *text, char *mlb){
 /*Export a mlb to a foreign format */
 int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len){
 	int ok,h_code,v_code;
-	char buf[2048];
+	char buf[4096];
 	/*TODO: test for height in mlb and return a warning/special return code if only partially translated
 	char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
 	short sepch,region;
