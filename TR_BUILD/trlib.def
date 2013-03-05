@@ -24,6 +24,7 @@ EXPORTS
 	TR_CloseProjection
 	TR_GetGeoidName
 	TR_ImportLabel
+	TR_ExportLabel
 	TR_Insert
 	bh_lat
 	bh_lmb
@@ -57,6 +58,7 @@ EXPORTS
 	eetmtu_g
 	erad
 	etrs89_trans
+	export_to_epsg
 	f_nxt
 	fe_trans
 	fgetdt

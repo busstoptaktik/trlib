@@ -85,7 +85,7 @@ int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, 
 PR *TR_OpenProjection(char *mlb);
 void TR_CloseProjection(PR *proj);
 void TR_GetGeoidName(struct TR *tr,char *name);
-int TR_ImportLabel(char *text, char *mlb);
+
 
 
 #endif

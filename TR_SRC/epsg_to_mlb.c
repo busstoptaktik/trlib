@@ -111,7 +111,8 @@ int export_to_epsg(char *mlb, int *h_code, int *v_code){
 	char mlb1[2*MLBLNG], mlb2[2*MLBLNG],mlb_src[2*MLBLNG+1], *h_datum,*utm_scan=0;
 	EPSG_ENTRY *found;
 	short sepch,region;
-	
+	*v_code=0;
+	*h_code=0;
 	if (EPSG_TABLE==NULL){
 		lord_error(TR_ALLOCATION_ERROR,"EPSG table not initialised.");
 		return TR_ALLOCATION_ERROR;
@@ -129,7 +130,7 @@ int export_to_epsg(char *mlb, int *h_code, int *v_code){
 	get_mlb(mlb,&region,mlb1,&sepch,mlb2,&h_datum);
 	
 	/*first see if this is a utm system */
-  if ((utm_scan=strstr(mlb1,"utm"))){
+        if ((utm_scan=strstr(mlb1,"utm"))){
 		if ((utm_zone=atoi(mlb1+3)))
 			strcpy(mlb1,"utm");
 	}

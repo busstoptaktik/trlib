@@ -27,6 +27,12 @@
 #define TR_ERROR 2
 #define TR_ALLOCATION_ERROR 3
 
+/* Defines for export to foreign srs-metadata */
+
+#define TR_FRMT_EPSG  (0)
+#define TR_FRMT_PROJ4 (1)
+#define TR_FRMT_ESRI_WKT (2)
+
 #pragma once
 #if defined __cplusplus
 #define KMSTR_API extern "C" 
@@ -38,7 +44,9 @@ KMSTR_API int   TR_InitLibrary(char *path);
 KMSTR_API int   TR_SetGeoidDir(char *path);
 KMSTR_API int   TR_GetLastError(void);
 KMSTR_API void TR_GetVersion(char *buffer, int bufferlength);
-KMSTR_API int   TR_GetEsriText(char *label_in, char *wkt_out);
+KMSTR_API int   TR_GetEsriText(char *label_in, char *wkt_out); /* DEPRECATED - should be moved to trlib_intern.h*/
+KMSTR_API int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len);
+KMSTR_API int TR_ImportLabel(char *text, char *mlb);
 KMSTR_API void TR_TerminateLibrary(void);
 KMSTR_API void TR_TerminateThread(void);
 KMSTR_API void TR_AllowUnsafeTransformations(void);

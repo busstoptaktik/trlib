@@ -32,9 +32,17 @@ def test():
 	for text in TESTS:
 		mlb=TrLib.ImportLabel(text)
 		if mlb is None:
-			mlb="Unable to translate..."
+			print("Unable to translate %s" %text)
 			nerr+=1
-		print("\n%s\n-> %s"%(text,mlb))
+		else:
+			print("\n%s\n-> %s"%(text,mlb))
+			#Test inverse:
+			out=TrLib.ExportLabel(mlb,"EPSG")
+			if out is not None:
+				print("To EPSG: %s->%s" %(mlb,out))
+			else:
+				print("No EPSG translation of %s" %mlb)
+		
 	return nerr
 
 def main(args):

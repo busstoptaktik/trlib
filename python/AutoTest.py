@@ -62,7 +62,7 @@ def main(args): #progname, test_lib
 	mlb="utm32_ed50"
 	print("Test if we can translate a minilabel:")
 	try:
-		wkt=TrLib.GetEsriText(mlb)
+		wkt=TrLib.ExportLabel(mlb,"WKT")
 	except:
 		nerr+=1
 	else:

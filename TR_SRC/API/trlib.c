@@ -793,17 +793,22 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc, int 
 
 /* Import a mlb from other projection specifications */
 int TR_ImportLabel(char *text, char *mlb){
-	int ok=0;
+	int ok=TR_LABEL_ERROR;
 	/*case proj4*/
 	if (strchr(text,'+'))
 		ok=proj4_to_mlb(text,mlb);
 	/*case epsg*/
 	else if (strstr(text,"EPSG")){
 		char *pos=strchr(text,':');
-		int code;
+		long code,v_code=0;
 		if (pos){
-			code=atoi(pos+1);
-			ok=import_from_epsg(code,0,mlb);
+			char *end_pt; /*test if the format is like EPSG:h_code:v_code*/
+			code=strtol(pos+1,&end_pt,0);
+			if (code>0){
+				if (*end_pt) /*so we have height info also*/
+					v_code=strtol(end_pt+1,NULL,0);
+				ok=import_from_epsg(code,v_code,mlb);
+			}
 		}
 		else
 			lord_warning(1,"EPSG: invalid format of EPSG code specification.");  
@@ -817,3 +822,46 @@ int TR_ImportLabel(char *text, char *mlb){
 		*mlb='\0';
 	return ok;
 }
+
+/*Export a mlb to a foreign format */
+int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len){
+	int ok,h_code,v_code;
+	char buf[2048];
+	/*TODO: test for height in mlb and return a warning/special return code if only partially translated
+	char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
+	short sepch,region;
+	ok=get_mlb(mlb,&region,mlb1,&sepch,mlb2,&h_datum);
+	*/
+	*out='\0';
+	switch(foreign_format_code){
+		case TR_FRMT_EPSG:
+			ok=export_to_epsg(mlb, &h_code, &v_code);
+			if (ok==TR_OK){
+				char *tmp=buf;
+				tmp+=sprintf(tmp,"EPSG:%d",h_code);
+				if (v_code>100)
+					sprintf(tmp,":%d",v_code);
+			}
+			break;
+		case TR_FRMT_PROJ4: /*TODO*/
+			lord_warning(TR_LABEL_ERROR,"Translation to proj4-format is not implemented (yet)!");
+			ok=TR_ERROR;
+			break;
+		case TR_FRMT_ESRI_WKT:
+			ok=TR_GetEsriText(mlb,buf);
+			break;
+		default:
+			lord_error(TR_LABEL_ERROR,LORD("Translation to foreign format with code %d not supported."),foreign_format_code);
+			return TR_ERROR;
+	}
+	if (ok==TR_OK){
+		if ( ((int) strlen(buf))>(buf_len-1)){
+			lord_error(TR_ALLOCATION_ERROR,LORD("To short input buffer to hold external srs-definition."));
+			return TR_ALLOCATION_ERROR;
+		}
+		strcpy(out,buf);
+		return TR_OK;
+	}
+	return TR_ERROR;
+}
+	
