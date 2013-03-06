@@ -100,6 +100,7 @@ EXPORTS
 	itrf_trans
 	kmsshp_tr
 	labchsum
+	mlb_to_proj4
 	ng_trans
 	pla_adm_f
 	prn_cho

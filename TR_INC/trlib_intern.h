@@ -28,11 +28,17 @@
 #define IS_CARTESIC(pr)           ((pr->plab->u_c_lab).cstm==1)
 #define IS_GEOGRAPHIC(pr)       ((pr->plab->u_c_lab).cstm==2)
 #define IS_TM(pr)                    ((pr->plab->u_c_lab).cstm==3)
+#define IS_MERCATOR(pr)          ((pr->plab->u_c_lab).cstm==4)
 #define GET_MLB(pr)                 ((pr->plab->u_c_lab).mlb)
 #define HAS_HEIGHTS(pr)          ((pr->plab->u_c_lab).h_dtm>200)
 #define IS_3D(pr)                     (pr!=NULL && (pr->plab->u_c_lab).ncoord==3)
 #define COORD_ORDER(pr)          ((pr->plab->u_c_lab).p_seq)
-
+#define GET_LAT0(pr)                ((pr->plab->u_c_lab).B0)
+#define GET_LON0(pr)                ((pr->plab->u_c_lab).L0)
+#define GET_X0(pr)                    ((pr->plab->u_c_lab).E0)
+#define GET_Y0(pr)		      ((pr->plab->u_c_lab).N0)
+#define GET_SCALE(pr)               ((pr->plab->u_c_lab).scale)
+#define GET_PDTM(pr)                ((pr->plab->u_c_lab).p_dtm)
 
 /*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */
 struct PR {

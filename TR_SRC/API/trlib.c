@@ -794,6 +794,7 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc, int 
 /* Import a mlb from other projection specifications */
 int TR_ImportLabel(char *text, char *mlb){
 	int ok=TR_LABEL_ERROR;
+	/*We go for autodetection of format - could also implement explicit identifiers like in EPSG:xxxxx*/
 	/*case proj4*/
 	if (strstr(text,"+proj"))
 		ok=proj4_to_mlb(text,mlb);
@@ -814,10 +815,12 @@ int TR_ImportLabel(char *text, char *mlb){
 			lord_warning(1,"EPSG: invalid format of EPSG code specification.");  
 	}
 	/*case wkt*/
-	else{
+	else if (strchr(text,'[') && strchr(text,']')){
 		ok=sgetshpprj(text,NULL,mlb);
 		ok=(ok==0)?(TR_OK):(TR_LABEL_ERROR);
 	}
+	else
+		lord_warning(TR_LABEL_ERROR,"Unrecognisable input format.");
 	if (ok!=TR_OK)
 		*mlb='\0';
 	return ok;
@@ -844,8 +847,8 @@ int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len){
 			}
 			break;
 		case TR_FRMT_PROJ4: /*TODO*/
-			lord_warning(TR_LABEL_ERROR,"Translation to proj4-format is not implemented (yet)!");
-			ok=TR_ERROR;
+			lord_warning(TR_LABEL_ERROR,"Translation to proj4-format is not fully implemented (yet)!");
+			ok=mlb_to_proj4(mlb,buf,4096);
 			break;
 		case TR_FRMT_ESRI_WKT:
 			ok=TR_GetEsriText(mlb,buf);

@@ -22,9 +22,12 @@
 #include "geo_lab.h"
 #include "proj4_to_mlb.h"
 #include "strong.h"
+#include "trlib_intern.h"
 #include "trlib_api.h"
 #include "lord.h"
 #include "parse_def_file.h"
+#include "get_mlb.h"
+#include "doc_def_data.h"
 /* A sketchy implementation of proj4 to mlb translation. 
 * lots of hardcoded stuff, which should perhaps be made more visible....
 */
@@ -125,8 +128,14 @@ void set_kms_datums_allowed(int is_allowed){
 	 }
 	 remove_whitespace(proj4_text,no_spaces);
 	 tokens=get_items(no_spaces,"+",&item_count);
-	 if (tokens==NULL||item_count<2){
-		 lord_error(TR_LABEL_ERROR,LORD("Proj4-string could not be splitted."));
+	 if (tokens==NULL){
+		 lord_error(TR_ALLOCATION_ERROR,LORD("Proj4 string could not be splitted."));
+		 free(no_spaces);
+		 return NULL;
+	 }
+	 if (item_count<2){
+		 lord_error(TR_LABEL_ERROR,LORD("Not enough items in proj4 string."));
+		 free(tokens);
 		 free(no_spaces);
 		 return NULL;
 	 }
@@ -315,15 +324,15 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 	char param_string[128]; /*string to print extra parameters to */
 	
 	proj4_entry *proj_entry=parse_proj4(proj4_text);
-	proj[0]='\0';
-	datum[0]='\0';
-	vdatum[0]='\0';
-	param_string[0]='\0'; /*no extra parameters as default*/
+	
 	if (proj_entry==NULL){
 		lord_error(TR_LABEL_ERROR,"Unable to parse proj4 string: %s",proj4_text);
 		return TR_LABEL_ERROR;
 	}
-	
+	proj[0]='\0';
+	datum[0]='\0';
+	vdatum[0]='\0';
+	param_string[0]='\0'; /*no extra parameters as default*/
 	/*set projection*/
 	
 	if (proj_entry->proj[0]=='\0'){
@@ -453,6 +462,96 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 	return TR_OK;
 }
 
+/*A sketchy implementation of this translation - todo: improve.... easier than the other way!*/
+int mlb_to_proj4(char *mlb, char *out, int buf_len){
+	int n_chars,is_geo=0;
+	char internal_buf[512], *tmp;
+	char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
+	short sepch,region;
+	PR *srs=NULL;
+	/*proj4_entry proj_out;*/
+	out[0]='\0';
+	srs=TR_OpenProjection(mlb);
+	if (srs==NULL){
+		return TR_LABEL_ERROR;
+	}
+	n_chars=get_mlb(mlb,&region,mlb1,&sepch,mlb2,&h_datum);
+	if (n_chars==0){
+		lord_error(TR_LABEL_ERROR,LORD("Failed to parse mlb"));
+		goto MLB_TO_PROJ4_CLEANUP;
+	}
+	tmp=internal_buf;
+	/*case utm*/
+	if (strstr(mlb1,"utm")==mlb1){
+		int utm_zone=atoi(mlb1+3);
+		if (utm_zone>0){
+			tmp+=sprintf(tmp,"+proj=utm +zone=%d",utm_zone);
+		}
+	}
+	/*case geo*/
+	else if (strstr(mlb1,"geo")==mlb1){
+		tmp+=sprintf(tmp,"+proj=latlong");
+		is_geo=1;
+	}
+	else{
+		if (IS_TM(srs)){
+			tmp+=sprintf(tmp,"+proj=etmerc");
+			tmp+=sprintf(tmp," +lat_0=%.2f +lon_0=%.2f",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
+			tmp+=sprintf(tmp," +x_0=%.2f +y_0=%.2f +k_0=%.8f",GET_X0(srs),GET_Y0(srs),GET_SCALE(srs)); 
+		}
+		else if (IS_MERCATOR(srs)){
+			tmp+=sprintf(tmp,"+proj=merc");
+			/*well - this is not it: TODO:*/
+			tmp+=sprintf(tmp," +lat_0=%.2f +lon_0=%.2f",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
+			tmp+=sprintf(tmp," +x_0=%.2f +y_0=%.2f",GET_X0(srs),GET_Y0(srs)); 
+		}
+		else{
+			lord_warning(0,LORD("Translation not implemented"));
+			goto MLB_TO_PROJ4_CLEANUP;
+		}
+	}
+	if (!is_geo)
+		tmp+=sprintf(tmp," +units=m");
+	/*datum part*/
+	if (!strcmp(mlb2,"wgs84")){
+		tmp+=sprintf(tmp," +datum=WGS84");
+	}
+	else{ /*TODO: use COMMON_PROJ4_TRANSLATIONS*/
+		if (strlen(mlb2)==0){
+			/*TODO: implement a simple get_dtm_mlb(int dtm_no) fct... simplifies stuff below...*/
+			char impl_dtm[MLBLNG];
+			char descr[128];
+			int type;
+			/*lord_warning(0,"Impl dtm: %s",GET_MLB(srs));*/
+			doc_prj(mlb1,descr,impl_dtm,&type,-1);
+			strcpy(mlb2,impl_dtm);
+		}
+		normalise_datum(mlb2);
+		if (!strcmp(mlb2,"etrs89") || !strcmp(mlb2,"gr96")){
+			tmp+=sprintf(tmp," +ellps=GRS80 +towgs84=0,0,0,0,0,0,0");
+		}
+		else if (!strcmp(mlb2,"ed50")){
+			tmp+=sprintf(tmp," +ellps=intl +towgs84=-87,-98,-121,0,0,0,0");
+		}
+		else{
+			lord_warning(0,"Also- TODO: datum:-)");
+			goto MLB_TO_PROJ4_CLEANUP;
+		}
+	}
+	tmp+=sprintf(tmp," +no_defs");
+	if ((tmp-internal_buf)>buf_len-1){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Supplied input buffer not long enough!"));
+		goto MLB_TO_PROJ4_CLEANUP;
+	}
+	strcpy(out,internal_buf);
+	TR_CloseProjection(srs);
+	return TR_OK;
+	/* clean up code on exit*/
+	MLB_TO_PROJ4_CLEANUP:
+		TR_CloseProjection(srs);
+		return TR_LABEL_ERROR;
+	
+}
 
 /*
 int main(int argc, char **argv){
