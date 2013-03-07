@@ -847,7 +847,6 @@ int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len){
 			}
 			break;
 		case TR_FRMT_PROJ4: /*TODO*/
-			lord_warning(TR_LABEL_ERROR,"Translation to proj4-format is not fully implemented (yet)!");
 			ok=mlb_to_proj4(mlb,buf,4096);
 			break;
 		case TR_FRMT_ESRI_WKT:

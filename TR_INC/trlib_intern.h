@@ -38,6 +38,8 @@
 #define GET_X0(pr)                    ((pr->plab->u_c_lab).E0)
 #define GET_Y0(pr)		      ((pr->plab->u_c_lab).N0)
 #define GET_SCALE(pr)               ((pr->plab->u_c_lab).scale)
+#define GET_ZONE(pr)                ((pr->plab->u_c_lab).zone)
+#define GET_DTM(pr)                  ((pr->plab->u_c_lab).datum)
 #define GET_PDTM(pr)                ((pr->plab->u_c_lab).p_dtm)
 
 /*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */

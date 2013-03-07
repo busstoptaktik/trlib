@@ -27,7 +27,7 @@
 #include "lord.h"
 #include "parse_def_file.h"
 #include "get_mlb.h"
-#include "doc_def_data.h"
+
 /* A sketchy implementation of proj4 to mlb translation. 
 * lots of hardcoded stuff, which should perhaps be made more visible....
 */
@@ -79,12 +79,14 @@ PROJ4_TO_KMS_DATUM[]={
 };
 
 /* A few datums that we want to recognize from ellipsoid and common proj4 datum shift parameters */
+/* not used right now
 static struct towgs84_translation
 COMMON_PROJ4_DEFINITIONS[]={
 {"ed50","intl",3,{-87,-98,-121,0,0,0,0}},
-{"etrs89","grs80",3,{0,0,0,0,0,0,0}},   /*and this could be gr96 as well! */
+{"etrs89","grs80",3,{0,0,0,0,0,0,0}},   and this could be gr96 as well! 
 {NULL,NULL,0,{0,0,0,0,0,0,0}}
 };
+*/
 
 /* Some KMS aliases for etrs89 - possibly others as well*/
 
@@ -94,6 +96,31 @@ static struct translation_entry KMS_DATUM_ALIAS[]={
 {NULL,NULL}
 };
 
+/*KMS to proj4  ellps translation
+* These are the ones, where we accept a direct translation!
+*Proj4 keys are converted to lower case, that's reflected in this table. Use the normalisation table below to normalise....
+*/
+static struct translation_entry ELLIPSOID_TRANSLATIONS[]={
+{"GRS80","grs80"}, 
+{"WGS84","wgs84"},
+{"Hayford","intl"},
+{"WGS72","wgs72"}, 
+{"NWL9D","nwl9d"}, 
+{"Bessel","bessel"},
+{"Clarke66","clrk66"},
+{"Clarke80","clrk80"},
+{"Everest","evrst30"},
+{NULL,NULL}
+};
+
+/*Table used to normalise proj4 ellipsoids*/
+static struct translation_entry PROJ4_ELLP_ALIAS[]={
+{"grs80","GRS80"},
+{"wgs84","WGS84"},
+{"wgs72","WGS72"},
+{"nwl9d","NWL9D"},
+{"NULL","NULL"}
+};
 
 void normalise_datum(char *datum){
 	struct translation_entry *look_up=KMS_DATUM_ALIAS;
@@ -106,6 +133,25 @@ void normalise_datum(char *datum){
 	}
 }
 
+static char *translate(struct translation_entry *table, char *look_for){
+	while (table->key!=NULL){
+		if (!strcmp(table->key,look_for)){
+			return table->value;
+		}
+		table++;
+	} /*end loop over translations */
+	return NULL;
+}
+
+static char *inverse_translate(struct translation_entry *table, char *look_for){
+	while (table->value!=NULL){
+		if (!strcmp(table->value,look_for)){
+			return table->key;
+		}
+		table++;
+	} /*end loop over translations */
+	return NULL;
+}
 
 /*setter function for allowing/disallowing KMS-datum extensions */
 /*Not thread safe! */
@@ -212,8 +258,11 @@ void set_kms_datums_allowed(int is_allowed){
 			char **params;
 			int n_params,j;
 			params=get_items(key_val[1],",",&n_params);
-			for(j=0; j<n_params; j++)
-				proj_entry->towgs84[j]=atof(params[j]);
+			for(j=0; j<n_params; j++){
+				double out=atof(params[j]);
+				proj_entry->towgs84[j]=out; /* check this!*/
+				/*lord_warning(0,"in: %s, out: %.8f",params[j],out);*/
+			}
 			free(params);
 			proj_entry->n_params=n_params;
 		}
@@ -229,39 +278,88 @@ void set_kms_datums_allowed(int is_allowed){
 * The proj4 policy seems also to have been not to include the datum-shift in the above case 
 * Thus there is no bullet proof method of setting a KMS datum from a proj4 string, unless the datum is explicitly given with the +datum token.
 *  E.g. there is no way of distinguishing etrs89 and gr96 in proj4 currently. (towgs both zeroes...)
-*  A *few* shaky defaults will be built in here however.... 
 */
 static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 	extern def_data *DEF_DATA; /*pointer to the preparsed def_data structure*/
 	/*if no datum - look for towgs84 params or guesssssss*/
 	datum[0]='\0';
+	if (DEF_DATA==NULL){
+		lord_error(TR_ALLOCATION_ERROR,LORD("def-data not initialised!"));
+		return TR_ALLOCATION_ERROR;
+	}
 	/*if proj4 datum token is not set, we will conduct a search for a KMS-match */
 	if (proj_entry->datum[0]=='\0'){
 		/*if no datum shift parameters are set, guess datum from ellipsoid name from a list of a few defaults - shaky! */
-		if (proj_entry->n_params==0){
+		if (proj_entry->n_params<3){
 			lord_warning(1,"Proj4: no proper datum (or datum shift) definition. Guessing datum from ellipsoid.");
 			/* if ellipsoid is not set, default to wgs84*/
 			if (proj_entry->ellps[0]=='\0'){
-				lord_warning(1,LORD("Proj4: proj and ellps keys both undefined, setting datum to WGS84"));
+				lord_warning(1,LORD("Proj4: datum and ellps keys both undefined, setting datum to WGS84"));
 				strcpy(datum,"wgs84");
 			}
 			else{/*look for a default translation of ellipsoid name to datum */
-				struct translation_entry *current_try=ELLIPSOID_TO_DATUM;
-				while (current_try->key!=NULL){
-					if (!strcmp(current_try->key,proj_entry->ellps)){
-						strcpy(datum,current_try->value);
-						break;
-					}
-					current_try++;
+				char *datum_guess=translate(ELLIPSOID_TO_DATUM,proj_entry->ellps);
+				if (datum_guess!=NULL)
+					strcpy(datum,datum_guess);
+				else{
+					lord_error(TR_LABEL_ERROR,LORD("Unable to guess datum from ellipsoid."));
+					return TR_LABEL_ERROR;
 				}
 			}
 			
 		}
-		/* else shift parameters are set. Then see if datum shift looks like something we know */
+		/* else shift parameters are set. Then see if datum shift and ellipsoids look like something we know */
 		else{ 
-			
-			struct towgs84_translation *current_try=COMMON_PROJ4_DEFINITIONS;
-			int i;
+			def_datum *dtm_def=NULL;
+			int i,found=0;
+			/*struct towgs84_translation *current_try=COMMON_PROJ4_DEFINITIONS;*/
+			char *kms_ellipsoid=inverse_translate(ELLIPSOID_TRANSLATIONS,proj_entry->ellps);
+			if (kms_ellipsoid==NULL){
+				lord_error(0,LORD("Unable to translate proj4 ellipsoid - datum not set."));
+				return TR_LABEL_ERROR;
+			}
+			for(i=0;i<DEF_DATA->n_dtm && !found; i++){
+				dtm_def=DEF_DATA->datums+i;
+				if (!strcmp(dtm_def->ellipsoid,kms_ellipsoid) && (!strcmp(dtm_def->p_datum,"wgs84") || !(strcmp(dtm_def->p_datum,"etrs89")))){
+					int t_ok=0,r_ok=-1,s_ok=-1,j;
+					double *transl=dtm_def->translation;
+					double *rot=dtm_def->rotation;
+					double scale=dtm_def->scale*1e6; /*scale converted to a decimal number, proj4 uses ppm (like we do in def_lab). */
+					for(j=0;j<3;j++)
+						t_ok+=(fabs(transl[j]-proj_entry->towgs84[j])<1e-2);
+					/*reverse a sign! - change to arc seconds*/	
+					if (proj_entry->n_params>5){
+						r_ok=0;
+						for(j=0;j<3;j++)
+							r_ok+=(fabs(rot[j]*DOUT*3600.0+proj_entry->towgs84[j+3])<1e-4);
+							
+					}
+					
+					if (proj_entry->n_params==7){
+						s_ok=0;
+						s_ok+=(fabs(proj_entry->towgs84[6]-scale)<1e-8);
+					}
+					
+					switch(dtm_def->type){
+						case 3:
+							found=(t_ok==3) && (r_ok==-1 || r_ok==3) && (s_ok==-1 || s_ok==1);
+							break;
+						default:
+							found=(t_ok==3) && (r_ok==3) && (s_ok==1);
+						
+					}
+					/*lord_debug(0,"dtm: %s, t_ok: %d, r_ok: %d, s_ok: %d, found: %d",dtm_def->mlb,t_ok,r_ok,s_ok,found);*/					
+				}
+			}
+			if (found){
+				strcpy(datum,dtm_def->mlb);
+			}
+			else{
+				lord_error(TR_LABEL_ERROR,LORD("Failed to recognize datum from parameters."));
+				/*lord_debug(0,"%.8f %.8f %.8f",proj_entry->towgs84[3],proj_entry->towgs84[4],proj_entry->towgs84[5]);*/
+				return TR_LABEL_ERROR;
+			}
+			/*
 			while (current_try->kms_dtm!=NULL){
 				if (!strcmp(proj_entry->ellps,current_try->proj4_ellps) && proj_entry->n_params>=current_try->min_params){
 					int nok=0;
@@ -270,26 +368,22 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 					if (nok==proj_entry->n_params){
 						strcpy(datum,current_try->kms_dtm);
 						break;
-					} /*end found datum*/
-				} /*end start checking ccommon proj4 def*/
+					} 
+				} 
 				current_try++;
-			} /*end loop over common proj4 definitions */
-			/*TODO: perhaps loop through kms-definitions in DEF_DATA to find a match from parameters...*/
-		}
+			} 
+			*/
+			
+		} /*end shift parameters given*/
 			
 			
 		
 	} /*end datum token not given */
 	else{ /*datum token is given and we look for a translation */
 		/*First check the proj4->kms datum translations*/
-		struct translation_entry *current_try=PROJ4_TO_KMS_DATUM;
-		while (current_try->key!=NULL){
-			if (!strcmp(current_try->key,proj_entry->datum)){
-				strcpy(datum,current_try->value);
-				break;
-			}
-			current_try++;
-		} /*end loop over translations */
+		char *datum_guess=translate(PROJ4_TO_KMS_DATUM,proj_entry->datum);
+		if (datum_guess!=NULL)
+			strcpy(datum,datum_guess);
 		/*IF allowed, see if the datum given is a valid kms-datum*/
 		if (ALLOW_KMS_DATUMS && strlen(datum)==0){
 			if (DEF_DATA==NULL)
@@ -469,7 +563,11 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 	char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
 	short sepch,region;
 	PR *srs=NULL;
-	/*proj4_entry proj_out;*/
+	extern def_data *DEF_DATA; /*pointer to the preparsed def_data structure*/
+	if (DEF_DATA==NULL){
+		lord_error(TR_ALLOCATION_ERROR,LORD("def-data not initialised!"));
+		return TR_ALLOCATION_ERROR;
+	}
 	out[0]='\0';
 	srs=TR_OpenProjection(mlb);
 	if (srs==NULL){
@@ -483,10 +581,8 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 	tmp=internal_buf;
 	/*case utm*/
 	if (strstr(mlb1,"utm")==mlb1){
-		int utm_zone=atoi(mlb1+3);
-		if (utm_zone>0){
-			tmp+=sprintf(tmp,"+proj=utm +zone=%d",utm_zone);
-		}
+		short utm_zone=GET_ZONE(srs);
+		tmp+=sprintf(tmp,"+proj=utm +zone=%d",utm_zone);
 	}
 	/*case geo*/
 	else if (strstr(mlb1,"geo")==mlb1){
@@ -494,16 +590,18 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 		is_geo=1;
 	}
 	else{
+		/*case TM*/
 		if (IS_TM(srs)){
 			tmp+=sprintf(tmp,"+proj=etmerc");
-			tmp+=sprintf(tmp," +lat_0=%.2f +lon_0=%.2f",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
-			tmp+=sprintf(tmp," +x_0=%.2f +y_0=%.2f +k_0=%.8f",GET_X0(srs),GET_Y0(srs),GET_SCALE(srs)); 
+			tmp+=sprintf(tmp," +lat_0=%.2g +lon_0=%.2g",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
+			tmp+=sprintf(tmp," +x_0=%.2g +y_0=%.2g +k_0=%.10g",GET_X0(srs),GET_Y0(srs),GET_SCALE(srs)); 
 		}
+		/*case MERCATOR*/
 		else if (IS_MERCATOR(srs)){
 			tmp+=sprintf(tmp,"+proj=merc");
 			/*well - this is not it: TODO:*/
-			tmp+=sprintf(tmp," +lat_0=%.2f +lon_0=%.2f",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
-			tmp+=sprintf(tmp," +x_0=%.2f +y_0=%.2f",GET_X0(srs),GET_Y0(srs)); 
+			tmp+=sprintf(tmp," +lat_0=%.2g +lon_0=%.2g",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
+			tmp+=sprintf(tmp," +x_0=%.2g +y_0=%.2g",GET_X0(srs),GET_Y0(srs)); 
 		}
 		else{
 			lord_warning(0,LORD("Translation not implemented"));
@@ -516,27 +614,53 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 	if (!strcmp(mlb2,"wgs84")){
 		tmp+=sprintf(tmp," +datum=WGS84");
 	}
-	else{ /*TODO: use COMMON_PROJ4_TRANSLATIONS*/
-		if (strlen(mlb2)==0){
-			/*TODO: implement a simple get_dtm_mlb(int dtm_no) fct... simplifies stuff below...*/
-			char impl_dtm[MLBLNG];
-			char descr[128];
-			int type;
-			/*lord_warning(0,"Impl dtm: %s",GET_MLB(srs));*/
-			doc_prj(mlb1,descr,impl_dtm,&type,-1);
-			strcpy(mlb2,impl_dtm);
+	else{ /*Another datum - look up parameters*/
+		short dtm_no=GET_DTM(srs);
+		int n_dtm=DEF_DATA->n_dtm,i;
+		char *ellipsoid,*n_ellipsoid;
+		double *transl,rot[3],scale;
+		def_datum *dtm_def=NULL;
+		for(i=0;i<n_dtm && dtm_def==NULL;i++){
+			if (DEF_DATA->datums[i].no==dtm_no){
+				dtm_def=DEF_DATA->datums+i;
+			}
 		}
-		normalise_datum(mlb2);
-		if (!strcmp(mlb2,"etrs89") || !strcmp(mlb2,"gr96")){
-			tmp+=sprintf(tmp," +ellps=GRS80 +towgs84=0,0,0,0,0,0,0");
-		}
-		else if (!strcmp(mlb2,"ed50")){
-			tmp+=sprintf(tmp," +ellps=intl +towgs84=-87,-98,-121,0,0,0,0");
-		}
-		else{
-			lord_warning(0,"Also- TODO: datum:-)");
+		if (dtm_def==NULL){
+			lord_error(TR_LABEL_ERROR,LORD("Failed to locate datum-no: %d"),dtm_no);
 			goto MLB_TO_PROJ4_CLEANUP;
 		}
+		/* ok now we have a proper handle of the definition of the datum!*/
+		/*should we use our definitions, or COMMON_PROJ4_DEFINITIONS - otherwise the mapping is not 1-1, probably never can be!
+		* Well - use our definitions - bot ways! */
+		transl=dtm_def->translation;
+		/*It seems like Proj4 uses reverse sign for rotations compared to us=gst/kms and EPSG*/
+		/* But units seem to be in arc seconds: http://trac.osgeo.org/proj/wiki/GenParms#towgs84-DatumtransformationtoWGS84 
+		* our parsed units are in radians */
+		for(i=0;i<3;i++)
+			rot[i]=-(dtm_def->rotation[i])*DOUT*(3600.0);
+		scale=dtm_def->scale*1e6;
+		strncpy(mlb2,dtm_def->mlb,MLBLNG);
+		/*Translate ellipsoid*/
+		ellipsoid=translate(ELLIPSOID_TRANSLATIONS,dtm_def->ellipsoid);
+		if (ellipsoid==NULL){
+			lord_error(TR_LABEL_ERROR,"Failed to translate ellipsoid!");
+			goto MLB_TO_PROJ4_CLEANUP;
+		}
+		n_ellipsoid=translate(PROJ4_ELLP_ALIAS,ellipsoid); /*normalise the format - really convert to upper case if needed...*/
+		if (n_ellipsoid!=NULL)
+			ellipsoid=n_ellipsoid;
+		tmp+=sprintf(tmp," +ellps=%s",ellipsoid);
+		if (strcmp(dtm_def->p_datum,"wgs84") && (strcmp(dtm_def->p_datum,"etrs89"))){ /*if parent not wgs84 - more complicated - skip*/
+			/*TODO: implement datum shift combination - or test if p_datum->p_datum is simple compared to wgs84!*/
+			lord_warning(0,LORD("Parent datum not wgs84 - unable to fetch datum shift parameters!"));
+		}
+		else
+		        tmp+=sprintf(tmp," +towgs84=%.6g,%.6g,%.6g,%.10g,%.10g,%.10g,%.10g",transl[0],transl[1],transl[2],rot[0],rot[1],rot[2],scale);
+		
+	}
+	if (h_datum!=NULL){
+		lord_warning(0,"+vdatum is a custom tag not supported in regular proj4 syntax");
+		tmp+=sprintf(tmp," +vdatum=%s",h_datum+2);
 	}
 	tmp+=sprintf(tmp," +no_defs");
 	if ((tmp-internal_buf)>buf_len-1){
