@@ -203,9 +203,10 @@ void set_kms_datums_allowed(int is_allowed){
 	 proj_entry->y_0=0;
 	 proj_entry->k=1.0;
 	 proj_entry->n_params=0;
-	 proj_entry->lon_0=NO_DATA;
-	 proj_entry->lat_0=NO_DATA;
-	 proj_entry->lat_ts=NO_DATA;
+	 /*these are sensible defaults*/
+	 proj_entry->lon_0=0.0; 
+	 proj_entry->lat_0=0.0;
+	 proj_entry->lat_ts=0.0;
 	 proj_entry->zone=NO_DATA;
 	 proj_entry->a=NO_DATA;
 	 proj_entry->b=NO_DATA;
@@ -529,7 +530,10 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 	}
 	else if (is_mercator){ /*TODO: the same as above....*/
 		/*check mrc0 and webmrc */
-		if (proj_entry->lat_ts==0 && proj_entry->lon_0==0 && proj_entry->x_0==0 && proj_entry->y_0==0 && proj_entry->k==1){
+		double lat_given=proj_entry->lat_ts; /* if not given - defaults to 0.0*/
+		if (proj_entry->lat_0!=0.0 && proj_entry->lat_ts==0.0) /*then this is what we've got*/
+			lat_given=proj_entry->lat_0;
+		if ( lat_given==0 && proj_entry->lon_0==0 && proj_entry->x_0==0 && proj_entry->y_0==0 && proj_entry->k==1){
 			if (proj_entry->a==RADIUS_FLAT && proj_entry->b==RADIUS_FLAT && strcmp(proj_entry->nadgrids,"@null")==0 && strcmp(datum,"wgs84")==0){
 				strcpy(mlb,"webmrc");
 				found_exact_alias=1;
@@ -538,7 +542,7 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 				strcpy(proj,"mrc0");
 		}
 		else{
-			sprintf(param_string,"%.2fdg  %.2f%s  %.2fdg  %.2f%s",proj_entry->lat_ts,proj_entry->y_0,proj_entry->units,
+			sprintf(param_string,"%.2fdg  %.2f%s  %.2fdg  %.2f%s",lat_given,proj_entry->y_0,proj_entry->units,
 			proj_entry->lon_0,proj_entry->x_0,proj_entry->units);
 		}
 			
@@ -593,14 +597,14 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 		/*case TM*/
 		if (IS_TM(srs)){
 			tmp+=sprintf(tmp,"+proj=etmerc");
-			tmp+=sprintf(tmp," +lat_0=%.2g +lon_0=%.2g",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
+			tmp+=sprintf(tmp," +lat_0=%.8g +lon_0=%.8g",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
 			tmp+=sprintf(tmp," +x_0=%.2g +y_0=%.2g +k_0=%.10g",GET_X0(srs),GET_Y0(srs),GET_SCALE(srs)); 
 		}
 		/*case MERCATOR*/
 		else if (IS_MERCATOR(srs)){
 			tmp+=sprintf(tmp,"+proj=merc");
 			/*well - this is not it: TODO:*/
-			tmp+=sprintf(tmp," +lat_0=%.2g +lon_0=%.2g",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
+			tmp+=sprintf(tmp," +lat_ts=%.8g +lon_0=%.8g",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
 			tmp+=sprintf(tmp," +x_0=%.2g +y_0=%.2g",GET_X0(srs),GET_Y0(srs)); 
 		}
 		else{
