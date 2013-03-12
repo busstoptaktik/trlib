@@ -167,6 +167,10 @@ def LoadLibrary(lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.set_lord_file.restype=None
 		tr_lib.set_lord_callback.argtypes=[MESSAGE_HANDLER]
 		tr_lib.set_lord_callback.restype=None
+		tr_lib.set_lord_modes.argtypes=[ctypes.c_int]*5
+		tr_lib.set_lord_modes.restype=None
+		tr_lib.set_lord_verbosity_levels.argtypes=[ctypes.c_int]*5 #get rid of last two params....
+		tr_lib.set_lord_verbosity_levels.restype=None
 	except Exception, msg:
 		return False, "Unable to load library %s in directory %s: %s" %(lib,lib_dir,repr(msg))
 	return True,""
@@ -204,11 +208,20 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 def GetLastError():
 	return tr_lib.TR_GetLastError()
 
+def GetVersion():
+	buf=ctypes.create_string_buffer(256)
+	tr_lib.TR_GetVersion(buf,256)
+	return buf.value
+
 def TerminateLibrary():
 	tr_lib.TR_TerminateLibrary()
 
 def TerminateThread():
 	tr_lib.TR_TerminateThread()
+	
+###############################################
+##Various functions which control the global behaviour of the library
+###############################################
 
 #Must be called if we want to perform transformations which are potentially not thread safe. 
 def AllowUnsafeTransformations():
@@ -231,6 +244,18 @@ def SetMessageHandler(fct):
 	CALL_BACK=MESSAGE_HANDLER(fct)
 	tr_lib.set_lord_callback(CALL_BACK)
 
+def SetLordModes(use_debug=False, use_info=False, use_warning=True, use_error=True, use_critical=True):
+	tr_lib.set_lord_modes(int(use_debug),int(use_info),int(use_warning),int(use_error),int(use_critical))
+
+def SetLordVerbosity(verb_debug=1, verb_info=1, verb_warning=1):
+	tr_lib.set_lord_verbosity_levels(verb_debug,verb_info,verb_warning,3,3) #should get rid of the last two params...
+
+def SetDebugMode():
+	global DEBUG
+	DEBUG=True
+	SetLordModes(True,True,True)
+	SetLordVerbosity(3,3,3)
+	
 def SetGeoidDir(geoid_dir):
 	global GEOIDS
 	msg=""
@@ -248,10 +273,7 @@ def SetGeoidDir(geoid_dir):
 	return ok==TR_OK,msg
 
 
-def GetVersion():
-	buf=ctypes.create_string_buffer(256)
-	tr_lib.TR_GetVersion(buf,256)
-	return buf.value
+
 
 #######################
 ## Minilabel conversion methods 
@@ -458,6 +480,15 @@ def SplitMLB(mlb):
 				hdatum=sep
 	return region,proj,datum,hdatum,htype
 
+#Simply extracts the parameters of a mlb as a list of strings containing also given units - assumes valid KMS-format, i.e. two spaces between separate fields.
+def GetParameters(mlb):
+	parts=mlb.split()
+	if len(parts)>1:
+		p_part=mlb[len(parts[0]):].strip()
+		params=p_part.replace("  ","*-*").replace("\t","*-*").replace(" ","").split("*-*") #extract kms-format
+		return params
+	return []
+
 def IsGeographic(mlb):
 	try:
 		region,proj,datum,hdatum,htype=SplitMLB(mlb)
@@ -483,7 +514,10 @@ def Convert2Geo(mlb):
 	region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
 	if len(dtm)==0:
 		dtm=GetDatum(mlb)
-	return "geo_"+dtm
+	out="geo_"+dtm
+	for param in GetParameters(mlb):
+		out+="  "+param
+	return out
 
 
 ################################

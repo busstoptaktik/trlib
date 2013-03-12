@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 #include "geo_lab.h"
 #include "proj4_to_mlb.h"
 #include "strong.h"
@@ -164,32 +165,32 @@ void set_kms_datums_allowed(int is_allowed){
 
 /*Function that parses proj4 tokens into a struct*/
  proj4_entry *parse_proj4(char *proj4_text){
-	 char **tokens=NULL, *no_spaces;
-	 int item_count,i,pair;
+	 char *tokens[64], cleaned[512], *tmp;
+	 int item_count=0,i,pair;
 	 proj4_entry *proj_entry;
-	 no_spaces=malloc(sizeof(char)*strlen(proj4_text));
-	 if (no_spaces==NULL){
-		 lord_error(TR_ALLOCATION_ERROR,LORD("Unable to allocate memory!"));
+	 if (strlen(proj4_text)>511){
+		 lord_error(TR_ALLOCATION_ERROR,LORD("Too long input text!"));
 		 return NULL;
 	 }
-	 remove_whitespace(proj4_text,no_spaces);
-	 tokens=get_items(no_spaces,"+",&item_count);
-	 if (tokens==NULL){
-		 lord_error(TR_ALLOCATION_ERROR,LORD("Proj4 string could not be splitted."));
-		 free(no_spaces);
-		 return NULL;
+	 /*scan the proj4 text*/
+	 remove_whitespace(proj4_text,cleaned);
+	 tmp=cleaned;
+	 /*this works also with scientific notation and things like +x_0=+45000*/
+	 while(*tmp){
+		 if (*tmp=='+' && isalpha(*(tmp+1))){
+			 tokens[item_count]=tmp+1;
+			 item_count++;
+			 *tmp='\0';
+		}
+		tmp++;
 	 }
 	 if (item_count<2){
-		 lord_error(TR_LABEL_ERROR,LORD("Not enough items in proj4 string."));
-		 free(tokens);
-		 free(no_spaces);
-		 return NULL;
+		lord_error(TR_LABEL_ERROR,LORD("Not enough items in proj4 string."));
+		return NULL;
 	 }
 	 proj_entry=malloc(sizeof(proj4_entry));
 	 /*no memory, we exit*/
 	 if (proj_entry==NULL){
-		 free(tokens);
-		 free(no_spaces);
 		 return NULL;
 	 }
 	 /*set default values*/
@@ -269,8 +270,6 @@ void set_kms_datums_allowed(int is_allowed){
 		}
 		free(key_val);
 	}
-	free(tokens);
-	free(no_spaces);
 	return proj_entry;
 }
 

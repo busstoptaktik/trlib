@@ -71,6 +71,27 @@ void remove_whitespace(char *text, char *out){
 	*out='\0';
 }
 
+int replace_pattern(char *in, char *out, char *to_replace, char *replace_with){
+	int n_found=0;
+	size_t n1=strlen(to_replace);
+	size_t n2=strlen(replace_with);
+	char *pos=strstr(in,to_replace);
+	while (pos!=NULL && *in){
+		memcpy(out,in,pos-in);
+		out+=(pos-in);
+		memcpy(out,replace_with,n2);
+		in=pos+n1;
+		out+=n2;
+		n_found++;
+		if (*in)
+			pos=strstr(in,to_replace);
+	}
+	/*copy the remaining part*/
+	strcpy(out,in);
+	return n_found;
+}
+	
+
 void string_tolower(char *text){
 	for(;*text;text++) *text=tolower(*text);
 }
