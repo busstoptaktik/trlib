@@ -447,7 +447,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		return;
 	}
 
-	if (stream_debug != NULL)
+	/* if (stream_debug != NULL) - this is decided in lord_wrapper.... */
 	{
 		if (debug == 0 || debug == 1)
 		{
@@ -455,7 +455,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		}
 	}
 
-	if (stream_info != NULL)
+	/*if (stream_info != NULL)*/
 	{
 		if (info == 0 || info == 1)
 		{
@@ -463,7 +463,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		}
 	}
 
-	if (stream_warning != NULL)
+	/*if (stream_warning != NULL)*/
 	{
 		if (warning == 0 || warning == 1)
 		{
@@ -471,7 +471,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		}
 	}
 
-	if (stream_error != NULL)
+	/*if (stream_error != NULL)*/
 	{
 		if (error == 0 || error == 1)
 		{
@@ -479,7 +479,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		}
 	}
 
-	if (stream_critical != NULL)
+	/*if (stream_critical != NULL)*/
 	{
 		if (critical == 0 || critical == 1)
 		{
@@ -498,7 +498,7 @@ void set_lord_outputs(FILE * stream_debug_outside, FILE * stream_info_outside, F
 	stream_critical = stream_critical_outside;
 }
 
-// Set the verbosity level for the modes
+/* Set the verbosity level for the modes - simlk: consider changing to only the three first classes in input */
 void set_lord_verbosity_levels(int verb_debug, int verb_info, int verb_warning, int verb_error, int verb_critical)
 {
 	if (!TR_IsMainThread())
