@@ -176,7 +176,7 @@ void set_kms_datums_allowed(int is_allowed){
 	 remove_whitespace(proj4_text,cleaned);
 	 tmp=cleaned;
 	 /*this works also with scientific notation and things like +x_0=+45000*/
-	 while(*tmp){
+	 while(*tmp && item_count<64){
 		 if (*tmp=='+' && isalpha(*(tmp+1))){
 			 tokens[item_count]=tmp+1;
 			 item_count++;
@@ -188,6 +188,8 @@ void set_kms_datums_allowed(int is_allowed){
 		lord_error(TR_LABEL_ERROR,LORD("Not enough items in proj4 string."));
 		return NULL;
 	 }
+	 if (item_count==64)
+		 lord_warning(0,LORD("Reached limit %d of proj4 items."),item_count);
 	 proj_entry=malloc(sizeof(proj4_entry));
 	 /*no memory, we exit*/
 	 if (proj_entry==NULL){
