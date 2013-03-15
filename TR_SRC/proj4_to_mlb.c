@@ -563,7 +563,7 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 
 /*A sketchy implementation of this translation - todo: improve.... easier than the other way!*/
 int mlb_to_proj4(char *mlb, char *out, int buf_len){
-	int n_chars,is_geo=0;
+	int n_chars,is_geo=0,set_datum=1;
 	char internal_buf[512], *tmp;
 	char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
 	short sepch,region;
@@ -606,7 +606,12 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 			tmp+=sprintf(tmp,"+proj=merc");
 			/*well - this is not it: TODO:*/
 			tmp+=sprintf(tmp," +lat_ts=%.8g +lon_0=%.8g",GET_LAT0(srs)*DOUT,GET_LON0(srs)*DOUT);
-			tmp+=sprintf(tmp," +x_0=%.2g +y_0=%.2g",GET_X0(srs),GET_Y0(srs)); 
+			tmp+=sprintf(tmp," +x_0=%.2g +y_0=%.2g",GET_X0(srs),GET_Y0(srs));
+			/*and special case webmrc*/
+			if (!strcmp(mlb,"webmrc")){
+				tmp+=sprintf(tmp," +a=6378137 +b=6378137 +nadgrids=@null");
+				set_datum=0;
+			}
 		}
 		else{
 			lord_warning(0,LORD("Translation not implemented"));
@@ -616,53 +621,55 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 	if (!is_geo)
 		tmp+=sprintf(tmp," +units=m");
 	/*datum part*/
-	if (!strcmp(mlb2,"wgs84")){
-		tmp+=sprintf(tmp," +datum=WGS84");
-	}
-	else{ /*Another datum - look up parameters*/
-		short dtm_no=GET_DTM(srs);
-		int n_dtm=DEF_DATA->n_dtm,i;
-		char *ellipsoid,*n_ellipsoid;
-		double *transl,rot[3],scale;
-		def_datum *dtm_def=NULL;
-		for(i=0;i<n_dtm && dtm_def==NULL;i++){
-			if (DEF_DATA->datums[i].no==dtm_no){
-				dtm_def=DEF_DATA->datums+i;
+	if (set_datum){
+		if (!strcmp(mlb2,"wgs84")){
+			tmp+=sprintf(tmp," +datum=WGS84");
+		}
+		else{ /*Another datum - look up parameters*/
+			short dtm_no=GET_DTM(srs);
+			int n_dtm=DEF_DATA->n_dtm,i;
+			char *ellipsoid,*n_ellipsoid;
+			double *transl,rot[3],scale;
+			def_datum *dtm_def=NULL;
+			for(i=0;i<n_dtm && dtm_def==NULL;i++){
+				if (DEF_DATA->datums[i].no==dtm_no){
+					dtm_def=DEF_DATA->datums+i;
+				}
 			}
+			if (dtm_def==NULL){
+				lord_error(TR_LABEL_ERROR,LORD("Failed to locate datum-no: %d"),dtm_no);
+				goto MLB_TO_PROJ4_CLEANUP;
+			}
+			/* ok now we have a proper handle of the definition of the datum!*/
+			/*should we use our definitions, or COMMON_PROJ4_DEFINITIONS - otherwise the mapping is not 1-1, probably never can be!
+			* Well - use our definitions - bot ways! */
+			transl=dtm_def->translation;
+			/*It seems like Proj4 uses reverse sign for rotations compared to us=gst/kms and EPSG*/
+			/* But units seem to be in arc seconds: http://trac.osgeo.org/proj/wiki/GenParms#towgs84-DatumtransformationtoWGS84 
+			* our parsed units are in radians */
+			for(i=0;i<3;i++)
+				rot[i]=-(dtm_def->rotation[i])*DOUT*(3600.0);
+			scale=dtm_def->scale*1e6;
+			strncpy(mlb2,dtm_def->mlb,MLBLNG);
+			/*Translate ellipsoid*/
+			ellipsoid=translate(ELLIPSOID_TRANSLATIONS,dtm_def->ellipsoid);
+			if (ellipsoid==NULL){
+				lord_error(TR_LABEL_ERROR,"Failed to translate ellipsoid!");
+				goto MLB_TO_PROJ4_CLEANUP;
+			}
+			n_ellipsoid=translate(PROJ4_ELLP_ALIAS,ellipsoid); /*normalise the format - really convert to upper case if needed...*/
+			if (n_ellipsoid!=NULL)
+				ellipsoid=n_ellipsoid;
+			tmp+=sprintf(tmp," +ellps=%s",ellipsoid);
+			if (strcmp(dtm_def->p_datum,"wgs84") && (strcmp(dtm_def->p_datum,"etrs89"))){ /*if parent not wgs84 - more complicated - skip*/
+				/*TODO: implement datum shift combination - or test if p_datum->p_datum is simple compared to wgs84!*/
+				lord_warning(0,LORD("Parent datum not wgs84 - unable to fetch datum shift parameters!"));
+			}
+			else
+				tmp+=sprintf(tmp," +towgs84=%.6g,%.6g,%.6g,%.10g,%.10g,%.10g,%.10g",transl[0],transl[1],transl[2],rot[0],rot[1],rot[2],scale);
+			
 		}
-		if (dtm_def==NULL){
-			lord_error(TR_LABEL_ERROR,LORD("Failed to locate datum-no: %d"),dtm_no);
-			goto MLB_TO_PROJ4_CLEANUP;
-		}
-		/* ok now we have a proper handle of the definition of the datum!*/
-		/*should we use our definitions, or COMMON_PROJ4_DEFINITIONS - otherwise the mapping is not 1-1, probably never can be!
-		* Well - use our definitions - bot ways! */
-		transl=dtm_def->translation;
-		/*It seems like Proj4 uses reverse sign for rotations compared to us=gst/kms and EPSG*/
-		/* But units seem to be in arc seconds: http://trac.osgeo.org/proj/wiki/GenParms#towgs84-DatumtransformationtoWGS84 
-		* our parsed units are in radians */
-		for(i=0;i<3;i++)
-			rot[i]=-(dtm_def->rotation[i])*DOUT*(3600.0);
-		scale=dtm_def->scale*1e6;
-		strncpy(mlb2,dtm_def->mlb,MLBLNG);
-		/*Translate ellipsoid*/
-		ellipsoid=translate(ELLIPSOID_TRANSLATIONS,dtm_def->ellipsoid);
-		if (ellipsoid==NULL){
-			lord_error(TR_LABEL_ERROR,"Failed to translate ellipsoid!");
-			goto MLB_TO_PROJ4_CLEANUP;
-		}
-		n_ellipsoid=translate(PROJ4_ELLP_ALIAS,ellipsoid); /*normalise the format - really convert to upper case if needed...*/
-		if (n_ellipsoid!=NULL)
-			ellipsoid=n_ellipsoid;
-		tmp+=sprintf(tmp," +ellps=%s",ellipsoid);
-		if (strcmp(dtm_def->p_datum,"wgs84") && (strcmp(dtm_def->p_datum,"etrs89"))){ /*if parent not wgs84 - more complicated - skip*/
-			/*TODO: implement datum shift combination - or test if p_datum->p_datum is simple compared to wgs84!*/
-			lord_warning(0,LORD("Parent datum not wgs84 - unable to fetch datum shift parameters!"));
-		}
-		else
-		        tmp+=sprintf(tmp," +towgs84=%.6g,%.6g,%.6g,%.10g,%.10g,%.10g,%.10g",transl[0],transl[1],transl[2],rot[0],rot[1],rot[2],scale);
-		
-	}
+	} /*end set datum*/
 	if (h_datum!=NULL){
 		lord_warning(0,"+vdatum is a custom tag not supported in regular proj4 syntax");
 		tmp+=sprintf(tmp," +vdatum=%s",h_datum+2);
