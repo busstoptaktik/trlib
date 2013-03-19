@@ -13,7 +13,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
 
 /* This module is a logging, reporting and debugging module....*/
@@ -47,6 +47,7 @@ for the debug, info and warning messages different verbosity level exist
 for error and critical messages 
 	The value of the lord_code is outputtet in the same line just after the message.
 */
+
 
 /* TODO: implement call back mechanism AND implement some max for logged messages - say if you are transforming a zillion points with some kind of wrong input 
 * and don't want a HUGE log file.... */
