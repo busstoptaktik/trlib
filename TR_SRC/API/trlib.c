@@ -119,7 +119,7 @@ int TR_InitLibrary(char *path) {
     }
     #ifdef _ROUT
     if (DEF_DATA && ERR_LOG){
-	    fprintf(ERR_LOG,"\nContents of %s:\n ",TR_DEF_FILE);
+	    fprintf(ERR_LOG,"\nContents of %s:\n",TR_DEF_FILE);
 	    present_data(ERR_LOG,DEF_DATA);
 	    fflush(ERR_LOG);
     }

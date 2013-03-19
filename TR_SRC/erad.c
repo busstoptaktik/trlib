@@ -189,8 +189,7 @@ Prog. KP OCT 1989/JAN 1992.
     break;
 
   default:
-    (void) fprintf(stderr,
-        "\n*** undef. call of erad with type %c", ft);
+  (void) lord_error(0, LORD("\n*** undef. call of erad with type %c"), ft);
     return(0.0);
   }
   return (c);
