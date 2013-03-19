@@ -425,9 +425,8 @@ in_gr, in_nr, pml->s_lab);
       if (in_chsum == outchsum) in_nr = outnr = 0;
 
 #ifdef  DEBUGFETRANS
-(void) fprintf(stdout, "\n* in = %s, out = %s;\n", in_cs, outcs);
-(void) fprintf(stdout, "\n*fe_trans in_nr     %d  outnr      %d;",
-in_nr, outnr);
+(void) lord_debug(0, LORD("\n* in = %s, out = %s;\n"), in_cs, outcs);
+(void) lord_debug(0, LORD("\n*fe_trans in_nr     %d  outnr      %d;"), in_nr, outnr);
 #endif
 
       ptab = fetab + fe_w*outnr;  /* output row */
@@ -442,8 +441,7 @@ in_nr, outnr);
       nst = (ptab+nst)->nstate;
 
 #ifdef  DEBUGFETRANS
-(void) fprintf(stdout, "\n*FE_TRANS ACTION  %d:   %d -> %d;",
-act, gst, nst);
+(void) lord_debug(0, LORD("\n*FE_TRANS ACTION  %d:   %d -> %d;"), act, gst, nst);
 #endif
 
       switch(act) {

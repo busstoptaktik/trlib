@@ -195,9 +195,7 @@ FILE                     *tr_error
     o_wclb  = &(o_lab.u_c_lab);
 
 #ifdef DEBUGTRANS
-(void) fprintf(stdout,
-"\n*etrs89_trans inlab = %s  outlab = (%s) %s;",
-i_clb->mlb, o_wclb->mlb, o_clb->mlb);
+  (void) lord_debug(0, LORD("\n*etrs89_trans inlab = %s  outlab = (%s) %s;"), i_clb->mlb, o_wclb->mlb, o_clb->mlb);
 #endif
     /* reg->reg */
     sta = *(io_nr_tab + i_clb->cstm);
@@ -223,8 +221,7 @@ i_clb->mlb, o_wclb->mlb, o_clb->mlb);
     }
 
 #ifdef DEBUGTRANS
-(void) fprintf(stdout, "\n*sta,sto,ptp = %d, %d, %d;",
-sta, stp, ptp);
+  (void) lord_debug(0, LORD("\n*sta,sto,ptp = %d, %d, %d;"), sta, stp, ptp);
 #endif
 
   } /* end of init of tables */
@@ -245,8 +242,8 @@ sta, stp, ptp);
     case  PTG: /* PRJ (or GEO) -> GEO */
       /*______________________________*/
 #ifdef DEBUGTRANS
-  (void) fprintf(stdout, "\n*case 2: PRJ -> GEO");
-  (void) fprintf(stdout, "   %s;", (i_lab.u_c_lab).mlb);
+  (void) lord_debug(0, LORD("\n*case 2: PRJ -> GEO"));
+  (void) lord_debug(0, LORD("   %s;"), (i_lab.u_c_lab).mlb);
 #endif
       ies = ptg(&i_lab, (int) ste, N, E, &N, &E, "etrs89_trans", tr_error);
       if (ptp) action += 3;
@@ -255,8 +252,8 @@ sta, stp, ptp);
     case  GTP: /* GEO -> PRJ (or GEO) */
       /*______________________________*/
 #ifdef DEBUGTRANS
-  (void) fprintf(stdout, "\n*case 6: GEO -> PRJ");
-  (void) fprintf(stdout, "   %s;", (o_lab.u_c_lab).mlb);
+  (void) lord_debug(0, LORD("\n*case 6: GEO -> PRJ"));
+  (void) lord_debug(0, LORD("   %s;"), (o_lab.u_c_lab).mlb);
 #endif
       ies = ptg(&o_lab, (int) (-ste), N, E, &N, &E, "etrs89_trans", tr_error);
       break;
@@ -276,7 +273,7 @@ sta, stp, ptp);
 
     if (res > ies) res = ies;
 #ifdef DEBUGTRANS
-(void) fprintf(stdout, "*    res = %d;", res);
+  (void) lord_debug(0, LORD("*    res = %d;"), res);
 #endif
   } /* action LOOP */
 

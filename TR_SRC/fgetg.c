@@ -174,8 +174,7 @@ char                        *udt
     case 7: /* no action */
       break;
     default:
-      (void) fprintf(stderr,
-          "\n***programfejl i in_geo");
+      	(void) lord_error(0,LORD("\n***programfejl i in_geo"));
       exit(1);
     };
 

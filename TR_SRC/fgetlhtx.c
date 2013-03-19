@@ -88,7 +88,7 @@ char              *in_str
 
     if (c == EOF) {
       (void) ungetc(c, iofile);
-      (void) fprintf(stdout, "\n\nEND OF FILE\n");
+      (void) lord_info(0,LORD("\n\nEND OF FILE\n"));
       return(EOF);
     }
 

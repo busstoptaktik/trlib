@@ -217,7 +217,7 @@ FILE               *fp
       break;
 
     default:
-      (void) fprintf(stderr, "\n*** fgetdt programfejl");
+	  (void) lord_error(0,LORD("\n*** fgetdt programfejl"));
       return(-1.0);
     }
   } while (nst < 9 && n_item == 0);
