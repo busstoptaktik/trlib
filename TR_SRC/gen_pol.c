@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* gen_pol                        # page 1   10 Sep 1998 12 02 */
-
-
-/* Copyright (c) 1995, GD, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include              <math.h>
 

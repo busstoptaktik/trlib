@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* geoid_t     ver 2004.01          # page 1   28 Jun 2004 10 19 */
-
-
-/* Copyright (c) 2004 GEK,  Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GEK, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 /* geoid_t(lab, name, h_dtm, descr) find the name of a table   */
 /*                           and reads some parameters         */
@@ -71,10 +59,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
   (void) strcpy(hlp_mlb, t_lab->mlb);
   if (strncmp(hlp_mlb, "grsoek", 6) == 0)
      (void) strcpy(hlp_mlb, "grsoek.06");
-
-
-/* geoid_t     ver 2004.01          # page 2   28 Jun 2004 10 19 */
-
 
   if (man_tab_file == NULL || init_tab_pos == 0) {
     (void) i_tabdir_file(1, "", &r, pth_mlb);

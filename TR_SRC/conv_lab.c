@@ -15,10 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* conv_lab  ver 2010.01            # page 1     5 Jan 2010 15 35 */
 
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
@@ -77,9 +73,6 @@ union geo_lab    *u_lab,
 ...
 )
 {
-
-
-/* conv_lab  ver 2010.01            # page 2     5 Jan 2010 15 35 */
 
 
   FILE                      *fc;

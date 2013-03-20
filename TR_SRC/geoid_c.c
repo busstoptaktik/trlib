@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* geoid_c                         # page 1   30 Oct 2001 17 25 */
-
-
-/* Copyright (c) 2001 LG, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                      */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <stdio.h>
 #include    <string.h>

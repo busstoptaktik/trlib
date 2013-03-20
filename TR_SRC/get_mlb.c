@@ -14,19 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
- */
- 
-
-
-/* get_mlb     ver 2003.01        # page 1    4 Jul 2003 10 19 */
-
-/* Copyright (c) 2003 GEK, Kort & Matrikelstyrelsen, Denmark    */
-/* All rights reserved.                                         */
-
-/* This is unpublished proprietary source code of LG, Kort &   */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-  
+ */  
 
 #include    <string.h>
 #include    <stdio.h>
@@ -64,9 +52,6 @@ char               **h_mlb
     /* COPY FIRST ITEM OF MLB-STRING */
     (void) sscanf(mlb_str, "%s%n", tx, &tx_lng);
     res = tx_lng;
-
-
-/* get_mlb     ver 2003.01        # page 2    4 Jul 2003 10 19 */
 
 
     /* REGION PREFIX */
@@ -122,10 +107,6 @@ char               **h_mlb
       }
     }
     else *h_mlb = NULL;
-
-
-/* get_mlb     ver 2003.01        # page 3    4 Jul 2003 10 19 */
-
 
     (void) strcpy(mlb1, ptx);
     *mlb2  = '\0';

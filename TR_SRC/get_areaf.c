@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* get_areaf                      # page 1    2 Feb 2004 14 02 */
-
-
-/* Copyright (c) 2004, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                    */
-
-/* This is unpublished proprietary source code of Kort- og     */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <math.h>
@@ -62,10 +50,6 @@ FILE            *tr_error
   struct dsh_str      trc;
   struct mgde_str     geoid_table;
   FILE               *fw = (FILE *) NULL, *fw1 = (FILE *) NULL, *fw2;
-
-
-/* get_areaf                      # page 2    2 Feb 2004 14 02 */
-
 
   double              Bm = 0.0, Bmin = +4.0, Bmax = -4.0;
   double              Lm = 0.0, Lmin = +4.0, Lmax = -4.0;
@@ -137,10 +121,6 @@ FILE            *tr_error
       (void) strcpy(d_name, p_name);
     }
 
-
-/* get_areaf                      # page 3    2 Feb 2004 14 02 */
-
-
     /* set geo_lab on the input datum */
     (void) strcpy(g_mini, "geo_");
     (void) strcat(g_mini, d_name);
@@ -195,10 +175,6 @@ FILE            *tr_error
     else
     if (Lmax < Z->e) Lmax = Z->e;
   }
-
-
-/* get_areaf                      # page 4    2 Feb 2004 14 02 */
-
 
   if (trr) {
     res = 5;
@@ -257,10 +233,6 @@ FILE            *tr_error
   pkt       =  max;
   Smax      =  0.0;
   g_sum     = -1.0e9;
-
-
-/* get_areaf                      # page 5    2 Feb 2004 14 02 */
-
 
   do {
     if (Smax * csb->Zb < 11000) {
