@@ -65,6 +65,7 @@
 
 #include    "KmsFncs.h"
 #include    "trthread.h"
+#include	"lord.h"
 
 int srch_def(int mode, char *p_sys, char *w_sys, int s_type,
              int s_cstm, int s_mode, struct lab_def_str *p_lb);
@@ -179,7 +180,7 @@ union geo_lab    *u_lab,
       p_tp = (char *) i_lab;
       for (i = sizeof(*i_lab) -1; i >= 0; i--) *(p_tp+i) = 0;
       if (res != EOF) {
-        (void) lord_error(0, "***conv_lab: error in label input");
+        (void) lord_error(0, LORD("***conv_lab: error in label input"));
 		i_lab->lab_type = ILL_LAB;
         return(ILL_LAB);
       }

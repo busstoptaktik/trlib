@@ -16,21 +16,10 @@
  * 
  */
  
-
-
-/* fgetlhtx                      # page 1   09 Feb 1995 14 49 */
-
-
-/* Copyright (c) 1995  GD,  Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
-
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "lord.h"
 
 int                fgetlhtx(
 /*________________________*/

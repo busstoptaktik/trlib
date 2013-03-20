@@ -15,25 +15,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* erad.c                             # page 1   29 sep 2009 13 05 */
-
-
-/* Copyright (c) 2009, Danish National Space Center, DTU       */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of DNSC, DTU    */
-/* This copyright claim does not indicate an intention of      */
-/* publishing this code.                                       */
 
 #include <math.h>
 #include <stdio.h>
-#include "trthread.h"
 
-
-/* erad.c                             # page 2   29 sep 2009 13 05 */
+#include "trthread.h"
+#include "lord.h"
+
 
 double                  erad(
 /*_________________________*/
