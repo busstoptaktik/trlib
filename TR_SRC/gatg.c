@@ -15,21 +15,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* gatg.c      version 1.0          # page 1   10 Aug 1994 17 25 */
-
-
-/* Copyright (c) 1992 GD, U/32, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include  <math.h>
 #include  <stdio.h>
+
+#include "lord.h"
 
 double        gatg(
 /*_______________*/
@@ -57,8 +47,7 @@ double               B
     B = B + h*sin(2.0*B);
   }
   else {
-    (void) fprintf(stderr,
-        "\nUndefined direction of Gauss <-> geo transformation");
+    (void) lord_error(0, LORD("\nUndefined direction of Gauss <-> geo transformation"));
     B = 1.0e+30;
   }
   return(B);

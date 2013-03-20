@@ -15,20 +15,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* fgetln_kms version 1.0               # page 1   18 Sep 1998 09 39 */
-
-
-/* Copyright (c) 1989 U/32, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include <stdio.h>
+
+#include "lord.h"
 
 int                 fgetln_kms(
 /*_______________________*/
@@ -210,7 +200,7 @@ FILE               *fp
       break;
 
     default:
-      (void) fprintf(stderr, "\n*** fgetln_kms programfejl");
+      (void) lord_error(0, LORD("\n*** fgetln_kms programfejl"));
       return(-1);
     }
   } while (nst < 9);
