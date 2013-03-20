@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* get_ha_s.c                        # page 1   28 Apr 1993 11:00 */
-
-
-/* Copyright (c) 1993, GD, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include   <stdio.h>
 #include   <math.h>
 
@@ -52,19 +40,18 @@ double               s_max)
  
   if (fseek(fw, 0L, SEEK_SET) ||
      (fread((char *) Z,  sizeof(*Z), 1, fw) - 1)) {
-    (void) fprintf(stdout, "\n***problemer med work(fw) read pos0;");
+	    (void) lord_warning(0, LORD("problemer med work(fw) read pos0;"));
     return(-1.0);
   }
   if (fseek(fw1, 0L, SEEK_SET) ||
      (fwrite((char *) Z,  sizeof(*Z), 1, fw1) - 1)) {
-    (void) fprintf(stdout, "\n***problemer med work(fw1) write pos0;");
+	    (void) lord_warning(0, LORD("problemer med work(fw1) write pos0;"));
     return(-1.0);
   }
 
   for (k = 1; k <= j; k++) {
     if (fread((char *) Z1, sizeof(*Z), 1, fw) - 1) {
-      (void) fprintf(stdout,
-             "\n***problemer med work(fw) read pos %d;", k);
+	    (void) lord_warning(0, LORD("problemer med work(fw) read pos %d;"), k);
       return(-1.0);
     }
     res = bshlm2g(a, f, Z->n, Z1->n, Z->e, Z1->e, &A0, &A1, &S);
@@ -81,15 +68,13 @@ double               s_max)
              bshlm1(a, f, Z->n, &Zm->n, Z->e, &Zm->e, A0, &a0m, S*0.5);
       }
       if (fwrite((char *) Zm, sizeof(*Z), 2, fw1) - 2) {
-        (void) fprintf(stdout,
-               "\n***problemer med work(fw1) write;");
+        (void) lord_warning(0, LORD("problemer med work(fw1) write;"));
         return(-1.0);
       }
       ++ *i;
     } else {
       if (fwrite((char *) Z1, sizeof(*Z), 1, fw1) - 1) {
-        (void) fprintf(stdout,
-               "\n***problemer med work(fw1) write;");
+            (void) lord_warning(0, LORD("problemer med work(fw1) write;"));
         return(-1.0);
       }
     }

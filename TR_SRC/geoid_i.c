@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* geoid_i   ver 2003.1           # page 1    4 Jul 2003 17 23 */
-
-
-/* Copyright (c) 2003 GEK, Kort & Matrikelstyrelsen, Denmark    */
-/* All rights reserved.                                         */
-
-/* This is unpublished proprietary source code of GD, Kort &   */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include        <stddef.h>
 #include        <stdio.h>
@@ -65,11 +53,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
   struct gde_lab             *t_lab_p;
   struct lab_def_str          lab_table, *p_lb = &lab_table;
 
-
-
-/* geoid_i   ver 2003.1           # page 2    4 Jul 2003 17 23 */
-
-
   /* initialize */
   /*____________*/
   if (geoid_table->init != 0) (void) geoid_c(geoid_table, 0, NULL);
@@ -86,10 +69,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
     *(ppge+qr) = -1l;
   }
 
-/*
-(void) fprintf(stdout,
-"\n*geoid_i : after init: geoid_n = %s;", geoid_n);
-*/
   /* initialize the geoid_n */
   /*________________________*/
   if (strlen(geoid_n) > 3 && islower(*geoid_n)) {
@@ -119,10 +98,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
     /* Test for identification of a man_tab_file.tab file */
     qr    = fgetln_kms(ftx, &used, man_tab_file);
     size  = !strncmp(ftx, "#geoid  manager  777", 20);
-
-
-/* geoid_i   ver 2003.1           # page 3    4 Jul 2003 17 23 */
-
 
     p_tp = ftx;
     if (size != 0L) {
@@ -154,10 +129,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
         qr   = fgetln_kms(ftx, &used, man_tab_file);
         size = (size_t) !strncmp(ftx, wrk, 2);
       } while (qr > 0 && (size == 0));
-
-
-/* geoid_i   ver 2003.1           # page 4    4 Jul 2003 17 23 */
-
 
       /* get geoid_names from the list : wrk */
       do {
