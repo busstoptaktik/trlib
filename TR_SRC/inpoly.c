@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* inpoly      version 1.1        # page 1   10 Sep 1998 08 57 */
-
-
-/* Copyright (c) 1996, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                   */
-
-/* This is unpublished proprietary source code of GD, Kort-og  */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include  <math.h>
 
@@ -78,10 +66,6 @@ double      *Ec
  F. Steffensen FEB 1994
  K. Engsager   SEP 1998
 */
-
-
-/* inpoly        version 1.         # page 2   10 Sep 1998 08 57 */
-
 
 {
   int              cn, ca, cb, dia, noc, ocab = -1, scab = -1;
@@ -143,10 +127,6 @@ double      *Ec
         if (*(p_h +1) < *Ec) cn++;
       ocab = 2;
       break;
-
-
-/* inpoly        version 1.         # page 3   10 Sep 1998 08 57 */
-
 
     case 3: /* line over  from *Nc : online, cut- test : h */
     case 5: /* line under from *Nc : online, cut- test : h */

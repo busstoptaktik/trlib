@@ -18,16 +18,6 @@
  
 
 
-/* ng_trans  ver 2006          # page 1    3 Oct 2006 13 55 */
-
-
-/* Copyright (c) 2006 Kort-og Matrikelstyrelsen, Denmark   */
-/* and Danish National Space Center: All rights reserved.  */
-
-/* This is unpublished proprietary source code of Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does  */
-/* not indicate an intention of publishing this code.      */
-
 /* 
 #define  DEBUGNGTRANS
 */
@@ -66,10 +56,6 @@ FILE                *tr_error
   static  int                 init = 0;
   static struct mtab3d_str   nadg_gr96_tab;
   static union  geo_lab      w_lab;
-
-
-/* ng_trans  ver 2006          # page 2    3 Oct 2006 13 55 */
-
 
   char                     in_cs[MLBLNG], outcs[MLBLNG];
   char                    *p_str, err_str[512];
@@ -126,10 +112,6 @@ FILE                *tr_error
     /* state :    0        1        2        3 */
     /*  3 */ {NTG,1}, {GTP,3}, {PTG,0}, {IDT,3},
   };
-
-
-/* ng_trans  ver 2006          # page 3    3 Oct 2006 13 55 */
-
 
   if (in_lab == NULL) {
     if (init) (void) fclose(nadg_gr96_tab.table_u.fd);
@@ -188,10 +170,6 @@ pml->trgr, pml->trnr, pml->s_lab);
           }
       }
 
-
-/* ng_trans  ver 2006          # page 4    3 Oct 2006 13 55 */
-
-
       /* In-system */
       /*___________*/
 
@@ -233,9 +211,8 @@ pml->trgr, pml->trnr, pml->s_lab);
       if (in_chsum == outchsum) in_nr = outnr = 0;
 
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n* in = %s, out = %s;\n", in_cs, outcs);
-(void) fprintf(stdout, "\n*ng_trans in_nr     %d  outnr      %d;",
-in_nr, outnr);
+(void) lord_debug(0, LORD("in = %s, out = %s;\n"), in_cs, outcs);
+(void) lord_debug(0, LORD("ng_trans in_nr     %d  outnr      %d;"), in_nr, outnr);
 #endif
 
       if (outnr == -1 || in_nr == -1) {
@@ -245,10 +222,6 @@ in_nr, outnr);
 
       ptab = ngtab + ng_w*outnr;  /* output row */
     } /* End of init actions */
-
-
-/* ng_trans  ver 2006          # page 5    3 Oct 2006 13 55 */
-
 
     /* transformation module */
 
@@ -265,8 +238,7 @@ in_nr, outnr);
       nst = (ptab+nst)->nstate;
 
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n*NG_TRANS ACTION  %d:   %d -> %d;",
-act, gst, nst);
+(void) lord_debug(0, LORD("NG_TRANS ACTION  %d:   %d -> %d;"), act, gst, nst);
 #endif
 
       switch(act) {
@@ -275,8 +247,7 @@ act, gst, nst);
         ies = tab3d_val(&w_lab, &nadg_gr96_tab,
                         N_g, E_g, val, err_str);
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n*NG_TRANS ACTION  NTG:   %f, %f, res=%d;",
-N_g*180.0 / M_PI, E_g*180.0 / M_PI, ies);
+(void) lord_debug(0, LORD("NG_TRANS ACTION  NTG:   %f, %f, res=%d;"), N_g*180.0 / M_PI, E_g*180.0 / M_PI, ies);
 #endif
         if (ies >= 0) {
           N  = N_g + *(val   ) * 0.0000001;
@@ -294,8 +265,7 @@ N_g*180.0 / M_PI, E_g*180.0 / M_PI, ies);
                              "sx", "", N_g, E_g, 0.0, 0.0);
         }
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n*NG_TRANS ACTION  NTG:   %f, %f, res=%d;",
-N*180.0 / M_PI, E*180.0 / M_PI, ies);
+(void) lord_debug(0, LORD("NG_TRANS ACTION  NTG:   %f, %f, res=%d;"), N*180.0 / M_PI, E*180.0 / M_PI, ies);
 #endif
         break;
 
@@ -303,24 +273,21 @@ N*180.0 / M_PI, E*180.0 / M_PI, ies);
         ies = tab3d_val(&w_lab, &nadg_gr96_tab,
                         N_g, E_g, val, err_str);
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n*NG_TRANS ACTION  GTN1:   %f, %f, res=%d;",
-*val, *(val+1), ies);
+(void) lord_debug(0, LORD("NG_TRANS ACTION  GTN1:   %f, %f, res=%d;"), *val, *(val+1), ies);
 #endif
         if (ies >= 0) {
           N = N_g - *(val   ) * 0.0000001;
           E = E_g - *(val +1) * 0.0000001;
           ies = tab3d_val(&w_lab, &nadg_gr96_tab, N, E, val, err_str);
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n*NG_TRANS ACTION  GTN2:   %f, %f, res=%d;",
-*val, *(val+1), ies);
+(void) lord_debug(0, LORD("NG_TRANS ACTION  GTN2:   %f, %f, res=%d;"), *val, *(val+1), ies);
 #endif
           if (ies >= 0) {
             N = N_g - *(val   ) * 0.0000001;
             E = E_g - *(val +1) * 0.0000001;
             ies = tab3d_val(&w_lab, &nadg_gr96_tab, N, E, val, err_str);
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n*NG_TRANS ACTION  GTN2:   %f, %f, res=%d;",
-*val, *(val+1), ies);
+(void) lord_debug(0, LORD("NG_TRANS ACTION  GTN2:   %f, %f, res=%d;"), *val, *(val+1), ies);
 #endif
             if (ies >= 0) {
               N  = N_g - *(val   ) * 0.0000001;
@@ -364,10 +331,6 @@ N*180.0 / M_PI, E*180.0 / M_PI, ies);
         }
         break;
 
-
-/* ng_trans  ver 2006          # page 6    3 Oct 2006 13 55 */
-
-
       case  PTG: /* PRJ -> GEO */
         /*______________________________*/
         ies = ptg(in_lab_u, +1, N, E, &N, &E,
@@ -375,8 +338,7 @@ N*180.0 / M_PI, E*180.0 / M_PI, ies);
         N_g = N;
         E_g = E;
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n*NG_TRANS ACTION  PTG:  %s, %f, %f, res=%d;",
-in_lab->mlb, N*180.0 / M_PI, E*180.0 / M_PI, ies);
+(void) lord_debug(0, LORD("NG_TRANS ACTION  PTG:  %s, %f, %f, res=%d;"), in_lab->mlb, N*180.0 / M_PI, E*180.0 / M_PI, ies);
 #endif
         if (ies < res) res = ies;
         break;
@@ -386,8 +348,7 @@ in_lab->mlb, N*180.0 / M_PI, E*180.0 / M_PI, ies);
         ies = ptg(outlab_u, -1, N, E, &N, &E,
                   "\nng_trans error:", tr_error);
 #ifdef  DEBUGNGTRANS
-(void) fprintf(stdout, "\n*NG_TRANS ACTION  GTP:   %s, res=%d;",
-outlab->mlb, ies);
+(void) lord_debug(0, LORD("\n*NG_TRANS ACTION  GTP:   %s, res=%d;"), outlab->mlb, ies);
 #endif
         if (ies < res) res = ies;
         break;

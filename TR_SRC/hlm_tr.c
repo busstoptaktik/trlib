@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* hlm_tr                         # page 1   03 Mar 1995 13 29 */
-
-
-/* Copyright (c) 1995, GD, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <stdio.h>
 #include    <math.h>
 #include    "KmsFncs.h"
@@ -73,10 +61,6 @@ char           *usertxt,
 FILE           *tr_error
 )
 {
-
-
-/* hlm_tr                         # page 2   03 Mar 1995 13 29 */
-
 
   double              N, E, n, e;
   double              a, b, A, B, D;
@@ -133,4 +117,3 @@ FILE           *tr_error
           "m ", "", N, E, N - N_in, E - E_in));
 
 }
-

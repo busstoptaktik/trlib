@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/*  gmb1.c                            # page 1    1 Mar 1993 11:18 */
-
-
-/* Copyright (c) 1991 U/32, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include  <math.h>
 #include  <stdio.h>
@@ -83,10 +71,6 @@ Frede Madsen 1981 , where 5th order terms were included.
 5th order terms removed, as bshlm1 is used for longer distances
 
 */
-
-
-/*  gmb1.c                            # page 2    1 Mar 1993 11:18 */
-
 
 {
   double     e2, n2, V, V2, c, s_N, cosb, sinb, t1, t2;

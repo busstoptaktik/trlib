@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* grid_val                 # page 1   30 Oct 2001 11 37 */
-
-
-/* Copyright (c) 1992 GD, U/32, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <string.h>
@@ -60,10 +48,6 @@ char                     *err_str
   int                        *tab_max = &(grid_table->tab_max); /* 1 */
   int                        *tab_nr  = &(grid_table->tab_nr);  /* 1 */
 
-
-/* grid_val                 # page 2   30 Oct 2001 11 37 */
-
-
   /* Labels and descriptors */
   struct coord_lab           *crd_lab = &(c_lab_u->u_c_lab);
 
@@ -90,19 +74,10 @@ char                     *err_str
   /* select the table */
   t_lab = &(grid_table->table_u[0]);
   for (g = 0, miss = 1; g < *tab_max && miss; t_lab++, g++) {
-/*
-(void) fprintf(stdout, "\n*grid_val, t_lab[%d:%d] = %s;",
-g, *tab_max, t_lab->mlb);
-*/
 
     geo = (crd_lab->cstm == 2) ? 1 : 0;
     if (!geo && t_lab->cstm == 0) continue;
     if ( geo && t_lab->cstm != 0) continue;
-
-
-/* grid_val                 # page 3   30 Oct 2001 11 37 */
-
-
     L_p = E - t_lab->L_min;
     if (geo) L_p = v_std(L_p);
     if (t_lab->B_min <= N && N <= t_lab->B_max 
@@ -156,10 +131,6 @@ g, *tab_max, t_lab->mlb);
       nw_pos   = (long) qr + (long) qr1;
       nw_idx   = e_i % t_lab->rec_p_bl;
 
-
-/* grid_val                 # page 5   30 Oct 2001 11 37 */
-
-
       /* Interpolation loop */
       if (0 <= n_i && n_i < t_lab->n_max &&
           0 <= e_i && e_i < t_lab->e_max) {
@@ -203,10 +174,6 @@ g, *tab_max, t_lab->mlb);
               break;
             }
           }
-
-
-/* grid_val                 # page 6   30 Oct 2001 11 37 */
-
 
           /* not found */
           if (s == -1) {
