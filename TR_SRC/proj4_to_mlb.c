@@ -586,7 +586,7 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 	tmp=internal_buf;
 	/*case utm*/
 	if (strstr(mlb1,"utm")==mlb1){
-		short utm_zone=GET_ZONE(srs);
+		int utm_zone=atoi(mlb1+3);
 		tmp+=sprintf(tmp,"+proj=utm +zone=%d",utm_zone);
 	}
 	/*case geo*/
