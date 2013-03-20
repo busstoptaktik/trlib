@@ -58,11 +58,6 @@ FILE                   *tr_error
   /* test labtype of TC_u */
   if (TC->lab_type == CRD_LAB) {
 
-
-
-/* ptg     ver 2010.1           # page 2   12 Jan 2010 10 41 */
-
-
     /* Transf. parameters */
     if (TC->init) {
 
@@ -86,10 +81,6 @@ FILE                   *tr_error
   
           Cn = N;
           Ce = E;
-
-
-/* ptg     ver 2010.1           # page 3   12 Jan 2010 10 41 */
-
 
           switch(cstm) {
           case 3: /* Transverse mercator */
@@ -157,10 +148,6 @@ FILE                   *tr_error
                 }
                 else res = TRF_AREA_;
                 break;
-
-
-/* ptg     ver 2010.1           # page 4   12 Jan 2010 10 41 */
-
 
               case 0: /* transfer results */
                 *Nout = Cn;
@@ -232,11 +219,6 @@ FILE                   *tr_error
                   Ce = v_red(Ce + TC->L0);
                 }
                 break;
-  
-
-
-/* ptg     ver 2010.1           # page 5   12 Jan 2010 10 41 */
-
 
               case -1: /* GEO -> PRJ */
                 /* cos Lat for check */
@@ -281,10 +263,6 @@ FILE                   *tr_error
             }
             break;
   
-
-/* ptg     ver 2010.1           # page 6   12 Jan 2010 10 41 */
-
-
           case 7: /* equivalent systems */
 
             switch(mode) {
@@ -315,11 +293,7 @@ FILE                   *tr_error
                   break;
                 }
               break; /* safle */
-  
-
-/* ptg     ver 2010.1           # page 7   12 Jan 2010 10 41 */
-
-  
+    
             case 2: /* Sansom-Flamsteed, authalic */
               for ( ; h - i; i += s)
                 switch(i) {
@@ -359,10 +333,6 @@ FILE                   *tr_error
                 }
               break; /* safl */
   
-
-/* ptg     ver 2010.1           # page 8   12 Jan 2010 10 41 */
-
-  
             case 3: /* Lambert equiv. cyl. proj., ellipsoidal */
               for ( ; h - i; i += s)
                 switch(i) {
@@ -400,10 +370,6 @@ FILE                   *tr_error
                 }
               break; /* lmbace */
   
-
-/* ptg     ver 2010.1           # page 9   12 Jan 2010 10 41 */
-
-
             case 4: /* Lambert equiv. pol. proj., (N) */
             case 5: /* Lambert equiv. pol. proj., (S) */
               for ( ; h - i; i += s)
@@ -453,10 +419,6 @@ FILE                   *tr_error
                   break;
                 }
               break; /* lmbap, lmbaps */
-  
-
-/* ptg     ver 2010.1           # page 10   12 Jan 2010 10 41 */
-
 
             case 6: /* authalic geogr. */
               auth = 1;
@@ -493,10 +455,6 @@ FILE                   *tr_error
                   break;
                 }
               break; /* authalic geogr. */
-  
-
-/* ptg     ver 2010.1           # page 11   12 Jan 2010 10 41 */
-
 
             case 7: /* Lambert Azimuthal Equal Area. */
              for ( ; h - i; i += s)
@@ -556,10 +514,6 @@ FILE                   *tr_error
 
           if(abs(direct) > 10) return(0);
 
-
-/* ptg     ver 2010.1           # page 12   12 Jan 2010 10 41 */
-
-
           /* tolerance test */
           if (res >= TRF_INACC_) {
             dCn = Cn - N;
@@ -583,10 +537,6 @@ FILE                   *tr_error
             *Nout = 0.0;
             *Eout = 0.0;
           }
-
-
-/* ptg     ver 2010.1           # page 13   12 Jan 2010 10 41 */
-
 
           /* status report block */
           /*_____________________*/
@@ -636,5 +586,3 @@ FILE                   *tr_error
           (direct > 0) ? "m " : "sx", "", N, E, dCn, dCe));
 
 }
-
-

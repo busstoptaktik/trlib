@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* prn_cho    ver 2003.01          # page 1    4 Jul 2003 16 33 */
-
-
-/* Copyright (c) 2003 GEK, Kort-og Matrikelstyrelsen, Denmark   */
-/* All rights reserved.                                         */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include   <stdio.h>
 #include    "KmsFncs.h"
 #include    "trthread.h"
@@ -63,9 +51,6 @@ double                  *old_cmt
 
     /* output of coord records */
     /* ________________________*/
-
-
-/* prn_cho    ver 2003.01         # page 2    4 Jul 2003 16 33 */
 
 
     switch(q_c) {

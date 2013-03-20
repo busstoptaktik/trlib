@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* sand_areal                      # page 1   2 Feb 2009 12 54 */
-
 
 /* Copyright (c) 2009, National Space Institute, DTU, Denmark */
 /* All rights reserved.                                       */

@@ -15,6 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,15 +48,6 @@ struct towgs84_translation{
 	 int min_params;
 	 double towgs84[7];
  };
-
- /* not used at the moment...
-static struct proj4_to_kms_ellps 
-ELLIPSOID_TRANSLATIONS[]={
-{"intl","Hayford"},
-{"bessel","Bessel"},
-{NULL,NULL}
-};
-*/
  
  #define NO_DATA (-9999)
  #define RADIUS_FLAT (6378137) /*used to recognize web Mercator */
@@ -361,20 +353,6 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 				/*lord_debug(0,"%.8f %.8f %.8f",proj_entry->towgs84[3],proj_entry->towgs84[4],proj_entry->towgs84[5]);*/
 				return TR_LABEL_ERROR;
 			}
-			/*
-			while (current_try->kms_dtm!=NULL){
-				if (!strcmp(proj_entry->ellps,current_try->proj4_ellps) && proj_entry->n_params>=current_try->min_params){
-					int nok=0;
-					for (i=0; i<proj_entry->n_params && i<7; i++)
-						nok+=(fabs(proj_entry->towgs84[i]-current_try->towgs84[i])<1e-7);
-					if (nok==proj_entry->n_params){
-						strcpy(datum,current_try->kms_dtm);
-						break;
-					} 
-				} 
-				current_try++;
-			} 
-			*/
 			
 		} /*end shift parameters given*/
 			
@@ -688,13 +666,3 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len){
 		return TR_LABEL_ERROR;
 	
 }
-
-/*
-int main(int argc, char **argv){
-	char mlb[128];
-	int rc;
-	rc=proj4_to_mlb(argv[0],mlb);
-	printf("Got: %s, rc: %d\n",mlb,rc);
-	return 0;
-}
-*/		

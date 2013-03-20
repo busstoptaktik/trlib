@@ -15,19 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* s_status    ver 2009.1        # page 1    7 jan 2009 14 05 */
-
-
-/* Copyright (c) 2009, National Space Institute, DTU, Denmark */
-/* All rights reserved.                                       */
-
-/* This is unpublished proprietary source code of DTU, Denmark */
-/* This copyright claim does not indicate an intention of      */
-/* publishing this code.                                       */
-
 
 #include    <stdio.h>
 #include    <stdarg.h>
@@ -67,10 +54,6 @@ SPECIAL::  c_unit == "non"  ==>>  SKIPS add params writing
   if (err_str != NULL) {
     p_er     = err_str;
     *err_str = '\0';
-
-
-/* s_status    ver 2009.1        # page 2    7 jan 2009 14 05 */
-
 
     c_err = err_type % 100;
     switch(c_err) {
@@ -133,10 +116,6 @@ SPECIAL::  c_unit == "non"  ==>>  SKIPS add params writing
       (void) strcpy(tpt, "manager.tab not found");
       break;
     };
-
-
-/* s_status    ver 2009.1        # page 3    7 jan 2009 14 05 */
-
 
     if (t_err < 0) {
       if (!c_err) p_er += sprintf(p_er, "\n");

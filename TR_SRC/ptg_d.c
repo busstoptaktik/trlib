@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* ptg_d   ver 2010.01           # page 1   12 Jan  2010 10 41 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -71,11 +66,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
   /* test labtype of TC_u */
   if (TC->lab_type == CRD_LAB) {
 
-
-
-/* ptg_d   ver 2010.01           # page 2   12 Jan  2010 10 41 */
-
-
     /* Transf. parameters */
     if (TC->init) {
 
@@ -108,11 +98,7 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
           Cn = N;
           Ce = E;
 
-
-/* ptg_d   ver 2010.01           # page 3   12 Jan  2010 10 41 */
-
-
-          switch(cstm) {
+		  switch(cstm) {
           case 3: /* Transverse mercator */
             for ( ; (h - i); i += s) {
               switch(i) {
@@ -188,10 +174,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                 }
                 else res = TRF_AREA_;
                 break;
-
-
-/* ptg_d   ver 2010.01           # page 4   12 Jan  2010 10 41 */
-
 
               case 0: /* transfer results */
                 *Nout = Cn;
@@ -275,11 +257,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                   Ce     = v_red(Ce + TC->L0);
                 }
                 break;
-  
-
-
-/* ptg_d   ver 2010.01           # page 5   12 Jan  2010 10 41 */
-
 
               case -1: /* GEO -> PRJ */
                 /* cos Lat for check */
@@ -324,11 +301,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
             }
             break;
   
-  
-
-/* ptg_d   ver 2010.01           # page 6   12 Jan  2010 10 41 */
-
-
           case 7: /* equivalent systems */
 
             switch(mode) {
@@ -359,10 +331,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                   break;
                 }
               break; /* safle */
-  
-
-/* ptg_d   ver 2010.01           # page 7   12 Jan  2010 10 41 */
-
   
             case 2: /* Sansom-Flamsteed, authalic */
               for ( ; h - i; i += s)
@@ -403,10 +371,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                 }
               break; /* safl */
   
-
-/* ptg_d   ver 2010.01           # page 8   12 Jan  2010 10 41 */
-
-  
             case 3: /* Lambert equiv. cyl. proj., ellipsoidal */
               for ( ; h - i; i += s)
                 switch(i) {
@@ -443,10 +407,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                   break;
                 }
               break; /* lmbace */
-  
-
-/* ptg_d   ver 2010.01           # page 9   12 Jan  2010 10 41 */
-
 
             case 4: /* Lambert equiv. pol. proj., (N) */
             case 5: /* Lambert equiv. pol. proj., (S) */
@@ -497,10 +457,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                   break;
                 }
               break; /* lmbap, lmbaps */
-  
-
-/* ptg_d   ver 2010.01           # page 10   12 Jan  2010 10 41 */
-
 
             case 6: /* authalic geogr. */
               auth = 1;
@@ -537,10 +493,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                   break;
                 }
               break; /* authalic geogr. */
-  
-
-/* ptg_d   ver 2010.01           # page 11   12 Jan  2010 10 41 */
-
 
             case 7: /* Lambert Azimuthal Equal Area. */
              for ( ; h - i; i += s)
@@ -600,10 +552,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
 
           if(abs(direct) > 10) return(0);
 
-
-/* ptg_d   ver 2010.01           # page 12   12 Jan  2010 10 41 */
-
-
           /* tolerance test */
           if (res >= TRF_INACC_) {
             dCn = Cn - N;
@@ -627,10 +575,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
             *Nout = 0.0;
             *Eout = 0.0;
           }
-
-
-/* ptg_d   ver 2010.01           # page 13   12 Jan  2010 10 41 */
-
 
           /* status report block */
           /*_____________________*/
