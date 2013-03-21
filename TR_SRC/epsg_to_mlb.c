@@ -220,8 +220,3 @@ int import_from_epsg(int h_code, int v_code, char *mlb){
 	}
 	return TR_OK;
 }
-	
-
-
-    
-    

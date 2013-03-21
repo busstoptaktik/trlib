@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* utmtmgr.c                        # page 1   22 Aug 1994 11 07 */
-
-
-/* Copyright (c) 1994, GD, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <stdio.h>
 #include    <math.h>
@@ -68,11 +56,6 @@ int                  cif
   czone = (int) (L0*180.0/M_PI - 2.9);
   czone = (czone + 186)/6;
   cmplt = c_lab->cmplt;
-
-
-
-/* utmtmgr.c                        # page 2   22 Aug 1994 11 07 */
-
 
   switch (direct) {
 
@@ -127,11 +110,6 @@ int                  cif
     nmd = (n - (n/unit)*unit)/unit_m;
     emd = (e - (e/unit)*unit)/unit_m;
 
-
-
-/* utmtmgr.c                        # page 3   22 Aug 1994 11 07 */
-
-
     /* output */
     *N = N1;
     *E = E1;
@@ -169,25 +147,20 @@ int                  cif
       fct = 1;
       break;
     default: /* untelligible mgr */
-      (void) printf("\n*** utmtmgr: INKONSISTENT MGR-KODE\n");
-      return(-100);
+      (void) lord_error(0, LORD("INKONSISTENT MGR-KODE"));
+	  return(-100);
     } /* end switch i */
 
     /* String components: UTM-zone, LAT-BELT, GRID-LTR, E, N */
     if (sscanf(mgref, p,
         &izone, &cbix, &ceix, &cnix, &emd, &nmd) != 6) {
-      (void) printf("\n*** utmtmgr: INKONSISTENT MGR-KODE\n");
-      return(-100);
+      (void) lord_error(0, LORD("INKONSISTENT MGR-KODE"));
+	  return(-100);
     }
 
     /* Contingent modification of the coord_label */
     if (izone != czone)
       c_lab->L0 = L0 + 6.0*(izone - czone)*M_PI/180.0;
-
-
-
-/* utmtmgr.c                        # page 4   22 Aug 1994 11 07 */
-
 
     /* LAT-BELT INDEX -> latitudes (S and N) */
     bix = cbix - 'A';
@@ -235,11 +208,6 @@ int                  cif
       r  = 1;
     }
 
-
-
-/* utmtmgr.c                        # page 5   22 Aug 1994 11 07 */
-
-
     /* contingent updating of the LNG and LAT */
     if (r) {
       Nx = n;
@@ -257,13 +225,9 @@ int                  cif
     break; /* case -1 */
 
   default: /* illegal direct-param */
-    (void) fprintf(stdout,
-        "\n*** utmtmgr: illegal direct-param: %d", direct);
+    (void) lord_error(0, LORD("illegal direct-param: %d"), direct);
     return(-100);
   } /* end direct-switch */
 
   return(izone - czone);
-
 }
-
-

@@ -15,10 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-/* srch_tab_typ     ver 2010.1        # page 1   18 Feb 2010 10 19 */
-
 
 /* Copyright (c) 2009, National Space Institute, DTU, Denmark */
 /* All rights reserved.                                       */
@@ -71,10 +67,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
   *pos  = ftell(man_tab_file) - (long) strlen(pth_mlb);
   (void) fseek(man_tab_file, *pos, SEEK_SET);
   if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, man_tab_file);
-
-
-/* srch_tab_typ     ver 2010.1        # page 2   18 Feb 2010 10 19 */
-
 
   if (qr != EOF) {
     for (f777 = 777 ; f777 >= LAST_TP && stype == STP_LAB; f777 --) {
@@ -129,10 +121,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
           tab_typ = f777;
         }
         break;
-
-
-/* srch_tab_typ     ver 2010.1        # page 2   18 Feb 2010 10 19 */
-
 
       case 770:
         if (!strncmp(pth_mlb, "t3dtab  manager  770", 20)) {

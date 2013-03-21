@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* bshlm2g                        # page 1   18 Feb 1994 13 55 */
-
-
-/* Copyright (c) 1993, GD, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <math.h>
 #include    <stdio.h>
@@ -82,10 +70,6 @@ Prog: Knud Poder APR 1993.
 
 */
 
-
-/* bshlm2g                        # page 2   18 Feb 1994 13 55 */
-
-
 {
 #include                 "bh_lat.h"
 #include                 "bh_lmb.h"
@@ -111,24 +95,11 @@ Prog: Knud Poder APR 1993.
       && fabs(B2-B1)                  < max_dif
 
       && fabs(L2-L1)*cos((B1+B2)/2.0) < max_dif) {
-/*
-(void) fprintf(stderr, "\ngmb2 start");
-*/
     res = gmb2(a, f, B1, B2, L1, L2, A1, A2, S);
-/*
-(void) fprintf(stderr, "\ngmb2 stop res = %4d", res);
-*/
     if (!res) return(res);
 
   }
 
-
-
-/* bshlm2g                        # page 3   18 Feb 1994 13 55 */
-
-/*
-(void) fprintf(stderr, "\nbshlm2 start");
-*/
   if (f > 1.0) f = 1.0/f;
   b0    = a*(1.0 - f);
   em2   = f*(2.0 - f)/(1.0 - f)/(1.0 - f);
@@ -151,11 +122,6 @@ Prog: Knud Poder APR 1993.
     dl     = dL + d_lmb;
   } while ((i--)
       && fabs(d_lmb - d_lmb1) >= fabs(d_lmb)*1.0e-10);
-
-  
-
-/* bshlm2g                        # page 4   18 Feb 1994 13 55 */
-
 
   if (i) {
     K1sq     = K1*K1;
@@ -186,10 +152,6 @@ Prog: Knud Poder APR 1993.
     return(2);
   }
   res = (*S > a*1e-6) ? 0 : 1;
-/*
-(void) fprintf(stderr, "\nbshlm2 stop res = %4d", res);
-*/
   return(res);
 
 }
-

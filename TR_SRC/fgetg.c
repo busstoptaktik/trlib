@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* fgetg                            # page 1   22 Feb 1993 12 54 */
-
-
-/* Copyright (c) 1991 U/32, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <math.h>
 #include    <stdio.h>
 #include    <stdlib.h>
@@ -68,11 +56,6 @@ char                        *udt
   int              nst = 0, act, clss;
   int              g, s;
   struct typ_dec   itd;
-
-
-/* fgetg                            # page 2   22 Feb 1993 12 54 */
-
-
   struct act_nst {
     short      action;
     short      nstate;
@@ -133,10 +116,6 @@ char                        *udt
       clss = 5;
     };
 
-
-/* fgetg                            # page 3   22 Feb 1993 12 54 */
-
-
     p_tab = acns_tab + 5*clss + nst;
     nst   = (*(p_tab)).nstate;
     act   = (*(p_tab)).action;
@@ -182,10 +161,6 @@ char                        *udt
 
   }; /* end of input loop */
 
-
-/* fgetg                            # page 4   22 Feb 1993 12 54 */
-
-
   if (cf + dc) {
     itd  = *set_tpd(np, cf, dc); 
     i    = get_tpd(&itd, &tp, h1, &cf, &dc, &factor);
@@ -225,5 +200,3 @@ char                        *udt
   return((val/factor));
 
 }
-
-

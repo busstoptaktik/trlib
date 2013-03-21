@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* ee_trans   version 3.0           # page 1   10 Sep 1998 11 36 */
-
-
-/* Copyright (c) 1998 GD, Kort-og Matrikelstyrelsen, Denmark   */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 /*
 #define  DEBUGEETRANS
@@ -85,10 +73,6 @@ FILE                *tr_error
 )
 {
 
-
-/* ee_trans   version 2.0           # page 2   10 Sep 1998 11 36 */
-
-
   static THREAD_SAFE  int  in_chsum = 0;
   static THREAD_SAFE  int  outchsum = 0;
   static  int  init = 0;
@@ -142,11 +126,6 @@ FILE                *tr_error
 
     /*stop*/ {-1, -1,   ""}
   };
-
-
-
-/* ee_trans   version 2.0           # page 3   10 Sep 1998 11 36 */
-
 
   struct act_nst {
     short     action;
@@ -208,11 +187,6 @@ FILE                *tr_error
     /* geo */ {VTG,2}, {TTG,2}, {IDT,2}
   };
 
-
-
-/* ee_trans   version 2.0           # page 4   10 Sep 1998 11 36 */
-
-
   if (init == 0) {
     /* Internal wrk-labels */
     act = (conv_lab("eetm27",        &TC_eetm, "") == CRD_LAB
@@ -249,11 +223,6 @@ FILE                *tr_error
               t_status(tr_error, usertxt,
               "ee_trans(i/o labels error)", TRF_ILLEG_));
     }
-
-
-
-/* ee_trans   version 2.0           # page 5   10 Sep 1998 11 36 */
-
 
     /* Out-system */
     /*____________*/
@@ -304,11 +273,6 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
               t_status(tr_error, usertxt,
               "ee_trans(unknown o-label)", TRF_ILLEG_));
     } /* end out-label check */
-
-
-
-/* ee_trans   version 2.0           # page 6   10 Sep 1998 11 36 */
-
 
     /* In-system */
     /*___________*/
@@ -434,10 +398,6 @@ ACTION[act], gst, nst, level);
 #endif
 
 
-
-/* ee_trans   version 2.0           # page 8   10 Sep 1998 11 36 */
-
-
       switch(act) {
 
       case ETG: /* eetm27 -> eegeo */
@@ -487,12 +447,7 @@ ACTION[act], gst, nst, level);
       case IDT: /* ident, no action */
         break;
 
-
-  
-/* ee_trans   version 2.0           # page 9   10 Sep 1998 11 36 */
-
-
-      default: /* programme error */
+	  default: /* programme error */
         return((tr_error==NULL) ? TRF_ILLEG_ :
                 t_status(tr_error, usertxt,
                 "ee_trans(prog error)", TRF_PROGR_));
@@ -526,5 +481,3 @@ ACTION[act], gst, nst, level);
 #undef  PVU
 
 }
-
-

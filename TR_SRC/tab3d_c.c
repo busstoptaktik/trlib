@@ -16,11 +16,6 @@
  * 
  */
  
-
-
-/* tab3d_c                         # page 1   25 Jun 2004 17 25 */
-
-
 /* Copyright (c) 2001 LG, Kort-og Matrikelstyrelsen, Denmark */
 /* All rights reserved.                                      */
 

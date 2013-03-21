@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* bh_lat.c                           # page 1   22 Feb 1993 12 54 */
-  
-
-/* Copyright (c) 1991 GS, U/32, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include <math.h>
 
@@ -63,10 +51,6 @@ s1     The length of the great circle on the auxiliary sphere from
 Prog.: Knud Poder SEP 1991.
 
 */
-
-
-/* bh_lat.c                           # page 2   22 Feb 1993 12 54 */
-
 
 {
   double             bm, k;

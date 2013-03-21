@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* utsb  ver 1999.01              # page 1   12 Jan 1999 12 54 */
-
-
-/* Copyright (c) 1999, LG,  Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <stdio.h>
 #include    <math.h>
@@ -81,10 +69,6 @@ FILE                     *tr_error
   prog: Knud Poder  DEC 1992
   */
 
-
-/* utsb  ver 1999.01              # page 2   12 Jan 1999 12 54 */
-
-
 {
 
   double         N, E, n, e, w, tol = 0.005;
@@ -120,11 +104,6 @@ FILE                     *tr_error
     cw = Cu32_sb;
   }
   else res = TRF_PROGR_;
-
-
-
-/* utsb  ver 1999.01              # page 3   12 Jan 1999 12 54 */
-
 
   /* Transformation */
 
@@ -178,5 +157,3 @@ FILE                     *tr_error
           t_status(tr_error, usertxt, "utsb", res,
           "m ", "", N_in, E_in,N_in - N, E_in - E));
 }
-
-

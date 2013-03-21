@@ -15,20 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* tab3d_val  ver 2004.01           # page 1   25 Jun 2004 11 37 */
-
-
-/* Copyright (c) 2004 Kort & Matrikelstyrelsen, Denmark   */
-/* and Danish National Space Center                       */
-/* All rights reserved.                                   */
-
-/* This is unpublished proprietary source code of Kort &         */
-/* Matrikelstyrelsen, Denmark, and Danish National Space Center. */
-/* This copyright claim does not indicate an intention of        */
-/* publishing this code.                                         */
 
 #include    <stdio.h>
 #include    <string.h>
@@ -75,10 +61,6 @@ char                     *err_str
   int                         s, g, i, t, k, kix;
   int                         miss, qr, qr1, tab3d;
   int                         dim3d, dim3d2, dim3d3;
-
-
-/* tab3d_val  ver 2004.01           # page 2   25 Jun 2004 11 37 */
-
 
   *val = *(val +1) = 9998.0;
 
@@ -143,11 +125,6 @@ char                     *err_str
     nw_pos = (long) qr + (long) qr1;
     nw_idx = (e_i % t_lab->rec_p_bl);
 
-
-
-/* tab3d_val  ver 2004.01           # page 3   25 Jun 2004 11 37 */
-
-
     /* Interpolation loop */
     if (0 <= n_i && n_i < t_lab->n_max &&
         0 <= e_i && e_i < t_lab->e_max) {
@@ -185,10 +162,6 @@ char                     *err_str
           break;
         } /* end t-switch ; */
 
-
-/* tab3d_valver 2004.01           # page 4   25 Jun 2004 11 37 */
-
-
         for (s = -1, i = 0; i < GEOIDPAGES; i++) {
           if (/* g == *(ppsg+i) && */ pos == *(ppge+i)) {
             s      = i;
@@ -209,29 +182,18 @@ char                     *err_str
           pfgh      = &(g_pg_i->fghtab[0]);
 
           if ((s=fseek(t_lab->fd, pos, SEEK_SET))) {
-            (void) fprintf(stdout,
-                "\n*** tab3d_val: ERROR fseek tab3de %s", t_lab->mlb);
-            (void) fprintf(stdout,
-                " blokaddr %8ld ;", pos);
-            return(TAB_N_SYS_);
+            (void) lord_error(0, LORD("ERROR fseek tab3de %s blokaddr %8ld ;"), t_lab->mlb, pos);        
+		   return(TAB_N_SYS_);
           }
 
           /* tab3d_val of floats */
           if ((qr = (int) fread((char *) pfgh, t_lab->blk_size,
                1, t_lab->fd))- 1) {
-            (void) fprintf(stdout,
-                "\n*** tab3d_val: ERROR input tab3de %s", t_lab->mlb);
-            (void) fprintf(stdout,
-                "\n blokaddr %8ld number = %4d size = %4ld ;",
-                pos, qr, (long) t_lab->blk_size);
-            return(TAB_N_SYS_);
+            (void) lord_error(0, LORD("ERROR input tab3de %s blokaddr %8ld number = %4d size = %4ld ;"), t_lab->mlb, pos, qr, (long) t_lab->blk_size);        
+		    return(TAB_N_SYS_);
           }
           ++ (tab3d_table->agn);
         } /* end not found actions */
-
-
-/* tab3d_valver 2004.01           # page 5   25 Jun 2004 11 37 */
-
 
         /* Table of floats */
         k          = dim3d * t;

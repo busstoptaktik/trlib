@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* fgetdt version 2010.1            # page 1   12 jan 2010 09 39 */
-
 
 /* Copyright (c) 2010, Danish National Space Center, DTU       */
 /* All rights reserved.                                        */
@@ -85,10 +80,6 @@ FILE               *fp
   /*        = 7  after more "       */
   /*        = 9  return  dummy      */
 
-
-/* fgetdt version 2010.1            # page 2   12 jan 2010 09 39 */
-
-
   *p_outstr = '\0';
   res       = 0;
   n_item    = 0;
@@ -153,10 +144,6 @@ FILE               *fp
       klasse = c > 32 ? 1 : 0;
       break;
     }
-
-
-/* fgetdt version 2010.1            # page 3   12 jan 2010 09 39 */
-
 
     if (klasse == 5 && mode_ap)
       nst      = 7;
@@ -228,4 +215,3 @@ FILE               *fp
   */
   return(cw);
 }
-

@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* sgetcw.c version 1.0               # page 1   14 Jun 1994 13 18 */
-
 
 /* Copyright (c) 1994, Kort-og Matrikelstyrelsen, GD, Denmark */
 /* All rights reserved.                                       */
@@ -72,10 +67,6 @@ char array must not hold 'spaces'. Use fgetln_kms to this end.
 
 */
 
-
-/* sgetcw.c version 1.0               # page 2   14 Jun 1994 13 18 */
-
-
 {
   char            *ps, c, char_do[3];
   int             ac, ch, ye, mo, ho, mi;
@@ -124,11 +115,6 @@ char array must not hold 'spaces'. Use fgetln_kms to this end.
         ho   = 0;
         mi   = 0;
       }
-
-
-
-/* sgetcw.c version 1.0               # page 3   14 Jun 1994 13 18 */
-
 
       /* check for new/old date format */
       if (w1 > 1000000L) { /* new */
@@ -193,5 +179,3 @@ char array must not hold 'spaces'. Use fgetln_kms to this end.
   }
 
 }
-
-

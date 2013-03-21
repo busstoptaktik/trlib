@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* conv_hgt    ver 2010.01          # page 1   12 jan 2010 10 19 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -58,11 +53,6 @@ struct hgt_lab          *h_lab,
   short                      par_dtm, mask;
   double                     ell_p[10];
   char                       e_name[24], p_name[24];
-
-
-/* conv_hgt    ver 2010.01          # page 2   12 jan 2010 10 19 */
-
-
   char                       t_lab_a[2*MLBLNG], *t_lab = t_lab_a;
   char                      *p_sys, *p_dtm, sepch, *p_tp;
 
@@ -104,11 +94,7 @@ struct hgt_lab          *h_lab,
     p_sys = (p_lb_ex->name);  /* name is mlb1 */
     p_dtm = (p_lb_ex->mlb2);  /* datum */
 
-
-/* conv_hgt    ver 2010.01          # page 3   12 jan 2010 10 19 */
-
-
-    /* clean lab */
+	/* clean lab */
     p_tp = (char *) h_lab;
     for (i = sizeof (*h_lab) - 1; i >= 0; i--) *(p_tp + i) = 0;
 
@@ -147,10 +133,6 @@ struct hgt_lab          *h_lab,
     /* separator and the datum. A non-zero imittance mask means */
     /* that only the coord_system is used. A separator != '_'   */
     /* is added to the minilabel, but no datum is given         */
-
-
-/* conv_hgt    ver 2010.01          # page 4   12 jan 2010 10 19 */
-
 
     h_lab->sepix = (short) strlen(p_sys);
     if (*p_lb_ex->pr_dtm == '\0') {
@@ -192,10 +174,6 @@ struct hgt_lab          *h_lab,
 
     h_lab->ch_sum = labchsum((union geo_lab *) h_lab, &h_lab->ch_sum);
     break;  /* conv_mode 0 & 1 */
-
-
-/* conv_hgt    ver 2010.01          # page 5   12 jan 2010 10 19 */
-
 
   case 3:  /* output of minilabel, simple */
   case 4:  /* output of minilabel, expand */
@@ -255,10 +233,6 @@ struct hgt_lab          *h_lab,
     } /* end conv_mode == 4 */
 
     break; /* end case 3 & 4, output label */
-
-
-/* conv_hgt    ver 2010.01          # page 6   12 jan 2010 10 19 */
-
 
   case 5:   /* DOCUMENTATION OF THE LABEL */
 
@@ -325,10 +299,6 @@ struct hgt_lab          *h_lab,
                      rgn_pref.prfx, rgn_name);
     }
 
-
-/* conv_hgt    ver 2010.01          # page 7   12 jan 2010 10 19 */
-
-
     /* Enumeration of coord system */
     (void) fprintf(iofile, "\ncstm      = %15d", h_lab->cstm);
     (void) fprintf(iofile, "         mode      = %15d", h_lab->mode);
@@ -382,10 +352,6 @@ struct hgt_lab          *h_lab,
     (void) sputg(t_lab, h_lab->Zb, &m_tpd, "g ");
     (void) fprintf(iofile, "\nZb        = %s", w_sys);
     NOT USED */
-
-
-/* conv_hgt    ver 2010.01          # page 8   12 jan 2010 10 19 */
-
 
     /* Gaussian latitude coeff. */
     /* NOT USED

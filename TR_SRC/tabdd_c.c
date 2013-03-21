@@ -15,20 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* tabdd_c                         # page 1   25 Jul 2006 17 25 */
-
-
-/* Copyright (c) 2006 Kort-og Matrikelstyrelsen, Denmark */
-/* and Danish National Space Center                      */
-/* All rights reserved.                                  */
-
-/* This is unpublished proprietary source code of Kort-og       */
-/* Matrikelstyrelsen, Denmark, and Danish National Spacecenter. */
-/* This copyright claim does not indicate an intention of       */
-/* publishing this code.                                        */
 
 #include        <stdio.h>
 #include        <string.h>

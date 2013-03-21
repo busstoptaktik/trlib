@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* etrs89_trans  ver 2009.03          # page 1   04 Mar 2009 11 36 */
-
 
 /* Copyright (c) 2009, National Space Institude, Danish Technical */
 /* University and Kort-og Matrikelstyrelsen, Denmark              */
@@ -68,10 +63,6 @@ FILE                     *tr_error
   /*   "etrs-tmzz", "ETRS-TMzz", "etrs-lcc", "ETRS-LCC",      */
   /*   "etrs-laea", "ETRS-LAEA"                               */
 
-
-/* etrs89_trans  ver 2009.03          # page 2   04 Mar 2009 11 36 */
-
-
   static THREAD_SAFE  char                 si_lab_str[MLBLNG];
   static THREAD_SAFE  char                 so_lab_str[MLBLNG];
   static THREAD_SAFE  union geo_lab        i_lab;
@@ -94,10 +85,6 @@ FILE                     *tr_error
     {"etrs-tm", 7}, {"ETRS-TM", 7}, {"fke", 3},
     {"etrs-lcc", 8}, {"ETRS-LCC", 8},
     {"etrs-laea", 9}, {"ETRS-LAEA", 9}, {"", 0}};
-
-
-/* etrs89_trans  ver 2009.03          # page 3   04 Mar 2009 11 36 */
-
 
   struct coord_lab           *o_wclb;
   char                        mlb_str[MLBLNG];
@@ -134,9 +121,6 @@ FILE                     *tr_error
 
   /* sequence of transformations : (part of ETPL)               */
   /* lev == 3 : transform coordinates                           */
-
-
-/* etrs89_trans  ver 2009.03          # page 4   04 Mar 2009 11 36 */
 
 
   /* Init of tables */
@@ -187,10 +171,6 @@ FILE                     *tr_error
 
     init =  1;
 
-
-/* etrs89_trans  ver 2009.03          # page 5   04 Mar 2009 11 36 */
-
-
     /* init of transformation  (b_lev == 3) */
     o_wclb  = &(o_lab.u_c_lab);
 
@@ -225,10 +205,6 @@ FILE                     *tr_error
 #endif
 
   } /* end of init of tables */
-
-
-/* etrs89_trans  ver 2009.03          # page 6   04 Mar 2009 11 36 */
-
 
   N      = N_in;
   E      = E_in;
@@ -277,10 +253,6 @@ FILE                     *tr_error
 #endif
   } /* action LOOP */
 
-
-/* etrs89_trans  ver 2009.03          # page 7   04 Mar 2009 11 36 */
-
-
   /* return of transformation */
   *X = N;
   *Y = E;
@@ -294,4 +266,3 @@ FILE                     *tr_error
 #undef ILL
 
 }
-

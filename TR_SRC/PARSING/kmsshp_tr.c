@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* kmsshp_tr  ver 2009.01          # page 1     7 Jan 2009 11 57 */
-
 
 /* Copyright (c) 2009, National Space Institute, DTU, Denmark */
 /* All rights reserved.                                       */

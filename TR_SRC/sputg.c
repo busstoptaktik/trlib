@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* sputg ver 1999.01              # page 1    3 Feb 1999 12 54 */
-
 
 /* Copyright (c) 1989 LG, Kort-og Matrikelstyrelsen, Denmark   */
 /* All rights reserved.                                        */
@@ -60,14 +55,6 @@ char                    *layout
       upgrade = 1;
     }
 
-/*
-(void) printf("\n*sputg gr = %4d  tp = %4d;", gr, tp);
-*/
-
-
-/* sputg ver 1999.01              # page 2    3 Feb 1999 12 54 */
-
-
     /* decode layout */
     if (*layout != '\0')
       do {
@@ -97,10 +84,6 @@ char                    *layout
       /* select output of units */
       np    = (unit ? name : "");
       w_val = val;
-
-
-/* sputg ver 1999.01              # page 3    3 Feb 1999 12 54 */
-
 
       /* select blanks in output */
       if (blnk) {
@@ -157,10 +140,6 @@ char                    *layout
         else
         if (cf > scf) mask = mask << (cf - scf);
       } /* end mask actions */
-
-
-/* sputg ver 1999.01              # page 4    3 Feb 1999 12 54 */
-
 
       /* adjust angles to  (-2pi, +2pi) */
       if (gr < 3) {  /* angles */
@@ -233,11 +212,6 @@ char                    *layout
         dc   = 0;
       }
 
-/*
-(void) printf("\ng = %16.0f  m= %16.0f  s= %16.0f", g, m,s);
-(void) printf("\ng = %16.14f  m= %16.14f  s= %16.14f", g, m,s);
-(void) printf("\nw_val = %+18.16f\n", w_val);
-*/
     } while (upgrade > 1);
 
     if (upgrade) {
@@ -245,18 +219,8 @@ char                    *layout
       if (*(np +1) == ' ') *(np +1) = '\0';
     }
     p = blnk ? h : outstr;
-/*
-(void) printf("\nfør sprint");
-*/
-    (void) sprintf(p, cstr, fw, dc, w_val, np);
-/*
-i = sprintf(h, cstr, fw, dc, w_val, np);
-(void) printf("\neft sprint = %s", p);
-*/
 
-
-/* sputg ver 1999.01              # page 5    3 Feb 1999 12 54 */
-
+	(void) sprintf(p, cstr, fw, dc, w_val, np);
 
     /* Insert spaces in output */
     if (blnk) {
@@ -276,4 +240,3 @@ i = sprintf(h, cstr, fw, dc, w_val, np);
   }
   return((int) strlen(outstr));
 }
-

@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* conv_plm    ver 2010.01          # page 1     7 jan 2010 10 19 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -80,9 +75,6 @@ struct plm_lab          *p_lab,
 /* nnr_igsxx     : searches the appropriate model for igsxx    */
 /* example       :                                             */
 /* nnr_itrf94    : gives nnr_nuvel1a                           */
-
-/* conv_plm    ver 2010.01          # page 2     7 jan 2010 10 19 */
-
 
 extern THREAD_SAFE FILE               *man_gps_file;
 extern THREAD_SAFE size_t              init_gps_pos;
@@ -123,10 +115,6 @@ extern THREAD_SAFE size_t              init_gps_pos;
     for (r = sizeof (*p_lab) - 1; r >= 0; r--) *(p_tp + r) = 0;
     p_lab->lab_type = ILL_LAB;
 
-
-/* conv_plm    ver 2010.01          # page 3     7 jan 2010 10 19 */
-
-
     (void) sprintf(p_lab->mlb, "%s_%s", p_lb->name, p_lb->mlb2);
     if (!strcmp(p_lb->mlb2, "std")) {
       nnr_std = 1;
@@ -159,10 +147,6 @@ extern THREAD_SAFE size_t              init_gps_pos;
         }
       } else r = 0;
       (void) fseek(man_gps_file, (long) init_gps_pos, SEEK_SET);
-
-
-/* conv_plm    ver 2010.01          # page 4     7 jan 2010 10 19 */
-
 
       do {
         /* Test for identification of a man_gps_file.gps file */
@@ -200,10 +184,6 @@ extern THREAD_SAFE size_t              init_gps_pos;
             default:
               ant     = 0;
             }
-
-
-/* conv_plm    ver 2010.01          # page 5     7 jan 2010 10 19 */
-
 
             if (run_ii) {
               /* look for information in REC_TABLE */
@@ -260,11 +240,6 @@ extern THREAD_SAFE size_t              init_gps_pos;
                   return(-1);
                 }
               } /* man_gps_file.plm file ok */
-
-
-/* conv_plm    ver 2010.01          # page 6     7 jan 2010 10 19 */
-
-
             } /* man_gps_file main label ok */
           } /* lab_tp loop */
         } /* qr != EOF */
@@ -284,10 +259,6 @@ extern THREAD_SAFE size_t              init_gps_pos;
     p_lab->ch_sum = labchsum((union geo_lab *) p_lab, &(p_lab->ch_sum));
 
     break; /* end of case 0 and 1: create a plm_lab */
-
-
-/* conv_plm    ver 2010.01          # page 7     7 jan 2010 10 19 */
-
 
   case 3:  /* output of minilabel, simple */
   case 4:  /* output of minilabel, expand */
@@ -353,4 +324,3 @@ extern THREAD_SAFE size_t              init_gps_pos;
 #undef    YEAR
 
 }
-

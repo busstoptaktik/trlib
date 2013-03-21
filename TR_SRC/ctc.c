@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/*  ctc   ver 1999.01            # page 1   12 Jan 1999 15 40 */
-
-
-/* Copyright (c) 1999, Kort-og Matrikelstyrelsen, Denmark     */
-/* All rights reserved.                                       */
-
-/* This is unpublished proprietary source code of LG, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not */
-/* indicate an intention of publishing this code.             */
-
 #include    <math.h>
 #include    <stdio.h>
 #include    "KmsFncs.h"
@@ -67,9 +55,6 @@ FILE                  *tr_error
     short     action;
     short     nstate;
   }    *ptab;
-
-
-/*  ctc   ver 1999.01            # page 2   12 Jan 1999 15 40 */
 
 
   static struct act_nst dtmtab[] = {
@@ -115,10 +100,6 @@ FILE                  *tr_error
   ci = id = i_lab->datum;
   fc = &(i_lab->dsh_con);
   if (id > 5) ci = i_lab->p_dtm;
-
-
-/*  ctc   ver 1999.01            # page 3   12 Jan 1999 15 40 */
-
 
   co = od = o_lab->datum;
   tc = &(o_lab->dsh_con);
@@ -167,10 +148,6 @@ FILE                  *tr_error
         wc = iw;
         break;
 
-
-/*  ctc   ver 1999.01            # page 4   12 Jan 1999 15 40 */
-
-
       default:
         break;
       }
@@ -206,5 +183,3 @@ FILE                  *tr_error
 #undef   IW
 
 }
-
-

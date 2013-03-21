@@ -15,17 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-/* tab3d_i   ver 2004.1           # page 1    24 Jun 2004 17 23 */
-
-
-/* Copyright (c) 2004 GEK, Kort & Matrikelstyrelsen, Denmark    */
-/* All rights reserved.                                         */
-
-/* This is unpublished proprietary source code of Kort &       */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <stdio.h>
 #include    <string.h>
@@ -56,10 +45,6 @@ char                    *err_str
   struct gde_lab             *t_lab_p;
   struct lab_def_str          lab_table, *p_lb = &lab_table;
 
-
-/* tab3d_i   ver 2004.1           # page 2    24 Jun 2004 17 23 */
-
-
   /* initialize */
   /*____________*/
   if (tab3d_table->init != 0) (void) tab3d_c(tab3d_table);
@@ -76,10 +61,6 @@ char                    *err_str
     *(ppge+qr) = -1l;
   }
 
-/*
-(void) fprintf(stdout,
-"\n*tab3d_i : after init: tab3d_n = %s;", tab3d_n);
-*/
   /* initialize the tab3d_n */
   /*________________________*/
   if (strlen(tab3d_n) > 3 && islower(*tab3d_n)) {

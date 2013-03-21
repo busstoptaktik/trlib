@@ -17,17 +17,6 @@
  */
  
 
-
-/* clenshaw.c version 1.0             # page 1   11 Aug 1994 12 54 */
-
-
-/* Copyright (c) 1992 GD, U/32, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <math.h>
 #include    <stdio.h>
 
@@ -47,10 +36,6 @@ sin cos sinh cosh
 
 Prog.: K. Engsager, MAY 1994 
 */
-
-
-/* clenshaw.c version 1.0             # page 2   11 Aug 1994 12 54 */
-
 
 {
   double      *p, r, i, hr, hr1, hr2, hi, hi1, hi2;
@@ -108,10 +93,6 @@ Prog.: K. Engsager, MAY 1994
     *I = -arg_r*hi1 - arg_i*hr1 + hi;
     break; /* G */
 
-
-/* clenshaw.c version 1.0             # page 3   11 Aug 1994 12 54 */
-
-
   case 'c':
   case 's':
     cos_arg_r  = cos(arg_r);
@@ -151,5 +132,3 @@ Prog.: K. Engsager, MAY 1994
   return(*R);
 
 }
-
-

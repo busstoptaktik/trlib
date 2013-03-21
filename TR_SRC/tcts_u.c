@@ -16,18 +16,6 @@
  *
  */
 
-
-
-/* tcts_u   ver 1999.01           # page 1   17 Nov 1999 13 25 */
-
-
-/* Copyright (c) 1999, Kort-og Matrikelstyrelsen, Denmark      */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort-og  */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>
@@ -77,10 +65,6 @@ Prog: Knud Poder, APR 1991
 #define  S45BYMIN     -50000.0
 #define  S45BXMAX    +150000.0
 #define  S45BXMIN     -56000.0
-
-
-/* tcts_u   ver 1999.01           # page 2   17 Nov 1999 13 25 */
-
 
 #define  T32JNMAX   +6500000.0
 #define  T32JNMIN   +6000000.0
@@ -136,10 +120,6 @@ Prog: Knud Poder, APR 1991
     /* 7 */    15564.9, 128976.2,  28148.8, 258789.3
   };
 
-
-/* tcts_u   ver 1999.01           # page 3   17 Nov 1999 13 25 */
-
-
   static  double      P_tcbo[] = {
     /*ant*/   4.0,
     /*  1*/  6150000.0, 894000.0, 6146000.0, 862000.0,
@@ -194,10 +174,6 @@ Prog: Knud Poder, APR 1991
     /* my =  1.73 cm    my_loss =    +7  y_enp =  +5.4 */
     /* mx =  1.58 cm    mx_loss =    +8  x_enp =  +4.6 */
     /* m_lim_gen:  0.139  red = 0        OBS =  26062  */
-
-
-/* tcts_u   ver 1999.01           # page 4   17 Nov 1999 13 25 */
-
 
     /*deg*/  13.0,
     /*Poly NORTH :: e-degree =  0  : n-degree = 13 */
@@ -256,11 +232,6 @@ Prog: Knud Poder, APR 1991
     /*104*/  -5.6336046875e-65,
     /*tcy*/    6208030.167965,
 
-
-/* tcts_u   ver 1999.01           # page 5   17 Nov 1999 13 25 */
-
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree = 13 */
     /*  0*/   2.6219050871e+05,  -1.0001375777e+00,   2.7781407173e-10,
     /*  3*/   8.3129733948e-16,   4.8889849265e-20,  -4.5522545693e-25,
@@ -318,19 +289,11 @@ Prog: Knud Poder, APR 1991
     /*tcx*/     533649.794619
   };
 
-
-/* tcts_u   ver 1999.01           # page 6   17 Nov 1999 13 25 */
-
-
   static  double        C_jtt[] = {
     /* s34j -> tc32_ed50                               */
     /* my =  1.73 cm    my_loss =    +7  y_enp =  +5.4 */
     /* mx =  1.58 cm    mx_loss =    +8  x_enp =  +4.8 */
     /* m_lim_gen:  0.139    red = 0      OBS   = 26062 */
-
-
-/* tcts_u   ver 1999.01           # page 6   17 Nov 1999 13 25 */
-
 
     /*deg*/  13.0,
     /*Poly NORTH :: e-degree =  0  : n-degree = 13 */
@@ -389,10 +352,6 @@ Prog: Knud Poder, APR 1991
     /*104*/  -5.5792025473e-65,
     /*tcy*/     176325.080506,
 
-
-/* tcts_u   ver 1999.01           # page 7   17 Nov 1999 13 25 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree = 13 */
     /*  0*/   5.3365156389e+05,  -9.9946358837e-01,   2.7668598883e-10,
     /*  3*/  -7.7750840602e-16,   4.9533630434e-20,   4.3863011417e-25,
@@ -450,10 +409,6 @@ Prog: Knud Poder, APR 1991
     /*tcx*/     262188.742761
   };
 
-
-/* tcts_u   ver 1999.01           # page 8   17 Nov 1999 13 25 */
-
-
   static  double     C_tts[] = {
     /* tc32_ed50 -> s34s */
     /* my =  1.26 cm    my_loss =    +6  y_enp =  +9.8 */
@@ -495,10 +450,6 @@ Prog: Knud Poder, APR 1991
     /* 54*/   1.1310675824e-45,
     /*tcy*/    6142519.772410,
 
-
-/* tcts_u   ver 1999.01           # page 9   17 Nov 1999 13 25 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree =  9 */
     /*  0*/   1.1696718747e+05,  -9.9978831381e-01,   2.1776749302e-09,
     /*  3*/  -1.2496489584e-15,  -3.3527323606e-21,   3.7270837329e-25,
@@ -533,10 +484,6 @@ Prog: Knud Poder, APR 1991
     /* 54*/  -6.6096428142e-46,
     /*tcx*/     680161.119096
   };
-
-
-/* tcts_u   ver 1999.01           # page 10  17 Nov 1999 13 25 */
-
 
   static  double     C_stt[] = {
     /* s34s -> tc32_ed50 */
@@ -579,10 +526,6 @@ Prog: Knud Poder, APR 1991
     /* 54*/   1.0289124711e-45,
     /*tcy*/     107905.132295,
 
-
-/* tcts_u   ver 1999.01           # page 11   17 Nov 1999 13 25 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree =  9 */
     /*  0*/   6.8016404556e+05,  -9.9982733281e-01,   2.1740820158e-09,
     /*  3*/   1.2382715255e-15,  -2.9662643366e-21,  -3.6554059502e-25,
@@ -617,10 +560,6 @@ Prog: Knud Poder, APR 1991
     /* 54*/  -7.1115410472e-46,
     /*tcx*/     116964.303712
   };
-
-
-/* tcts_u   ver 1999.01           # page 11   17 Nov 1999 13 25 */
-
 
   static  double     C_ttb[] = {
     /* tc32_ed50 -> s45b */
@@ -679,10 +618,6 @@ Prog: Knud Poder, APR 1991
     /*tcx*/     878354.943082
   };
 
-
-/* tcts_u   ver 1999.01           # page 12   17 Nov 1999 13 25 */
-
-
   static  double      C_btt[] = {
     /* s45b -> tc32_ed50 */
     /* m_lim_gen:  0.154  red  = 0      OBS   = 1074    */
@@ -740,10 +675,6 @@ Prog: Knud Poder, APR 1991
     /*tcx*/      47022.563745
   };
 
-
-/* tcts_u   ver 1999.01           # page 13   17 Nov 1999 13 25 */
-
-
   static  double      C_ttu_b[] = {
     /* tc32_ed50 -> utm32_ed50 : Bornholm */
     /* m_lim_gen:  0.086  red  = 0      OBS   =    852   */
@@ -785,10 +716,6 @@ Prog: Knud Poder, APR 1991
 
     /*tcx*/     877605.269066
   };
-
-
-/* tcts_u   ver 1999.01           # page 14   17 Nov 1999 13 25 */
-
 
   static  double      C_utt_b[] = {
     /* utm32_ed50 -> tc32_ed50 : Bornholm */
@@ -838,10 +765,6 @@ Prog: Knud Poder, APR 1991
     /* my =  1.59 cm    my_loss =    +9  y_enp =  +4.1 */
     /* mx =  1.48 cm    mx_loss =   +10  x_enp =  +3.9 */
     /* m_lim_gen:  0.096  red = 0        OBS =  31136  */
-
-
-/* tcts_u   ver 1999.01           # page 15   17 Nov 1999 13 25 */
-
 
     /*deg*/  15.0,
     /*Poly NORTH :: e-degree =  0  : n-degree = 15 */
@@ -896,9 +819,6 @@ Prog: Knud Poder, APR 1991
     /*108*/   8.1333615707e-47,  -7.7935503263e-50,   1.0207593542e-55,
     /*111*/   2.4417961337e-60,   2.1206760006e-65,  -3.4204444616e-71,
     /*114*/  -5.4286217856e-76,
-
-/* tcts_u   ver 1999.01           # page 16   17 Nov 1999 13 25 */
-
     /*Poly NORTH :: e-degree = 10  : n-degree =  5 */
     /*115*/  -4.8258845422e-51,   2.0287646410e-55,  -2.2892909773e-61,
     /*118*/   1.2279446749e-65,  -6.8839078080e-71,  -8.7218142644e-76,
@@ -956,9 +876,6 @@ Prog: Knud Poder, APR 1991
     /* 84*/   3.3775642884e-44,   5.2329011479e-49,  -3.4252433832e-54,
     /* 87*/  -3.2316843056e-59,   1.7818938169e-64,   4.8077211024e-70,
     /* 90*/  -2.7479002516e-75,
-
-/* tcts_u   ver 1999.01           # page 16   17 Nov 1999 13 25 */
-
     /*Poly EAST  :: n-degree =  7  : e-degree =  8 */
     /* 91*/   4.5949423757e-36,  -1.5085433524e-39,   1.1892402157e-44,
     /* 94*/   4.9232401471e-49,  -1.8297885990e-54,  -3.6673914781e-59,
@@ -988,10 +905,6 @@ Prog: Knud Poder, APR 1991
     /*135*/   6.4734988935e-77,
     /*tcx*/     570523.004090
   };
-
-
-/* tcts_u   ver 1999.01           # page 17   17 Nov 1999 13 25 */
-
 
   static  double      C_utt_l[] = {
     /* utm32_ed50 -> tc32_ed50 : Jylland & Sjæland      */
@@ -1048,10 +961,6 @@ Prog: Knud Poder, APR 1991
     /*100*/  -5.9447090366e-41,   9.3625309330e-46,   5.1490355624e-50,
     /*103*/   7.0406706327e-55,  -5.6530673241e-60,  -6.9417327826e-65,
     /*106*/   6.4248996055e-71,   7.4362404024e-76,
-
-
-/* tcts_u   ver 1999.01           # page 15   17 Nov 1999 13 25 */
-
     /*Poly NORTH :: e-degree =  9  : n-degree =  6 */
     /*108*/  -8.1371907265e-47,   7.7937907063e-50,  -1.0202856343e-55,
     /*111*/  -2.4414752008e-60,  -2.1207513918e-65,   3.4193169071e-71,
@@ -1108,10 +1017,6 @@ Prog: Knud Poder, APR 1991
     /* 73*/   5.7184948784e-39,  -2.2651396195e-44,  -6.4114385006e-49,
     /* 76*/   2.5250823400e-54,   2.5930985128e-59,  -1.0968083685e-64,
     /* 79*/  -3.4270399496e-70,   1.5664868003e-75,
-
-
-/* tcts_u   ver 1999.01           # page 15   17 Nov 1999 13 25 */
-
     /*Poly EAST  :: n-degree =  6  : e-degree =  9 */
     /* 81*/   8.2129987018e-30,   1.7497602718e-34,   1.6908456297e-39,
     /* 84*/  -3.3775240805e-44,  -5.2329133583e-49,   3.4251560882e-54,
@@ -1147,10 +1052,6 @@ Prog: Knud Poder, APR 1991
     /*tcx*/     570522.986054
   };
 
-
-/* tcts_u   ver 1999.01           # page 19   17 Nov 1999 13 25 */
-
-
   pd = isupper(landsdel);				// C_UPPER udskiftet med isupper 20120529 stl
   if (pd) {
     va_start(o_p, tr_error);
@@ -1179,15 +1080,10 @@ Prog: Knud Poder, APR 1991
     s_u_xmax  = S34JXMAX;
     s_u_xmin  = S34JXMIN;
     break;
-
-/* tcts_u   ver 1999.01           # page 20   17 Nov 1999 13 25 */
 
   case 2:  /* sjælland */
   case 's':
   case 'S':
-/*
-(void) fprintf(stdout, "\n*tcts_u : s :;");
-*/
     cb_d      = C_tts;
     cb_r      = C_stt;
     pol_d     = P_tcs;
@@ -1216,9 +1112,6 @@ Prog: Knud Poder, APR 1991
     s_u_xmax  = S45BXMAX;
     s_u_xmin  = S45BXMIN;
     break;
-
-
-/* tcts_u   ver 1999.01           # page 21   17 Nov 1999 13 25 */
 
   case 4:  /*u32 hele landet */
   case 'u':
@@ -1278,35 +1171,19 @@ Prog: Knud Poder, APR 1991
         && s_u_xmin <= Ein && Ein <= s_u_xmax);
   }
 
-
-/* tcts_u   ver 1999.01           # page 22   17 Nov 1999 13 25 */
-
-
   /* Preserve input for reverse check */
   N = Nin;
   E = Ein;
 
-/*
-(void) fprintf(stdout,
-"\n*tcts_u : %7.0f  %6.0f  ins=%d, direct=%d, ins_alarm=%d;",
-Nin, Ein, ins, direct, ins_alarm);
-*/
-
   if (ins) {
 
     if ((i=inpoly(pol, &Nin, &Ein)) < 0) res = TRF_INACC_;
-/*
-(void) fprintf(stdout, ", inpoly res = %d", res);
-*/
     if (! pd) { /* no derivatives */
       /* Transformation loop */
       for (i = -1; i <= 1; ++i)
         if (i) {
           /* Collect constants and addresses */
           g   = (int) *cb;
-/*
-(void) fprintf(stdout, "\n*loop i = %d, degree = %d;", i, g);
-*/
           sz  = (g + 1)*(g + 2)/2 + 1;
           tcy = cb  + sz;
           tcx = tcy + sz;
@@ -1322,9 +1199,6 @@ Nin, Ein, ins, direct, ins_alarm);
             N = e*N + u;
             E = n*E + v;
           }
-/*
-(void) fprintf(stdout, "\n*loop i = %d, N = %7.3f, E = %7.3f;", i, N,E);
-*/
         }
 
 
@@ -1335,10 +1209,6 @@ Nin, Ein, ins, direct, ins_alarm);
         }
 
     } else { /* with derivatives */
-
-
-/* tcts_u   ver 1999.01           # page 23   17 Nov 1999 13 25 */
-
 
       /* Transformation loop */ /* with derivatives */
       for (i = -1; i <= 1; ++i)
@@ -1397,10 +1267,6 @@ Nin, Ein, ins, direct, ins_alarm);
     *xout = Ein;
   }
   if (!res) return(0);
-
-
-/* tcts_u   ver 1999.01           # page 23   17 Nov 1999 13 25 */
-
 
   switch(landsdel) {
   case 1:  /* jylland */
