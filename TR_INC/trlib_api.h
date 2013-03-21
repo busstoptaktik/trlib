@@ -65,5 +65,30 @@ KMSTR_API int   TR_InverseTransformPoint(TR *tr, double X_in, double Y_in, doubl
 KMSTR_API void TR_Close (TR *tr);
 KMSTR_API int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
 
+/***************************************
+**********LORD module functions ********
+****************************************/
+
+/*return last buffered error code from the lord module */
+KMSTR_API int TR_GetLastError(void);
+
+/* Return last buffered error code from the lord module */
+//TR_set_lord_max_messages
+
+/* Sets the lord call back function */
+//KMSTR_API void TR_SetLordCallBack(LORD_CALLBACK fct);
+
+/* Turn the lord modes on or off */
+KMSTR_API void TR_SetLordModes(int debug, int info, int warning, int error, int critical);
+
+/* Set the output pointers for each lord_type */
+KMSTR_API void TR_SetLordOutputs(FILE * stream_debug_outside, FILE * stream_info_outside, FILE * stream_warning_outside, FILE * stream_error_outside, FILE * stream_critical_outside);
+
+/* Set the verbosity level for the modes */
+KMSTR_API void TR_SetLordVerbosityLevels(int verb_debug, int verb_info, int verb_warning);
+
+/* Sets the lord output file for all modes */
+KMSTR_API void TR_SetLordFile(char *fullfilename);
+
 
 #endif

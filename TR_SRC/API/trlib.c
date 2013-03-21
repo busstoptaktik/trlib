@@ -59,10 +59,6 @@ FILE *ERR_LOG=0;
 
 def_data *DEF_DATA=0;
 
-/*return last buffered error code from gd_trans */
-int TR_GetLastError(void){
-    return lord_get_last_error();
-}
 
 /* only used in InitLibrary at the moment- but could be useful */
 int TR_IsMainThread(void){
@@ -866,4 +862,40 @@ int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len){
 	}
 	return TR_ERROR;
 }
-	
+
+/********************************************************
+********* LORD wrapper functions ************************
+********************************************************/
+
+/*return last buffered error code from the lord module */
+int TR_GetLastError(void){
+    return lord_get_last_error();
+}
+
+/* Return last buffered error code from the lord module */
+//TR_set_lord_max_messages
+
+/* Sets the lord call back function */
+void TR_SetLordCallBack(LORD_CALLBACK fct) {
+	set_lord_callback(fct);
+}
+
+/* Turn the lord modes on or off */
+void TR_SetLordModes(int debug, int info, int warning, int error, int critical) {
+	set_lord_modes(debug, info, warning, error, critical);
+}
+
+/* Set the output pointers for each lord_type */
+void TR_SetLordOutputs(FILE * stream_debug_outside, FILE * stream_info_outside, FILE * stream_warning_outside, FILE * stream_error_outside, FILE * stream_critical_outside) {
+	set_lord_outputs(stream_debug_outside, stream_info_outside, stream_warning_outside, stream_error_outside, stream_critical_outside);
+}
+
+/* Set the verbosity level for the modes */
+void TR_SetLordVerbosityLevels(int verb_debug, int verb_info, int verb_warning) {
+	set_lord_verbosity_levels(verb_debug, verb_info, verb_warning, 3, 3);
+}
+
+/* Sets the lord output file for all modes */
+void TR_SetLordFile(char *fullfilename) {
+	set_lord_file(fullfilename);
+}
