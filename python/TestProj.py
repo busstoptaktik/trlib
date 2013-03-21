@@ -12,7 +12,6 @@ TESTS=["+proj=utm +zone=32 +units=m +ellps=GRS80 +nodefs",
 "+proj=longlat +datum=WGS84 +nodefs",
 "+proj=utm +zone=32 +units=m +datum=NAD83 +nodefs",
 "+proj=etmerc +lat_0=0 +y_0=0 +lon_0=9 +x_0=500000 +k=0.9996 +units=m +datum=WGS84",
-"+proj=utm +zone=32 +units=m +ellps=intl +towgs84=-87,-98,-121,0,0,0",
 "+proj=etmerc +lat_0=0 +y_0=-5000000 +lon_0=9 +x_0=200000 +k=0.999980 +units=m +ellps=GRS80",
 "+proj=etmerc +lat_0=0 +y_0=-5000000 +lon_0=9 +x_0=200000 +k=0.999980 +units=m +datum=etrs89",
 "+proj=etmerc +lat_0=0 +y_0=-5000000 +lon_0=9 +x_0=200000 +k=0.999980 +units=m +datum=etrf89",
@@ -32,7 +31,7 @@ def test():
 	for text in TESTS:
 		mlb=TrLib.ImportLabel(text)
 		if mlb is None:
-			print("Unable to translate %s" %text)
+			print("\nUnable to translate %s" %text)
 			nerr+=1
 		else:
 			print("\n%s\n-> %s"%(text,mlb))
