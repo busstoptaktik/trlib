@@ -15,10 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-/* tab_doc_f     ver 2009.01          # page 1   26 Mar 2009 10 19 */
-
 
 /* Copyright (c) 2009, National Space Institute, DTU, Denmark */
 /* All rights reserved.                                       */
@@ -70,10 +66,6 @@ FILE                    *fh_out
 )
 {
 
-
-/* tab_doc_f     ver 2009.01          # page 2   26 Mar 2009 10 19 */
-
-
 extern THREAD_SAFE FILE               *man_tab_file;
 extern THREAD_SAFE size_t              init_tab_pos;
 
@@ -100,10 +92,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
     }
   }
   (void) fseek(man_tab_file, (long) init_tab_pos, SEEK_SET);
-
-
-/* tab_doc_f     ver 2009.01          # page 2   26 Mar 2009 10 19 */
-
 
   p_tp = name +1;
   switch(*name) {
@@ -156,10 +144,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
     if (empty == 0 && 
         strcmp(tab_typ_txt, p_nm) == 0) type_quest = 1;
   }
-
-
-/* tab_doc_f     ver 2009.01          # page 3   26 Mar 2009 10 19 */
-
 
   do {
     if (new_table) {
@@ -221,9 +205,6 @@ extern THREAD_SAFE size_t              init_tab_pos;
           }
         }
       } while (strncmp(pth_mlb, "stop", 4) && r && used > 0);
-
-/* tab_doc_f     ver 2009.01          # page 4   26 Mar 2009 10 19 */
-
 
       if (r != 0 && strncmp(pth_mlb, "stop", 4) == 0) {
         new_table = 1;
@@ -247,4 +228,3 @@ extern THREAD_SAFE size_t              init_tab_pos;
   }
   return(i);
 }
-

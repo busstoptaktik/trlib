@@ -15,21 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* tabdd_val  ver 2006.01           # page 1   25 Jun 2006 11 37 */
-
-
-/* Copyright (c) 2004 Kort & Matrikelstyrelsen, Denmark   */
-/* and Danish National Space Center                       */
-/* All rights reserved.                                   */
-
-/* This is unpublished proprietary source code of Kort &         */
-/* Matrikelstyrelsen, Denmark, and Danish National Space Center. */
-/* This copyright claim does not indicate an intention of        */
-/* publishing this code.                                         */
-
 
 #include    <stdio.h>
 #include    <string.h>
@@ -73,10 +58,6 @@ char                     *err_str
   double                      tval[8];
   int                         s, g, i, t, k, kix;
   int                         miss, qr, qr1;
-
-
-/* tabdd_val  ver 2006.01           # page 2   25 Jun 2006 11 37 */
-
 
   *val = *(val +1) = 99999999.0;
 
@@ -136,10 +117,6 @@ char                     *err_str
     nw_pos = (long) qr + (long) qr1;
     nw_idx = (e_i % t_lab->rec_p_bl);
 
-
-/* tabdd_val  ver 2006.01           # page 3   25 Jun 2006 11 37 */
-
-
     /* Interpolation loop */
     if (0 <= n_i && n_i < t_lab->n_max &&
         0 <= e_i && e_i < t_lab->e_max) {
@@ -177,10 +154,6 @@ char                     *err_str
           break;
         } /* end t-switch ; */
 
-
-/* tabdd_val  ver 2006.01           # page 4   25 Jun 2006 11 37 */
-
-
         for (s = -1, i = 0; i < GEOIDPAGES; i++) {
           if (/* g == *(ppsg+i) && */ pos == *(ppge+i)) {
             s      = i;
@@ -202,29 +175,20 @@ char                     *err_str
 
           s = fseek(t_lab->fd, pos, SEEK_SET);
           if (s) {
-            (void) fprintf(stdout,
-                "\n*** tabdd_val: ERROR fseek tabdd %s", t_lab->mlb);
-            (void) fprintf(stdout,
-                " blokaddr %8ld ;", pos);
+            (void) lord_error(0, LORD("ERROR fseek tabdd %s blokaddr %8ld ;"), t_lab->mlb, pos);
+
             return(TAB_N_SYS_);
           }
 
           /* tabdd_valab of doubles */
           qr = (int) (fread((char *) pdgh, t_lab->blk_size, 1, t_lab->fd)- 1);
           if (qr) {
-            (void) fprintf(stdout,
-                "\n*** tabdd_val: ERROR input tabdd %s", t_lab->mlb);
-            (void) fprintf(stdout,
-                "\n blokaddr %8ld number = %4d size = %4d ;",
-                pos, qr, t_lab->blk_size);
+            (void) lord_error(0, LORD("ERROR input tabdd %s blokaddr %8ld number = %4d size = %4d ;"), t_lab->mlb, pos, qr, t_lab->blk_size);
+
             return(TAB_N_SYS_);
           }
           ++ (tabdd_table->agn);
         } /* end not found actions */
-
-
-/* tabdd_val  ver 2006.01           # page 5   25 Jun 2006 11 37 */
-
 
         /* Table of double */
         k          = 2 * t;
@@ -267,4 +231,3 @@ char                     *err_str
 
   return(TAB_C_ARE_);
 }
-

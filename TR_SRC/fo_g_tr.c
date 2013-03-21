@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* fo_g_tr   ver2012.03         # page 1   30 Jan 2012 12 58 */
-
 
 /* Copyright (c) 2001 SPACE Danish Technical University (DTU)  */
 /* All rights reserved.                                        */
@@ -52,11 +47,6 @@ FILE                    *tr_error
   double          *cb = NULL, *cw = NULL;
   double          *tcy, *tcx;
   int              res = 0, i, g, r, c, sz;
-
-
-
-/* fo_g_tr   ver2012.03         # page 2   30 Jan 2012 12 58 */
-
 
   /* Y&X-generelt pol. resultater
   utm29_etrs89 -> fu50
@@ -96,11 +86,6 @@ FILE                    *tr_error
     /*Poly NORTH :: e-degree =  8  : n-degree =  0 */
     /* 44*/   9.7095487316e-37,
     /*tcy*/    6879424.796540,
-
-
-/* fo_g_tr   ver2012.03         # page 3   30 Jan 2012 12 58 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree =  8 */
     /*  0*/   6.1239508822e+05,   1.0000381892e+00,   1.2922161625e-10,
     /*  3*/  -6.0631287811e-14,   1.8771395832e-19,   1.3267179576e-22,
@@ -174,11 +159,6 @@ FILE                    *tr_error
     /*Poly NORTH :: e-degree =  8  : n-degree =  0 */
     /* 44*/  -9.7074292773e-37,
     /*tcy*/    6879661.411589,
-
-
-/* fo_g_tr   ver2012.03         # page 5   30 Jan 2012 12 58 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree =  8 */
     /*  0*/   6.1228650586e+05,   9.9996181213e-01,  -1.2916907733e-10,
     /*  3*/   6.0621861790e-14,  -1.8809380752e-19,  -1.3264842733e-22,
@@ -208,10 +188,6 @@ FILE                    *tr_error
     /* 44*/   8.2139738269e-39,
     /*tcx*/     612395.112536
   };
-
-
-/* fo_g_tr   ver2012.03         # page 6   30 Jan 2012 12 58 */
-
 
   /* Y&X-generelt pol. resultater
   utm29_etrs89 -> fk54
@@ -251,11 +227,6 @@ FILE                    *tr_error
     /*Poly NORTH :: e-degree =  8  : n-degree =  0 */
     /* 44*/   6.8277323814e-37,
     /*tcy*/    6879465.208682,
-
-
-/* fo_g_tr   ver2012.03         # page 7   30 Jan 2012 12 58 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree =  8 */
     /*  0*/   3.8739346100e+05,  -1.0002866171e+00,   8.2969875437e-10,
     /*  3*/   9.0712856492e-14,   3.6464938561e-18,  -1.5953913520e-22,
@@ -285,10 +256,6 @@ FILE                    *tr_error
     /* 44*/  -1.9941904225e-39,
     /*tcx*/     612267.169002
   };
-
-
-/* fo_g_tr   ver2012.03         # page 8   30 Jan 2012 12 58 */
-
 
   /* Y&X-generelt pol. resultater
   fk54 -> utm29_etrs89
@@ -328,11 +295,6 @@ FILE                    *tr_error
     /*Poly NORTH :: e-degree =  8  : n-degree =  0 */
     /* 44*/  -6.8067325241e-37,
     /*tcy*/     505206.998038,
-
-
-/* fo_g_tr   ver2012.03         # page 9   30 Jan 2012 12 58 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree =  8 */
     /*  0*/   6.1226813573e+05,  -9.9971346599e-01,   8.2963227372e-10,
     /*  3*/  -9.0629603396e-14,   3.6380432206e-18,   1.5939757551e-22,
@@ -362,10 +324,6 @@ FILE                    *tr_error
     /* 44*/  -2.0022164452e-39,
     /*tcx*/     387392.493987
   };
-
-
-/* fo_g_tr   ver2012.03         # page 10   30 Jan 2012 12 58 */
-
 
   /* Y&X-generelt pol. resultater
   utm29_etrs89 -> fk89
@@ -415,11 +373,6 @@ FILE                    *tr_error
     /*Poly NORTH :: e-degree = 10  : n-degree =  0 */
     /* 65*/  -1.7883993198e-45,
     /*tcy*/    6884892.302740,
-
-
-/* fo_g_tr   ver2012.03         # page 11   30 Jan 2012 12 58 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree = 10 */
     /*  0*/   5.8403112397e+05,  -1.0002499735e+00,   1.0462114095e-09,
     /*  3*/   3.8346137186e-14,   4.3986548477e-18,   9.0532119046e-23,
@@ -459,10 +412,6 @@ FILE                    *tr_error
     /* 65*/  -2.9093981205e-48,
     /*tcx*/     615628.465396
   };
-
-
-/* fo_g_tr   ver2012.03         # page 12   30 Jan 2012 12 58 */
-
 
   /* Y&X-generelt pol. resultater
   fk89 -> utm29_etrs89
@@ -512,11 +461,6 @@ FILE                    *tr_error
     /*Poly NORTH :: e-degree = 10  : n-degree =  0 */
     /* 65*/   1.7818748571e-45,
     /*tcy*/     710635.000077,
-
-
-/* fo_g_tr   ver2012.03         # page 13   30 Jan 2012 12 58 */
-
-
     /*Poly EAST  :: n-degree =  0  : e-degree = 10 */
     /*  0*/   6.1562917300e+05,  -9.9975008896e-01,   1.0454602153e-09,
     /*  3*/  -3.8334505700e-14,   4.3939317783e-18,  -9.0279545687e-23,
@@ -556,10 +500,6 @@ FILE                    *tr_error
     /* 65*/  -2.9025701465e-48,
     /*tcx*/     584030.416203
   };
-
-
-/* fo_g_tr   ver2012.03         # page 14   30 Jan 2012 12 58 */
-
 
   /* Collect start values */
   N = N_in;
@@ -615,10 +555,6 @@ FILE                    *tr_error
         cb     = cw; /* reverse direction */
       }
 
-
-/* fo_g_tr   ver2012.03         # page 15   30 Jan 2012 12 58 */
-
-
     if (res >= TRF_TOLLE_) {
       if (fabs(N - N_in) < tol && fabs(E - E_in) < tol) return (0);
       else
@@ -632,4 +568,3 @@ FILE                    *tr_error
 
 #undef   COORDLIM
 }
-

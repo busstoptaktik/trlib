@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* eetmtu_g   ver 1999.01         # page 1   12 Jan 1999 12 58 */
-
-
-/* Copyright (c) 1999, LG,  Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort-og  */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <stdio.h>
 #include    <math.h>
@@ -52,10 +40,6 @@ FILE                    *tr_error
   double          *cb = NULL, *cw = NULL;
   double          *tcy, *tcx;
   int              res = 0, i, g, r, c, sz;
-
-
-
-/* eetmtu_g   ver 1999.01         # page 2   12 Jan 1999 16 30 */
 
 
   /*
@@ -104,10 +88,6 @@ FILE                    *tr_error
     /*tcx*/    5434819.352771
   };
 
-
-/* eetmtu_g   ver 1999.01         # page 3   12 Jan 1999 16 30 */
-
-
   /*
   utm35_euref89 -> eetm27
   grad:  5 pass: 11
@@ -154,10 +134,6 @@ FILE                    *tr_error
     /*tcx*/     434723.295482
   };
 
-
-/* eetmtu_g   ver 1999.01         # page 4   12 Jan 1999 16 30 */
-
-
   /*
   eelmne -> utm35_euref89
   grad:  3 pass: 2
@@ -194,10 +170,6 @@ FILE                    *tr_error
     /*tcx       205948.442690 */
   };
 
-
-/* eetmtu_g   ver 1999.01         # page 5   12 Jan 1999 16 30 */
-
-
   /*
   utm35_euref89 -> eelmne
   grad:  3 pass: 2
@@ -233,10 +205,6 @@ FILE                    *tr_error
     /*  9*/  -5.7177739731e-16,
     /*tcx*/     390224.248657
   };
-
-
-/* eetmtu_g   ver 1999.01         # page 6   12 Jan 1999 16 30 */
-
 
   /*
   tm27_eeold42 -> eetm27
@@ -278,10 +246,6 @@ FILE                    *tr_error
     /*tcx*/     429022.848847
   };
 
-
-/* eetmtu_g   ver 1999.01         # page 7   12 Jan 1999 16 30 */
-
-
   /*
   eetm27 -> tm27_eeold42
   grad:  4 pass: 2
@@ -321,10 +285,6 @@ FILE                    *tr_error
     /* 14*/  -3.1753244878e-22,
     /*tcx*/    5429021.216300
   };
-
-
-/* eetmtu_g   ver 1999.01         # page 8   12 Jan 1999 16 30 */
-
 
   /* Collect start values */
   N = N_in;
@@ -367,10 +327,6 @@ FILE                    *tr_error
     if (N < 6296000 || 6696000 < N ||
         E < 5197000 || 5597000 < E) res = TRF_INACC_;
     break;
-
-
-/* eetmtu_g   ver 1999.01         # page 9   12 Jan 1999 16 30 */
-
 
   case  3 : /* Forward == LMNE -> U35 */
     cb  = LMNE_U35;
@@ -430,10 +386,6 @@ FILE                    *tr_error
         cb    = cw;
       }
 
-
-/* eetmtu_g   ver 1999.01         # page 10  12 Jan 1999 16 30 */
-
-
     if (res == 0) {
       /* tol-check of results*/
       if (fabs(N - N_in) < tol && fabs(E - E_in) < tol) return (0);
@@ -449,4 +401,3 @@ FILE                    *tr_error
 #undef   MAP_LIM
 
 }
-

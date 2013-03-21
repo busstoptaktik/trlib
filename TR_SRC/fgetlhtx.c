@@ -51,12 +51,6 @@ char              *in_str
           break;
         }
         break;
-
-
-
-/* fgetlhtx                      # page 2   09 Feb 1995 14 49 */
-
-
       case 2: /* comment * ... ; */
         if (c == ';') i = 1;
         break;
@@ -86,5 +80,3 @@ char              *in_str
   return(0);
 
 }
-
-

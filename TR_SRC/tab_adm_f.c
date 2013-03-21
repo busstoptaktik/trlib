@@ -16,19 +16,6 @@
  * 
  */
  
-
-/* tab_adm_f                       # page 1   27 Jun 2004 22 00 */
-
-
-/* Copyright (c) 2004 Kort & Matrikelstyrelsen, Denmark   */
-/* and Danish National Space Center                       */
-/* All rights reserved.                                   */
-
-/* This is unpublished proprietary source code of Kort &         */
-/* Matrikelstyrelsen, Denmark, and Danish National Space Center. */
-/* This copyright claim does not indicate an intention of        */
-/* publishing this code.                                         */
-
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <limits.h>
@@ -81,9 +68,6 @@
 /* nr    crd1    crd2    val    val                          */
 /*   from the binary file tab_name, controloutput to fo      */
 
-
-/* tab_adm_f                       # page 2   27 Jun 2004 22 00 */
-
 void                 reset_dir();
 
 char                 sav_dir[256], in[256];
@@ -135,10 +119,6 @@ int                  tab_adm_f(
   FILE                  *fd = (FILE *) NULL, *in_2d = (FILE *) NULL, *in_3d = (FILE *) NULL, *f_act = (FILE *) NULL;
 
   struct typ_dec         g_tpd, r_tpd;
-
-
-/* tab_adm_f                       # page 3   27 Jun 2004 22 00 */
-
 
   if (global_dir == NULL) {
     (void) sprintf(errtx, "\nglobal_dir undefined");
@@ -200,10 +180,6 @@ prst = gettabdir();
         if (strcmp(sav_dir, global_dir)) reset_dir();
         return(-1);
       }
-
-
-/* tab_adm_f                       # page 4   27 Jun 2004 22 00 */
-
 
       (void) strcpy(t_lab->clb, des);
       (void) fprintf(fo, "\ncrd label fra manager : %s", des);
@@ -269,10 +245,6 @@ prst = gettabdir();
       }
     }
 
-
-/* tab_adm_f                       # page 5   27 Jun 2004 22 00 */
-
-
     (void) fprintf(fo, "\nPath:  %s\n\n", t_lab->mlb);
 
     p_tp = tp;
@@ -306,10 +278,6 @@ prst = gettabdir();
 
     (void) fprintf(fo, "\n # %s \n\n", tab_name);
     (void) fprintf(fo, "rec_size = %d", r_size);
-
-
-/* tab_adm_f                       # page 6   27 Jun 2004 22 00 */
-
 
     /* head of grid_tabs */
     if (hd_limits) {
@@ -357,10 +325,6 @@ prst = gettabdir();
            (void) fprintf(fo, "\n\nH_file pos = %ld", ftell(in_3d));
       }
 
-
-/* tab_adm_f                       # page 7   27 Jun 2004 22 00 */
-
-
       if (geo_def) {
         lim    = 0.00000278 /* 0.01 sx */;
         /* change for both longitudes negative */
@@ -401,10 +365,6 @@ prst = gettabdir();
         }
         g_tpd = t_lab->g_tpd;
       }
-
-
-/* tab_adm_f                       # page 8   27 Jun 2004 22 00 */
-
 
       if (n && lab_ok) {
         (void) fprintf(fo, "\n\nLabel changed +++\n");
@@ -448,10 +408,6 @@ prst = gettabdir();
         t_lab->row_size = (t_lab->estop / t_lab->rec_p_bl)
                                         * t_lab->blk_size;
       }
-
-
-/* tab_adm_f                       # page 9   27 Jun 2004 22 00 */
-
 
       else {
         t_lab->B_min    = BL[0] / conv_f;
@@ -508,10 +464,6 @@ prst = gettabdir();
     e_max = t_lab->e_max;
     estop = t_lab->estop;
 
-
-/* tab_adm_f                       # page 10  27 Jun 2004 22 00 */
-
-
     /* write HEAD info */
     if ((qr = (int) fwrite((void *) &f777, sizeof(int), 1, fd)) - 1) {
       (void) sprintf(errtx,
@@ -541,10 +493,6 @@ prst = gettabdir();
     (void) fprintf(fo, "\nPos after ezf  %ld", pos);
 
     /* NO TEST OF 2dim table head and 3dim table head */
-
-
-/* tab_adm_f                       # page 11  27 Jun 2004 22 00 */
-
 
     /* input of table data */
     pr_val = 0;
@@ -601,10 +549,6 @@ prst = gettabdir();
           pos = ftell(fd);
           i   = 0;
         }
-
-
-/* tab_adm_f                       # page 12  27 Jun 2004 22 00 */
-
 
         /* grid_tab of floats / int / double */
         j = i * dim3;
@@ -689,10 +633,6 @@ prst = gettabdir();
           }
         }
 
-
-/* tab_adm_f                       # page 13  27 Jun 2004 22 00 */
-
-
         if (pr_val) {
           if (e==0) (void) fprintf(fo, "\n");
           (void) fprintf(fo, "\n n:%3d, e: %3d, g(%d):", n, e, j);
@@ -757,10 +697,6 @@ prst = gettabdir();
     }
 
     break; /* end binary output */
-
-
-/* tab_adm_f                       # page 14  27 Jun 2004 22 00 */
-
 
   case 't': /* OUTPUT A TABLE  AS TEXT */
 
@@ -878,10 +814,6 @@ prst = gettabdir();
     fd  = t_lab->fd;
     pos = 0L;
 
-
-/* tab_adm_f                       # page 16   27 Jun 2004 22 00 */
-
-
     for (f_act = fo, r = 0; r < dim3; r ++) {
       (void) fprintf(f_act, "\n # %s \n\n", t_lab->mlb);
       (void) fprintf(f_act, "\n\n");
@@ -932,10 +864,6 @@ prst = gettabdir();
         return(-1);
       }
 
-
-/* tab_adm_f                       # page 17   27 Jun 2004 22 00 */
-
-
       for (i = 0, qr = 0, n = 0; i < 6; i++) {
         diff =  (i == 0) ? t_lab->B_min :
                ((i == 1) ? t_lab->B_max :
@@ -977,10 +905,6 @@ prst = gettabdir();
       B       = t_lab->B_max - n*t_lab->dB;
       rest_sz = (size_t) (tbwd*r_size);
       load_sz = 0;
-
-
-/* tab_adm_f                       # page 18   27 Jun 2004 22 00 */
-
 
       for (e = 0, L = t_lab->L_min; e < e_max; e++) {
 
@@ -1060,10 +984,6 @@ prst = gettabdir();
       } /* end e-loop */
     } /* end n_loop */
 
-
-/* tab_adm_f                       # page 19   27 Jun 2004 22 00 */
-
-
     chsz *= r_size;
     fill  = (t_lab->estop - e_max) * t_lab->n_max * r_size;
     sz_u  = (long) (head + dim3 * (chsz + fill));
@@ -1095,10 +1015,6 @@ prst = gettabdir();
     if (dim3 > 2) (void) fclose(in_3d);
 
   break; /* Output of table  */
-
-
-/* tab_adm_f                       # page 20  27 Jun 2004 22 00 */
-
 
   case 'l': /* OUTPUT A TABLE  AS LIST */
 
@@ -1133,10 +1049,6 @@ prst = gettabdir();
       if (strcmp(sav_dir, global_dir)) reset_dir();
       return(-1);
     }
-
-
-/* tab_adm_f                       # page 21   27 Jun 2004 22 00 */
-
 
     if (t_lab->local) *in = '\0';
     else (void) strcpy(in, global_dir);
@@ -1186,10 +1098,6 @@ prst = gettabdir();
 
     fd  = t_lab->fd;
     pos = 0L;
-
-
-/* tab_adm_f                       # page 22   27 Jun 2004 22 00 */
-
 
     (void) fprintf(fo, "\n#%s\n", t_lab_u.u_g_lab.clb);
 
@@ -1256,10 +1164,6 @@ prst = gettabdir();
       }
     }
 
-
-/* tab_adm_f                       # page 24   27 Jun 2004 22 00 */
-
-
     s     = 0;
     chsz  = 0L;
     e_max = t_lab->e_max;
@@ -1306,10 +1210,6 @@ prst = gettabdir();
         (void) fprintf(fo, "  ");
         (void) fputg(fo, L, &r_tpd, "+u");
 
-
-/* tab_adm_f                       # page 25   27 Jun 2004 22 00 */
-
-
         if (val_mode == 1) {
           /* grid_tab of floats */
           for (r = 0; r < dim3; r ++) {
@@ -1337,10 +1237,6 @@ prst = gettabdir();
     } /* end n_loop */
 
   break; /* Output of list  */
-
-
-/* tab_adm_f                       # page 20   27 Jun 2004 22 00 */
-
 
   case 'd': /* TABLE DOCUMENTATION */
 
@@ -1400,10 +1296,6 @@ prst = gettabdir();
         return(-1);
       }
 
-
-/* tab_adm_f                       # page 21   27 Jun 2004 22 00 */
-
-
       if (f777 != res) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: %s is not a table of correct type;\n",
@@ -1460,10 +1352,6 @@ prst = gettabdir();
         if (strcmp(sav_dir, global_dir)) reset_dir();
         return(-1);
       }
-
-
-/* tab_adm_f                       # page 22   27 Jun 2004 22 00 */
-
 
       for (i = 0, qr = 0, n = 0; i < 6; i++) {
         diff =  (i == 0) ? t_lab->B_min :

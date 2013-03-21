@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* sftr.c                        # page 1   22 Feb 1993 12 54 */
-
 
 /* Copyright (c) 1989 U/32, Kort-og Matrikelstyrelsen, Denmark */
 /* All rights reserved.                                        */
@@ -78,5 +73,3 @@ double            *B
   return(c);
 
 }
-
-

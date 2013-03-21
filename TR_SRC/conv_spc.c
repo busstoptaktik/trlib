@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* conv_spc    ver 2010.01          # page 1    7 jan 2010 10 19 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -60,11 +55,6 @@ union  geo_lab          *u_lab,
   struct wrh_lab            *h_lab = &(w_lab->wh_lab);
   struct coord_lab          *c_lab = &(w_lab->wc_lab);
   union  geo_lab            wk1_lab, *wrk_lab = &wk1_lab;
-
-
-/* conv_spc    ver 2010.01          # page 2    7 jan 2010 10 19 */
-
-
   int                        conv_mode, i, used;
   int                        crd_type, t_char, iq;
   double                     r_wrk;
@@ -118,10 +108,6 @@ union  geo_lab          *u_lab,
     h_lab->lab_type = p_lb->lab_type;
     h_lab->version  = LAB_VERSION;
     h_lab->region   = p_lb->region;
-
-
-/* conv_spc    ver 2010.01          # page 3    7 jan 2010 10 19 */
-
 
     /* get coord_sys */
     switch(h_lab->lab_type) {
@@ -181,10 +167,6 @@ union  geo_lab          *u_lab,
 
       break; /* end WOR_LAB */
 
-
-
-/* conv_spc    ver 2010.01          # page 4    7 jan 2010 10 19 */
-
     case POC_LAB:
       c_lab    = &(wrk_lab->u_c_lab);
       crd_type = conv_lab("in_u_#", wrk_lab, iofile);
@@ -211,10 +193,6 @@ union  geo_lab          *u_lab,
     if (h_lab->lab_type == WOR_LAB)
        h_lab->ch_sum = labchsum(u_lab, &h_lab->ch_sum);
     break; /* end conv_mode == 1 */
-
-
-/* conv_spc    ver 2010.01          # page 5    7 jan 2010 10 19 */
-
 
   case 3:  /* output of minilabel, simple */
   case 4:  /* output of minilabel, expand */
@@ -258,10 +236,6 @@ union  geo_lab          *u_lab,
 
     break; /* end case 3 & 4 */
 
-
-/* conv_spc    ver 2010.01          # page 6    7 jan 2010 10 19 */
-
-
   case 5:   /* DOCUMENTATION OF THE LABEL */
     sepch = *(p_lab->mlb + p_lab->sepix);
     if (sepch == '\0') sepch = ' ';
@@ -303,10 +277,6 @@ union  geo_lab          *u_lab,
       (void) fprintf(iofile, "\nc_mlb     = %15s", h_lab->c_mlb );
       (void) fprintf(iofile, "\n\nslut    %15s\n", h_lab->mlb );
       break; /* WOR_LAB */
-
-
-/* conv_spc    ver 2010.01          # page 7    7 jan 2010 10 19 */
-
 
     case POC_LAB :
       (void) fprintf(iofile, "\n\f     PHOTO_OC-LABEL:\n # ");
@@ -360,10 +330,6 @@ union  geo_lab          *u_lab,
       (void) fprintf(iofile, "\n\nslut    %15s\n", i_lab->mlb );
       break; /* IDT_LAB */
 
-
-/* conv_spc    ver 2010.01          # page 8    7 jan 2010 10 19 */
-
-
     default : /* unintelligible label */
       lord_error(0,LORD("conv_spc : %s not programmed"), h_lab->mlb);
     } /* end switch(lab_type) */
@@ -372,4 +338,3 @@ union  geo_lab          *u_lab,
   } /* end switch(conv_mode) */
   return(h_lab->lab_type);
 }
-

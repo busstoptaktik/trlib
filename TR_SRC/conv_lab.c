@@ -129,10 +129,6 @@ union geo_lab    *u_lab,
   static THREAD_SAFE struct sep_str   *spr;
   int                       sep_ok = 0;
 
-
-/* conv_lab  ver 2010.01            # page 3     5 Jan 2010 15 35 */
-
-
   (void) strcpy(DK_rgn.prfx, "DK");
   p_lb->d_kind   = 0;
   p_lb->d_type   = 0;
@@ -196,10 +192,6 @@ union geo_lab    *u_lab,
         return(STP_LAB);
       }
 
-
-/* conv_lab  ver 2010.01            # page 11     5 Jan 2010 15 35 */
-
-
       if (strlen(t_info) >= 2) {
         p_lb->lab_rgn = 0; 
         lab_lng = get_mlb(t_info,
@@ -213,12 +205,6 @@ union geo_lab    *u_lab,
           else *in_str = '\0';
           if (io_str != NULL) (void) strcat(in_str, io_str);
         }
-/*
-(void) fprintf(stdout, "\n%s\n%s %d %s %d %s",
-"\nconv_lab: t_info, lab_rgn, p_sys, sepch, p_dtm, h_mlb:",
-t_info, lab_rgn, p_sys, p_lb->sepch, p_dtm);
-if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
-*/
 
         /* search the def_lab_file for p_sys (or w_sys) */ 
         i = srch_def(0, p_sys, w_sys, 0, 0, 0, p_lb);
@@ -238,7 +224,7 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
             }
           }
           if (!sep_ok) {
-				lord_error(0,LORD("conv_lab: illegal separator %c"), p_lb->sepch);
+				lord_error(0,LORD("illegal separator %c"), p_lb->sepch);
             return (ILL_LAB);
           }
         }
@@ -251,10 +237,6 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
           /* too short lab_type : try file */
           p_lb->lab_type   = ILL_LAB;
       }
-
-
-/* conv_lab  ver 2010.01            # page 12     5 Jan 2010 15 35 */
-
 
       switch (p_lb->lab_type) {
       case CRD_LAB: /* coordinates */
@@ -378,10 +360,6 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
         }
         break;
 
-
-/* conv_lab  ver 2010.01            # page 13     5 Jan 2010 15 35 */
-
-
       case STP_LAB: /* stop-label */
         /* PT bruges i_lab for stop-label    */
         i_lab->lab_type = STP_LAB;
@@ -428,10 +406,6 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
     }
 
     break;
-
-
-/* conv_lab  ver 2010.01            # page 14     5 Jan 2010 15 35 */
-
 
   case 3: /* ordinary output */
   case 4: /* special  output */
@@ -501,10 +475,6 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
     }
     break;
 
-
-/* conv_lab  ver 2010.01            # page 15     5 Jan 2010 15 35 */
-
-
   case 6: /* List of cstms and separators */
     va_start(o_p, u_lab);
     descript = va_arg(o_p, char *);
@@ -540,10 +510,6 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
         return(c_quest);
         /* end all systems */
       }
-
-
-/* conv_lab  ver 2010.01            # page 16     5 Jan 2010 15 35 */
-
 
       else {
         /* selected system */

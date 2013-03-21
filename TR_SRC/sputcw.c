@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* sputcw.c version 1.0             # page 1   31 May 1996 08 06 */
-
 
 /* Copyright (c) 1994, Kort-og Matrikelstyrelsen, GD, Denmark */
 /* All rights reserved.                                       */
@@ -55,10 +50,6 @@ simple            1992
 MD            1 00045 89 02 3 012   max < 900 00000 00 00 0 000
 
 */
-
-
-/* sputcw.c version 1.0             # page 2   31 May 1996 08 06 */
-
 
 {
   int     ch, ek, ye, mo, da, ho, mi;
@@ -122,10 +113,6 @@ MD            1 00045 89 02 3 012   max < 900 00000 00 00 0 000
           ch    = sprintf(str, "%16d %d %03d", da, ho, mi);
         }
 
-
-/* sputcw.c version 1.0             # page 3   31 May 1996 08 06 */
-
-
         else {
           /* number in any kind          */
           /* layoyt :   xx xxx xx xxx x  */
@@ -174,5 +161,3 @@ MD            1 00045 89 02 3 012   max < 900 00000 00 00 0 000
 
   return(ch);
 }
-
-

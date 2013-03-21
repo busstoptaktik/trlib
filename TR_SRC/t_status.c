@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* t_status    ver 1999.01        # page 1    3 Feb 1999 14 05 */
-
 
 /* Copyright (c) 1999, LG,  Kort & Matrikelstyrelsen, Denmark  */
 /* All rights reserved.                                        */
@@ -61,10 +56,6 @@ double                   dN, dE, dH;
   va_start(cp, err_type);
   if (tr_error != NULL) {
 
-
-/* t_status    ver 1999.01        # page 2    3 Feb 1999 14 05 */
-
-
     c_err =  err_type        % 100;
     t_err = ((err_type / 100) % 100) * 100;
     if ((TRF_AREA_  <= c_err && c_err < 0) ||
@@ -85,5 +76,3 @@ double                   dN, dE, dH;
   va_end(cp);
   return(err_type);
 }
-
-

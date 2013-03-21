@@ -63,10 +63,6 @@ struct gde_lab          *t_lab,
 
 {
 
-
-/* conv_tab    ver 2010.1          # page 2   12 jan 2010 10 19 */
-
-
   FILE                      *iofile = (FILE *) NULL;
   char                      *io_str = (char *) NULL;
   va_list                    o_p;
@@ -104,10 +100,6 @@ struct gde_lab          *t_lab,
 
   /* save lab_info */
   (void) strcpy(t_lab_info, lab_info);
-
-
-/* conv_tab    ver 2010.1          # page 3   12 jan 2010 10 19 */
-
 
   all_out   =  strcmp(t_lab_info,  "nnput");
   if (!all_out) *t_lab_info = 'i';
@@ -175,10 +167,6 @@ struct gde_lab          *t_lab,
     }
     /* table file detected */
 
-
-/* conv_tab    ver 2010.1          # page 4   12 jan 2010 10 19 */
-
-
     /* Input table area limits */
     pos = pos + (long) qr;
     if ((qr = fread((void *) BL, 6 * sizeof (double),
@@ -227,10 +215,6 @@ struct gde_lab          *t_lab,
         *(BL + 3)     = 2.0 * M_PI;
       }
 
-
-/* conv_tab    ver 2010.1          # page 5   12 jan 2010 10 19 */
-
-
       /* Test for fortran identification of a binary grid file */
       t_lab->f_comp   = 1;
       t_lab->g_tpd    = *set_tpd("dg", 10, 6);
@@ -278,10 +262,6 @@ struct gde_lab          *t_lab,
 	  fclose(tab_file);
       return (-2);
     }
-
-
-/* conv_tab    ver 2010.1          # page 6   12 jan 2010 10 19 */
-
 
     /* datum, ellipsoid, proj */
     {
@@ -340,10 +320,6 @@ struct gde_lab          *t_lab,
 
     break; /* end of case 0 and 1: create a gde_lab */
 
-
-/* conv_tab    ver 2010.1          # page 7   12 jan 2010 10 19 */
-
-
   case 3:  /* output of minilabel, simple */
   case 4:  /* output of minilabel, expand */
   case 5:  /* DOCUMENTATION OF THE LABEL  */
@@ -386,9 +362,6 @@ struct gde_lab          *t_lab,
       }
       (void) fprintf(iofile, "\n * FULL NAME: %s%s\n ",
                      p_tp, t_lab->mlb);
-
-
-/* conv_tab    ver 2010.1          # page 8   12 jan 2010 10 19 */
 
       (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*t_lab));
       (void) fprintf(iofile, "\nlab_type  = %15d", t_lab->lab_type);
@@ -448,10 +421,6 @@ struct gde_lab          *t_lab,
                        "\n  %-12s %7d", "rec_size", t_lab->rec_size);
         (void) fprintf(iofile,
                        "     %-12s %7d", "rec_p_bl", t_lab->rec_p_bl);
-
-
-/* conv_tab    ver 2010.1          # page  9  12 jan 2010 10 19 */
-
 
         (void) fprintf(iofile,
                        "\n  %-12s %7s", "rec_type",

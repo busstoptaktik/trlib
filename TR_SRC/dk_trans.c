@@ -16,18 +16,6 @@
  *
  */
 
-
-
-/* dk_trans  ver 2003.01        # page 1   12 Jan 2003 13 55 */
-
-
-/* Copyright (c) 2003, Kort-og Matrikelstyrelsen, Denmark      */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of Kort-og      */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <stdio.h>
 #include    <math.h>
 #include    <string.h>
@@ -77,10 +65,6 @@
 
 /* #define  DEBUGDKTRANS */
 
-
-/* dk_trans  ver 2003.01        # page 2   12 Jan 2003 13 55 */
-
-
 int                   dk_trans(
 /*___________________________*/
 union geo_lab       *in_lab_a,
@@ -125,10 +109,6 @@ FILE                *tr_error
     "xidt", "illg", "tgtp", "gttp", "p_tp", "t32l", "lt32"
   };
 #endif
-
-
-/* dk_trans  ver 2003.01        # page 3   12 Jan 2003 13 55 */
-
 
   struct nr_mlb {
     short        trgr;
@@ -183,10 +163,6 @@ FILE                *tr_error
 
     /*stop*/ {-1, -1,   ""}
   };
-
-
-/* dk_trans  ver 2003.01        # page 4   12 Jan 2003 13 55 */
-
 
   struct act_nst {
     short     action;
@@ -248,10 +224,6 @@ FILE                *tr_error
     /* u32 */ {T32U,2},{BT32,0},{IDNT,2}
   };
 
-
-/* dk_trans  ver 2003.01        # page 5   12 Jan 2003 13 55 */
-
-
   static struct act_nst gstab[] = {
     /* i/o_sys :: TC32: 0 */
     /* input   tc32       gs     u32      gsgeo  */
@@ -309,10 +281,6 @@ FILE                *tr_error
               "dk_trans(init labels)", TRF_PROGR_));
     }
 
-
-/* dk_trans  ver 2003.01        # page 6   12 Jan 2003 13 55 */
-
-
   /* Check i/o labels, init of actual transf. systems */
   if (in_chsum != in_lab->ch_sum || outchsum != outlab->ch_sum) {
 
@@ -365,10 +333,6 @@ outgr, outnr, pml->s_lab, outcs);
                 "dk_trans(unknown o-label)", TRF_ILLEG_));
       }
 
-
-/* dk_trans  ver 2003.01        # page 7   12 Jan 2003 13 55 */
- 
-
     /* In-system */
     /*____________*/
 
@@ -413,10 +377,6 @@ outgr, outnr, pml->s_lab, in_cs);
     /* Save check-sums */
     in_chsum = in_lab->ch_sum;
     outchsum = outlab->ch_sum;
-
-
-/* dk_trans  ver 2003.01        # page 8   12 Jan 2003 13 55 */
-
 
     /* Test identical labels */
     if (in_chsum == outchsum) {
@@ -471,10 +431,6 @@ outcs, outgr, outnr, proj_proj);
     }
 
   } /* end of init after input def */
-
-
-/* dk_trans  ver 2003.01        # page 9   12 Jan 2003 13 55 */
-
 
   /* transformation module */
   *Hout = H;
@@ -532,10 +488,6 @@ ACTION[act], nst, level);
         else nst = (act == TGTP) ? 1 : 5;
         /* when totally outside DK, where utm32_ed50 == tc32_ed50 */
         break;
-
-
-/* dk_trans  ver 2003.01        # page 10   12 Jan 2003 13 55 */
-
 
       case PTGS: /* gs -> geo */
         res = ptg(&TC__gs, +1, N, E, &N, &E, usertxt, tr_error);
@@ -600,10 +552,6 @@ ACTION[act], nst, level);
                         "m ", "", N, E, 0.0, 0.0);
         break;
 
-
-/* dk_trans  ver 2003.01        # page 11   12 Jan 2003 13 55 */
-
-
       case U_GS: /* utm32 -> gs  */
         res = utgs(N, E, &N, &E, 'd', +1, usertxt, tr_error);
         break;
@@ -658,10 +606,6 @@ ACTION[act], nst, level);
         res = utgs(N, E, &N, &E, 'b', -1, usertxt, tr_error);
         break;
 
-
-/* dk_trans  ver 2003.01        # page 12   12 Jan 2003 13 55 */
-
-
       case IDNT: /* ident and terminating transf */
         *Nout = N;
         *Eout = E;
@@ -695,10 +639,6 @@ ACTION[act], nst, level);
     }    while (act && result >= TRF_TOLLE_);
   }
   return (result);
-
-
-/* dk_trans  ver 2003.01        # page 13   12 Jan 2003 13 55 */
-
 
   /* UNDEFINE ACTION NUMBERS */
 #undef  IDNT
@@ -740,5 +680,3 @@ ACTION[act], nst, level);
 #undef  LT32
 
 }
-
-

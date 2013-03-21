@@ -44,9 +44,6 @@ double      *e,
 
 {
 
-
-
-
   char                        s_name[24], *ell_nm = s_name;
  
 
@@ -65,8 +62,6 @@ double      *e,
   extern def_data *DEF_DATA;
   def_grs *grs_def;
   int n_grs=0;
-
-
 
 
 #define  GEQ      978049.e-5      /* Equator qravity    */
@@ -125,11 +120,6 @@ double      *e,
     if (DEF_DATA==NULL) 
 	    return -1;
 
- 
-
-
-   
-    
 
     if (*s_name=='#'){ /* userdefined ellipsoid */
       (void) strcpy(s_name, ellname);
@@ -185,8 +175,6 @@ double      *e,
     } while (res <= 0 &&  n_grs<DEF_DATA->n_ellip);
   } /*end not user defined */
     
-  
- 
 
 if (empty) {
     ell_nmb = -2;
@@ -232,9 +220,6 @@ if (empty) {
     geq = GM/a/b*(1. - m*(1. + qdp/qd));
     n   = f/(2. - f);
     break;
-
-
-
 
   case  2: /* define by a, f, geq and omg */
     geq = GMg;
@@ -289,9 +274,6 @@ if (empty) {
       toise_t_m = 1.0;
       break;
     }
-
-
-
 
     n2 = n*n;
     a *= 90.0/M_PI_2*(1. + n)

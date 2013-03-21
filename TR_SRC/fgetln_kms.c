@@ -69,10 +69,6 @@ FILE               *fp
   /*        = 7  after more "       */
   /*        = 9  return  dummy      */
 
-
-/* fgetln_kms version 1.0               # page 2   18 Sep 1998 09 39 */
-
-
   *outstr   = '\0';
   res       = 0;
   *n_item   = 0;
@@ -137,10 +133,6 @@ FILE               *fp
       klasse = c > 32 ? 1 : 0;
       break;
     }
-
-
-/* fgetln_kms version 1.0               # page 3   18 Sep 1998 09 39 */
-
 
     if (klasse == 5 && mode_ap)
       nst      = 7;

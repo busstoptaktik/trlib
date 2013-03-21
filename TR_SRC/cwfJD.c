@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* cw from JD or n                 # page 1    1 Feb 2004 11:18 */
-
-
-/* Copyright (c) 1994, Kort-og Matrikelstyrelsen, GD, Denmark */
-/* All rights reserved.                                       */
-
-/* This is unpublished proprietary source code of GD, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not */
-/* indicate an intention of publishing this code.             */
-
 #include   <math.h>
 
 double           cwfJD(
@@ -65,10 +53,6 @@ REF.: Fliegel, H.F. and van Flandern, T.C. (1968).
 Progr.: K.Engsager, Feb. 2004.
 */
 
-
-/* cw from JD or n                 # page 2    1 Feb 2004 11:18 */
-
-
 {
 
 #define  YE_BASE      20
@@ -97,10 +81,6 @@ Progr.: K.Engsager, Feb. 2004.
 
   int            days, ye4, ye, mo, da, ho, mi;
   double         loc_t;
-
-
-/* cw from JD or n                 # page 3    1 Feb 2004 11:18 */
-
 
   /* NO check for proper values */
   {
@@ -160,5 +140,3 @@ Progr.: K.Engsager, Feb. 2004.
 #undef SUM_BASE
 #undef SUM_LAST
 }
-
-

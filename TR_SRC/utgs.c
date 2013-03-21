@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/*  utgs   ver 1999.01            # page 1   12 Jan 1999 12 54 */
-
-
-/* Copyright (c) 1999 LG,   Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort-og  */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <stdio.h>
 #include    <math.h>
@@ -79,10 +67,6 @@ produces UTM 32 Northing and Easting of the gs coordinates y,x
 in Sealand or Jutland. Note the & operator on N1, E1.
 */
 
-
-/*  utgs   ver 1999.01            # page 2   12 Jan 1999 12 54 */
-
-
   double        N, E, n, e, w, tol = GSTOLMS;
   double        N_max, N_min, E_max, E_min;
   double       *c, *cb = NULL, *cw = NULL, *cbu, *cbg;
@@ -129,10 +113,6 @@ in Sealand or Jutland. Note the & operator on N1, E1.
 
   N = Nin;
   E = Ein;
-
-
-/*  utgs   ver 1999.01            # page 3   12 Jan 1999 17 59 */
-
 
   switch (landsdel)
   {
@@ -196,10 +176,6 @@ in Sealand or Jutland. Note the & operator on N1, E1.
     cw = cbu;
   }
   else res = TRF_ILLEG_;
-
-
-/*  utgs   ver 1999.01            # page 4   12 Jan 1999 17 59 */
-
 
   if (N < N_min || N_max < N || E < E_min || E_max < E) res = TRF_AREA_;
 

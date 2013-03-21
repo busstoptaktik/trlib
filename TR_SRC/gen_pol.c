@@ -48,10 +48,6 @@ double               *Eout
   E  = E_in;
   Cp = C_f;
 
-
-/* gen_pol                        # page 2   10 Sep 1998 12 02 */
-
-
   /* Transformation loop */
   for (i = -1; i <= 1 && res == 0; ++i)
     if (i) {
@@ -92,5 +88,3 @@ double               *Eout
 #undef   FLOATLIMIT
 
 }
-
-

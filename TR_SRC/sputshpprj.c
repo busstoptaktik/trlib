@@ -250,7 +250,6 @@ union geo_lab   *g_lab)
 	      
 	      }
 	      
-      // wkt_out+=sprintf(wkt_out, ",AXIS[\"N\",NORTH],AXIS[\"E\",EAST]");
       wkt_out+=sprintf(wkt_out, ",UNIT[\"m\",1.0]]");
       -- str_state;
     }
@@ -285,7 +284,6 @@ int get_val_str(char* val_str, double val) {
   while (dec < 10 && fabs(val2 - val1) > fabs(val1) * 1.0e-12) {
     val1 *= 10.0;
     val2 = floor(val1 + 0.5);
- /*   val3 = fabs(val2 - val1); */
     ++ dec;
   }
   if (dec == 0) dec = 1;

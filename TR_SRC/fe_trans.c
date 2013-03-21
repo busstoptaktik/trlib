@@ -15,10 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* fe_trans  ver 2012.03        # page 1   18 dec 2012 13 55 */
 
 
 /* Copyright (c) 2011 SPACE Danish Technical University (DTU)  */
@@ -73,10 +69,6 @@ FILE                *tr_error
 
 {
 
-
-/* fe_trans  ver 2012.03        # page 2   18 dec 2012 13 55 */
-
-
   static THREAD_SAFE int   in_chsum = 0L;
   static THREAD_SAFE int   outchsum = 0L;
   static int   init = 0;
@@ -115,9 +107,6 @@ FILE                *tr_error
     /*  7 */ { 1,  7,   "fk89"},  /* Region is FO */
     /*stop*/ {-1, -1,   ""}
   };
-
-
-/* fe_trans  ver 2012.03        # page 3   18 dec 2012 13 55 */
 
 
   struct act_nst {
@@ -255,9 +244,6 @@ FILE                *tr_error
     /* input :: 7 :: IDT                                          */
   };
 
-
-/* fe_trans  ver 2012.03        # page 4   18 dec 2012 13 55 */
-
 
   /* Test io-labels */
   if (in_lab->lab_type == CRD_LAB && outlab->lab_type == CRD_LAB) {
@@ -295,15 +281,10 @@ FILE                *tr_error
           outgr = pml->trgr;
           outnr = pml->trnr;
 #ifdef DEBUGFETRANS
-(void) printf("\n*OUT  grp = %4d    nr = %4d   navn = %s;",
-outgr, outnr, pml->s_lab);
+(void) lord_error(0,LORD("OUT  grp = %4d    nr = %4d   navn = %s;"), outgr, outnr, pml->s_lab);
 #endif
           break;
         }
-
-
-/* fe_trans  ver 2012.03        # page 5   18 dec 2012 13 55 */
-
 
       /* Datum and region check */
       switch (outgr) {
@@ -341,7 +322,7 @@ outgr, outnr, pml->s_lab);
         break;
       } /* end out-label check */
 #ifdef DEBUGFETRANS
-(void) printf("\n*OUT  grp = %4d    nr = %4d;", pml->trgr, pml->trnr);
+(void) lord_error(0,LORD("OUT  grp = %4d    nr = %4d;"), pml->trgr, pml->trnr);
 #endif
 
       if (res == TRF_ILLEG_)
@@ -364,8 +345,7 @@ outgr, outnr, pml->s_lab);
           in_gr = pml->trgr;
           in_nr = pml->trnr;
 #ifdef DEBUGFETRANS
-(void) printf("\n*IN   grp = %4d    nr = %4d   navn = %s;",
-in_gr, in_nr, pml->s_lab);
+(void) lord_error(0,LORD("IN   grp = %4d    nr = %4d   navn = %s;"), in_gr, in_nr, pml->s_lab);
 #endif
           break;
         }
@@ -406,11 +386,8 @@ in_gr, in_nr, pml->s_lab);
         break;
       } /* end in_-label check */
 #ifdef DEBUGFETRANS
-(void) printf("\n*IN   grp = %4d    nr = %4d;", in_gr, in_nr);
+(void) lord_error(0,LORD("IN   grp = %4d    nr = %4d;"), in_gr, in_nr);
 #endif
-
-
-/* fe_trans  ver 2012.03        # page 6   18 dec 2012 13 55 */
 
 
       if (res == TRF_ILLEG_)
@@ -452,10 +429,6 @@ in_gr, in_nr, pml->s_lab);
       case UTG: /* utm29_etrs89 -> geo_etrs89 */
         ies = ptg(&TC_u29, +1, N, E, &N, &E,  usertxt, tr_error);
         break;
-
-
-/* fe_trans  ver 2012.03        # page 7   18 dec 2012 13 55 */
-
 
       case FTU: /* FO national system -> utm29_etrs89 */
         ies = ptg(&TC_fke, +2, N, E, &N, &E, usertxt, tr_error);
@@ -511,10 +484,6 @@ in_gr, in_nr, pml->s_lab);
 
       case IDT: /* ident, no action */
         break;
-
-
-
-/* fe_trans  ver 2012.03        # page 8   18 dec 2012 13 55 */
 
       default: /* programme error */
         return(t_status(

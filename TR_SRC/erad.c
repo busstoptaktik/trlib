@@ -84,10 +84,6 @@ Prog. KP OCT 1989/JAN 1992.
 
 */
 
-
-/* erad.c                             # page 3   29 sep 2009 13 05 */
-
-
 {
   double       n, n2, h = 0.0, h1, h2 = 0.0, *p;
   double       e2p, cos_b, cos2_b, V2, c;
@@ -182,5 +178,3 @@ Prog. KP OCT 1989/JAN 1992.
   }
   return (c);
 }
-
-

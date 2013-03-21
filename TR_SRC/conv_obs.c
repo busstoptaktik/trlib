@@ -17,10 +17,6 @@
  */
  
 
-
-/* conv_obs  ver 2010.01            # page 1    7 jan 2010 15 35 */
-
-
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
 
@@ -65,10 +61,6 @@ struct obs_lab          *o_lab,
   union rgn_un               rgn_pref;
   struct dsh_str             d_sh;
 
-
-/* conv_obs  ver 2010.01            # page 2    7 jan 2010 15 35 */
-
-
   struct otype_str {
     short      obs_type;
     short      mc_type;
@@ -110,10 +102,6 @@ struct obs_lab          *o_lab,
 
     { 0, 0, "", "", "", "", "", "", "", "", "", "" }
   };
-
-
-/* conv_obs  ver 2010.01            # page 3    7 jan 2010 15 35 */
-
 
   static struct otype_str  ntype[] = {
     { 5, 1, "prs", "Precise levelling",
@@ -167,10 +155,6 @@ struct obs_lab          *o_lab,
 
     { 0, 0, "", "", "", "", "", "", "", "", "", "" }
   };
-
-
-/* conv_obs  ver 2010.01            # page 4    7 jan 2010 15 35 */
-
 
   static struct otype_str  mtype[] = {
     { 1, 0, "cl",  "Monocomparator clockwise",
@@ -228,10 +212,6 @@ struct obs_lab          *o_lab,
     o_lab->m2cx     = 0.0;
     o_lab->m2dx     = 0.0;
 
-
-/* conv_obs  ver 2010.01            # page 5    7 jan 2010 15 35 */
-
-
     /* PRODUCE THE MINI-LAB  from : mlb1, sepch, dtm */
     (void) sprintf(o_lab->mlb, "%s%c%s", p_sys, sepch, p_dtm);
     o_lab->sepix = (short) strlen(p_sys);
@@ -282,10 +262,6 @@ struct obs_lab          *o_lab,
 
       break;
 
-
-/* conv_obs  ver 2010.01            # page 6    7 jan 2010 15 35 */
-
-
     default: /* unknown kind */
       lord_error(0,LORD("conv_obs : %s : Unknown observation kind %d"),
           o_lab->mlb, o_lab->obs_kind);
@@ -324,10 +300,6 @@ struct obs_lab          *o_lab,
       o_lab->lab_type = ILL_LAB;
       return(ILL_LAB);
     }
-
-
-/* conv_obs  ver 2010.01            # page 7    7 jan 2010 15 35 */
-
 
     if (o_lab->cmplt) {
       if (p_otype->mc_type) {
@@ -378,10 +350,6 @@ struct obs_lab          *o_lab,
       }
     }
 
-
-/* conv_obs  ver 2010.01            # page 8    7 jan 2010 15 35 */
-
-
     else {
       if (p_otype->mc_type) {
         w          = sgetg(io_str, &(o_lab->md_tpd), &used,
@@ -414,10 +382,6 @@ struct obs_lab          *o_lab,
     o_lab->ch_sum   = labchsum((union geo_lab *) o_lab, &o_lab->ch_sum);
 
     break; /* end conv_mode 0 & 1 */
-
-
-/* conv_obs  ver 2010.01            # page 9    7 jan 2010 15 35 */
-
 
   case 3:  /* output of minilabel, simple */
   case 4:  /* output of minilabel, expand */
@@ -464,11 +428,7 @@ struct obs_lab          *o_lab,
       if (o_lab->obs_type == p_otype->obs_type) break;
     }
 
-
-/* conv_obs  ver 2010.01            # page 10   7 jan 2010 15 35 */
-
-
-    if (*(o_lab->mlb + o_lab->sepix) == '_') { /* print mean errors */
+	if (*(o_lab->mlb + o_lab->sepix) == '_') { /* print mean errors */
       if (p_otype->mc_type) {
         (void) fprintf(iofile, "  ");
         (void) fputg(iofile, sqrt(o_lab->m2d), &o_lab->md_tpd, " u");
@@ -517,10 +477,7 @@ struct obs_lab          *o_lab,
                        " ", rgn_pref.prfx, rgn_name);
       }
 
-
-/* conv_obs  ver 2010.01            # page 11   7 jan 2010 15 35 */
-
-      if (*(o_lab->mlb + o_lab->sepix) == 'D') {
+	  if (*(o_lab->mlb + o_lab->sepix) == 'D') {
         (void) fprintf(iofile, "\nDefault MFC :");
         if (p_otype->mc_type) {
           (void) sputg(t_lab, sqrt(o_lab->m2d), &o_lab->md_tpd, " u");
@@ -557,10 +514,6 @@ struct obs_lab          *o_lab,
       }
       (void) fprintf(iofile, "\n;\n");
     } /* end conv_mode == 4 */
-
-
-/* conv_obs  ver 2010.01            # page 12   7 jan 2010 15 35 */
-
 
     if (conv_mode == 5) { /* SURVEY : DOCUMENTATION OF THE LABEL */
       sepch = *(o_lab->mlb + o_lab->sepix);

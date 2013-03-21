@@ -16,10 +16,6 @@
  * 
  */
  
-
-/* set_itrf_c  ver 2009.02      # page 1    12 aug 2009 17 23 */
-
-
 /* Copyright (c) 2009, National Space Institute, DTU, Denmark */
 /* All rights reserved.                                       */
 
@@ -86,9 +82,6 @@ char                    *err_str
                            : not found.
   set_itrf_c == ITRF_SYS_  : man_gps_file.gps file not found.
   */
-
-/* set_itrf_c  ver 2007.02      # page 2    12 aug 2009 17 23 */
-
 
   /*
   *i_JD      input coord epoch (may be set)
@@ -151,11 +144,7 @@ char                    *err_str
   gr96/etrf89  -> wgs84 is done to itrfmax (latest realisation)
   and reverse  . . .
   */
-  
-
-/* set_itrf_c  ver 2007.02      # page 3    12 aug 2009 17 23 */
-
-
+ 
 #define YEAR(yy) ((yy) +(((yy)<88) ? 2000 : (((yy)<100) ? 1900 : 0)))
 
   union geo_lab           *geo_lb;
@@ -205,10 +194,6 @@ char                    *err_str
   o_plm_dt            = to_lb->JD;
   for (qr = 16, p_tp = p_gps->datum; qr; qr--) *(p_tp++) = '\0';
   if (stn_vel) stn_vel = 1;
-
-
-/* set_itrf_c  ver 2007.02      # page 4    12 aug 2009 17 23 */
-
 
   i_dtm = from_lb->mlb + from_lb->sepix +1;
   o_dtm =   to_lb->mlb +   to_lb->sepix +1;
@@ -287,10 +272,6 @@ char                    *err_str
     if (!strcmp(ipl_nam, "std"))
                (void) strcpy(ipl_nam, "nkgrf03vel.01");
   }
-  
-
-/* set_itrf_c  ver 2007.02      # page 5    12 aug 2009 17 23 */
-
 
   if (man_gps_file == NULL || init_gps_pos == 0) {
     (void) i_tabdir_file(2, "", &i, pth_mlb);
@@ -313,10 +294,6 @@ char                    *err_str
                             from_str, 9, 4,
                             &gps_table->i_ipl_dt, &gps_table->plm_dt);
       ipl_std = 1;
-/*
-(void) fprintf(stdout, "\n*%s_%s: %5.3f years;", from_str, to___str,
-gps_table->plm_dt - gps_table->i_ipl_dt);
-*/
     } else
     if (i_sys == 5) {
       (void) strcpy(from_str, "GR_gr96");
@@ -324,10 +301,6 @@ gps_table->plm_dt - gps_table->i_ipl_dt);
       i_zz = get_yy_item(0, pth_mlb, p_gps, D_gps,
                          from_str, 7, 4,
                          &gps_table->i_ipl_dt, &gps_table->plm_dt);
-/*
-(void) fprintf(stdout, "\n*%s_%s: %5.3f years;", from_str, to___str,
-gps_table->plm_dt - gps_table->i_ipl_dt);
-*/
     } else
     if (i_sys == 6) {
       (void) strcpy(from_str, "wgs84");
@@ -335,14 +308,7 @@ gps_table->plm_dt - gps_table->i_ipl_dt);
       i_zz = get_yy_item(0, pth_mlb, p_gps, D_gps,
                          from_str, 5, 4,
                          &gps_table->i_ipl_dt, &gps_table->plm_dt);
-/*
-(void) fprintf(stdout, "\n*%s_%s: %5.3f years;", from_str, to___str,
-gps_table->plm_dt - gps_table->i_ipl_dt);
-*/
     }
-
-
-/* set_itrf_c  ver 2007.02      # page 6    12 aug 2009 17 23 */
 
 
     if (i_zz >= 0) {
@@ -375,10 +341,6 @@ gps_table->plm_dt - gps_table->i_ipl_dt);
                              D_gps, from_str, 9, 4,
                              &gps_table->o_ipl_dt, &gps_table->plm_dt);
       ipl_std += 2;
-/*
-(void) fprintf(stdout, "\n*%s_%s: %5.3f years;", from_str, to___str,
-gps_table->plm_dt - gps_table->o_ipl_dt);
-*/
     } else
     if (o_sys == 5) {
       (void) strcpy(from_str, "GR_gr96");
@@ -386,10 +348,6 @@ gps_table->plm_dt - gps_table->o_ipl_dt);
       o_zz = get_yy_item(0, pth_mlb, &(gps_table->ogat_tr), D_gps,
                          from_str, 7, 4,
                          &gps_table->o_ipl_dt, &gps_table->plm_dt);
-/*
-(void) fprintf(stdout, "\n*%s_%s: %5.3f years;", from_str, to___str,
-gps_table->plm_dt - gps_table->o_ipl_dt);
-*/
     } else
     if (o_sys == 6) {
       (void) strcpy(from_str, "wgs84");
@@ -397,10 +355,6 @@ gps_table->plm_dt - gps_table->o_ipl_dt);
       o_zz = get_yy_item(0, pth_mlb, &(gps_table->ogat_tr), D_gps,
                          from_str, 5, 4,
                          &gps_table->o_ipl_dt, &gps_table->plm_dt);
-/*
-(void) fprintf(stdout, "\n*%s_%s: %5.3f years;", from_str, to___str,
-gps_table->plm_dt - gps_table->o_ipl_dt);
-*/
     }
     if (o_zz >= 0) {
       xx = o_zz;
@@ -410,10 +364,6 @@ gps_table->plm_dt - gps_table->o_ipl_dt);
        return(s_status(err_str, "set_itrf_c", ITRF_NON_));
   }
   else return(s_status(err_str, "set_itrf_c", ITRF_NAM_));
-
-
-/* set_itrf_c  ver 2007.02      # page 7    12 aug 2009 17 23 */
-
 
   w_is = (i_zz >= 0) ? 1 : i_sys; // GATE same as ITRF
   w_os = (o_zz >= 0) ? 1 : o_sys; // GATE same as ITRF
@@ -479,10 +429,6 @@ gps_table->plm_dt - gps_table->o_ipl_dt);
     }
     break;
 
-
-/* set_itrf_c  ver 2007.02      # page 8    12 aug 2009 17 23 */
-
-
   case 4:   /* etrf89 EUREF recommandation */
     if (w_os <= 2) { /* itrf */
       eur_yy  = xx;
@@ -529,12 +475,8 @@ gps_table->plm_dt - gps_table->o_ipl_dt);
       qr   = get_tab_item(1, pth_mlb, p_gps, run_JD,
                           from_str, 5, to___str, D_gps, err_str);
       if (qr < 0) return(ITRF_DTM_);
-/*
-(void) fprintf(stdout,
-"\n*%s_%s: %5.3f year - <ref_year>;", from_str, to___str,
-run_JD / 365.25);
-*/
-      if (igs_ii < 0) {
+
+	  if (igs_ii < 0) {
         p_gps->tx = -p_gps->tx;
         p_gps->ty = -p_gps->ty;
         p_gps->tz = -p_gps->tz;
@@ -570,16 +512,8 @@ run_JD / 365.25);
       D_gps->rx += D_gate_igs.rx * ff;
       D_gps->ry += D_gate_igs.ry * ff;
       D_gps->rz += D_gate_igs.rz * ff;
-/*
-(void) fprintf(stdout, "\n*igs_itrf: %5.3f years;", from_str, to___str,
-dd);
-*/
     }
   }
-
-
-/* set_itrf_c  ver 2007.02      # page 9    12 aug 2009 17 23 */
-
 
   if (itrf_ii) {
     if (YEAR(itrf_xx) < YEAR(itrf_yy)) {
@@ -599,11 +533,8 @@ dd);
     qr    = get_tab_item(1, pth_mlb, p_gps, run_JD,
     /* dummy D_gate.. */ from_str, 6, to___str, &D_gate_igs, err_str);
     if (qr < 0) return(ITRF_DTM_);
-/*
-(void) fprintf(stdout, "\n*%s_%s: %5.3f year - <ref_year>;",
-from_str, to___str, run_JD / 365.25);
-*/
-    if (itrf_ii < 0) {
+
+	if (itrf_ii < 0) {
       p_gps->tx = -p_gps->tx;
       p_gps->ty = -p_gps->ty;
       p_gps->tz = -p_gps->tz;
@@ -625,11 +556,8 @@ from_str, to___str, run_JD / 365.25);
     qr    = get_tab_item(1-stn_vel, pth_mlb, p_gps, run_JD,
     /* dummy D_gate.. */ from_str, 6, to___str, &D_gate_igs, err_str);
     if (qr < 0) return(ITRF_DTM_);
-/*
-(void) fprintf(stdout, "\n*%s_%s: %5.3f year - <ref_year>;",
-from_str, to___str, run_JD / 365.25);
-*/
-    if (ieur_ii) {
+
+	if (ieur_ii) {
       p_gps->tx = -p_gps->tx;
       p_gps->ty = -p_gps->ty;
       p_gps->tz = -p_gps->tz;
@@ -643,10 +571,6 @@ from_str, to___str, run_JD / 365.25);
 
   gps_table->seq[i_seq] = 0;
   (void) c_tabdir_file(1, man_gps_file);
-
-
-/* set_itrf_c  ver 2007.02      # page 10   12 aug 2009 17 23 */
-
 
   if (stn_vel) {
     gps_table->ipl_yy     = 0.0;
@@ -713,9 +637,6 @@ from_str, to___str, run_JD / 365.25);
             ++ p_pl_inf;
           } while ((p_pl_inf -1)->plate_nr > 0);
         }
-
-
-/* set_itrf_c  ver 2007.02      # page 11   12 aug 2009 17 23 */
 
       } else {
         *s_used_plm_nam = '\0';
@@ -784,10 +705,6 @@ long get_tab_part(int type, char *pth_mlb)
   return(pos);
 }
 
-
-/* set_itrf_c  ver 2007.02      # page 12   12 aug 2009 17 23 */
-
-
 void get_molodensky(int req_D, double dd,
      char *pth_mlb, char *p_tp,
      struct gps_c_str *p_gps, struct gps_c_str *D_gps)
@@ -819,10 +736,6 @@ void get_molodensky(int req_D, double dd,
   /* read Dtranslations */
   p_tp        = pth_mlb;
   (void) fgetln_kms(pth_mlb, &qr, man_gps_file);
-
-
-/* set_itrf_c  ver 2007.02      # page 13   12 aug 2009 17 23 */
-
 
   if (req_D >= 1) { /* get velocities */
     /* transform ITRFzz to run_JD */
@@ -864,11 +777,6 @@ void get_molodensky(int req_D, double dd,
   } /* get velocities */
   return;
 }
-
-
-
-/* set_itrf_c  ver 2007.02      # page 14   12 aug 2009 17 23 */
-
 
 int get_tab_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
     double i_JD, char *from_str, int fr_ch, char *to___str,
@@ -924,10 +832,6 @@ int get_tab_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
   } while (nsz && strncmp(pth_mlb, "stop", 4));
   return((ant == 0 || nsz) ? -100 : ant);
 }
-
-
-/* set_itrf_c  ver 2007.02      # page 15   12 aug 2009 17 23 */
-
 
 int get_yy_item(int req_D, char *pth_mlb, struct gps_c_str *p_gps,
      struct gps_c_str *D_gps,

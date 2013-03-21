@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* u32_to_map.c                     # page 1   04 Jul 1997 12 34 */
-
-
-/* Copyright (c) 1997, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                   */
-
-/* This is unpublished proprietary source code of ITG, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 /* F. Steffensen JUL. 1997 (MI/ITG) */
 /* SWN sept. 1997 REK (enkelt rettelse vedr. indlab på Bornholm */
@@ -83,9 +71,6 @@
 * MS 08/92
 */
 
-
-/* u32_to_map.c                     # page 2   04 Jul 1997 12 34 */
-
 
 #include <string.h>
 #include <stdlib.h>
@@ -94,6 +79,7 @@
 #include "conv_lab.h"
 #include "gd_trans.h"
 #include "trthread.h"
+#include "lord.h"
 
 #define FALSE 0
 #define TRUE  1
@@ -136,11 +122,6 @@ char           kvartstg[20])
   double            Gh;
   static THREAD_SAFE  struct mgde_str   grid_tab;
 
-
-
-/* u32_to_map.c                     # page 3   04 Jul 1997 12 34 */
-
-
   p_k  = kvartstg;
   *p_k = '\0';
 
@@ -165,8 +146,7 @@ char           kvartstg[20])
 /* ind_label er altid u32 */
 
   if (conv_lab(inlab, &i_reg, "") == ILL_LAB) {
-      (void) fprintf(stderr,
-          "\n***label ej kendt (conv_lab), %s\n", inlab);
+      (void) lord_error(0, LORD("label ej kendt (conv_lab), %s"), inlab);
      exit(0);
    }
 
@@ -174,8 +154,7 @@ char           kvartstg[20])
     (void) strcpy(outlab, "gs");
 
     if (conv_lab(outlab, &o_reg, "") == ILL_LAB) {
-      (void) fprintf(stderr,
-          "\n***label ej kendt (conv_lab), %s\n", outlab);
+      (void) lord_error(0, LORD("label ej kendt (conv_lab), %s"), outlab);
       exit(0);
     }
     retur = gd_trans(&i_reg, &o_reg, n, e, 0.0, &y_ud, &x_ud, &dummy, 
@@ -184,10 +163,6 @@ char           kvartstg[20])
     if (retur) { /* transformation ikke OK */
       return(-1);
     }
-
-
-/* u32_to_map.c                     # page 4   04 Jul 1997 12 34 */
-
 
     if (x_ud >= -197730.343860) /* ikke øst for 16-søjlen */
     {
@@ -245,10 +220,6 @@ char           kvartstg[20])
                   delta_y = hoejde4cm * 2 / 3;
                 }
 
-
-/* u32_to_map.c                     # page 5   04 Jul 1997 12 34 */
-
-
             /* Her placeres koden til at finde        */
             /*     1010 - 1619 kortbladet             */
 
@@ -277,10 +248,6 @@ char           kvartstg[20])
   else
     u33 = TRUE;
 
-
-/* u32_to_map.c                     # page 6   04 Jul 1997 12 34 */
-
-
   if (u33) {
     /* Hvis indenfor 1710 til 1919 beregn da kortblad ud fra u33 */
 
@@ -296,8 +263,7 @@ char           kvartstg[20])
     (void) strcpy(outlab, "utm33_ed50");
 
     if (conv_lab(outlab, &o_reg, "") == ILL_LAB) {
-      (void) fprintf(stderr,
-          "\n***label ej kendt (conv_lab), %s\n", outlab);
+      (void) lord_error(0, LORD("label ej kendt (conv_lab), %s"), outlab);
       return(-1);
     }
 
@@ -305,8 +271,7 @@ char           kvartstg[20])
         &Gh, G_req, &grid_tab, "", stderr);
 
     if (retur) {  /* transformation ikke OK */
-      (void) fprintf (stderr, "retur : %d %7.5f %7.5f\n", 
-          retur, n_ud, e_ud);
+      (void) lord_error(0, LORD("retur : %d %7.5f %7.5f"), retur, n_ud, e_ud);
       return(-1);
     }
 
@@ -342,10 +307,6 @@ char           kvartstg[20])
     /* 1cm bladnummer */
     cm       = (17 + rk1cm) * 100 + 10 + sj1cm;
   }
-
-
-/* u32_to_map.c                     # page 7   04 Jul 1997 12 34 */
-
 
   /* Lægger cm ned i kvartstg som streng */
 
@@ -402,11 +363,6 @@ char           kvartstg[20])
     (void) strcat(p_k, " IV SØ");
     retur = cm * 100 + 42;
     break;
-
-
-/* u32_to_map.c                     # page 7   04 Jul 1997 12 34 */
-
-
   case 11:
     (void) strcat(p_k, " I SV");
     retur = cm * 100 + 13;

@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* sgetdt   ver 2003.01           # page 1   19 Dec 2002 13 18 */
-
 
 /* Copyright (c) 2002, Kort-og Matrikelstyrelsen, Denmark */
 /* All rights reserved.                                   */
@@ -76,11 +71,7 @@ char array must not hold 'spaces'. Use fgetln_kms to this end.
   long            w1;
   double          cw, GMT;
 
-
-/* sgetdt   ver 2003.01           # page 2   19 Dec 2002 13 18 */
-
-
-  /* first try readning with format as double, if this         */
+  /* first try reading with format as double, if this         */
   /* is an succes and no comma is met, then return date.       */
 
   /* if comma is met then assume GI. cw, read hours and mi-    */
@@ -132,5 +123,3 @@ char array must not hold 'spaces'. Use fgetln_kms to this end.
   }
   return (-2.0);
 }
-
-

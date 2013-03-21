@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* c_gps_c    ver 2003.01               # page 1   12 Jan 2003 12 06 */
-
-
-/* Copyright (c) 2003 GEK, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include          <stdio.h>
 #include          <math.h>
@@ -50,10 +38,6 @@ double                *Zo
 #define  MAS         (180.0*3600.0*1000.0/M_PI)
 
   double             X, Y, Z;
-
-
-/* c_gps_c    ver 2003.01               # page 2   12 Jan 2003 12 06 */
-
 
 /*
 (void) printf("\nc_gps_c: INPUT   %+12.3f   %+12.3f   %+12.3f",
@@ -85,5 +69,3 @@ shp->rx * MAS, shp->ry * MAS, shp->rz * MAS);
   return(0);
 #undef     MAS
 }
-
-
