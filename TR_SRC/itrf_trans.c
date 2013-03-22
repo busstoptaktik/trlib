@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* itrf_trans  ver 2007.02          # page 1    10 Oct 2008 11 57 */
-
-
-/* Copyright (c) 2007, National Space Institute, DTU, Denmark */
-/* All rights reserved.                                       */
-
-/* This is unpublished proprietary source code of DTU, Denmark */
-/* This copyright claim does not indicate an intention of      */
-/* publishing this code.                                       */
-
 #include    <stdio.h>
 #include    <string.h>
 #include    "KmsFncs.h"
@@ -65,9 +53,6 @@ double         *ipl_oJD   = plate_info->ipl_odt;
 char           *u_plm_nam = plate_info->plm_nam;
 char           *u_plt_nam = plate_info->plt_nam;
 char           *u_ipl_nam = plate_info->ipl_nam;
-
-
-/* itrf_trans  ver 2007.02          # page 2    10 Oct 2008 11 57 */
 
 
   /* itrf_trans initialize the tables needed or closes the tables */
@@ -129,10 +114,6 @@ char           *u_ipl_nam = plate_info->ipl_nam;
   /*     tab_t == {"" or "STD"} used_plm_nam == recommended           */
   /*     tab_i == {"" or "STD"} used_ipl_nam == ""                    */
   /*           else the given name is used as NON STANDARD            */
-
-
-
-/* itrf_trans  ver 2007.02          # page 2    10 Oct 2008 11 57 */
 
 
   /* GR96 epoch       :: 1996 08 15 :: 1996.620 :: ITRF94      */
@@ -201,11 +182,6 @@ char           *u_ipl_nam = plate_info->ipl_nam;
   static THREAD_SAFE  char                 s_tab_t[MLBLNG], s_tab_i[MLBLNG];
   static THREAD_SAFE  char                 s_u_plm_nam[MLBLNG];
   static THREAD_SAFE  char                 s_u_ipl_nam[MLBLNG];
-
-
-/* itrf_trans  ver 2007.02          # page 3    10 Oct 2008 11 57 */
-
-
   static THREAD_SAFE  struct mtab3d_str    ipl_table;
   static THREAD_SAFE  union geo_lab        plm_lab_a;
   static THREAD_SAFE  union geo_lab        Hipl_lab;      /* prj_datum    */
@@ -218,12 +194,6 @@ char           *u_ipl_nam = plate_info->ipl_nam;
   double                      N, E, H, h, B=0.0, L=0.0, X, Y, Z;
   double                      VX=0.0, VY=0.0, VZ=0.0, WX, WY, WZ;
 
-  /* TEST
-  char                       *ACT_STR[] = {
-    "IDTT", "ITRF", "IGST", "IGT", "OGT", "ILLE",
-     "ILLE", "ILLE","ILLE", "ILLE"
-  };
-  TEST */
   int                         TU = 0;
 
   *(o_crd+0) = 0.0;
@@ -255,9 +225,6 @@ char           *u_ipl_nam = plate_info->ipl_nam;
     ipl_table.init   = 0;
     *s_u_plm_nam     = *s_u_ipl_nam = '\0';
   }
-
-/* itrf_trans  ver 2007.02          # page 4    10 Oct 2008 11 57 */
-
 
   /* Init of tables */
   /*________________*/
@@ -268,11 +235,8 @@ char           *u_ipl_nam = plate_info->ipl_nam;
       s_stn_vel != stn_vel ||
       sate_in   != i_JD || sate_out != o_lab->u_c_lab.JD ||
       strcmp(tab_t, s_tab_t) || strcmp(tab_i, s_tab_i)) {  
-/*
-(void) fprintf(stdout, "\n\nitrf_trans:: %s, %s, %s, %s\n",
-i_lab->u_c_lab.mlb, o_lab->u_c_lab.mlb, tab_t, tab_i);
-*/
-    /* Init of IGS and ITRF-tables */
+
+	/* Init of IGS and ITRF-tables */
     i_clb                = &(i_lab->u_c_lab);
     o_clb                = &(o_lab->u_c_lab);
     i_chsum              = o_chsum = 0;
@@ -288,12 +252,6 @@ i_lab->u_c_lab.mlb, o_lab->u_c_lab.mlb, tab_t, tab_i);
       return(s_status(err_str,
              "itrf_trans(i/o CRT or Ellipsoid error)", TRF_PROGR_));
     }
-/*
-(void) fprintf(stdout, "\n*itrf_trans : i_cstm, dtm = %d, %d;",
-i_clb->cstm, i_clb->datum);
-(void) fprintf(stdout, "\n*itrf_trans : o_cstm, dtm = %d, %d;",
-o_clb->cstm, o_clb->datum);
-*/
 
     (void) strcpy(u_plm_nam, "");
     (void) strcpy(u_plt_nam, "non");
@@ -305,7 +263,7 @@ o_clb->cstm, o_clb->datum);
                          s_u_plm_nam, s_u_ipl_nam,
                          err_str);
 if (TU)
-(void) fprintf(stdout, "\n*itrf_trans : seq_max = %d;", seq_max);
+	(void) lord_info(0, LORD("itrf_trans : seq_max = %d;"), seq_max);
 
     if (seq_max < 0) return(seq_max);
     /* start and stop level: get a geo_itrf */
@@ -313,12 +271,7 @@ if (TU)
     s_lev = (o_clb->cstm != 1) ? 2 : 1;
 
 if (TU)
-(void) fprintf(stdout,
-"\n*itrf_trans : req_plm = %d;", gps_table.req_plm_tr);
-
-
-/* itrf_trans  ver 2007.02          # page 5    10 Oct 2008 11 57 */
-
+	(void) lord_info(0, LORD("\n*itrf_trans : req_plm = %d;"), gps_table.req_plm_tr);
 
     /* test for identical systems */
     if (i_clb->ch_sum == o_clb->ch_sum 
@@ -350,12 +303,6 @@ if (TU)
   *ipl_iJD = -10000000.0;
   *ipl_oJD = -10000000.0;
 
-/*
-(void) fprintf(stdout, "\n*itrf_trans : b_lev, s_lev = %d, %d;",
-b_lev, s_lev);
-(void) fprintf(stdout, "\n*itrf_trans : i_dat,o_dat = %f, %f;",
-i_JD, o_clb->JD);
-*/
   N = *(i_crd +0);
   E = *(i_crd +1);
   H = *(i_crd +2);
@@ -367,7 +314,7 @@ i_JD, o_clb->JD);
 
   for (lev = b_lev; lev <= s_lev && res >= TRF_TOLLE_; lev++) {
 if (TU)
-(void) fprintf(stdout, "\n\n*itrf_trans  lev %d;", lev);
+	(void) lord_info(0, LORD("itrf_trans  lev %d;"), lev);
 
     switch(lev) {
     case 0: /* XXX_dtm -> geo_itrf && PRJ_dtm -> CRT_dtm */
@@ -382,10 +329,6 @@ if (TU)
       }
       if (res < TRF_TOLLE_) return(res);
       break;
-
-
-/* itrf_trans  ver 2007.02          # page 6    10 Oct 2008 11 57 */
-
 
     case 1: /* central: CRT shifts to CRT */
       ipl_tr = (!gps_table.req_ipl_tr) ? -1
@@ -413,10 +356,8 @@ if (TU)
 
       for (rs = 0; rs < seq_max; rs ++) {
         act = gps_table.seq[rs];
-/*
-(void) fprintf(stdout, "\n*ITRF_TRANS ACTION  %s;", ACT_STR[act]);
-*/
-        switch(act) {
+
+		switch(act) {
         case IGAT: /* IGATE <-> ITRFyy */
           shp  = &gps_table.igat_tr;
           Dshp = NULL;
@@ -441,14 +382,7 @@ if (TU)
           return(s_status(err_str, "itrf_trans", TRF_ILLEG_));
         }
 
-
-/* itrf_trans  ver 2007.02          # page 7    10 Oct 2008 11 57 */
-
-
         if (act +10 == ipl_tr) {
-/*
-(void) fprintf(stdout, "\n*trf : %-8.6f  %-8.6f   %-8.6f;", N, E, H);
-*/
           ipl_res  = ipl_move(&Hipl_lab, &ipl_table, gps_table.ipl_yy,
                               B, L, &X, &Y, &Z, u_ipl_nam,
                               err_str);
@@ -463,9 +397,6 @@ if (TU)
             *(tr_par +1) += Y;
             *(tr_par +2) += Z;
           }
-/*
-(void) fprintf(stdout, "\n*ipl : %-8.6f  %-8.6f   %-8.6f;", X, Y, Z);
-*/
         }
 
         if (shp != NULL) {
@@ -488,21 +419,11 @@ if (TU)
             VZ += WZ;
           }
 
-/*
-(void) fprintf(stdout, "\n*trf : %-8.6f  %-8.6f   %-8.6f;", N, E, H);
-(void) fprintf(stdout, "\n*tras: %-8.6f  %-8.6f   %-8.6f   %-8.6f;",
-shp->tx, shp->ty, shp->tz, shp->sc);
-(void) fprintf(stdout, "\n*trot: %-8.6e  %-8.6e   %-8.6e;",
-shp->rx, shp->ry, shp->rz);
-*/
           /* Molodensky transformation SMALL SHIFTS only */
           X = N * shp->sc + shp->tx - E * shp->rz + H * shp->ry;
           Y = E * shp->sc + shp->ty + N * shp->rz - H * shp->rx;
           Z = H * shp->sc + shp->tz - N * shp->ry + E * shp->rx;
-/*
-(void) fprintf(stdout, "\n*TRF : %-8.6f  %-8.6f   %-8.6f;", X, Y, Z);
-(void) fprintf(stdout, "\n*res : %-8.6f  %-8.6f   %-8.6f;", N, E, H);
-*/
+
           N += X;
           E += Y;
           H += Z;
@@ -518,11 +439,7 @@ shp->rx, shp->ry, shp->rz);
           }
         }
         if (act == ipl_tr) {
-/*
-(void) fprintf(stdout, "\n*trf : %-8.6f  %-8.6f   %-8.6f;", N, E, H);
-(void) fprintf(stdout, "\n*trf :ipl:B,L: %-8.6f  %-8.6f;",
-B*180/M_PI, L*180/M_PI);
-*/
+
           ipl_res  = ipl_move(&Hipl_lab, &ipl_table, gps_table.ipl_yy,
                               B, L, &X, &Y, &Z, u_ipl_nam,
                               err_str);
@@ -537,21 +454,11 @@ B*180/M_PI, L*180/M_PI);
             *(tr_par +1) += Y;
             *(tr_par +2) += Z;
           }
-/*
-(void) fprintf(stdout, "\n*ipl : %-8.6f  %-8.6f   %-8.6f;", X, Y, Z);
-*/
         }
       } /* loop CRT */
 
-
-/* itrf_trans  ver 2007.02          # page 8    10 Oct 2008 11 57 */
-
-
       *plm_JD = -10000000.0;
       if (gps_table.req_plm_tr) {
-/*
-(void) fprintf(stdout, "\n*trf : %-8.6f  %-8.6f   %-8.6f;", N, E, H);
-*/
         /* select plate no *plate_nr */
         if ((res = srch_plate(pl_inf, B, L,
                    plm_lab, &plm_tr, err_str)) >= 0) {
@@ -561,20 +468,12 @@ B*180/M_PI, L*180/M_PI);
             (void) strcpy(u_plt_nam, plm_tr.datum);
             *plm_trf = 1;
             *plm_JD  = gps_table.plm_dt;
-/*
-(void) fprintf(stdout, "\n*plm :rot: %f, %f, %f, yy=%f;",
-plm_tr.rx*180*60*60/M_PI, plm_tr.ry*180*60*60/M_PI,
-plm_tr.rz*180*60*60/M_PI, gps_table.plm_yy);
-*/
             /* Molodensky transformation SMALL SHIFTS only */
             X      = (-E * plm_tr.rz + H * plm_tr.ry) *gps_table.plm_yy;
             Y      = ( N * plm_tr.rz - H * plm_tr.rx) *gps_table.plm_yy;
             Z      = (-N * plm_tr.ry + E * plm_tr.rx) *gps_table.plm_yy;
-/*
-(void) fprintf(stdout, "*plm_yy %-5.3f;", gps_table.plm_yy);
-(void) fprintf(stdout, "\n*plm %-8.6f  %-8.6f   %-8.6f;", X, Y, Z);
-*/
-            N     += X;
+
+			N     += X;
             E     += Y;
             H     += Z;
 
@@ -618,10 +517,6 @@ plm_tr.rz*180*60*60/M_PI, gps_table.plm_yy);
     }
   } /* lev LOOP */
 
-
-/* itrf_trans  ver 2007.02          # page 9    10 Oct 2008 11 57 */
-
-
   /* return of transformation */
   *(o_crd+0) = N;
   *(o_crd+1) = E;
@@ -661,10 +556,6 @@ char                     *err_str
 
 #include              "tab3d_val.h"
 
-
-/* itrf_trans  ver 2007.02          # page 10   10 Oct 2008 11 57 */
-
-
   int                         res = 0;
   double                      dc[3];
   double                      csB, snB, csL, snL;
@@ -683,39 +574,40 @@ char                     *err_str
 
   res    = tab3d_val(Hipl_lab, tab3d_table, B, L, dc, err_str);
   (void) strcpy(used_ipl_nam, tab3d_table->table_u.mlb);
-if (TU) (void) fprintf(stdout,
-"\n*ipl_move  dc = %f, %f, %f, res = %d;",
-dc[0], dc[1],dc[2], res);
+if (TU)
+	(void) lord_info(0, LORD("ipl_move  dc = %f, %f, %f, res = %d;"), dc[0], dc[1],dc[2], res);
 
   if (res >= TRF_TOLLE_) {
-if (TU) (void) fprintf(stdout,
-"\n*ipl_move  dc = %f, %f, %f, res = %d;",
-dc[0], dc[1],dc[2], res);
+
+if (TU)
+	(void) lord_info(0, LORD("ipl_move  dc = %f, %f, %f, res = %d;"), dc[0], dc[1],dc[2], res);
     dc[0] *= tr_yy;
     dc[1] *= tr_yy;
     dc[2] *= tr_yy;
-if (TU) (void) fprintf(stdout, "\n*ipl_move  dc = %f, %f, %f, dd = %e;",
-dc[0], dc[1],dc[2], tr_yy);
+
+if (TU) 
+	(void) lord_info(0, LORD("ipl_move  dc = %f, %f, %f, dd = %e;"), dc[0], dc[1],dc[2], tr_yy);
     csB    = cos(B);
     snB    = sin(B);
     csL    = cos(L);
     snL    = sin(L);
+
 if (TU) {
-(void) fprintf(stdout, "\n*ipl_move  ROT(B)= %f, %f, %f ",
--snB*csL, -snL, csB*csL);
-(void) fprintf(stdout, "\n ipl_move  ROT(B)= %f, %f, %f ",
--snB*snL, csL, csB*snL);
-(void) fprintf(stdout, "\n ipl_move  ROT(B)= %f, %f, %f;",
-csB, 0.0, snB);
+	(void) lord_info(0, LORD("ipl_move  ROT(B)= %f, %f, %f "), -snB*csL, -snL, csB*csL);
+	(void) lord_info(0, LORD("ipl_move  ROT(B)= %f, %f, %f "), -snB*snL, csL, csB*snL);
+	(void) lord_info(0, LORD("ipl_move  ROT(B)= %f, %f, %f;"), csB, 0.0, snB);
 }
-    *dX    = -snB*csL * dc[0]  - snL * dc[1]  + csB*csL * dc[2];
+
+	*dX    = -snB*csL * dc[0]  - snL * dc[1]  + csB*csL * dc[2];
     *dY    = -snB*snL * dc[0]  + csL * dc[1]  + csB*snL * dc[2];
     *dZ    =  csB     * dc[0] /*+0.0* dc[1]*/ + snB     * dc[2];
-if (TU) (void) fprintf(stdout, "\n*ipl_move  dc = %f, %f, %f;",
-*dX, *dY,*dZ);
+if (TU)
+	(void) lord_info(0, LORD("\n*ipl_move  dc = %f, %f, %f;"), *dX, *dY,*dZ);
   } else {
-if (TU) (void) fprintf(stdout, "\n\n*ipl_move  res = %d;", res);
-    if (res != TAB_C_ARE_) res = 0;
+if (TU)
+	(void) lord_info(0, LORD("\n\n*ipl_move  res = %d;"), res);
+
+	if (res != TAB_C_ARE_) res = 0;
     *dX = 0.0;
     *dY = 0.0;
     *dZ = 0.0;
@@ -723,5 +615,4 @@ if (TU) (void) fprintf(stdout, "\n\n*ipl_move  res = %d;", res);
 
   /* return of transformation */
   return(res);
-
 }

@@ -15,10 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-/* set_dtm     ver 2010.1          # page 1   12 jan 2010 10 19 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -70,10 +66,6 @@ struct dsh_str     *trp
 #define  IGSyy    (6)  /* IGSyy   for GPS only */
 #define  ITRFyy   (7)  /* ITRFyy  NOT for GPS */
 #define  ETRFyy   (8)  /* ETRFyy              */
-
-
-/* set_dtm     ver 2010.1          # page 2   12 jan 2010 10 19 */
-
 
   /* adjacent datums */
 #define  ETOPEX   (9)  /* TOPEX datum */
@@ -190,10 +182,6 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
   double                      sin_ry, cos_ry;
   double                      sin_rz, cos_rz;
 
-
-/* set_dtm     ver 2010.1          # page 4    12 jan 2010 10 19 */
-
-
   struct typ_dec              g_tpd, *r_tpd;
   struct dsh_par {
     double       tx, ty, tz;
@@ -206,10 +194,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
   if (def_lab_file == NULL || init_prj_pos == 0) {
     (void) i_tabdir_file(3, "", &res, pth_mlb);
     if (res) {
-      (void) fprintf(stdout, "\n*** def_lab.txt: %s %s;\n", pth_mlb,
-        (res == -1) ? "NOT FOUND" :
-        (res == -2) ? "NOT lab definition file" :
-                      "Content not accepted");
+      (void) lord_error(0, LORD("\n*** def_lab.txt: %s %s;\n"), pth_mlb, (res == -1) ? "NOT FOUND" : (res == -2) ? "NOT lab definition file" : "Content not accepted");
       return (-2);
     }
   }
@@ -225,8 +210,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
       }
     } while (qr && res != EOF);
     if (qr) {
-      (void) fprintf(stdout, 
-         "\n*** set_dtm: lab_def.txt DATUM not found ;\n");
+      (void) lord_error(0, LORD("lab_def.txt DATUM not found;"));
       return (-2);
     }
     init_dtm_pos = ftell(def_lab_file);
@@ -234,10 +218,6 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
   if (d_quest <= 0) pos = init_dtm_pos;
   /* datum definition file detected */
   res = -1;
-
-
-/* set_dtm     ver 2010.1          # page 5    12 jan 2010 10 19 */
-
 
   /* find datum name from datum number */
   if (d_no > 0) {
@@ -283,10 +263,6 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
               p_tp += used;
               (void) strcpy(e_nm, e_name);
 
-
-/*   set_dtm     ver 2010.1          # page 6    12 jan 2010 10 19 */
-
-
               /* collect datum shift params */
               /*____________________________*/
               if (qr != EOF) qr = fgetln_kms(pth_mlb, &used, def_lab_file);
@@ -327,10 +303,6 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
               /* ROTZ=(-sz cz 0), ROTY=(0  1   0), ROTX=(0  cx sx) */
               /*      (  0  0 1)       (sy 0  cy)       (0 -sx cx) */
 
-
-/*   set_dtm     ver 2010.1          # page 7    12 jan 2010 10 19 */
-
-
               trp->r11  =  cos_ry*cos_rz;
               trp->r12  =  cos_rx*sin_rz + sin_rx*sin_ry*cos_rz;
               trp->r13  =  sin_rx*sin_rz - cos_rx*sin_ry*cos_rz;
@@ -358,9 +330,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
                   }
                 } while (*p_no <= 0 && strcmp(d_name, "stop"));
                 if (*p_no == -1) {
-                  (void) fprintf(stderr,
-                      "\n*** set_dtm PROG FEJL, parent datum mgl for %s",
-                      d_name);
+                  (void) lord_error(0, LORD("PROG FEJL, parent datum mgl for %s"), d_name);
                   return(-1);
                 }
               } else *p_no = d_nmb;
@@ -383,10 +353,6 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
       /* return res or 'no datum found' */
       return(res);
     } else
-
-
-/* set_dtm     ver 2010.1          # page 8    12 jan 2010 10 19 */
-
 
     if (*d_nm == '!' || *d_nm == '?' || *d_nm == '*') {
       all = (strlen(d_nm) == 1)   ? 0 : /* all datum texts */
@@ -441,9 +407,6 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
               if (*(pth_mlb +qr) == '\n') *(pth_mlb +qr) = '\0';
               (void) sprintf(d_nm, "%-10s   * %-36s;", d_name, pth_mlb);
 
-
-/*   set_dtm     ver 2010.1          # page 9    12 jan 2010 10 19 */
-
               if (all == 0 && d_nmb > 0) {
                 pos     = ftell(def_lab_file);
                 ++ d_quest;
@@ -454,9 +417,7 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
               return((int) d_nmb);
             }
           } else {
-            (void) fprintf(stderr,
-                   "\n*** set_dtm def_dtm.txt ERROR after count %d",
-                   d_quest);
+            (void) lord_error(0, LORD("def_dtm.txt ERROR after count %d"), d_quest);
             pos     = init_dtm_pos;
             d_quest = 0;
             return(-1);
@@ -479,4 +440,3 @@ extern THREAD_SAFE size_t              init_dtm_pos, init_prj_pos;
   }
   return(-1);
 }
-

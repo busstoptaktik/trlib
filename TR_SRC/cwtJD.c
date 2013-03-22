@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* cw to JD, n and GMT              # page 1    1 Mar 1993 11:18 */
-
-
-/* Copyright (c) 1994, Kort-og Matrikelstyrelsen, GD, Denmark */
-/* All rights reserved.                                       */
-
-/* This is unpublished proprietary source code of GD, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not */
-/* indicate an intention of publishing this code.             */
 
 #include <string.h>
 #include "geo_lab.h"
@@ -63,10 +51,6 @@ _                        Programmed for :
 _            :  DK     : Denmark.
 
 */
-
-
-
-/* cw to JD, n and GMT              # page 2    1 Mar 1993 11:18 */
 
 
 {
@@ -162,5 +146,3 @@ _            :  DK     : Denmark.
 #undef SUM_BASE
 #undef SUM_LAST
 }
-
-

@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* labchsum   ver 2003.01         # page 1    4 Jul 2003 10 03 */
-
-
-/* Copyright (c) 2003 GEK, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include     <stddef.h>
 #include     "geo_lab.h"
 

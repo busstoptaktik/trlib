@@ -31,6 +31,7 @@ import ctypes
 import os
 import sys
 import time
+__version__=1.0                        #This number can be used to test if a trui plugin is compatible
 IS_INIT=False
 if sys.platform.startswith("win"):
 	STD_LIB="KMSTRLIB.dll"
@@ -41,11 +42,15 @@ else:
 STD_DIRNAME=os.path.dirname(__file__)
 REQUIRED_FILES=["def_lab.txt","def_shp.txt"]
 tr_lib=None
-#define return codes, really define in trlib_api.h
+#define return codes, really defined in trlib_api.h
 TR_OK=0
 TR_LABEL_ERROR=1
 TR_ERROR=2
 TR_ALLOCATION_ERROR=3
+#format codes for foreign srs metadata descriptions - defined in API-header#
+FRMT_EPSG=0
+FRMT_PROJ4=1
+FRMT_ESRI_WKT=2
 #special return code for this module
 TRLIB_NOT_INITIALIZED=-1
 #TABDIR env var
@@ -132,15 +137,29 @@ def LoadLibrary(lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_AllowUnsafeTransformations.restype=None
 		tr_lib.TR_ForbidUnsafeTransformations.argtypes=None
 		tr_lib.TR_ForbidUnsafeTransformations.restype=None
-		#Some extra functions which might get exposed in the API#
+		tr_lib.TR_ImportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_ImportLabel.restype=ctypes.c_int
+		tr_lib.TR_ExportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_int,ctypes.c_int]
+		tr_lib.TR_ExportLabel.restype=ctypes.c_int
+		tr_lib.TR_SetGeoidDir.argtypes=[ctypes.c_char_p]
+		tr_lib.TR_SetGeoidDir.restype=ctypes.c_int
+		#LORD module functions
+		tr_lib.TR_SetLordMaxMessages.argtypes=[ctypes.c_int]
+		tr_lib.TR_SetLordMaxMessages.restype=None
+		tr_lib.TR_SetLordFile.argtypes=[ctypes.c_char_p]
+		tr_lib.TR_SetLordFile.restype=None
+		tr_lib.TR_SetLordCallBack.argtypes=[MESSAGE_HANDLER]
+		tr_lib.TR_SetLordCallBack.restype=None
+		tr_lib.TR_SetLordModes.argtypes=[ctypes.c_int]*5
+		tr_lib.TR_SetLordModes.restype=None
+		tr_lib.TR_SetLordVerbosityLevels.argtypes=[ctypes.c_int]*3 #get rid of last two params....
+		tr_lib.TR_SetLordVerbosityLevels.restype=None
+		#Functions defined in the 'internal' API
 		tr_lib.TR_OpenProjection.argtypes=[ctypes.c_char_p]
 		tr_lib.TR_OpenProjection.restype=ctypes.c_void_p
 		tr_lib.TR_CloseProjection.argtypes=[ctypes.c_void_p]
 		tr_lib.TR_CloseProjection.restype=None
-		tr_lib.TR_ImportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
-		tr_lib.TR_ImportLabel.restype=ctypes.c_int
-		tr_lib.TR_SetGeoidDir.argtypes=[ctypes.c_char_p]
-		tr_lib.TR_SetGeoidDir.restype=ctypes.c_int
+		#Some extra functions which might get exposed in the API#
 		tr_lib.set_grs.argtypes=[ctypes.c_int,ctypes.c_char_p,LP_c_double]
 		tr_lib.bshlm1.restype=ctypes.c_int
 		tr_lib.bshlm1.argtypes=[ctypes.c_double]*3+[LP_c_double,ctypes.c_double]*3
@@ -154,13 +173,13 @@ def LoadLibrary(lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.sgetshpprj.restype=ctypes.c_int
 		tr_lib.proj4_to_mlb.argtypes=[ctypes.c_char_p]*2
 		tr_lib.proj4_to_mlb.restype=ctypes.c_int
-		tr_lib.set_lord_file.argtypes=[ctypes.c_char_p]
-		tr_lib.set_lord_file.restype=None
-		tr_lib.set_lord_callback.argtypes=[MESSAGE_HANDLER]
-		tr_lib.set_lord_callback.restype=None
-
+		tr_lib.export_to_epsg.argtypes=[ctypes.c_char_p,LP_c_int,LP_c_int]
+		tr_lib.export_to_epsg.restype=ctypes.c_int
+		
 	except Exception, msg:
+		print msg
 		return False, "Unable to load library %s in directory %s: %s" %(lib,lib_dir,repr(msg))
+		
 	return True,""
 
 
@@ -174,7 +193,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		ok,msg=LoadLibrary(lib,lib_dir)
 	if not ok or tr_lib is None:
 		return False
-	if len(geoid_dir)==0:
+	if geoid_dir is None or len(geoid_dir)==0:
 		if os.environ.has_key(TABDIR_ENV):
 			geoid_dir=os.environ[TABDIR_ENV]
 		else:
@@ -184,9 +203,7 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 		sdir=geoid_dir
 	for fname in REQUIRED_FILES:
 		if not os.path.exists(os.path.join(geoid_dir,fname)):
-			print("Tabdir: %s" %sdir)
-			print("Required file %s not found, failed to initialize library!" %fname)
-			return False
+			raise Exception("Tabdir: %s, required file %s not found, failed to initialize library!" %(sdir,fname))
 	if len(sdir)>0 and sdir[-1] not in ["\\","/"]:
 		sdir+="/"
 	GEOIDS=geoid_dir
@@ -198,11 +215,20 @@ def InitLibrary(geoid_dir="",lib=STD_LIB,lib_dir=STD_DIRNAME):
 def GetLastError():
 	return tr_lib.TR_GetLastError()
 
+def GetVersion():
+	buf=ctypes.create_string_buffer(256)
+	tr_lib.TR_GetVersion(buf,256)
+	return buf.value
+
 def TerminateLibrary():
 	tr_lib.TR_TerminateLibrary()
 
 def TerminateThread():
 	tr_lib.TR_TerminateThread()
+	
+###############################################
+##Various functions which control the global behaviour of the library
+###############################################
 
 #Must be called if we want to perform transformations which are potentially not thread safe. 
 def AllowUnsafeTransformations():
@@ -223,8 +249,23 @@ def SetThreadMode(on=True):
 def SetMessageHandler(fct):
 	global CALL_BACK #keep this reference ....
 	CALL_BACK=MESSAGE_HANDLER(fct)
-	tr_lib.set_lord_callback(CALL_BACK)
+	tr_lib.TR_SetLordCallBack(CALL_BACK)
 
+def SetMaxMessages(max_msg):
+	tr_lib.TR_SetLordMaxMessages(int(max_msg))
+
+def SetLordModes(use_debug=False, use_info=False, use_warning=True, use_error=True, use_critical=True):
+	tr_lib.TR_SetLordModes(int(use_debug),int(use_info),int(use_warning),int(use_error),int(use_critical))
+
+def SetLordVerbosity(verb_debug=1, verb_info=1, verb_warning=1):
+	tr_lib.TR_SetLordVerbosityLevels(verb_debug,verb_info,verb_warning) #should get rid of the last two params...
+
+def SetDebugMode():
+	global DEBUG
+	DEBUG=True
+	SetLordModes(True,True,True)
+	SetLordVerbosity(3,3,3)
+	
 def SetGeoidDir(geoid_dir):
 	global GEOIDS
 	msg=""
@@ -242,14 +283,13 @@ def SetGeoidDir(geoid_dir):
 	return ok==TR_OK,msg
 
 
-def GetVersion():
-	buf=ctypes.create_string_buffer(256)
-	tr_lib.TR_GetVersion(buf,256)
-	return buf.value
+
 
 #######################
 ## Minilabel conversion methods 
 #######################
+
+#DEPRECATED -use ExportLabel
 def GetEsriText(label):
 	if IS_INIT:
 		wkt=ctypes.create_string_buffer(2048);
@@ -257,7 +297,8 @@ def GetEsriText(label):
 		if retval==0:
 			return wkt.value
 	return None
-	
+
+#DEPRECATED -use ImportLabel
 def FromEsriText(wkt):
 	if IS_INIT:
 		out=ctypes.create_string_buffer(128)
@@ -268,6 +309,7 @@ def FromEsriText(wkt):
 			print retval
 	return None
 
+#DEPRECATED - use ImportLabel
 def FromProj4(proj4def):
 	mlb=ctypes.create_string_buffer(128)
 	retval=tr_lib.proj4_to_mlb(proj4def,mlb)
@@ -275,6 +317,27 @@ def FromProj4(proj4def):
 		return None
 	else:
 		return mlb.value
+
+#Export a label to a foreign description
+def ExportLabel(mlb,type=FRMT_EPSG):
+	if isinstance(type,str):
+		type=type.upper()
+		if "EPSG" in type:
+			type=FRMT_EPSG
+		elif "PROJ" in type:
+			type=FRMT_PROJ4
+		elif "WKT" in type:
+			type=FRMT_ESRI_WKT
+	if IS_INIT:
+		if type==FRMT_ESRI_WKT:
+			buf_len=2048
+		else:
+			buf_len=512
+		out=ctypes.create_string_buffer(buf_len)
+		retval=tr_lib.TR_ExportLabel(mlb,out,type,buf_len)
+		if retval==TR_OK:
+			return out.value
+	return None
 		
 #Import a label from wkt, proj4 or epsg definitions...
 def ImportLabel(extern_def):
@@ -355,7 +418,7 @@ def DescribeDatum(mlb_dtm):
 		if (mlb_dtm=="E"):
 			return "Ellipsoidal heights"
 		if (mlb_dtm=="N"):
-			mlb_dtm="Normal heights"
+			return "Normal heights"
 		descr=ctypes.create_string_buffer(512)
 		rc=tr_lib.doc_dtm(mlb_dtm,descr,0)
 		if (rc==TR_OK):
@@ -427,6 +490,15 @@ def SplitMLB(mlb):
 				hdatum=sep
 	return region,proj,datum,hdatum,htype
 
+#Simply extracts the parameters of a mlb as a list of strings containing also given units - assumes valid KMS-format, i.e. two spaces between separate fields.
+def GetParameters(mlb):
+	parts=mlb.split()
+	if len(parts)>1:
+		p_part=mlb[len(parts[0]):].strip()
+		params=p_part.replace("  ","*-*").replace("\t","*-*").replace(" ","").split("*-*") #extract kms-format
+		return params
+	return []
+
 def IsGeographic(mlb):
 	try:
 		region,proj,datum,hdatum,htype=SplitMLB(mlb)
@@ -452,7 +524,10 @@ def Convert2Geo(mlb):
 	region,prj,dtm,h_dtm,h_type=SplitMLB(mlb)
 	if len(dtm)==0:
 		dtm=GetDatum(mlb)
-	return "geo_"+dtm
+	out="geo_"+dtm
+	for param in GetParameters(mlb):
+		out+="  "+param
+	return out
 
 
 ################################

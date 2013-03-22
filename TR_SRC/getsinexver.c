@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* getsinexver  ver 2008.01        # page 1    1 Dec 2008 15 35 */
-
-
-/* Copyright (c) 2008 Danish National Spacecenter.             */
-/* All rights reserved.  */
-
-/* This is unpublished proprietary source code of Danish       */
-/* National Spacecenter.  This copyright claim does not        */
-/* indicate an intention of publishing this code.              */
 
 /* getsinexver sets the version number to the text ftx          */
 
@@ -37,9 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-
-/* getsinexver  ver 2008.01        # page 1    1 Dec 2008 15 35 */
 
 
 void               getsinexver(

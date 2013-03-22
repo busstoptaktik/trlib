@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/*  gtc   ver 2001.01             # page 1   12 Jan 2001 16 18 */
-
-
-/* Copyright (c) 1998, Kort-og Matrikelstyrelsen, Denmark      */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of  Kort-og     */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <math.h>
 #include    <stdio.h>
 #include    "KmsFncs.h"
@@ -58,15 +46,9 @@ Return value
 0           => ok
 TRF_TOLLE_  => tolerance exceeded.
 TRF_PROGR_  => syntax error.
-
 */
 
-
-/*  gtc   ver 2001.01             # page 2   12 Jan 2001 16 18 */
-
-
 /*
-
 g_lab       (call)           union geo_lab
 The geo_lab union must contain a a coordinate label. Only the
 type ( == 1), the init (== 1), the semi major-axis and the
@@ -108,10 +90,6 @@ errors    KE JAN 2001.
   double                   dCx = 0.0, dCy = 0.0, dCz = 0.0, tol;
   double                   p, N, Nh, cosB = 0.0, sinB;
   double                   ia, ie2;
-
-
-/*  gtc   ver 2001.01             # page 3   12 Jan 2001 16 18 */
-
 
   /* alarm for label error */
   if (c_lab->lab_type == CRD_LAB) {
@@ -168,10 +146,6 @@ errors    KE JAN 2001.
           break;
         } /* end switch(i) */
 
-
-/*  gtc   ver 2001.01             # page 4   12 Jan 2001 16 18 */
-
-
       if (res == 0) {
         /* tolerance check of results */
         dCx = Cx - B;
@@ -200,5 +174,3 @@ errors    KE JAN 2001.
           B, L, H, dCx, dCy, dCz));
 
 }
-
-

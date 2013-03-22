@@ -13,7 +13,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- * 
+ *
  */
 
 /* This module is a logging, reporting and debugging module....*/
@@ -31,9 +31,9 @@ Then output each call by using
 lord_type(int lord_code, char *frmt, ...)
 
 Example code for outputting the lord code 0 and the text filenotfound to the error module
-(void) lord_error(0, "filenotfound"));
+(void) lord_error(0, "filenotfound");
 The c code line number will also be outputted if written like this
-(void) lord_error(0, LORD("filenotfound")));
+(void) lord_error(0, LORD("filenotfound"));
 
 
 The lord_code has different meaning:
@@ -47,9 +47,6 @@ for the debug, info and warning messages different verbosity level exist
 for error and critical messages 
 	The value of the lord_code is outputtet in the same line just after the message.
 */
-
-/* TODO: implement call back mechanism AND implement some max for logged messages - say if you are transforming a zillion points with some kind of wrong input 
-* and don't want a HUGE log file.... */
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -85,8 +82,9 @@ FILE * stream_critical;
 THREAD_SAFE int last_error=TR_OK;
 
 /*message overflow protection*/
-#define MAX_MESSAGES (5000)
+//#define MAX_MESSAGES (5000)
 THREAD_SAFE int n_logged=0;
+int _max_messages = 5000;
 
 /*call back function*/
 static LORD_CALLBACK lord_call_back=NULL;
@@ -111,6 +109,11 @@ void reset_lord(){
 	n_logged=0;
 }
 
+/* Sets the maximum number of lord messages pr. thread in the LORD module. A negative number means no limit */
+void set_lord_max_messages(int max_messages) {
+	_max_messages = max_messages;
+}
+
 void set_lord_callback(LORD_CALLBACK fct){
 	lord_call_back=fct;
 }
@@ -119,11 +122,11 @@ void set_lord_callback(LORD_CALLBACK fct){
 static void lord_wrapper(LORD_CLASS report_class, int err_code, FILE *stream, char *frmt, va_list args){
 	char buf[1024], *tmp=buf;
 	n_logged++;
-	if (n_logged>MAX_MESSAGES)
+	if (n_logged>_max_messages && _max_messages > -1)
 		return;
 	/*use special message in case of overflow....*/
-	if (n_logged==MAX_MESSAGES){
-		sprintf(buf,"%d messages logged - nothing will be reported from now on.",MAX_MESSAGES);
+	if (n_logged==_max_messages){
+		sprintf(buf,"%d messages logged - nothing will be reported from now on.",_max_messages);
 	}
 	else{
 		/*compose message identifier*/
@@ -439,7 +442,7 @@ void init_lord()
 	stream_critical = stderr;
 }
 
-// Turn the lord modes on or off, an output stream must be specified or the mode cannot be turned on
+// Turn the lord modes on or off
 void set_lord_modes(int debug, int info, int warning, int error, int critical)
 {
 	if (!TR_IsMainThread())
@@ -447,7 +450,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		return;
 	}
 
-	if (stream_debug != NULL)
+	/* if (stream_debug != NULL) - this is decided in lord_wrapper.... */
 	{
 		if (debug == 0 || debug == 1)
 		{
@@ -455,7 +458,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		}
 	}
 
-	if (stream_info != NULL)
+	/*if (stream_info != NULL)*/
 	{
 		if (info == 0 || info == 1)
 		{
@@ -463,7 +466,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		}
 	}
 
-	if (stream_warning != NULL)
+	/*if (stream_warning != NULL)*/
 	{
 		if (warning == 0 || warning == 1)
 		{
@@ -471,7 +474,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		}
 	}
 
-	if (stream_error != NULL)
+	/*if (stream_error != NULL)*/
 	{
 		if (error == 0 || error == 1)
 		{
@@ -479,7 +482,7 @@ void set_lord_modes(int debug, int info, int warning, int error, int critical)
 		}
 	}
 
-	if (stream_critical != NULL)
+	/*if (stream_critical != NULL)*/
 	{
 		if (critical == 0 || critical == 1)
 		{
@@ -498,7 +501,7 @@ void set_lord_outputs(FILE * stream_debug_outside, FILE * stream_info_outside, F
 	stream_critical = stream_critical_outside;
 }
 
-// Set the verbosity level for the modes
+/* Set the verbosity level for the modes - simlk: consider changing to only the three first classes in input */
 void set_lord_verbosity_levels(int verb_debug, int verb_info, int verb_warning, int verb_error, int verb_critical)
 {
 	if (!TR_IsMainThread())

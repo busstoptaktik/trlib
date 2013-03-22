@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/*  s34tkk   ver 1999.01          # page 1   12 Jan 1999 12 54 */
-
-
-/* Copyright (c) 1999 LG, Kort-og Matrikelstyrelsen, Denmark   */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort-og  */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <stdio.h>
 #include    <math.h>
 #include    "KmsFncs.h"
@@ -69,10 +57,6 @@ direct, call by value indicating
   modification (s34s->kk): WLW, Januar 1989
   modification           : KE,  Januar 1999
 */
-
-
-/*  s34tkk   ver 1999.01          # page 2   12 Jan 1999 12 54 */
-
 
 {
 
@@ -137,10 +121,6 @@ int               res = 0;
       else res = TRF_AREA_;
     }
 
-
-/*  s34tkk   ver 1999.01          # page 3   12 Jan 1999 12 54 */
-
-
     else { /* collect output coord */
       *yout = N;
       *xout = E;
@@ -157,4 +137,3 @@ int               res = 0;
           "m ", "", N, E, N - y, E - x));
 
 }
-

@@ -15,20 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* tabdd_i   ver 2006.1           # page 1    24 Jul 2006 17 23 */
-
-
-/* Copyright (c) 2004 Kort & Matrikelstyrelsen, Denmark   */
-/* and Danish National Space Center                       */
-/* All rights reserved.                                   */
-
-/* This is unpublished proprietary source code of Kort &         */
-/* Matrikelstyrelsen, Denmark, and Danish National Space Center. */
-/* This copyright claim does not indicate an intention of        */
-/* publishing this code.                                         */
 
 #include    <stdio.h>
 #include    <string.h>
@@ -59,10 +45,6 @@ char                    *err_str
   struct gde_lab             *t_lab_p;
   struct lab_def_str          lab_table, *p_lb = &lab_table;
 
-
-/* tabdd_i   ver 2006.1           # page 2    24 Jul 2006 17 23 */
-
-
 #ifndef   _WIN32
   int                         r;
 #endif
@@ -83,10 +65,6 @@ char                    *err_str
     *(ppge+qr) = -1l;
   }
 
-/*
-(void) fprintf(stdout,
-"\n*tabdd_i : after init: tabdd_n = %s;", tabdd_n);
-*/
   /* initialize the tabdd_n */
   /*________________________*/
   if (strlen(tabdd_n) > 3 && islower(*tabdd_n)) {

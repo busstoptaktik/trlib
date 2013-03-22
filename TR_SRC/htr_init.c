@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* htr_init  ver 2010            # page 1    24 Jul 2010 11 57 */
-
-
-/* Copyright (c) 2003,   Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                     */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <stdio.h>
 #include    <string.h>
 #include    <math.h>
@@ -213,4 +201,3 @@ char                    *dh_tr_info
 
   return(tr_type);
 }
-

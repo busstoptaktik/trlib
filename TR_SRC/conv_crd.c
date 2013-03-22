@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* conv_crd    ver 2012.01          # page 1    31 May 2012 10 19 */
-
 
 /* Copyright (c) 2012 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -54,10 +49,6 @@ struct coord_lab        *c_lab,
 ...
 )
 {
-
-
-/* conv_crd    ver 2012.01          # page 2    31 May 2012 10 19 */
-
 
   FILE                      *iofile = (FILE *) NULL;
   char                      *io_str = (char *) NULL;
@@ -107,10 +98,6 @@ struct coord_lab        *c_lab,
     /* 18 */ "gravity",
     /* 19 */ "",
   };
-
-
-/* conv_crd    ver 2012.01          # page 3    31 May 2012 10 19 */
-
 
   (void) strcpy(rgn_EE.prfx, "EE");
   /* save lab_info */
@@ -188,10 +175,6 @@ struct coord_lab        *c_lab,
       break;
     }
 
-
-/* conv_crd    ver 2012.01          # page 4    31 May 2012 10 19 */
-
-
     /* set params of the coord systems */
     /*_________________________________*/
     switch(c_lab->cstm) {
@@ -225,10 +208,6 @@ struct coord_lab        *c_lab,
         (void) strcpy(p_lb->pr_dtm, p_gsb);
         if (sepch == '_') sepch = '\0';
         break;
-
-
-/* conv_crd    ver 2012.01          # page 5    31 May 2012 10 19 */
-
 
       case 0:
       default:
@@ -282,11 +261,7 @@ struct coord_lab        *c_lab,
       }
       break; /* end case 3 : utm, itm, dks, asb, sb */
 
-
-/* conv_crd    ver 2012.01          # page 6    31 May 2012 10 19 */
-
-
-    case  4: /* mrc */
+	case  4: /* mrc */
     case  5: /* lmb */
     case  6: /* stg */
     case  7: /* safle, safl, lmbac, lmbap, lmblap, lmbaps, lmblaps, authalic geog. */
@@ -318,10 +293,6 @@ struct coord_lab        *c_lab,
       c_lab->lab_type = ILL_LAB;
       break;
     }
-
-
-/* conv_crd    ver 2012.01          # page  7    31 May 2012 10 19 */
-
 
     /* PRODUCE THE MINI-LAB  from : mlb1, sepch, dtm */
 
@@ -368,10 +339,6 @@ struct coord_lab        *c_lab,
         c_lab->ellipsoid = (short) set_grs(-1, t_lab, ell_p);
         c_lab->datum     = -2;
       }
-
-
-/* conv_crd    ver 2012.01          # page  8    31 May 2012 10 19 */
-
 
       if (c_lab->ellipsoid >= 0) {
         /* ellipsoid params */
@@ -523,9 +490,6 @@ struct coord_lab        *c_lab,
     /* set trf. constants for completed systems */
     (void) set_trc(c_lab);
 
-
-/* conv_crd    ver 2012.01          # page  9    31 May 2012 10 19 */
-
      /* INPUT OF DATE at datums: ITRF, IGS, ETRF */
     if (6 <= c_lab->datum && c_lab->datum <= 8) {
       if (conv_mode == 0 || conv_mode == 1) {
@@ -548,10 +512,6 @@ struct coord_lab        *c_lab,
       c_lab->ch_sum = labchsum((union geo_lab *) c_lab, &c_lab->ch_sum);
 
     break; /* end conv_mode 0 & 1 */
-
-
-/* conv_crd    ver 2012.01          # page 10    31 May 2012 10 19 */
-
 
   case 3:  /* output of minilabel, simple */
   case 4:  /* output of minilabel, expand */
@@ -668,10 +628,6 @@ struct coord_lab        *c_lab,
                        " ", rgn_pref.prfx, rgn_name);
       }
 
-
-/* conv_crd    ver 2012.01          # page 11    31 May 2012 10 19 */
-
-
       /* Datum, ellipsoid, and parent datum */
 
       if (c_lab->datum > 0
@@ -712,10 +668,6 @@ struct coord_lab        *c_lab,
     } /* end conv_mode == 4 */
 
     break; /* end case 3 & 4, output label */
-
-
-/* conv_crd    ver 2012.01          # page 12    31 May 2012 10 19 */
-
 
   case 5:   /* DOCUMENTATION OF THE LABEL */
 
@@ -880,10 +832,6 @@ struct coord_lab        *c_lab,
       }
     }
 
-
-/* conv_crd    ver 2012.01          # page 13    31 May 2012 10 19 */
-
-
     /* Enumeration of coord system */
     (void) fprintf(iofile, "\ncstm      = %15d", c_lab->cstm);
     (void) fprintf(iofile, "         mode      = %15d", c_lab->mode);
@@ -934,10 +882,6 @@ struct coord_lab        *c_lab,
        (void) fprintf(iofile, "\ncP        = %15.14f", c_lab->cP);
     else
        (void) fprintf(iofile, "\ns34 curv. = %15.14e", c_lab->cP);
-
-
-/* conv_crd    ver 2012.01          # page 14    31 May 2012 10 19 */
-
 
     if (c_lab->cstm != 7) {
       /* Gaussian latitude coeff. */
@@ -993,4 +937,3 @@ struct coord_lab        *c_lab,
 
   return(c_lab->lab_type);
 }
-

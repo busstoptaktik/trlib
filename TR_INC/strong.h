@@ -20,5 +20,6 @@
  double get_number(char *item);
  char **append_items(char **items1, char **items2, int n_items1, int n_items2);
  void string_tolower(char *text);
+ int replace_pattern(char *in, char *out, char *to_replace, char *replace_with);
  char *path_basename(char *full_path);
  

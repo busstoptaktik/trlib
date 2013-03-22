@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* s34jtos  ver 1999.01           # page 1   10 Sep 1998 12 54 */
-
-
-/* Copyright (c) 1999 LG, Kort-og Matrikelstyrelsen, Denmark   */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort-og  */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <stdio.h>
 #include    <math.h>
@@ -76,9 +64,6 @@ produces os coordinates Y,X from the s34j coordinates y,x.
 Note the operator & on Y and X.
 */
 
-
-/* s34jtos  ver 1999.01           # page 2   10 Sep 1998 12 54 */
-
 
   double               N = 0.0, E = 0.0, n, e, w, tol = 0.0005;
   double               *c, *cb = NULL, *cw = NULL;
@@ -127,10 +112,6 @@ Note the operator & on Y and X.
   }
   else res = TRF_ILLEG_;
 
-
-/* s34jtos  ver 1999.01           # page 3   10 Sep 1998 12 54 */
-
-
   for (i = -1; i <= 1 && res == 0; ++i)
     if (i) { /* transformation, i == -1 => f, i == 1 => b */
       t   = (int) fabs(*cb);
@@ -175,4 +156,3 @@ Note the operator & on Y and X.
           "m ", "", N, E, N - y, E - x));
 
 }
-

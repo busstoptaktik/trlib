@@ -7,7 +7,6 @@ EXPORTS
 	TR_GetVersion
 	TR_TerminateLibrary
 	TR_TerminateThread
-	TR_GetLastError
 	TR_Open
 	TR_Close
 	TR_Transform
@@ -24,7 +23,15 @@ EXPORTS
 	TR_CloseProjection
 	TR_GetGeoidName
 	TR_ImportLabel
+	TR_ExportLabel
 	TR_Insert
+	TR_GetLastError
+	TR_SetLordMaxMessages
+	TR_SetLordCallBack
+	TR_SetLordModes
+	TR_SetLordOutputs
+	TR_SetLordVerbosityLevels
+	TR_SetLordFile
 	bh_lat
 	bh_lmb
 	bshlm1
@@ -57,6 +64,7 @@ EXPORTS
 	eetmtu_g
 	erad
 	etrs89_trans
+	export_to_epsg
 	f_nxt
 	fe_trans
 	fgetdt
@@ -98,6 +106,7 @@ EXPORTS
 	itrf_trans
 	kmsshp_tr
 	labchsum
+	mlb_to_proj4
 	ng_trans
 	pla_adm_f
 	prn_cho

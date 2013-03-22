@@ -15,19 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* dks_tr   ver 1999.01           # page 1   12 Jan 1999 13 41 */
-
-
-/* Copyright (c) 1992 LG, Kort-og Matrikelstyrelsen, Denmark   */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort-og  */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include     <stdio.h>
 #include     <math.h>
 #include     <string.h>
@@ -68,9 +55,6 @@ FILE           *tr_error
 #define  R3R9    -4
 #define  ILLG    99
 
-
-/* dks_tr   ver 1999.01           # page 2   12 Jan 1999 13 41 */
-
 
   double                      N, E;
 
@@ -95,10 +79,6 @@ FILE           *tr_error
     /*  4 */ {  4,   "rt38v"},
     /*stop*/ { -1,   ""}
   };
-
-
-/* dks_tr   ver 1999.01           # page 3   12 Jan 1999 13 41 */
-
 
   static double Cdks_s34s[] = {
 
@@ -140,10 +120,6 @@ FILE           *tr_error
     /* X0*/     103637.116675
   };
 
-
-/* dks_tr   ver 1999.01           # page 4   12 Jan 1999 13 41 */
-
-
   static double Cs34s_dks[] = {
 
     /*deg*/  5.0,
@@ -183,10 +159,6 @@ FILE           *tr_error
 
     /* X0*/      72992.401611
   };
-
-
-/* dks_tr   ver 1999.01           # page 5   12 Jan 1999 13 41 */
-
 
   static double Cdks_rt90[] = {
 
@@ -228,10 +200,6 @@ FILE           *tr_error
     /* X0*/     103611.774935
   };
 
-
-/* dks_tr   ver 1999.01           # page 6   12 Jan 1999 13 41 */
-
-
   static double Crt90_dks[] = {
 
     /*deg*/  5.0,
@@ -271,10 +239,6 @@ FILE           *tr_error
 
     /* X0*/     -62968.974963
   };
-
-
-/* dks_tr   ver 1999.01           # page 7   12 Jan 1999 13 41 */
-
 
   static double Cdks_u33[] = {
 
@@ -316,10 +280,6 @@ FILE           *tr_error
     /* X0*/     103637.116675
   };
 
-
-/* dks_tr   ver 1999.01           # page 8   12 Jan 1999 13 41 */
-
-
   static double Cu33_dks[] ={
 
     /*deg*/  5.0,
@@ -359,10 +319,6 @@ FILE           *tr_error
 
     /* X0*/     346377.379477
   };
-
-
-/* dks_tr   ver 1999.01           # page 9   12 Jan 1999 13 41 */
-
 
   /* Constants given by LMV, Geodetiska Utvecklingsenheten */
   /* Transformation RT38 5 GON V 0.0 -> RT90 5 GON V 0.0   */
@@ -468,10 +424,6 @@ FILE           *tr_error
     in_nr = 0;
   }
 
-
-/* dks_tr   ver 1999.01           # page 11   12 Jan 1999 13 41 */
-
-
   /* transformation module */
   *N_out = *E_out = 0.0;
   nst    = in_nr;
@@ -516,10 +468,6 @@ FILE           *tr_error
       if (N < NMIN || NMAX < N || E < EMIN || EMAX < E)
           res = TRF_AREA_;
       break;
-
-
-/* dks_tr   ver 1999.01           # page 12   12 Jan 1999 13 41 */
-
 
     case R9R3: /* rt90->rt38 */
       res = hlm_tr(Crt38_rt90, -1, N, E, &N, &E, usertxt, tr_error);
@@ -568,4 +516,3 @@ FILE           *tr_error
 #undef  ILLG
 
 }
-

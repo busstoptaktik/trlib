@@ -179,7 +179,6 @@ int set_hth(char **tokens,  def_hth_tr *entry, int n_items, char *descr){
 			for(i=0;i<5 && i<n_items-5; i++){
 				val=get_number(tokens[5+i]);
 				(entry->constants)[i]=val;
-				/*printf("hth: %s, item: %s, val: %e\n",tokens[0],tokens[5+i],val);*/
 			}
 			break;
 		default:
@@ -332,7 +331,6 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	next_tokens=get_items(savelines[n_lines]," \n\r", &n_items2);
 	if (next_tokens!=NULL && n_items2>0){
 		tokens=append_items(tokens,next_tokens,n_items,n_items2);
-		/*printf("n_items: %d, n_items2: %d first: %s\n",n_items,n_items2,tokens[0]);*/
 		n_items+=n_items2;
 		free(next_tokens);
 	}
@@ -365,7 +363,6 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 		n_set[mode]++;
 	else{
 		(*n_err)++;
-		/*printf("Err: mode: %s, item: %s n_items: %d\n",mode_names[mode],tokens[0],n_items);*/
 		}
 	completed=1;
 	/*end main loop over lines */
@@ -416,9 +413,6 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	    return NULL;
 }
 
-
-
-
 void close_def_data( def_data *data){
 	free(data->projections);
 	free(data->datums);
@@ -428,19 +422,3 @@ void close_def_data( def_data *data){
 	free(data);
 	return;
 }
-
-/*
-
-int main(void){
-	int n_err=0;
-	FILE *fp=fopen("def_lab.txt","rb");
-	 def_data *data=NULL;
-	data=open_def_data(fp,&n_err);
-	fclose(fp);
-	present_data(stdout,data);
-	close_def_data(data);
-	printf("Errors: %d\n",n_err);
-	return 0;}
-	
-*/
-

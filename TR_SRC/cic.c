@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* cic    ver 1999.01               # page 1   12 Jan 1999 12 06 */
-
-
-/* Copyright (c) 1999 LG, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of LG, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include          <stdio.h>
 #include          <math.h>
@@ -74,14 +62,6 @@ FILE                  *tr_error
     return((tr_error==NULL) ? TRF_PROGR_ :
             t_status(tr_error, usertxt,
                      "\n*** cic: UDEFINERET RETNING;\n", TRF_PROGR_));
-
-
-/* cic    ver 1999.01               # page 2   12 Jan 1999 12 06 */
-
-
-/*
-(void) printf("\nINPUT   %+12.3f   %+12.3f   %+12.3f", X, Y, Z);
-*/
     for (i = b; i != e; i += s) switch(i) {
 
     case 1: /* forward */
@@ -116,11 +96,6 @@ FILE                  *tr_error
 
     case 0:
     case 4: /* control */
-/*
-(void) printf("\nCHECK   %+12.3f   %+12.3f   %+12.3f", X, Y, Z);
-(void) printf("\nDIFF    %+12.7e   %+12.7e   %+12.7e\n",
-X-Xi, Y-Yi, Z-Zi);
-*/
 
       if     (fabs(X - Xi) < tol
           &&  fabs(Y - Yi) < tol
@@ -135,4 +110,3 @@ X-Xi, Y-Yi, Z-Zi);
   }
   return(0);
 }
-

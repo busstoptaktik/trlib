@@ -121,10 +121,6 @@ extern def_data *DEF_DATA;
 
 #define  MAX_IMPL_CDTM   (153)
 
-
-/* set_dtm     ver 2010.1          # page 3   12 jan 2010 10 19 */
-
-
   /* implicit datums Height */
 #define  HLOKD  (201)  /* Local Reference Level */
 #define  HMSLD  (202)  /* Mean Sea Level of geoid dtm */
@@ -286,8 +282,6 @@ extern def_data *DEF_DATA;
       /* return res or 'no datum found' */
      
       return(res);
-   
-
 
 
 /* This is not implemented here - should perhaps be up to a separate documentation function??*/

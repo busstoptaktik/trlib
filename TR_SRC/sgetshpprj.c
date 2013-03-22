@@ -30,7 +30,7 @@ union geo_lab   *g_lab,
 char            *mlb_out)
 {
 
-/* fgetshpprj returns::
+/* sgetshpprj returns::
    0    prj line ok. label_set ok.
    -1   syntax error in prj line.
    -2   def_shp.txt  def_shp.txt file not found in geoid directory
@@ -59,6 +59,12 @@ char            *mlb_out)
   if (g_lab!=NULL)
 	  g_lab->u_c_lab.g_tpd = *set_tpd("dg", 2, 7);
   k = 0;
+  *mlb_out='\0';
+  /*added some extra bullet-proofing - simlk, ,arch 2013*/
+  if (wkt_in==NULL || strlen(wkt_in)==0){
+	  lord_error(TR_LABEL_ERROR,LORD("Empty input string."));
+	  return -1;
+  }
   do {
     c = *(wkt_in++);
     if (c != '\n' && c != '_' && c != ' ') {
@@ -78,19 +84,29 @@ char            *mlb_out)
     }
   } while ((state > 0 || lab_state == 0) &&
             chrs_in < 2047 && c != '\0');
+  lord_debug(0,LORD("Escaped parsing wkt"));
   *(prj_txt + chrs_in) = '\0';
+    /*moved these assignments for earlier error check - simlk march 2013*/
+    p_txt1 = strchr(p_txt, '[');
+    k    = (int)((ptrdiff_t)p_txt1 - (ptrdiff_t)p_txt);
+  
   lab_state = 0;
-  if (state == 0 && chrs_in > 0) {
+  if (state == 0 && chrs_in > 0 && p_txt1 && (k>0)){
     fp = i_tabdir_file(5, "def_shp.txt", &i, temp);
     if (i) return ((i == -1) ? -2 : -3);
 
     *param = '\0';
     (void) strcpy(mlb2, "_h_msl");
-    p_txt1 = strchr(p_txt, '[');
-    k      = (int)((ptrdiff_t)p_txt1 - (ptrdiff_t)p_txt);
+    /*p_txt1 = strchr(p_txt, '[');
+    k      = (int)((ptrdiff_t)p_txt1 - (ptrdiff_t)p_txt); - moved above...*/
     (void) fgetlhtx(fp, entry);
     for (j = 0; go_on && state == 0; j++) {
-      (void) fgetln_kms(entry, &i, fp);
+      int n_read=fgetln_kms(entry, &i, fp);
+      if (n_read==EOF){ /*add an escape route!*/
+	      state=1;
+	      lord_error(TR_LABEL_ERROR,LORD("Reached end of file while scanning!"));
+	      break;  
+      }
       if (strncmp(p_txt, entry, k) == 0) {
         switch (j) {
         case 0:  /*COMPDCS*/
@@ -304,5 +320,8 @@ char            *mlb_out)
     } else i = 1;
     (void) c_tabdir_file(5, fp);
     return(i);
-  } else return(-1);
+  } else{
+	  lord_error(TR_LABEL_ERROR,LORD("Malformed WKT"));
+	  return(-1);
+  }
 }

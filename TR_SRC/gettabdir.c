@@ -17,9 +17,6 @@
  */
  
 
- /* gettabdir  ver 2000.01           # page 1   12 Jan 1999 17 23 */
-
-
 #include        <string.h>
 
 

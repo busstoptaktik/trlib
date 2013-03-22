@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* h_trans  ver 2004.01          # page 1    24 Jan 2004 11 57 */
-
-
-/* Copyright (c) 2003,   Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                     */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <stdio.h>
 #include    <string.h>
 #include    <math.h>
@@ -47,10 +35,6 @@ char                    *tr_str
 
   extern THREAD_SAFE FILE               *def_lab_file;
   extern THREAD_SAFE size_t              init_prj_pos, init_hth_pos;
-
-
-/* h_trans  ver 2004.01          # page 2    24 Jan 2004 11 57 */
-
 
   struct h_trc_str {
     union geo_lab ref_lab;
@@ -80,11 +64,6 @@ char                    *tr_str
 
   /* LAT0, LON0, M0, N0, coord and Curvatures of ref stn            */
 
-
-
-/* h_trans  ver 2004.01          # page 3    24 Jan 2004 11 57 */
-
-
   if (ic_lab->lab_type != CRD_LAB)
     return(s_status(tr_str, "h_trans(i labels error)", TRF_ILLEG_));
 
@@ -92,10 +71,7 @@ char                    *tr_str
     if (def_lab_file == NULL || init_prj_pos == 0) {
       (void) i_tabdir_file(3, "", &res, pth_mlb);
       if (res) {
-        (void) fprintf(stdout, "\n*** def_lab.txt: %s %s;\n", pth_mlb,
-          (res == -1) ? "NOT FOUND" :
-          (res == -2) ? "NOT lab definition file" :
-                        "Content not accepted");
+        (void) lord_info(0, LORD("def_lab.txt: %s %s;"), pth_mlb, (res == -1) ? "NOT FOUND" : (res == -2) ? "NOT lab definition file" : "Content not accepted");
         return (-2);
       }
     } else res = 0;
@@ -111,8 +87,7 @@ char                    *tr_str
         }
       } while (qr && res != EOF);
       if (qr) {
-        (void) fprintf(stdout, 
-           "\n*** set_dtm: lab_def.txt H_to_H not found ;\n");
+        (void) lord_error(0, LORD("set_dtm: lab_def.txt H_to_H not found;"));
         return (-2);
       }
       init_hth_pos = ftell(def_lab_file);
@@ -191,4 +166,3 @@ char                    *tr_str
   return(0);
 
 }
-

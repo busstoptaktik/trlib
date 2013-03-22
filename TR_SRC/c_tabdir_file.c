@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* c_tabdir_file  ver 2010.01          # page 1    15 Feb 2010 15 35 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -27,6 +22,7 @@
 /* This is unpublished proprietary source code of Danish       */
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
+
 
 /* c_tabdir_file(mode, f_in) closes the file pointed by f_in   */
 /*      some GLOBAL PARAMS are initialized to zero             */
@@ -69,10 +65,6 @@ int               mode,
 FILE             *f_in
 )
 {
-
-
-/* c_tabdir_file  ver 2010.01            # page 2     5 feb 2010 15 35 */
-
 
   if (mode == 0 || mode == 1) { // manager.tab
     if (man_tab_file != NULL) {

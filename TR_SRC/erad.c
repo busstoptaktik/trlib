@@ -15,25 +15,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* erad.c                             # page 1   29 sep 2009 13 05 */
-
-
-/* Copyright (c) 2009, Danish National Space Center, DTU       */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of DNSC, DTU    */
-/* This copyright claim does not indicate an intention of      */
-/* publishing this code.                                       */
 
 #include <math.h>
 #include <stdio.h>
-#include "trthread.h"
 
-
-/* erad.c                             # page 2   29 sep 2009 13 05 */
+#include "trthread.h"
+#include "lord.h"
+
 
 double                  erad(
 /*_________________________*/
@@ -95,10 +83,6 @@ Any other value of ft gives an alarm exit.
 Prog. KP OCT 1989/JAN 1992.
 
 */
-
-
-/* erad.c                             # page 3   29 sep 2009 13 05 */
-
 
 {
   double       n, n2, h = 0.0, h1, h2 = 0.0, *p;
@@ -189,11 +173,8 @@ Prog. KP OCT 1989/JAN 1992.
     break;
 
   default:
-    (void) fprintf(stderr,
-        "\n*** undef. call of erad with type %c", ft);
+  (void) lord_error(0, LORD("\n*** undef. call of erad with type %c"), ft);
     return(0.0);
   }
   return (c);
 }
-
-

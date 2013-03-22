@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* bshlm2.c                         # page 1   18 Feb 1994 13 50 */
-
-
-/* Copyright (c) 1991 U/32, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include    <math.h>
 #include    <stdio.h>
@@ -79,10 +67,6 @@ S       the length of the geodesic between the stations in units
 Prog: Knud Poder NOV 1990
 */
 
-
-/* bshlm2.c   Turbo C version       # page 2   18 Feb 1994 13 50 */
-
-
 {
   double     em2, V1, V2, b0, PF;
   double     dL, d_lmb, d_lmb1;
@@ -123,11 +107,6 @@ Prog: Knud Poder NOV 1990
   } while ((i--)
       && fabs(d_lmb - d_lmb1) >= fabs(d_lmb)*1.0e-10);
 
-
-
-/* bshlm2.c   Turbo C version       # page 3   18 Feb 1994 13 50 */
-
-
   if (i) {
     K1sq     = K1*K1;
     PF       = b0*(1.0 + K1sq/4.0)/(1.0 - K1);
@@ -158,4 +137,3 @@ Prog: Knud Poder NOV 1990
   }
   return(*S > a*1e-6 ? 0 : 1);
 }
-

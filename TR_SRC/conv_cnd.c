@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* conv_cnd  ver 2010.01            # page 1    7 jan 2010 15 35 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -63,10 +58,6 @@ struct obs_lab          *o_lab,
   int                        conv_mode, i, used = 0;
   char                       rgn_name[24];
   union rgn_un               rgn_pref;
-
-
-/* conv_cnd  ver 2010.01            # page 2    7 jan 2010 15 35 */
-
 
   struct otype_str {
     short      obs_type;
@@ -117,9 +108,6 @@ struct obs_lab          *o_lab,
 
     p_tp = (char *) o_lab; /* clean lab */
     for (i = sizeof (*o_lab) - 1; i >= 0; i--) *(p_tp + i) = 0;
-
-
-/* conv_cnd  ver 2010.01            # page 3    7 jan 2010 15 35 */
 
     i                = 0;
     o_lab->lab_type  = p_lb->lab_type;
@@ -174,10 +162,6 @@ struct obs_lab          *o_lab,
       return(ILL_LAB);
     }
 
-
-/* conv_cnd  ver 2010.01            # page 4    7 jan 2010 15 35 */
-
-
     if (o_lab->cmplt) {
       if (o_lab->obs_kind != 1) {
         if (p_otype->mc_type) {
@@ -229,10 +213,6 @@ struct obs_lab          *o_lab,
       }
     }
 
-
-/* conv_cnd  ver 2010.01            # page 5    7 jan 2010 15 35 */
-
-
     else {
       if (p_otype->mc_type) {
         w          = sgetg(io_str, &(o_lab->md_tpd), &used,
@@ -265,10 +245,6 @@ struct obs_lab          *o_lab,
     o_lab->ch_sum   = labchsum((union geo_lab *) o_lab, &o_lab->ch_sum);
 
     break; /* end conv_mode 0 & 1 */
-
-
-/* conv_cnd  ver 2010.01            # page 6    7 jan 2010 15 35 */
-
 
   case 3:  /* output of minilabel, simple */
   case 4:  /* output of minilabel, expand */
@@ -320,10 +296,6 @@ struct obs_lab          *o_lab,
     } /* end sepch = '_' */
     (void) fprintf(iofile, "\n");
 
-
-/* conv_cnd  ver 2010.01            # page 7    7 jan 2010 15 35 */
-
-
     if (conv_mode == 4) {
 
       if (!o_lab->obs_type) {
@@ -372,10 +344,6 @@ struct obs_lab          *o_lab,
 
       (void) fprintf(iofile, "\n;\n");
     } /* end conv_mode == 4 */
-
-
-/* conv_cnd  ver 2010.01            # page 8    7 jan 2010 15 35 */
-
 
     if (conv_mode == 5) { /* SURVEY : DOCUMENTATION OF THE LABEL */
       sepch = *(o_lab->mlb + o_lab->sepix);

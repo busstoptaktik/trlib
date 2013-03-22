@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* setDtrc                          # page 1    1 Mar 1993 11:18 */
-
 
 /* Copyright (c) 1994 GD, Kort-og Matrikelstyrelsen, Denmark */
 /* All rights reserved.                                      */
@@ -51,10 +46,6 @@ Springer-Verlag, Berlin/Goettingen/Heidelberg 1951.
   if (c_lab->lab_type == 1 ) {
     /* Initialize the Derivatives transformation constants */
 
-
-/* setDtrc                          # page 2    1 Mar 1993 11:18 */
-
-
     /* third flattening */
     np = n = c_lab->f/(2.0 - c_lab->f);
     /* coef of trig serie geo -> norm. Meridian length */
@@ -80,7 +71,7 @@ Springer-Verlag, Berlin/Goettingen/Heidelberg 1951.
     case 7: /* pseudo-equivalent projections */
       break;
     default: /* Programme error */
-	    lord_error(TR_LABEL_ERROR,"setDtrc: Should only be used on TM-projection input.\n");
+	    lord_error(TR_LABEL_ERROR,LORD("Should only be used on TM-projection input."));
 /*#ifndef _WIN32
       (void) fprintf(stderr, 
           "\n***setDtrc: Program- eller maskinfejl  - ak ak");

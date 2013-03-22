@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* pla_adm_f    ver 1998.02            # page 1   18 Feb 1998 14 13 */
-
-
-/* Copyright (c) 1998, Kort-og Matrikelstyrelsen, Denmark      */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GEK, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <string.h>
@@ -69,10 +57,6 @@
 /*   to poly loops (txt) in o_name                            */
 /*                                                            */
 
-
-/* pla_adm_f                           # page 2   18 Feb 1998 14 13 */
-
-
 int                  pla_adm_f(
 /*___________________________*/
 char                 mode,
@@ -97,10 +81,6 @@ char                *err_txt
   struct  plate_info     pl_inf;
   struct typ_dec         tpd;
 
-
-/* pla_adm_f                           # page 2   18 Feb 1998 14 13 */
-
-
   switch (mode) {
   case 'b': /* to_bin */
             /* ______ */
@@ -108,7 +88,7 @@ char                *err_txt
 
     /* read plates info */
     if (conv_lab("input", &lab_a, i_fd) != CRD_LAB) {
-      (void) sprintf(err_txt, "\n+++ mangler label\n");
+      (void) lord_error(0, LORD("mangler label"));
       return(-1);
     }
     (void) fgetln_kms(txt, &qr, i_fd);

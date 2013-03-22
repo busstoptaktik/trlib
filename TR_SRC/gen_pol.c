@@ -15,18 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* gen_pol                        # page 1   10 Sep 1998 12 02 */
-
-
-/* Copyright (c) 1995, GD, Kort-og Matrikelstyrelsen, Denmark  */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of GD, Kort- og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
 
 #include              <math.h>
 
@@ -59,10 +47,6 @@ double               *Eout
   N  = N_in;
   E  = E_in;
   Cp = C_f;
-
-
-/* gen_pol                        # page 2   10 Sep 1998 12 02 */
-
 
   /* Transformation loop */
   for (i = -1; i <= 1 && res == 0; ++i)
@@ -104,5 +88,3 @@ double               *Eout
 #undef   FLOATLIMIT
 
 }
-
-

@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* etrs89_trans  ver 2009.03          # page 1   04 Mar 2009 11 36 */
-
 
 /* Copyright (c) 2009, National Space Institude, Danish Technical */
 /* University and Kort-og Matrikelstyrelsen, Denmark              */
@@ -68,10 +63,6 @@ FILE                     *tr_error
   /*   "etrs-tmzz", "ETRS-TMzz", "etrs-lcc", "ETRS-LCC",      */
   /*   "etrs-laea", "ETRS-LAEA"                               */
 
-
-/* etrs89_trans  ver 2009.03          # page 2   04 Mar 2009 11 36 */
-
-
   static THREAD_SAFE  char                 si_lab_str[MLBLNG];
   static THREAD_SAFE  char                 so_lab_str[MLBLNG];
   static THREAD_SAFE  union geo_lab        i_lab;
@@ -94,10 +85,6 @@ FILE                     *tr_error
     {"etrs-tm", 7}, {"ETRS-TM", 7}, {"fke", 3},
     {"etrs-lcc", 8}, {"ETRS-LCC", 8},
     {"etrs-laea", 9}, {"ETRS-LAEA", 9}, {"", 0}};
-
-
-/* etrs89_trans  ver 2009.03          # page 3   04 Mar 2009 11 36 */
-
 
   struct coord_lab           *o_wclb;
   char                        mlb_str[MLBLNG];
@@ -134,9 +121,6 @@ FILE                     *tr_error
 
   /* sequence of transformations : (part of ETPL)               */
   /* lev == 3 : transform coordinates                           */
-
-
-/* etrs89_trans  ver 2009.03          # page 4   04 Mar 2009 11 36 */
 
 
   /* Init of tables */
@@ -187,17 +171,11 @@ FILE                     *tr_error
 
     init =  1;
 
-
-/* etrs89_trans  ver 2009.03          # page 5   04 Mar 2009 11 36 */
-
-
     /* init of transformation  (b_lev == 3) */
     o_wclb  = &(o_lab.u_c_lab);
 
 #ifdef DEBUGTRANS
-(void) fprintf(stdout,
-"\n*etrs89_trans inlab = %s  outlab = (%s) %s;",
-i_clb->mlb, o_wclb->mlb, o_clb->mlb);
+  (void) lord_debug(0, LORD("\n*etrs89_trans inlab = %s  outlab = (%s) %s;"), i_clb->mlb, o_wclb->mlb, o_clb->mlb);
 #endif
     /* reg->reg */
     sta = *(io_nr_tab + i_clb->cstm);
@@ -223,15 +201,10 @@ i_clb->mlb, o_wclb->mlb, o_clb->mlb);
     }
 
 #ifdef DEBUGTRANS
-(void) fprintf(stdout, "\n*sta,sto,ptp = %d, %d, %d;",
-sta, stp, ptp);
+  (void) lord_debug(0, LORD("\n*sta,sto,ptp = %d, %d, %d;"), sta, stp, ptp);
 #endif
 
   } /* end of init of tables */
-
-
-/* etrs89_trans  ver 2009.03          # page 6   04 Mar 2009 11 36 */
-
 
   N      = N_in;
   E      = E_in;
@@ -245,8 +218,8 @@ sta, stp, ptp);
     case  PTG: /* PRJ (or GEO) -> GEO */
       /*______________________________*/
 #ifdef DEBUGTRANS
-  (void) fprintf(stdout, "\n*case 2: PRJ -> GEO");
-  (void) fprintf(stdout, "   %s;", (i_lab.u_c_lab).mlb);
+  (void) lord_debug(0, LORD("\n*case 2: PRJ -> GEO"));
+  (void) lord_debug(0, LORD("   %s;"), (i_lab.u_c_lab).mlb);
 #endif
       ies = ptg(&i_lab, (int) ste, N, E, &N, &E, "etrs89_trans", tr_error);
       if (ptp) action += 3;
@@ -255,8 +228,8 @@ sta, stp, ptp);
     case  GTP: /* GEO -> PRJ (or GEO) */
       /*______________________________*/
 #ifdef DEBUGTRANS
-  (void) fprintf(stdout, "\n*case 6: GEO -> PRJ");
-  (void) fprintf(stdout, "   %s;", (o_lab.u_c_lab).mlb);
+  (void) lord_debug(0, LORD("\n*case 6: GEO -> PRJ"));
+  (void) lord_debug(0, LORD("   %s;"), (o_lab.u_c_lab).mlb);
 #endif
       ies = ptg(&o_lab, (int) (-ste), N, E, &N, &E, "etrs89_trans", tr_error);
       break;
@@ -276,13 +249,9 @@ sta, stp, ptp);
 
     if (res > ies) res = ies;
 #ifdef DEBUGTRANS
-(void) fprintf(stdout, "*    res = %d;", res);
+  (void) lord_debug(0, LORD("*    res = %d;"), res);
 #endif
   } /* action LOOP */
-
-
-/* etrs89_trans  ver 2009.03          # page 7   04 Mar 2009 11 36 */
-
 
   /* return of transformation */
   *X = N;
@@ -297,4 +266,3 @@ sta, stp, ptp);
 #undef ILL
 
 }
-

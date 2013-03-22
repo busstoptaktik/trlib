@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* ch_tabdir_par  ver 2010.01          # page 1    15 Feb 2010 15 35 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -63,10 +58,6 @@ FILE             *n_f,
 size_t            n_p
 )
 {
-
-
-/* ch_tabdir_par  ver 2010.01            # page 2     5 feb 2010 15 35 */
-
 
   if (mode == 1) { // manager.tab
     *s_f         = man_tab_file;

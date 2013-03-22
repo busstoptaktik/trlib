@@ -16,11 +16,6 @@
  * 
  */
  
-
-
-/* srch_plate  ver 2008.02          # page 1   16 May 2008 11 57 */
-
-
 /* Copyright (c) 2008, DTU, National Space Research Institute    */
 /* All rights reserved.                                          */
 
@@ -69,10 +64,6 @@ char                     *err_txt
   /* (YS) = (Y) + (T2) + ( R3  D  -R1) (Y)                          */
   /* (ZS) = (Z) + (T3) + (-R2  R1  D ) (Z)                          */
   /* T == 0.0,  D = 0.0, R = plm_R * (o_date - i_date)              */
-
-
-/* srch_plate  ver 2008.02          # page 2   16 May 2008 11 57 */
-
 
   /* the search is continued until new_srch == false */
   if (s_plate == -1) *s_plm_mlb = '\0';
@@ -131,10 +122,6 @@ char                     *err_txt
       else new_srch = 0;
     }
   }
-
-
-/* srch_plate  ver 2008.02          # page 3   16 May 2008 11 57 */
-
 
   /* step through all plates */
   if (new_srch) {
@@ -196,10 +183,6 @@ char                     *err_txt
         if (new_srch) ++ p_pl_inf;
       } while (p_pl_inf->plate_nr && new_srch);
 
-
-/* srch_plate  ver 2008.02          # page 4   16 May 2008 11 57 */
-
-
       if (new_srch) {
         /* test poly_b : 3. fine polygon test */
         inf_nr   = -1;
@@ -252,4 +235,3 @@ char                     *err_txt
   return(p_pl_inf->plate_nr -1);
 
 }
-

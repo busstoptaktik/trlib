@@ -21,60 +21,51 @@
 
 
 #include  <stdio.h>
-
+#include "trlib_api.h" /*includes type definitions for callback functions - so must be included here */
 
 /* Pepper the format string with file(line) information */
 #define STRINGIFY(x)  #x
 #define TOSTRING(x)   STRINGIFY(x)
 #define LORD(x)        __FILE__ "(" TOSTRING(__LINE__) "): " x
 
-/* class code to distinguish type in call_back*/
-typedef enum 
-{LORD_DEBUG=0, 
-LORD_INFO=1, 
-LORD_WARNING=2,
-LORD_ERROR=3,
-LORD_CRITICAL=4} LORD_CLASS;
+void lord_debug(int lord_code, char *frmt, ...);
 
-/*call back definition*/
-typedef void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
-
-extern void lord_debug(int lord_code, char *frmt, ...);
-
-extern void lord_info(int lord_code, char *frmt, ...);
+void lord_info(int lord_code, char *frmt, ...);
 	
-extern void lord_warning(int lord_code, char *frmt, ...);
+void lord_warning(int lord_code, char *frmt, ...);
 
-extern void lord_error(int lord_code, char *frmt, ...);
+void lord_error(int lord_code, char *frmt, ...);
 
-extern void lord_critical(int lord_code, char *frmt, ...);
+void lord_critical(int lord_code, char *frmt, ...);
 
-extern void set_lord_debug_mode(FILE * stream, char *verbosity);
+void set_lord_debug_mode(FILE * stream, char *verbosity);
 
-extern void set_lord_info_mode(FILE * stream, char *verbosity);
+void set_lord_info_mode(FILE * stream, char *verbosity);
 
-extern void set_lord_warning_mode(FILE * stream, char *verbosity);
+void set_lord_warning_mode(FILE * stream, char *verbosity);
 
-extern void set_lord_error_mode(FILE * stream, char *verbosity);
+void set_lord_error_mode(FILE * stream, char *verbosity);
 
-extern void set_lord_critical_mode(FILE * stream, char *verbosity);
+void set_lord_critical_mode(FILE * stream, char *verbosity);
 
-extern void init_lord();
+void init_lord();
 
-extern void set_lord_modes(int debug, int info, int warning, int error, int critical);
+void set_lord_modes(int debug, int info, int warning, int error, int critical);
 
-extern void set_lord_outputs(FILE * stream_debug, FILE * stream_info, FILE * stream_warning, FILE * stream_error, FILE * stream_critical);
+void set_lord_outputs(FILE * stream_debug, FILE * stream_info, FILE * stream_warning, FILE * stream_error, FILE * stream_critical);
 
-extern void set_lord_verbosity_levels(int verb_debug, int verb_info, int verb_warning, int verb_error, int verb_critical);
+void set_lord_verbosity_levels(int verb_debug, int verb_info, int verb_warning, int verb_error, int verb_critical);
 
-extern void set_lord_file(char *fullfilename);
+void set_lord_file(char *fullfilename);
 
-extern int lord_get_last_error();
+int lord_get_last_error();
 
-extern void reset_lord();
+void reset_lord();
 
-extern void set_lord_callback(LORD_CALLBACK fct);
+void set_lord_max_messages(int max_messages);
 
-extern int is_lord_initialised();
+void set_lord_callback(LORD_CALLBACK fct);
+
+int is_lord_initialised();
 
 #endif

@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* fh_trans  ver 2010.1        # page 1    12 Jan 2010 13 55 */
-
 
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
@@ -63,11 +58,6 @@ FILE                *tr_error
 
   /* Fehmarn Bridge Projection test of AREA */
   /* and transf to/from geo                 */
-
-
-/* fh_trans  ver 2010.1        # page 2    12 Jan 2010 13 55 */
-
-
   static THREAD_SAFE  int               in_chsum = 0L;
   static THREAD_SAFE  int               outchsum = 0L;
   static THREAD_SAFE  int               init = 0;
@@ -112,10 +102,6 @@ FILE                *tr_error
                 t_status(tr_error, "",
                 "fh_trans(internal labels)", TRF_ILLEG_));
     }
-
-
-/* fh_trans  ver 2010.1        # page 2    12 Jan 2010 13 55 */
-
 
     /* Check i/o labels, init of actual transf. systems */
     if (in_chsum != in_lab->ch_sum || date != in_lab->date ||
@@ -164,10 +150,6 @@ FILE                *tr_error
 
       ptab = fhtab + fh_w*outnr;  /* output row */
     } /* End of init actions */
-
-
-/* fh_trans  ver 2010.1        # page 3    12 Jan 2010 13 55 */
-
 
     /* transformation module */
     *Hout = H;

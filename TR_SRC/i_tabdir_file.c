@@ -17,17 +17,6 @@
  */
  
 
-
-/* i_tabdir_file  ver 2010.01          # page 1    15 Feb 2010 15 35 */
-
-
-/* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of Danish       */
-/* National Space Center  DTU  Denmark.  This copyright claim  */
-/* does not indicate an intention of publishing this code.     */
-
 /* FILE *i_tabdir_file(mode, *name, *result, *dir_path)        */
 /*      opens the file for reading                             */
 /*      some files are TESTED                                  */
@@ -72,9 +61,6 @@ THREAD_SAFE    size_t             init_prj_pos = 0, init_rgn_pos = 0;
 THREAD_SAFE    size_t             init_dtm_pos = 0, init_grs_pos = 0;
 THREAD_SAFE    size_t             init_hth_pos = 0;
 THREAD_SAFE    size_t             init_tab_pos = 0, init_gps_pos = 0;
-
-
-/* i_tabdir_file  ver 2010.01            # page 2     5 feb 2010 15 35 */
 
 
 FILE             *i_tabdir_file(
@@ -136,10 +122,6 @@ char             *dir_name
     break;
   }
 
-
-/* i_tabdir_file  ver 2010.01            # page 3     5 feb 2010 15 35 */
-
-
   if (*f_in == NULL) {
     /* Look for p_name in user's directory */
     /* or         in <global_dir>/<p_name> */
@@ -166,10 +148,6 @@ char             *dir_name
 
     /* open the file */
 #ifndef _WIN32
-/*    if ((qr = open(pth_mlb, O_RDONLY)) == -1
-      || (*f_in = fdopen(qr, r_mode)) == NULL) {
-      *init_pos = 0; *result = -2; return (NULL); }
-      */
     if ((*f_in = fopen(pth_mlb, r_mode)) == NULL) {
       *init_pos = 0; *result = -2; return (NULL); }
 

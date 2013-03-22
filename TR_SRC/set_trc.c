@@ -15,11 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
- 
-
-
-/* set_trc                        # page 1   22 Oct 2002 10 45 */
-
 
 /* Copyright (c) 1992 GD, U/32, Kort-og Matrikelstyrelsen, Denmark */
 /* All rights reserved.                                        */
@@ -64,10 +59,6 @@ struct coord_lab         *c_lab
 
     /* third flattening */
     np = n = c_lab->f/(2.0 - c_lab->f);
-
-
-/* set_trc                        # page 2   22 Oct 2002 10 45 */
-
 
     /* COEF. OF TRIG SERIES GEO <-> GAUSS */
     /* gb := Gaussian -> Geodetic, KW p190 - 191 (61) - (62) */
@@ -129,10 +120,6 @@ struct coord_lab         *c_lab
                 - gatg(c_lab->tcgg, -1, c_lab->B0)/2.0));
       break;
 
-
-/* set_trc                        # page 3   22 Oct 2002 10 45 */
-
-
     case 5: /* Lambert */
     case 9: /* GS conf. con. */
       switch(c_lab->mode) {
@@ -177,11 +164,6 @@ struct coord_lab         *c_lab
                 + c_lab->N0;
       break;
 
-
-
-/* set_trc                        # page 4   22 Oct 2002 10 45 */
-
-
     case 6: /* Stereographic coordinates */
       e = sqrt(c_lab->f*(2.0 - c_lab->f));
       e = pow((1.0 - e)/(1.0 + e), e/2.0);
@@ -225,9 +207,6 @@ struct coord_lab         *c_lab
         break;
       }
       break;
-
-
-/* set_trc                        # page 5   22 Oct 2002 10 45 */
 
       case 7: /* Equivalent projections */
 
@@ -289,14 +268,8 @@ struct coord_lab         *c_lab
         }
         break;
 
-
-/* set_trc                        # page 6   22 Oct 2002 10 45 */
-
-
       default:
-        (void) fprintf(stderr, "\n*** set_trc: unintelligible ");
-        (void) fprintf(stderr,
-                      "mode %d for equiv. projections", c_lab->mode);
+        (void) lord_error(0, LORD("unintelligible mode %d for equiv. projections"), c_lab->mode);
         return(-1);
       } /* end equiv. modes */
 
@@ -318,5 +291,3 @@ struct coord_lab         *c_lab
 
   return(res);
 }
-
-

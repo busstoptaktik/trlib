@@ -59,10 +59,6 @@ FILE *ERR_LOG=0;
 
 def_data *DEF_DATA=0;
 
-/*return last buffered error code from gd_trans */
-int TR_GetLastError(void){
-    return lord_get_last_error();
-}
 
 /* only used in InitLibrary at the moment- but could be useful */
 int TR_IsMainThread(void){
@@ -722,34 +718,6 @@ void TR_TerminateThread(void){
 	c_tabdir_file(0,NULL);
 }
 
-/*
-BOOL WINAPI
-DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
-{
-    switch (dwReason)
-    {
-        case DLL_PROCESS_ATTACH:
-            // Code to run when the DLL is loaded
-            break;
-
-        case DLL_PROCESS_DETACH:
-            // Code to run when the DLL is freed
-            break;
-
-        case DLL_THREAD_ATTACH:
-            // Code to run when a thread is created during the DLL's lifetime
-            break;
-
-        case DLL_THREAD_DETACH:
-		printf("Thread detaching!\n");
-	        TerminateLibrary();
-            // Code to run when a thread ends normally.
-            break;
-    }
-    return TRUE;
-}
-*/
-
 /* Translates mlb to ESRI wkt*/
 int TR_GetEsriText(char *mlb, char *wkt_out){
     int err;
@@ -758,7 +726,7 @@ int TR_GetEsriText(char *mlb, char *wkt_out){
 	return TR_LABEL_ERROR;
     err=sputshpprj(wkt_out,TC->plab); /* See fputshpprj.h for details on return value */
     TR_CloseProjection(TC);
-    return err;
+    return (err==0)?(TR_OK):(TR_LABEL_ERROR);
 }
     
 /* out must be an array of length 2*/
@@ -793,27 +761,115 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc, int 
 
 /* Import a mlb from other projection specifications */
 int TR_ImportLabel(char *text, char *mlb){
-	int ok=0;
+	int ok=TR_LABEL_ERROR;
+	/*We go for autodetection of format - could also implement explicit identifiers like in EPSG:xxxxx*/
 	/*case proj4*/
-	if (strchr(text,'+'))
+	if (strstr(text,"+proj"))
 		ok=proj4_to_mlb(text,mlb);
 	/*case epsg*/
 	else if (strstr(text,"EPSG")){
 		char *pos=strchr(text,':');
-		int code;
+		long code,v_code=0;
 		if (pos){
-			code=atoi(pos+1);
-			ok=import_from_epsg(code,0,mlb);
+			char *end_pt; /*test if the format is like EPSG:h_code:v_code*/
+			code=strtol(pos+1,&end_pt,0);
+			if (code>0){
+				if (*end_pt) /*so we have height info also*/
+					v_code=strtol(end_pt+1,NULL,0);
+				ok=import_from_epsg(code,v_code,mlb);
+			}
 		}
 		else
 			lord_warning(1,"EPSG: invalid format of EPSG code specification.");  
 	}
 	/*case wkt*/
-	else{
+	else if (strchr(text,'[') && strchr(text,']')){
 		ok=sgetshpprj(text,NULL,mlb);
 		ok=(ok==0)?(TR_OK):(TR_LABEL_ERROR);
 	}
+	else
+		lord_warning(TR_LABEL_ERROR,"Unrecognisable input format.");
 	if (ok!=TR_OK)
 		*mlb='\0';
 	return ok;
+}
+
+/*Export a mlb to a foreign format */
+int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len){
+	int ok,h_code,v_code;
+	char buf[4096];
+	/*TODO: test for height in mlb and return a warning/special return code if only partially translated
+	char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
+	short sepch,region;
+	ok=get_mlb(mlb,&region,mlb1,&sepch,mlb2,&h_datum);
+	*/
+	*out='\0';
+	switch(foreign_format_code){
+		case TR_FRMT_EPSG:
+			ok=export_to_epsg(mlb, &h_code, &v_code);
+			if (ok==TR_OK){
+				char *tmp=buf;
+				tmp+=sprintf(tmp,"EPSG:%d",h_code);
+				if (v_code>100)
+					sprintf(tmp,":%d",v_code);
+			}
+			break;
+		case TR_FRMT_PROJ4: /*TODO*/
+			ok=mlb_to_proj4(mlb,buf,4096);
+			break;
+		case TR_FRMT_ESRI_WKT:
+			ok=TR_GetEsriText(mlb,buf);
+			break;
+		default:
+			lord_error(TR_LABEL_ERROR,LORD("Translation to foreign format with code %d not supported."),foreign_format_code);
+			return TR_ERROR;
+	}
+	if (ok==TR_OK){
+		if ( ((int) strlen(buf))>(buf_len-1)){
+			lord_error(TR_ALLOCATION_ERROR,LORD("To short input buffer to hold external srs-definition."));
+			return TR_ALLOCATION_ERROR;
+		}
+		strcpy(out,buf);
+		return TR_OK;
+	}
+	return TR_ERROR;
+}
+
+/********************************************************
+********* LORD wrapper functions ************************
+********************************************************/
+
+/*return last buffered error code from the lord module */
+int TR_GetLastError(void){
+    return lord_get_last_error();
+}
+
+/* Sets the max messages pr. thread in the lord module. Negative number means no limit */
+void TR_SetLordMaxMessages (int max_messages) {
+	set_lord_max_messages(max_messages);
+}
+
+/* Sets the lord call back function */
+void TR_SetLordCallBack(LORD_CALLBACK fct) {
+	set_lord_callback(fct);
+}
+
+/* Turn the lord modes on or off */
+void TR_SetLordModes(int debug, int info, int warning, int error, int critical) {
+	set_lord_modes(debug, info, warning, error, critical);
+}
+
+/* Set the output pointers for each lord_type */
+void TR_SetLordOutputs(FILE * stream_debug_outside, FILE * stream_info_outside, FILE * stream_warning_outside, FILE * stream_error_outside, FILE * stream_critical_outside) {
+	set_lord_outputs(stream_debug_outside, stream_info_outside, stream_warning_outside, stream_error_outside, stream_critical_outside);
+}
+
+/* Set the verbosity level for the modes */
+void TR_SetLordVerbosityLevels(int verb_debug, int verb_info, int verb_warning) {
+	set_lord_verbosity_levels(verb_debug, verb_info, verb_warning, 3, 3);
+}
+
+/* Sets the lord output file for all modes */
+void TR_SetLordFile(char *fullfilename) {
+	set_lord_file(fullfilename);
 }

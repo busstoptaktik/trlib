@@ -16,18 +16,6 @@
  * 
  */
  
-
-
-/* gmb2.c version 1.0                 # page 1    1 Mar 1993 11:18 */
-
-
-/* Copyright (c) 1991 U/32, Kort-og Matrikelstyrelsen, Denmark */
-/* All rights reserved.                                        */
-
-/* This is unpublished proprietary source code of G/S, Kort-og */
-/* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
-/* indicate an intention of publishing this code.              */
-
 #include  <math.h>
 #include  <stdio.h>
 
@@ -68,13 +56,6 @@ double                    *s
   n2   = e2*cosb*cosb;
   V2   = 1. + n2;
   V    = sqrt(V2);
-
-
-
-/* gmb2.c version 1.0                 # page 2    1 Mar 1993 11:18 */
-
-
-
   dB  = dlat/V2;
   dL  = dlng * cosb;
   dA  = dlng*sinb/2.0;

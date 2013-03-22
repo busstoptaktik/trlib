@@ -16,11 +16,6 @@
  *
  */
 
-
-
-/* gd_trans  ver 2010.1          # page 1   12 jan 2010 11 36 */
-
-
 /* Copyright (c) 2010 GEK  Danish National Space Center  DTU   */
 /* All rights reserved.                                        */
 
@@ -75,10 +70,6 @@ FILE                     *tr_error
 )
 {
 
-
-/* gd_trans  ver 2010.1          # page 2   12 jan 2010 11 36 */
-
-
   static THREAD_SAFE  int      (*dfb_trf)(
     union geo_lab      *in_lab,
     union geo_lab      *outlab,
@@ -120,10 +111,6 @@ FILE                     *tr_error
   struct coord_lab           *H_clb  = &(H0_lab.u_c_lab);
   struct coord_lab           *H1_clb = &(H1_lab.u_c_lab);
   struct coord_lab           *t_clb  = &(t_lab.u_c_lab);
-
-
-/* gd_trans  ver 2010.1          # page 3   12 jan 2010 11 36 */
-
 
   union geo_lab              *i_wlab = NULL;  /* begin REG of ETPL  */
   union geo_lab              *o_wlab = NULL;  /* end   REG of ETPL  */
@@ -182,10 +169,6 @@ FILE                     *tr_error
   /* lev == 3 : transform coordinates                           */
 
   /* Geoid Height gh is not transformed at Datum Shifts of Height*/
-
-
-/* gd_trans  ver 2010.1          # page 4   12 jan 2010 11 36 */
-
 
   /*                     Geoid requested ::  (allso -g param)   */
   /* crt_          :: is treated as sepch == E                  */
@@ -254,10 +237,6 @@ FILE                     *tr_error
                      ((req_gh > 0) &&
                       grid_tab->table_u[0].lab_type != GDE_LAB)))) {
 
-
-/* gd_trans  ver 2010.1          # page 5   12 jan 2010 11 36 */
-
-
     if (grid_tab->init != 0 && grid_tab->init != 1)
         grid_tab->init = 0;
     i_chsum    = o_chsum = 0;
@@ -311,10 +290,6 @@ FILE                     *tr_error
       else
       if (o_rgn == 0 && i_rgn != 0) o_rgn = i_rgn;
     }
-
-
-/* gd_trans  ver 2010.1          # page 6   12 jan 2010 11 36 */
-
 
     /* Loop for init of geoid/table and transformation */
     for (b_lev = (req_gh == -1) ? 2 : 0; b_lev <= s_lev; b_lev ++) {
@@ -389,10 +364,7 @@ FILE                     *tr_error
         o_rlab = &G_Rlab;
         break;
 
-
-/* gd_trans  ver 2010.1          # page 7   12 jan 2010 11 36 */
-
-      case 2:
+	  case 2:
         htr_const.inv = 0;
         if (i_clb->h_dtm == o_clb->h_dtm) s_req_dh = 0;
         else
@@ -454,10 +426,6 @@ FILE                     *tr_error
 
       if (sta[b_lev] != stp[b_lev]) continue;
 
-
-/* gd_trans  ver 2010.1          # page 8   12 jan 2010 11 36 */
-
-
       /* regular/non-regular decisions */
       /*  in       regular    non-reg   */
       /*  out */
@@ -516,13 +484,8 @@ FILE                     *tr_error
       } /* end switch(R_N) */
 
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout,
-"\n*gd_trans (lev:%d) inlab = %s  outlab = (%s) %s, R_N = %d;",
-b_lev, i_clb->mlb, w_oclb->mlb, o_clb->mlb, R_N);
+	(void) lord_debug(0, LORD("\n*gd_trans (lev:%d) inlab = %s  outlab = (%s) %s, R_N = %d;"), b_lev, i_clb->mlb, w_oclb->mlb, o_clb->mlb, R_N);
 #endif
-
-
-/* gd_trans  ver 2010.1          # page 9   12 jan 2010 11 36 */
 
 
 #ifdef BULK_OF_TREASURE_HERE
@@ -605,14 +568,8 @@ b_lev, i_clb->mlb, w_oclb->mlb, o_clb->mlb, R_N);
         return(TRF_PROGR_);
       } /* end rs switch */
 
-
-
-/* gd_trans  ver 2010.1          # page 10  12 jan 2010 11 36 */
-
-
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout, "\n*gd_trans rs = %d, nonp = %d, %d, t,g=%s,%s;",
-rs, nonp_i[b_lev], nonp_o[b_lev], t_clb->mlb, (g_lab.u_c_lab).mlb);
+	(void) lord_debug(0, LORD("rs = %d, nonp = %d, %d, t,g=%s,%s;"), rs, nonp_i[b_lev], nonp_o[b_lev], t_clb->mlb, (g_lab.u_c_lab).mlb);
 #endif
       switch(R_N) {
       case REG_REG : /* reg->reg */
@@ -660,10 +617,6 @@ rs, nonp_i[b_lev], nonp_o[b_lev], t_clb->mlb, (g_lab.u_c_lab).mlb);
           i_Nlab     = &g_lab;
           sta[b_lev] = PRE;
         }
-
-
-/* gd_trans  ver 2010.1          # page 11  12 jan 2010 11 36 */
-
 
         if (dsh) {
           ptp[b_lev] = 0;
@@ -725,10 +678,6 @@ rs, nonp_i[b_lev], nonp_o[b_lev], t_clb->mlb, (g_lab.u_c_lab).mlb);
           }
         }
         break;
-
-
-/* gd_trans  ver 2010.1          # page 12  12 jan 2010 11 36 */
-
 
       case NON_NON : /* non-reg input/output */
         /* t_lab: 0 : G_Nlab, 2 : T_Nlab, 3 : O_Nlab(o_lab) */
@@ -828,23 +777,14 @@ rs, nonp_i[b_lev], nonp_o[b_lev], t_clb->mlb, (g_lab.u_c_lab).mlb);
       }
     } /* end of b_lev loop */
 
-
-/* gd_trans  ver 2010.1          # page 13  12 jan 2010 11 36 */
-
-
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout, "\n*sta,sto,ptp(0) = %d, %d, %d;",
-sta[0], stp[0], ptp[0]);
-(void) fprintf(stdout, "\n*sta,sto,ptp(1) = %d, %d, %d;",
-sta[1], stp[1], ptp[1]);
-(void) fprintf(stdout, "\n*sta,sto,ptp(2) = %d, %d, %d;",
-sta[2], stp[2], ptp[2]);
-(void) fprintf(stdout, "\n*sta,sto,ptp(3) = %d, %d, %d;",
-sta[3], stp[3], ptp[3]);
+	(void) lord_debug(0, LORD("sta,sto,ptp(0) = %d, %d, %d;"), sta[0], stp[0], ptp[0]);
+	(void) lord_debug(0, LORD("sta,sto,ptp(1) = %d, %d, %d;"), sta[1], stp[1], ptp[1]);
+	(void) lord_debug(0, LORD("sta,sto,ptp(2) = %d, %d, %d;"), sta[2], stp[2], ptp[2]);
+	(void) lord_debug(0, LORD("sta,sto,ptp(3) = %d, %d, %d;"), sta[3], stp[3], ptp[3]);
 #endif
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout, "\n*ghr :: i/o_sep = %c %d   %c %d;",
-i_sep, i_sep, o_sep, o_sep);
+	(void) lord_debug(0, LORD("ghr :: i/o_sep = %c %d   %c %d;"), i_sep, i_sep, o_sep, o_sep);
 #endif
     /* final setting of ghr for transformation */
     /* dsh is showing iff datum_shift[level=3] */
@@ -886,9 +826,6 @@ i_sep, i_sep, o_sep, o_sep);
       }
     }
 
-
-/* gd_trans  ver 2010.1          # page 14  12 jan 2010 11 36 */
-
     if (!init) {
       i_chsum = -i_clb->ch_tsum;
       return((tr_error==NULL) ? TRF_PROGR_ :
@@ -924,10 +861,7 @@ i_sep, i_sep, o_sep, o_sep);
       stp[1]  = (short) ies;
       o_wlab  = &H0_lab;
       lev     = 0;
-/*
-(void) fprintf(stdout, "\n*SET ZERO LEV -> lev = 0;");
-*/
-      break;
+	break;
     case 2:
       i_wlab = T_Nlab;
       o_wlab = T_Rlab;
@@ -939,34 +873,20 @@ i_sep, i_sep, o_sep, o_sep);
       break;
     }
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout, "\n\n*gd_trans  lev %d, nonp %d, %d, Ehr %d %d;",
-lev, nonp_i[lev], nonp_o[lev], iEhr, oEhr);
+	(void) lord_debug(0, LORD("lev %d, nonp %d, %d, Ehr %d %d;"), lev, nonp_i[lev], nonp_o[lev], iEhr, oEhr);
 #endif
-/*
-(void) fprintf(stdout, "\n*gd_trans   lev %d", lev);
-(void) fprintf(stdout, "  start %2d  stop %2d;", sta[lev], stp[lev]);
-if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
-*/
-
-
-/* gd_trans  ver 2010.1          # page 15  12 jan 2010 11 36 */
-
 
     for (action = sta[lev], res = 0;
          action <= stp[lev] && res >= TRF_TOLLE_; action++) {
-
-/*
-(void) fprintf(stdout, "\n*gd_trans :  action  %d;", action);
-*/
 
       switch(action) {
    
       case  PRE: /* crt_* -> geoE* */
         /*_____________________*/
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 0: CRT -> GEO");
-  (void) fprintf(stdout, "   %s;", (g_lab.u_c_lab).mlb);
-  (void) fprintf(stdout, "\n* %7.2f  %7.2f   %7.2f;", N, E, H);
+	(void) lord_debug(0, LORD("case 0: CRT -> GEO"));
+	(void) lord_debug(0, LORD("   %s;"), (g_lab.u_c_lab).mlb);
+	(void) lord_debug(0, LORD(" %7.2f  %7.2f   %7.2f;"), N, E, H);
 #endif
         ies = gtc(&g_lab, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
         if (iEhr) {
@@ -974,20 +894,17 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
           iEhr = 0;
         }
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*-> %7.6f  %7.6f   %7.2f;",
-         N/M_PI*180.0, E/M_PI*180.0, H);
-  (void) fprintf(stdout, "\n*-> %7.2f  %7.2f   %7.2f, iEh=%f;",
-         N, E, H, iEh);
+	(void) lord_debug(0, LORD("-> %7.6f  %7.6f   %7.2f;"), N/M_PI*180.0, E/M_PI*180.0, H);
+	(void) lord_debug(0, LORD("-> %7.2f  %7.2f   %7.2f, iEh=%f;"), N, E, H, iEh);
 #endif
         break;
 
       case  NTP: /* NON -> PRJ (or GEO) */
         /*______________________________*/
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 1: NON -> PRJ");
-  (void) fprintf(stdout, "   %s -> %s;",
-         (i_Nlab->u_c_lab).mlb, (i_wlab->u_c_lab).mlb);
-  (void) fprintf(stdout, "\n* %7.2f  %7.2f   %7.2f;", N, E, H);
+	(void) lord_debug(0, LORD("case 1: NON -> PRJ"));
+	(void) lord_debug(0, LORD("   %s -> %s;"), (i_Nlab->u_c_lab).mlb, (i_wlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD(" %7.2f  %7.2f   %7.2f;"), N, E, H);
 #endif
         ies = (*dfb_trf)(i_Nlab, i_wlab,
                          N, E, H, &N, &E, &HH, usertxt, tr_error);
@@ -995,7 +912,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
           req_th = -1;
           th     = HH - H;
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout, "\n*case 1: NON -> PRJ: th = %f", th);
+	(void) lord_debug(0, LORD("case 1: NON -> PRJ: th = %f"), th);
 #endif
         }
         if (nonp_i[b_lev]) action ++;
@@ -1004,24 +921,20 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
       case  PTG: /* PRJ (or GEO) -> GEO */
         /*______________________________*/
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 2: PRJ -> GEO");
-  (void) fprintf(stdout, "   %s;", (i_Rlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("\n*case 2: PRJ -> GEO"));
+	(void) lord_debug(0, LORD("   %s;"), (i_Rlab->u_c_lab).mlb);
 #endif
         ies = ptg(i_Rlab, +1, N, E, &N, &E, usertxt, tr_error);
         if (ptp[lev]) action += 3;
         break;
 
-
-/* gd_trans  ver 2010.1          # page 16  12 jan 2010 11 36 */
-
    
       case  GTC: /* GEO -> CRT */
         /*_____________________*/
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 3: GEO -> CRT");
-  (void) fprintf(stdout, "   %s;", (i_Rlab->u_c_lab).mlb);
-  (void) fprintf(stdout, "\n*  %10.5f  %10.5f    %8.5f  %8.5f;",
-  N, E, N*180.0/M_PI, E*180.0/M_PI);
+	(void) lord_debug(0, LORD("\n*case 3: GEO -> CRT"));
+	(void) lord_debug(0, LORD("   %s;"), (i_Rlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("\n*  %10.5f  %10.5f    %8.5f  %8.5f;"), N, E, N*180.0/M_PI, E*180.0/M_PI);
 #endif
         if (req_th < 0 && stp[3] == GTC) { /* dh from 3D table_trf */
           H      += th;
@@ -1033,9 +946,8 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
       case  CTC: /* CRT -> CRT */
         /*______________________*/
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 4: CRT -> CRT");
-  (void) fprintf(stdout, "   %s -> %s;",
-         (i_Rlab->u_c_lab).mlb, (o_wlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("case 4: CRT -> CRT"));
+	(void) lord_debug(0, LORD("   %s -> %s;"), (i_Rlab->u_c_lab).mlb, (o_wlab->u_c_lab).mlb);
 #endif
         if (iEhr) {
           (void) gtc(i_lab, -1, N, E, H, &NN, &EE, &HH, "", NULL);
@@ -1049,8 +961,8 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
       case  CTG: /* CRT -> GEO */
         /*_____________________*/
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 5: CRT -> GEO");
-  (void) fprintf(stdout, "   %s;", (o_wlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("case 5: CRT -> GEO"));
+	(void) lord_debug(0, LORD("   %s;"), (o_wlab->u_c_lab).mlb);
 #endif
         ies = gtc(o_wlab, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
         break;
@@ -1059,24 +971,20 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
         /*______________________________*/
         if (!nonp_o[lev]) {
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 6: GEO -> PRJ");
-  (void) fprintf(stdout, "   %s;", (o_wlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("case 6: GEO -> PRJ"));
+	(void) lord_debug(0, LORD("   %s;"), (o_wlab->u_c_lab).mlb);
 #endif
           ies = ptg(o_wlab, -1, N, E, &N, &E, usertxt, tr_error);
         }
         break;
 
-
-/* gd_trans  ver 2010.1          # page 17  12 jan 2010 11 36 */
-
-
       case  PTN: /* PRJ (or GEO) -> NON */
         /*______________________________*/
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 7: PRJ -> NON");
+  (void) fprintf(stdout, "case 7: PRJ -> NON");
   (void) fprintf(stdout, "   %s -> %s;",
          (i_Nlab->u_c_lab).mlb, (i_wlab->u_c_lab).mlb);
-  (void) fprintf(stdout, "\n*  %10.5f  %10.5f    %8.5f  %8.5f  %6.2f;",
+  (void) fprintf(stdout, "  %10.5f  %10.5f    %8.5f  %8.5f  %6.2f;",
   N, E, N*180.0/M_PI, E*180.0/M_PI, H);
 #endif
         ies = (*dfb_trf)(i_Nlab, i_wlab,
@@ -1085,7 +993,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
           req_th = -1;
           th     = HH - H;
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout, "\n*case 7: PRJ -> NON: th = %f", th);
+(void) fprintf(stdout, "case 7: PRJ -> NON: th = %f", th);
 #endif
         }
         break;
@@ -1093,10 +1001,9 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
       case  ANT: /* geoE* -> crt_* */
         /*_____________________*/
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 8: GEO -> CRT");
-  (void) fprintf(stdout, "   %s;", (g_lab.u_c_lab).mlb);
-  (void) fprintf(stdout, "\n*  %10.5f  %10.5f    %8.5f  %8.5f  %6.2f;",
-         N, E, N*180.0/M_PI, E*180.0/M_PI, H);
+	(void) lord_debug(0, LORD("case 8: GEO -> CRT"));
+	(void) lord_debug(0, LORD("   %s;"), (g_lab.u_c_lab).mlb);
+	(void) lord_debug(0, LORD(" %10.5f  %10.5f    %8.5f  %8.5f  %6.2f;"), N, E, N*180.0/M_PI, E*180.0/M_PI, H);
 #endif
         if (oEhr == 1) {
           oEh  = H;
@@ -1111,8 +1018,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
 
       case  IDT: /* No action, ident, ok */
 #ifdef DEBUGGDTRANS
-  (void) fprintf(stdout, "\n*case 9: IDT, oEhr = %d, lev = %d",
-         oEhr, lev);
+	(void) lord_debug(0, LORD("case 9: IDT, oEhr = %d, lev = %d"), oEhr, lev);
 #endif
         if (oEhr) {
           oEh  = Nh + igh;
@@ -1136,13 +1042,10 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
 
       if (res > ies) res = ies;
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout, "*    res = %d;", res);
+	(void) lord_debug(0, LORD("*    res = %d;"), res);
 #endif
-    } /* action LOOP */
 
-
-/* gd_trans  ver 2010.1          # page 18  12 jan 2010 11 36 */
-
+	} /* action LOOP */
 
     if (RES > res) RES = res;
     switch (lev) {
@@ -1169,7 +1072,7 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
         if (RGH < 0) {
           if (RES > RGH) RES = RGH;
           if (tr_error != NULL)
-             (void) fprintf(tr_error, "%s\n%s\n", err_txt, usertxt);
+          	(void) lord_error(0, LORD("%s    %s"), err_txt, usertxt);
           gh   = 9999.9;
           *ogh = gh;
         }
@@ -1178,10 +1081,6 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
       } else *ogh = gh = 0.0;
 
       break;
-
-
-/* gd_trans  ver 2010.1          # page 19  12 jan 2010 11 36 */
-
 
     case 2:
       if (RES >= TRF_TOLLE_) {
@@ -1211,8 +1110,8 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
         } else {
           if (RES > RGH) RES = RGH;
           dh = 0.0;
-          if (tr_error != NULL) (void) fprintf(tr_error,
-                   "gd_trans\n%s\n%s", err_txt, usertxt);
+          if (tr_error != NULL)
+			(void) lord_error(0, LORD("%s    %s"), err_txt, usertxt);
         }
       }
       else {
@@ -1246,18 +1145,11 @@ if (sta[lev] > stp[lev]) (void) fprintf(stdout, "  *** ;");
       break;
     }
 #ifdef DEBUGGDTRANS
-(void) fprintf(stdout,
-"\n* H_in = %7.3f, H   = %7.3f, iEh = %7.3f, Nh = %7.3f;",
-H_in, H, iEh, Nh);
-(void) fprintf(stdout,
-"\n* gh   = %7.3f, igh = %7.3f, oEh = %7.3f, dh = %7.3f, th = %7.3f;",
-gh, igh, oEh, dh, th);
+	(void) lord_debug(0, LORD("H_in = %7.3f, H   = %7.3f, iEh = %7.3f, Nh = %7.3f;"), H_in, H, iEh, Nh);
+	(void) lord_debug(0, LORD("gh   = %7.3f, igh = %7.3f, oEh = %7.3f, dh = %7.3f, th = %7.3f;") ,gh, igh, oEh, dh, th);
 #endif
 
   } /* lev LOOP */
-
-
-/* gd_trans  ver 2010.1          # page 20  12 jan 2010 11 36 */
 
   /* return of transformation */
   *X = N;
@@ -1284,4 +1176,3 @@ gh, igh, oEh, dh, th);
 #undef NON_NON
 
 }
-

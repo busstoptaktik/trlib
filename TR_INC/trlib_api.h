@@ -27,6 +27,12 @@
 #define TR_ERROR 2
 #define TR_ALLOCATION_ERROR 3
 
+/* Defines for export to foreign srs-metadata */
+
+#define TR_FRMT_EPSG  (0)
+#define TR_FRMT_PROJ4 (1)
+#define TR_FRMT_ESRI_WKT (2)
+
 #pragma once
 #if defined __cplusplus
 #define KMSTR_API extern "C" 
@@ -36,9 +42,10 @@
 
 KMSTR_API int   TR_InitLibrary(char *path);
 KMSTR_API int   TR_SetGeoidDir(char *path);
-KMSTR_API int   TR_GetLastError(void);
 KMSTR_API void TR_GetVersion(char *buffer, int bufferlength);
-KMSTR_API int   TR_GetEsriText(char *label_in, char *wkt_out);
+KMSTR_API int   TR_GetEsriText(char *label_in, char *wkt_out); /* DEPRECATED - should be moved to trlib_intern.h*/
+KMSTR_API int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len);
+KMSTR_API int TR_ImportLabel(char *text, char *mlb);
 KMSTR_API void TR_TerminateLibrary(void);
 KMSTR_API void TR_TerminateThread(void);
 KMSTR_API void TR_AllowUnsafeTransformations(void);
@@ -56,6 +63,42 @@ KMSTR_API int   TR_TransformPoint(TR *tr, double X_in, double Y_in, double Z_in,
 KMSTR_API int   TR_InverseTransformPoint(TR *tr, double X_in, double Y_in, double Z_in, double *X_out, double *Y_out, double *Z_out);
 KMSTR_API void TR_Close (TR *tr);
 KMSTR_API int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
+
+/***************************************
+**********LORD module functions ********
+****************************************/
+/* class code to distinguish type in call_back*/
+typedef enum 
+{LORD_DEBUG=0, 
+LORD_INFO=1, 
+LORD_WARNING=2,
+LORD_ERROR=3,
+LORD_CRITICAL=4} LORD_CLASS;
+
+/*call back definition*/
+typedef void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
+
+
+/*return last buffered error code from the lord module */
+KMSTR_API int TR_GetLastError(void);
+
+/* Return last buffered error code from the lord module */
+KMSTR_API void TR_SetLordMaxMessages (int max_messages);
+
+/* Sets the lord call back function */
+KMSTR_API void TR_SetLordCallBack(LORD_CALLBACK fct);
+
+/* Turn the lord modes on or off */
+KMSTR_API void TR_SetLordModes(int debug, int info, int warning, int error, int critical);
+
+/* Set the output pointers for each lord_type */
+KMSTR_API void TR_SetLordOutputs(FILE * stream_debug_outside, FILE * stream_info_outside, FILE * stream_warning_outside, FILE * stream_error_outside, FILE * stream_critical_outside);
+
+/* Set the verbosity level for the modes */
+KMSTR_API void TR_SetLordVerbosityLevels(int verb_debug, int verb_info, int verb_warning);
+
+/* Sets the lord output file for all modes */
+KMSTR_API void TR_SetLordFile(char *fullfilename);
 
 
 #endif
