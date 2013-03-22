@@ -7,7 +7,6 @@ EXPORTS
 	TR_GetVersion
 	TR_TerminateLibrary
 	TR_TerminateThread
-	TR_GetLastError
 	TR_Open
 	TR_Close
 	TR_Transform
