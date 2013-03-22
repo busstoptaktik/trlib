@@ -264,7 +264,8 @@ if (h_mlb != NULL) (void) fprintf(stdout, ",  %s", h_mlb);
 
       switch (p_lb->lab_type) {
       case CRD_LAB: /* coordinates */
-        p_lb->lab_type = (conv_mode == 0)
+        p_lb->lab_type = ((conv_mode == 0) ||
+                          (conv_mode == 1 && p_lb->q_par && *p_lb->add_p == '\0'))
                        ? (short) conv_crd("", p_lb, c_lab, in_str)
                        : (short) conv_crd("input", p_lb, c_lab, iofile);
         if (p_lb->sepch == 'N') {

@@ -450,6 +450,8 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
 
             case 4: /* Lambert equiv. pol. proj., (N) */
             case 5: /* Lambert equiv. pol. proj., (S) */
+            case 8: /* Lambert equiv. pol. proj. Lc, (N) */
+            case 9: /* Lambert equiv. pol. proj. Lc, (S) */
               for ( ; h - i; i += s)
                 switch(i) {
   

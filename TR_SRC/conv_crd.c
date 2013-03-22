@@ -62,7 +62,7 @@ struct coord_lab        *c_lab,
   FILE                      *iofile = (FILE *) NULL;
   char                      *io_str = (char *) NULL;
   va_list                    o_p;
-
+  size_t                     io_lng = 0;
   int                        conv_mode, i, used;
   int                        zone;
   short                      par_dtm, dtm_req = 1, mask;
@@ -149,7 +149,7 @@ struct coord_lab        *c_lab,
     sepch           = (char) p_lb->sepch;
     c_lab->lab_type = p_lb->lab_type;
     c_lab->version  = LAB_VERSION;
-    c_lab->cmplt    = (short) ((p_lb->q_par) ? 0 : 1);
+    c_lab->cmplt    = (short) 0;
     c_lab->cstm     = p_lb->d_kind;
     c_lab->mode     = p_lb->d_type;
     c_lab->region   = p_lb->region;
@@ -289,7 +289,7 @@ struct coord_lab        *c_lab,
     case  4: /* mrc */
     case  5: /* lmb */
     case  6: /* stg */
-    case  7: /* safle, safl, lmbac, lmbap, lmbaps, authalic geog. */
+    case  7: /* safle, safl, lmbac, lmbap, lmblap, lmbaps, lmblaps, authalic geog. */
              /* ETRS Lambert Azimuthal Equal Area                 */
     case  9: /* gs and gsb */
     case 12: /* rt90v and rt38v, spec. f. dks */
@@ -389,7 +389,7 @@ struct coord_lab        *c_lab,
     }
 
     if (conv_mode == 1) {  /* iofile */
-      if ((p_lb->q_par && *p_lb->add_p == '\0') || 
+      if ((p_lb->q_par && *p_lb->add_p != '\0') || 
           (6 <= c_lab->datum && c_lab->datum <= 8)) {
         (void) fgetln_kms(iofile_str, &i, iofile);
       }
@@ -399,106 +399,117 @@ struct coord_lab        *c_lab,
 
     /* INPUT OF ADDITIONAL PARAMETERS */
     if (p_lb->q_par) {
-      if (*p_lb->add_p == '\0') { /* read predifined */
-        p_tp = p_lb->par_str;
+      /* read predifined  ? */
+      p_tp   = (*p_lb->add_p == '\0') ? p_lb->par_str : p_io;
+      io_lng = strlen(p_tp);
+      if (*p_tp != '\0' && io_lng > 3) {
         switch (p_lb->q_par) {
+        case 1:
+          c_lab->L0  = sgetg(p_tp, &(c_lab->g_tpd), &used, "sx");
+          break;
         case 2:
           c_lab->B1 = sgetg(p_tp, &(c_lab->g_tpd), &used, "sx");
-          p_tp     += used;
-          (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
+          p_tp    += used;
+          io_lng  -= used;
+          if (io_lng > 2)
+             (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
+          else {
+            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            return(ILL_LAB);
+          }
           break;
         case 3:
           f = sgetg(p_tp, &(c_lab->m_tpd), &used, "m");
           if (c_lab->cstm == 6) // upsn / upss
               c_lab->N0 = f;
           else  /* s34 */ c_lab->B0 = f;
-          p_tp      += used;
-          c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
-          p_tp      += used;
-          (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
+          p_tp    += used;
+          io_lng  -= used;
+          if (io_lng > 2)
+             c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
+          else {
+            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            return(ILL_LAB);
+          }
+          p_tp    += used;
+          io_lng  -= used;
+          if (io_lng > 2)
+             (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
+          else {
+            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            return(ILL_LAB);
+          }
           break;
         case 4:
         case 5:
         case 6:
           c_lab->B0  = sgetg(p_tp, &(c_lab->g_tpd), &used, "sx");
-          p_tp      += used;
-          c_lab->N0  = sgetg(p_tp, &(c_lab->m_tpd), &used, "m");
-          p_tp      += used;
-          c_lab->L0  = sgetg(p_tp, &g_tpd, &used, "sx");
-          p_tp      += used;
-          c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
-          p_tp += used;
-          if (p_lb->q_par == 5 && (c_lab->cstm == 3 || c_lab->cstm == 12))
-             (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
+          p_tp    += used;
+          io_lng  -= used;
+          if (io_lng > 2)
+             c_lab->N0  = sgetg(p_tp, &(c_lab->m_tpd), &used, "m");
           else {
-            c_lab->B1 = sgetg(p_tp, &g_tpd, &used, "sx");
-            if (p_lb->q_par == 6) { // dlmb
-              p_tp      += used;
-              c_lab->B2  = sgetg(p_tp, &g_tpd, &used, "sx");
+            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            return(ILL_LAB);
+          }
+          p_tp   += used;
+          io_lng -= used;
+          if (io_lng > 2)
+             c_lab->L0  = sgetg(p_tp, &g_tpd, &used, "sx");
+          else {
+            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            return(ILL_LAB);
+          }
+          p_tp    += used;
+          io_lng  -= used;
+          if (io_lng > 2)
+              c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
+          else {
+            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            return(ILL_LAB);
+          }
+          if (p_lb->q_par >= 5) {
+            p_tp   += used;
+            io_lng -= used;
+            if (io_lng > 2) {
+              if (p_lb->q_par == 5 && (c_lab->cstm == 3 || c_lab->cstm == 12))
+                 (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
+              else {
+                c_lab->B1 = sgetg(p_tp, &g_tpd, &used, "sx");
+                if (p_lb->q_par == 6) { // dlmb
+                  p_tp    += used;
+                  io_lng  -= used;
+                  if (io_lng > 2)
+                  c_lab->B2  = sgetg(p_tp, &g_tpd, &used, "sx");
+                  else {
+                    lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+                    return(ILL_LAB);
+                  }
+                }
+              }
+            } else {
+              lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+              return(ILL_LAB);
             }
           }
           break;
         }
-        c_lab->cmplt = 1;
-        p_tp = p_io;
-      } else {
-        p_tp = p_io;
-        if (*p_io != '\0' && strlen(p_io) > 4) {
-         switch (p_lb->q_par) {
-          case 2:
-            c_lab->B1  = sgetg(p_tp, &(c_lab->g_tpd), &used, "sx");
-            p_tp      += used;
-            (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
-            p_tp      += used;
-            break;
-          case 3:
-            f = sgetg(p_tp, &(c_lab->m_tpd), &used, "m");
-            if (c_lab->cstm == 6) // upsn / upss
-                c_lab->N0 = f;
-            else  /* s34 */ c_lab->B0 = f;
-            c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
-            (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
-            p_tp      += used;
-            break;
-          case 4:
-          case 5:
-          case 6:
-            c_lab->B0  = sgetg(p_tp, &(c_lab->g_tpd), &used, "sx");
-            p_tp      += used;
-            c_lab->N0  = sgetg(p_tp, &(c_lab->m_tpd), &used, "m");
-            p_tp      += used;
-            c_lab->L0  = sgetg(p_tp, &g_tpd, &used, "sx");
-            p_tp      += used;
-            c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
-            p_tp += used;
-            if (p_lb->q_par == 5 && c_lab->cstm == 3)
-               (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
-            else {
-              c_lab->B1 = sgetg(p_tp, &g_tpd, &used, "sx");
-              if (p_lb->q_par == 6) { // dlmb
-                p_tp      += used;
-                c_lab->B2  = sgetg(p_tp, &g_tpd, &used, "sx");
-              }
-            }
-            p_tp += used;
-            break;
-          }
-          c_lab->cmplt = 1;
-        } /* not empty string */
-        else {
-          c_lab->lab_type = ILL_LAB;
-          return (ILL_LAB);
-        }
-        c_lab->cmplt = 2;
-      }  /* input from string */
+        io_lng       -= used;
+        c_lab->cmplt  = (short) ((*p_lb->add_p == '\0') ? 1 : 2);
+        p_tp          = p_io;
+      } /* not empty string */
+      else {
+        c_lab->lab_type = ILL_LAB;
+        return (ILL_LAB);
+      }
 
       if (c_lab->cstm == 6 /*ste*/) {
-        if (c_lab->mode == 3) {
+        if (c_lab->mode == 3) { /* np_stg or sp_stg ? */
           if (c_lab->B0 == M_PI_2 || c_lab->B0 == -M_PI_2) {
             c_lab->mode = (c_lab->B0 > 0.0) ? +1 : -1;
           }
         }
-        if (c_lab->mode == 4) {
+        if (c_lab->mode == 4) { /* np_estg or sp_esg ? */
           if (c_lab->B0 == M_PI_2 || c_lab->B0 == -M_PI_2) {
             c_lab->mode  = (c_lab->B0 > 0.0) ? +2 : -2;
             c_lab->N0    = c_lab->E0 = 2000000.0;
@@ -574,10 +585,15 @@ struct coord_lab        *c_lab,
     }
 
     if ((c_lab->cmplt == 2)
-        && (3 <= c_lab->cstm) && (c_lab->cstm <= 6)) {
+        && (3 <= c_lab->cstm) && (c_lab->cstm <= 7)) {
       g_tpd = *set_tpd("sx", 9, 255);
       m_tpd = *set_tpd("m ", 9, 255);
       switch (p_lb->q_par) {
+      case 1:
+        /* lmblap, lmblaps: L0 */
+        (void) fprintf(iofile, "  ");
+        (void) fputg(iofile, c_lab->L0, &g_tpd, "u");
+        break;
       case 2:
         /* npstg, spstg: scaled */
         (void) fputg(iofile, c_lab->B1, &g_tpd, "u");
@@ -727,10 +743,15 @@ struct coord_lab        *c_lab,
     }
 
     if ((c_lab->cmplt == 2)
-        && (3 <= c_lab->cstm) && (c_lab->cstm <= 6)) {
+        && (3 <= c_lab->cstm) && (c_lab->cstm <= 7)) {
       g_tpd = *set_tpd("sx", 9, 255);
       m_tpd = *set_tpd("m ", 9, 255);
       switch (p_lb->q_par) {
+      case 1:
+        /* lmblap, lmblaps: L0 */
+        (void) fprintf(iofile, "  ");
+        (void) fputg(iofile, c_lab->L0, &g_tpd, "u");
+        break;
       case 2:
         /* npstg, spstg: scaled */
         (void) fprintf(iofile, "  ");

@@ -237,6 +237,8 @@ struct coord_lab         *c_lab
       case 3: /* Lambert cylindrical equival.   */
       case 4: /* Lambert polar equivalent.  (N) */
       case 5: /* Lambert polar equivalent.  (S) */
+      case 8: /* Lambert polar equivalent. Lc (N) */
+      case 9: /* Lambert polar equivalent. Lc (S) */
       case 6: /* Authalic geogr.                */
       case 7: /* Lambert azimuthal equivalent   */
 
