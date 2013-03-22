@@ -76,7 +76,7 @@ LORD_ERROR=3,
 LORD_CRITICAL=4} LORD_CLASS;
 
 /*call back definition*/
-typedef KMSTR_API void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
+typedef void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
 
 
 /*return last buffered error code from the lord module */
