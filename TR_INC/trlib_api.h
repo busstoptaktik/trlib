@@ -42,7 +42,6 @@
 
 KMSTR_API int   TR_InitLibrary(char *path);
 KMSTR_API int   TR_SetGeoidDir(char *path);
-KMSTR_API int   TR_GetLastError(void);
 KMSTR_API void TR_GetVersion(char *buffer, int bufferlength);
 KMSTR_API int   TR_GetEsriText(char *label_in, char *wkt_out); /* DEPRECATED - should be moved to trlib_intern.h*/
 KMSTR_API int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len);
@@ -68,15 +67,26 @@ KMSTR_API int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
 /***************************************
 **********LORD module functions ********
 ****************************************/
+/* class code to distinguish type in call_back*/
+typedef enum 
+{LORD_DEBUG=0, 
+LORD_INFO=1, 
+LORD_WARNING=2,
+LORD_ERROR=3,
+LORD_CRITICAL=4} LORD_CLASS;
+
+/*call back definition*/
+typedef KMSTR_API void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
+
 
 /*return last buffered error code from the lord module */
 KMSTR_API int TR_GetLastError(void);
 
 /* Return last buffered error code from the lord module */
-//TR_set_lord_max_messages
+KMSTR_API void TR_SetLordMaxMessages (int max_messages);
 
 /* Sets the lord call back function */
-//KMSTR_API void TR_SetLordCallBack(LORD_CALLBACK fct);
+KMSTR_API void TR_SetLordCallBack(LORD_CALLBACK fct);
 
 /* Turn the lord modes on or off */
 KMSTR_API void TR_SetLordModes(int debug, int info, int warning, int error, int critical);

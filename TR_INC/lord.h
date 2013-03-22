@@ -21,23 +21,12 @@
 
 
 #include  <stdio.h>
-
+#include "trlib_api.h" /*includes type definitions for callback functions - so must be included here */
 
 /* Pepper the format string with file(line) information */
 #define STRINGIFY(x)  #x
 #define TOSTRING(x)   STRINGIFY(x)
 #define LORD(x)        __FILE__ "(" TOSTRING(__LINE__) "): " x
-
-/* class code to distinguish type in call_back*/
-typedef enum 
-{LORD_DEBUG=0, 
-LORD_INFO=1, 
-LORD_WARNING=2,
-LORD_ERROR=3,
-LORD_CRITICAL=4} LORD_CLASS;
-
-/*call back definition*/
-typedef void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
 
 void lord_debug(int lord_code, char *frmt, ...);
 
