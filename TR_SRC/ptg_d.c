@@ -412,11 +412,12 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
             case 5: /* Lambert equiv. pol. proj., (S) */
             case 8: /* Lambert equiv. pol. proj. Lc, (N) */
             case 9: /* Lambert equiv. pol. proj. Lc, (S) */
+              spl = mode == 5 || mode == 9;
               for ( ; h - i; i += s)
                 switch(i) {
   
                 case  1: /* PRJ -> GEO */
-                  Cn -= TC->N0;
+                  Cn  = TC->N0 - Cn;
                   Ce -= TC->E0;
 #ifdef  WIN32
                   Z  = 0.5 * _hypot(Cn, Ce) / TC->Zb;
@@ -433,7 +434,7 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                                      &dCn, &dCe);
                     } else 
                       Cn = ((Z > 0.0) ? M_PI_2 : -M_PI_2);
-                    if (mode == 5) Cn = -Cn;
+                    if (spl) Cn = -Cn;
                     Ce = v_red(Ce + TC->L0);
                   }
                   else res = TRF_AREA_;
@@ -443,13 +444,13 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                   Ce     = v_red(Ce - TC->L0);
                   /* cos Lat for check */
                   cos_Cn = cos(Cn);
-                  if (mode == 5) Cn = -Cn;
+                  if (spl) Cn = -Cn;
                   /* latitude to authalic latitude  */
                   Cn += clenshaw('s', TC->tcgg+5, 5, 2.*Cn, 0.0,
                                  &dCn, &dCe);
                   Z  = 2.0 * TC->Zb * sin(M_PI_4 - Cn*0.5);
-                  Cn = Z*cos(Ce) + TC->N0;
-                  Ce = Z*sin(Ce) + TC->E0;
+                  Cn = TC->N0 - Z*cos(Ce);
+                  Ce = TC->E0 + Z*sin(Ce);
                   break;
   
                 case  0: /* transfer results */
@@ -472,7 +473,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                   /* geodetic latitude  */
                   Cn += clenshaw('s', TC->tcgg, 5, 2.*Cn, 0.0,
                                  &dCn, &dCe);
-                  if (mode == 5) Cn = -Cn;
                   Ce = v_red(Ce + TC->L0);
                   break;
   
@@ -480,7 +480,6 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
                   Ce = v_red(Ce - TC->L0);
                   /* cos Lat for check */
                   cos_Cn = cos(Cn);
-                  if (mode == 5) Cn = -Cn;
                   /* geo latitude to authalic latitude  */
                   Cn += clenshaw('s', TC->tcgg+5, 5, 2.*Cn, 0.0,
                                  &dCn, &dCe);
