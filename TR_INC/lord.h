@@ -73,6 +73,8 @@ int lord_get_last_error();
 
 void reset_lord();
 
+void set_lord_max_messages(int max_messages);
+
 void set_lord_callback(LORD_CALLBACK fct);
 
 int is_lord_initialised();
