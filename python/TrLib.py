@@ -249,9 +249,9 @@ def SetThreadMode(on=True):
 def SetMessageHandler(fct):
 	global CALL_BACK #keep this reference ....
 	CALL_BACK=MESSAGE_HANDLER(fct)
-	tr_lib.TR_SetLordCallback(CALL_BACK)
+	tr_lib.TR_SetLordCallBack(CALL_BACK)
 
-def SetLordMaxMessages(max_msg):
+def SetMaxMessages(max_msg):
 	tr_lib.TR_SetLordMaxMessages(int(max_msg))
 
 def SetLordModes(use_debug=False, use_info=False, use_warning=True, use_error=True, use_critical=True):
