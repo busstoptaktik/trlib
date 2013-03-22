@@ -26,6 +26,13 @@ EXPORTS
 	TR_ImportLabel
 	TR_ExportLabel
 	TR_Insert
+	TR_GetLastError
+	TR_SetLordMaxMessages
+	TR_SetLordCallBack
+	TR_SetLordModes
+	TR_SetLordOutputs
+	TR_SetLordVerbosityLevels
+	TR_SetLordFile
 	bh_lat
 	bh_lmb
 	bshlm1
