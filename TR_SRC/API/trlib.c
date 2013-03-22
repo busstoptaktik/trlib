@@ -718,34 +718,6 @@ void TR_TerminateThread(void){
 	c_tabdir_file(0,NULL);
 }
 
-/*
-BOOL WINAPI
-DllMain (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
-{
-    switch (dwReason)
-    {
-        case DLL_PROCESS_ATTACH:
-            // Code to run when the DLL is loaded
-            break;
-
-        case DLL_PROCESS_DETACH:
-            // Code to run when the DLL is freed
-            break;
-
-        case DLL_THREAD_ATTACH:
-            // Code to run when a thread is created during the DLL's lifetime
-            break;
-
-        case DLL_THREAD_DETACH:
-		printf("Thread detaching!\n");
-	        TerminateLibrary();
-            // Code to run when a thread ends normally.
-            break;
-    }
-    return TRUE;
-}
-*/
-
 /* Translates mlb to ESRI wkt*/
 int TR_GetEsriText(char *mlb, char *wkt_out){
     int err;
@@ -872,8 +844,10 @@ int TR_GetLastError(void){
     return lord_get_last_error();
 }
 
-/* Return last buffered error code from the lord module */
-//TR_set_lord_max_messages
+/* Sets the max messages pr. thread in the lord module. Negative number means no limit */
+void TR_SetLordMaxMessages (int max_messages) {
+	set_lord_max_messages(max_messages);
+}
 
 /* Sets the lord call back function */
 void TR_SetLordCallBack(LORD_CALLBACK fct) {

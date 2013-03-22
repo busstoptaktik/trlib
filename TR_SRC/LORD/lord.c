@@ -31,9 +31,9 @@ Then output each call by using
 lord_type(int lord_code, char *frmt, ...)
 
 Example code for outputting the lord code 0 and the text filenotfound to the error module
-(void) lord_error(0, "filenotfound"));
+(void) lord_error(0, "filenotfound");
 The c code line number will also be outputted if written like this
-(void) lord_error(0, LORD("filenotfound")));
+(void) lord_error(0, LORD("filenotfound"));
 
 
 The lord_code has different meaning:
@@ -47,10 +47,6 @@ for the debug, info and warning messages different verbosity level exist
 for error and critical messages 
 	The value of the lord_code is outputtet in the same line just after the message.
 */
-
-
-/* TODO: implement call back mechanism AND implement some max for logged messages - say if you are transforming a zillion points with some kind of wrong input 
-* and don't want a HUGE log file.... */
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -86,8 +82,9 @@ FILE * stream_critical;
 THREAD_SAFE int last_error=TR_OK;
 
 /*message overflow protection*/
-#define MAX_MESSAGES (5000)
+//#define MAX_MESSAGES (5000)
 THREAD_SAFE int n_logged=0;
+int _max_messages = 5000;
 
 /*call back function*/
 static LORD_CALLBACK lord_call_back=NULL;
@@ -112,6 +109,11 @@ void reset_lord(){
 	n_logged=0;
 }
 
+/* Sets the maximum number of lord messages pr. thread in the LORD module. A negative number means no limit */
+void set_lord_max_messages(int max_messages) {
+	_max_messages = max_messages;
+}
+
 void set_lord_callback(LORD_CALLBACK fct){
 	lord_call_back=fct;
 }
@@ -120,11 +122,11 @@ void set_lord_callback(LORD_CALLBACK fct){
 static void lord_wrapper(LORD_CLASS report_class, int err_code, FILE *stream, char *frmt, va_list args){
 	char buf[1024], *tmp=buf;
 	n_logged++;
-	if (n_logged>MAX_MESSAGES)
+	if (n_logged>_max_messages && _max_messages > -1)
 		return;
 	/*use special message in case of overflow....*/
-	if (n_logged==MAX_MESSAGES){
-		sprintf(buf,"%d messages logged - nothing will be reported from now on.",MAX_MESSAGES);
+	if (n_logged==_max_messages){
+		sprintf(buf,"%d messages logged - nothing will be reported from now on.",_max_messages);
 	}
 	else{
 		/*compose message identifier*/
@@ -440,7 +442,7 @@ void init_lord()
 	stream_critical = stderr;
 }
 
-// Turn the lord modes on or off, an output stream must be specified or the mode cannot be turned on
+// Turn the lord modes on or off
 void set_lord_modes(int debug, int info, int warning, int error, int critical)
 {
 	if (!TR_IsMainThread())
