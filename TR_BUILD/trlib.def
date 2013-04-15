@@ -13,6 +13,7 @@ EXPORTS
 	TR_InverseTransform
 	TR_Transform2
 	TR_InverseTransform2
+	TR_TransformGH
 	TR_TransformPoint
 	TR_InverseTransformPoint
 	TR_Stream
