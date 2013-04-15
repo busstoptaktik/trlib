@@ -489,7 +489,7 @@ int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
 	int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->proj_in,tr->proj_out, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_in,tr->proj_out, X,Y,Z,X,Y,Z,NULL,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
  
@@ -497,7 +497,7 @@ int TR_Transform(TR *tr, double *X, double *Y, double *Z, int n) {
 	 int err;
 	 if ((0==tr)||(0==X)||(0==Y))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->proj_out,tr->proj_in, X,Y,Z,X,Y,Z,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_out,tr->proj_in, X,Y,Z,X,Y,Z,NULL,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
 
@@ -505,7 +505,7 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 int err;
 	 if ((0==tr)||(0==X_in)||(0==Y_in)||(0==X_out)||(0==Y_out))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->proj_in,tr->proj_out, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_in,tr->proj_out, X_in,Y_in,Z_in,X_out,Y_out,Z_out,NULL,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
  
@@ -513,7 +513,7 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 int err;
 	 if ((0==tr)||(0==X_in)||(0==Y_in)||(0==X_out)||(0==Y_out))
 		 return TR_LABEL_ERROR;
-	 err=TR_tr(tr->proj_out,tr->proj_in, X_in,Y_in,Z_in,X_out,Y_out,Z_out,n,tr->use_geoids,tr->geoid_pt);
+	 err=TR_tr(tr->proj_out,tr->proj_in, X_in,Y_in,Z_in,X_out,Y_out,Z_out,NULL,n,tr->use_geoids,tr->geoid_pt);
 	 return err;
  }
 
@@ -529,6 +529,18 @@ int TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_ou
 	 return err;
  }
  
+ int TR_TransformGH(TR *tr, double *X_in, double *Y_in, double *Z_in, double *GH_out, int n){
+	 int use_geoids,err;
+	/*test if we request geoid heights and that we have geoids (use_geoids=0)*/
+	if (tr->use_geoids==0 && GH_out)
+	    use_geoids=1;
+	else
+	    use_geoids=tr->use_geoids;
+	err=TR_tr(tr->proj_in,tr->proj_out,X_in,Y_in,Z_in,X_in,Y_in,Z_in,GH_out,n,use_geoids,tr->geoid_pt);
+	return err;
+}
+ 
+ 
 /* transform one or more xyz-tables */
 int TR_tr(
    PR *proj_in,
@@ -539,6 +551,7 @@ int TR_tr(
    double *X_out,
    double *Y_out,
    double *Z_out,
+   double *GH_out,
    int n, 
    int use_geoids, 
    struct mgde_str *geoid_pt
@@ -548,7 +561,7 @@ int TR_tr(
     union geo_lab *plab_in,*plab_out;
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i; /*use_geoids; */
-	 
+
     /*escape if the underlying TR-object is not fully composed....*/
     if (!proj_in || !proj_out){
 	    lord_error(TR_LABEL_ERROR,"TR_tr: TR-object not fully composed.\n");
@@ -575,7 +588,7 @@ int TR_tr(
   
    for (i = 0;  i < n;  i++) {
       	z = Z_in? Z_in[i]: z1;
-        err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z_out? Z_out+i: &z2), &GH,use_geoids,geoid_pt, "", ERR_LOG);
+        err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z_out? Z_out+i: &z2), (GH_out?GH_out+i: &GH) ,use_geoids,geoid_pt, "", ERR_LOG);
 	#ifdef _ROUT
 	if (err)
 		lord_debug(0,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",GET_MLB(proj_in),GET_MLB(proj_out),err,x_in[i],y_in[i],z);
@@ -590,6 +603,11 @@ int TR_tr(
    return ERR? TR_ERROR: TR_OK;
     
 }
+
+
+
+
+
 
 /* transform ITRF one or more xyz-tables */
 int TR_itrf(
