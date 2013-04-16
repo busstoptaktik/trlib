@@ -22,10 +22,10 @@
 
 /* API header til eksterne brugere og til internt 'sanity' check, simlk, thokn sep. 2011 */
 
-#define TR_OK 0
-#define TR_LABEL_ERROR 1
-#define TR_ERROR 2
-#define TR_ALLOCATION_ERROR 3
+#define TR_OK                  (0)
+#define TR_LABEL_ERROR    (1)
+#define TR_ERROR             (2)
+#define TR_ALLOCATION_ERROR  (3)
 
 /* Defines for export to foreign srs-metadata */
 
@@ -33,7 +33,6 @@
 #define TR_FRMT_PROJ4 (1)
 #define TR_FRMT_ESRI_WKT (2)
 
-#pragma once
 #if defined __cplusplus
 #define KMSTR_API extern "C" 
 #else 
@@ -82,7 +81,7 @@ typedef void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
 /*return last buffered error code from the lord module */
 KMSTR_API int TR_GetLastError(void);
 
-/* Return last buffered error code from the lord module */
+/* Set the maximal number of messages that should be logged - use a negative number if you do not want logging to stop at all */
 KMSTR_API void TR_SetLordMaxMessages (int max_messages);
 
 /* Sets the lord call back function */

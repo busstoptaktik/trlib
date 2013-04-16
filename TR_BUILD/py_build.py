@@ -85,7 +85,7 @@ def GetRev(trlib):
 		print "Identify failed - trlib is: %s" %trlib
 		rev="undefined"
 	lines=rev.splitlines()
-	if len(lines)>1:
+	if len(lines)>1 or rc!=0:
 		print "Identify failed - trlib is: %s" %trlib
 		return "undefined"
 	return rev.strip()
