@@ -8,6 +8,7 @@ LDFLAGS = -I./TR_INC -shared  -DTHREAD_SAFE -pg -g
 EXENAME = main
 
 SRCS       =  $(wildcard TR_SRC/*.c)
+GEOMETRIC_GEODESYSRC    = $(wildcard TR_SRC/GEOMETRIC_GEODESY/*c)
 LORDSRC    = $(wildcard TR_SRC/LORD/*c)
 DEPSRC     =  $(wildcard TR_SRC/DEPRECATED/*.c)
 APISRC     =  $(wildcard TR_SRC/API/*.c)
@@ -17,9 +18,10 @@ UTILSSRC   =  $(wildcard TR_SRC/UTILS/*.c)
 STRONGSRC  =  $(wildcard TR_SRC/STRONG/*.c)
 
 #ALLSRC =  $(SRCS) $(LORDSRC) $(APISRC) $(JNISRC) $(DEPSRC)
-ALLSRC =  $(SRCS) $(LORDSRC) $(DEPSRC) $(APISRC) $(UTILSSRC) $(PARSINGSRC) $(STRONGSRC)
+ALLSRC =  $(SRCS) $(GEOMETRIC_GEODESYSRC) $(LORDSRC) $(DEPSRC) $(APISRC) $(UTILSSRC) $(PARSINGSRC) $(STRONGSRC)
 
 OBJS       =  $(patsubst TR_SRC/%.c,     $(BUILDDIR)/%.o,  $(SRCS))
+GEOMETRIC_GEODESYOBJ =  $(patsubst TR_SRC/GEOMETRIC_GEODESY/%.c,     $(BUILDDIR)/%.o,  $(GEOMETRIC_GEODESYSRC))
 LORDOBJ    =  $(patsubst TR_SRC/LORD/%.c,     $(BUILDDIR)/%.o,  $(LORDSRC))
 APIOBJ     =  $(patsubst TR_SRC/API/%.c, $(BUILDDIR)/%.o,  $(APISRC))
 DEPOBJ     =  $(patsubst TR_SRC/DEPRECATED/%.c, $(BUILDDIR)/%.o,  $(DEPSRC))
@@ -28,7 +30,7 @@ PARSINGOBJ =  $(patsubst TR_SRC/PARSING/%.c, $(BUILDDIR)/%.o,  $(PARSINGSRC))
 UTILSOBJ   =  $(patsubst TR_SRC/UTILS/%.c,   $(BUILDDIR)/%.o,  $(UTILSSRC))
 STRONGOBJ   =  $(patsubst TR_SRC/STRONG/%.c,   $(BUILDDIR)/%.o,  $(STRONGSRC))
 #ALLOBJ =  $(OBJS) $(LORDOBJ) $(APIOBJ) $(JNIOBJ) $(DEPOBJ)  $(UTILSOBJ) $(PARSINGOBJ)
-ALLOBJ =  $(OBJS) $(LORDOBJ) $(DEPOBJ) $(APIOBJ) $(UTILSOBJ) $(PARSINGOBJ) $(STRONGOBJ)
+ALLOBJ =  $(OBJS) $(GEOMETRIC_GEODESYOBJ) $(LORDOBJ) $(DEPOBJ) $(APIOBJ) $(UTILSOBJ) $(PARSINGOBJ) $(STRONGOBJ)
 .PHONY: pre
 
 all: lib so
