@@ -82,15 +82,16 @@ FILE * stream_critical;
 THREAD_SAFE int last_error=TR_OK;
 
 /*message overflow protection*/
-//#define MAX_MESSAGES (5000)
+/*#define MAX_MESSAGES (5000)*/
 THREAD_SAFE int n_logged=0;
 int _max_messages = 5000;
 
 /*call back function*/
 static LORD_CALLBACK lord_call_back=NULL;
 
-/*declare the wrapper function*/
+/*declare the static functions*/
 static void lord_wrapper(LORD_CLASS report_class, int err_code, FILE *stream, char *frmt, va_list args);
+static void close_lord_outputs();
 
 
 /*returns last (thread local) error*/
@@ -165,12 +166,12 @@ static void lord_wrapper(LORD_CLASS report_class, int err_code, FILE *stream, ch
 	return;
 }
 		
-// Output debug messages
+/* Output debug messages*/
 void lord_debug(int lord_code, char *frmt, ...)
 {
 	if (use_debug)
 	{
-		// Determine if the message shall be outputted according to verbosity level
+		/*Determine if the message shall be outputted according to verbosity level*/
 		int output = 0;
 		if (lord_code == 3 || lord_code == 0) {
 			output = 1; }
@@ -192,12 +193,12 @@ void lord_debug(int lord_code, char *frmt, ...)
 	}
 }
 
-// Output info messages
+/* Output info messages*/
 void lord_info(int lord_code, char *frmt, ...)
 {
 	if (use_info)
 	{
-		// Determine if the message shall be outputted according to verbosity level
+		/*Determine if the message shall be outputted according to verbosity */
 		int output = 0;
 		if (lord_code == 3 || lord_code == 0) {
 			output = 1; }
@@ -218,12 +219,12 @@ void lord_info(int lord_code, char *frmt, ...)
 	}
 }
 	
-// Output warning messages
+/* Output warning messages*/
 void lord_warning(int lord_code, char *frmt, ...)
 {
 	if (use_warning)
 	{
-			// Determine if the message shall be outputted according to verbosity level
+			/* Determine if the message shall be outputted according to verbosity level*/
 		int output = 0;
 		if (lord_code == 3 || lord_code == 0) {
 			output = 1; }
@@ -244,7 +245,7 @@ void lord_warning(int lord_code, char *frmt, ...)
 	}
 }
 
-// Output error messages
+/* Output error messages*/
 void lord_error(int lord_code, char *frmt, ...)
 {      
 	/*buffer last error*/
@@ -259,7 +260,7 @@ void lord_error(int lord_code, char *frmt, ...)
 	}
 }
 
-// Output critical mesaages
+/*Output critical mesaages*/
 void lord_critical(int lord_code, char *frmt, ...)
 {
 	/*buffer last error*/
@@ -274,7 +275,7 @@ void lord_critical(int lord_code, char *frmt, ...)
 	}
 }
 
-// Set and initialise the debug module
+/*Set and initialise the debug module*/
 void set_lord_debug_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -306,7 +307,7 @@ void set_lord_debug_mode(FILE * stream, char *verbosity)
 	}
 }
 
-// Set and initialise the info module
+/* Set and initialise the info module*/
 void set_lord_info_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -338,7 +339,7 @@ void set_lord_info_mode(FILE * stream, char *verbosity)
 	}
 }
 
-// Set and initialise the warning module
+/* Set and initialise the warning module*/
 void set_lord_warning_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -370,7 +371,7 @@ void set_lord_warning_mode(FILE * stream, char *verbosity)
 	}
 }
 
-// Set and initialise the error module
+/* Set and initialise the error module*/
 void set_lord_error_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -388,11 +389,11 @@ void set_lord_error_mode(FILE * stream, char *verbosity)
 		use_error = 0;
 	}
 
-	// All error messages shall be outputted if the module is turned on
+	/* All error messages shall be outputted if the module is turned on*/
 	verbosity_error = 3;
 }
 
-// Set and initialise the critical module
+/* Set and initialise the critical module*/
 void set_lord_critical_mode(FILE * stream, char *verbosity)
 {
 	if (!TR_IsMainThread())
@@ -410,11 +411,11 @@ void set_lord_critical_mode(FILE * stream, char *verbosity)
 		use_critical = 0;
 	}
 
-	// All critical messages shall be outputted if the module is turned on
+	/* All critical messages shall be outputted if the module is turned on*/
 	verbosity_critical = 3;
 }
 
-// Initialise the lord module with default values
+/* Initialise the lord module with default */
 void init_lord()
 {
 	if (!TR_IsMainThread())
@@ -442,56 +443,21 @@ void init_lord()
 	stream_critical = stderr;
 }
 
-// Turn the lord modes on or off
+/*Turn the lord modes on or off */
 void set_lord_modes(int debug, int info, int warning, int error, int critical)
 {
 	if (!TR_IsMainThread())
 	{
 		return;
 	}
-
-	/* if (stream_debug != NULL) - this is decided in lord_wrapper.... */
-	{
-		if (debug == 0 || debug == 1)
-		{
-			use_debug = debug;
-		}
-	}
-
-	/*if (stream_info != NULL)*/
-	{
-		if (info == 0 || info == 1)
-		{
-			use_info = info;
-		}
-	}
-
-	/*if (stream_warning != NULL)*/
-	{
-		if (warning == 0 || warning == 1)
-		{
-			use_warning = warning;
-		}
-	}
-
-	/*if (stream_error != NULL)*/
-	{
-		if (error == 0 || error == 1)
-		{
-			use_error = error;
-		}
-	}
-
-	/*if (stream_critical != NULL)*/
-	{
-		if (critical == 0 || critical == 1)
-		{
-			use_critical = critical;
-		}
-	}
+	use_debug = debug;
+	use_info = info;
+	use_warning = warning;
+	use_error = error;
+	use_critical = critical;
 }
 
-// Set the output pointers for each lord_type
+/* Set the output pointers for each lord_type */
 void set_lord_outputs(FILE * stream_debug_outside, FILE * stream_info_outside, FILE * stream_warning_outside, FILE * stream_error_outside, FILE * stream_critical_outside)
 {
 	stream_debug = stream_debug_outside;
@@ -514,19 +480,44 @@ void set_lord_verbosity_levels(int verb_debug, int verb_info, int verb_warning, 
 	verbosity_warning = verb_warning;
 }
 
-// implement it so only one file when implemented in python binding
-void set_lord_file(char *fullfilename)
+/*close output streams if they are set, not previously closed and not equal to stdout,stderr */
+static void close_lord_outputs(){
+	FILE *is_closed[5]={NULL,NULL,NULL,NULL,NULL};
+	FILE **streams[5]={&stream_debug,&stream_info,&stream_warning,&stream_error,&stream_critical};
+	int i;
+	for (i=0; i<5; i++){
+		FILE **pstream=streams[i];
+		if (*pstream!=stdout && *pstream!=stderr && *pstream!=NULL){
+			FILE **test_closed=is_closed;
+			while (*test_closed && *test_closed!=*pstream) test_closed++;
+			/*if test_closed points to NULL the stream did not match any previously closed stream and its safe to close*/
+			if (!*test_closed){
+				fclose(*pstream);
+				*test_closed=*pstream;
+				*pstream=NULL;
+			}
+		}
+	}
+}
+
+/* useful to set a log file from binding languages where FILE* is hard to map exactly 
+*  NOT intended to be mixed with calls to set_lord_outputs, use one or the other
+*/
+int set_lord_file(char *fullfilename)
 {
 	if (!TR_IsMainThread())
 	{
-		return;
+		return TR_ERROR;
 	}
-
+	close_lord_outputs();
 	stream_debug = fopen (fullfilename , "w");
 	stream_info = stream_debug;
 	stream_warning = stream_debug;
 	stream_error = stream_debug;
 	stream_critical = stream_debug;
+	return (stream_debug) ? (TR_OK) : (TR_ALLOCATION_ERROR);
 }
+
+
 
 

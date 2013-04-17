@@ -97,7 +97,7 @@ KMSTR_API void TR_SetLordOutputs(FILE * stream_debug_outside, FILE * stream_info
 KMSTR_API void TR_SetLordVerbosityLevels(int verb_debug, int verb_info, int verb_warning);
 
 /* Sets the lord output file for all modes */
-KMSTR_API void TR_SetLordFile(char *fullfilename);
+KMSTR_API int TR_SetLordFile(char *fullfilename);
 
 
 #endif
