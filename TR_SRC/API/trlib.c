@@ -888,6 +888,6 @@ void TR_SetLordVerbosityLevels(int verb_debug, int verb_info, int verb_warning) 
 }
 
 /* Sets the lord output file for all modes */
-void TR_SetLordFile(char *fullfilename) {
-	set_lord_file(fullfilename);
+int TR_SetLordFile(char *fullfilename) {
+	return set_lord_file(fullfilename);
 }
