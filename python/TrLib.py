@@ -147,7 +147,7 @@ def LoadLibrary(lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_SetLordMaxMessages.argtypes=[ctypes.c_int]
 		tr_lib.TR_SetLordMaxMessages.restype=None
 		tr_lib.TR_SetLordFile.argtypes=[ctypes.c_char_p]
-		tr_lib.TR_SetLordFile.restype=None
+		tr_lib.TR_SetLordFile.restype=ctypes.c_int
 		tr_lib.TR_SetLordCallBack.argtypes=[MESSAGE_HANDLER]
 		tr_lib.TR_SetLordCallBack.restype=None
 		tr_lib.TR_SetLordModes.argtypes=[ctypes.c_int]*5
@@ -252,6 +252,15 @@ def SetMessageHandler(fct):
 	global CALL_BACK #keep this reference ....
 	CALL_BACK=MESSAGE_HANDLER(fct)
 	tr_lib.TR_SetLordCallBack(CALL_BACK)
+
+def RemoveMessageHandler():
+	global CALL_BACK
+	tr_lib.TR_SetLordCallBack(ctypes.cast(ctypes.c_void_p(None),MESSAGE_HANDLER));
+	CALL_BACK=None
+
+#Used to define a log file - subsequent calls will close prviously used files
+def SetLordFile(path):
+	return tr_lib.TR_SetLordFile(path)
 
 def SetMaxMessages(max_msg):
 	tr_lib.TR_SetLordMaxMessages(int(max_msg))
