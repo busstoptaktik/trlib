@@ -778,12 +778,13 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc, int 
 }
 
 /* Import a mlb from other projection specifications */
-int TR_ImportLabel(char *text, char *mlb){
+int TR_ImportLabel(char *text, char *mlb_out, int buf_len){
 	int ok=TR_LABEL_ERROR;
+	char buf[2*MLBLNG]; /*TODO: improve translation functions so that buf_len is included in call.
 	/*We go for autodetection of format - could also implement explicit identifiers like in EPSG:xxxxx*/
 	/*case proj4*/
 	if (strstr(text,"+proj"))
-		ok=proj4_to_mlb(text,mlb);
+		ok=proj4_to_mlb(text,buf);
 	/*case epsg*/
 	else if (strstr(text,"EPSG")){
 		char *pos=strchr(text,':');
@@ -794,7 +795,7 @@ int TR_ImportLabel(char *text, char *mlb){
 			if (code>0){
 				if (*end_pt) /*so we have height info also*/
 					v_code=strtol(end_pt+1,NULL,0);
-				ok=import_from_epsg(code,v_code,mlb);
+				ok=import_from_epsg(code,v_code,buf);
 			}
 		}
 		else
@@ -802,13 +803,15 @@ int TR_ImportLabel(char *text, char *mlb){
 	}
 	/*case wkt*/
 	else if (strchr(text,'[') && strchr(text,']')){
-		ok=sgetshpprj(text,NULL,mlb);
+		ok=sgetshpprj(text,NULL,buf);
 		ok=(ok==0)?(TR_OK):(TR_LABEL_ERROR);
 	}
 	else
 		lord_warning(TR_LABEL_ERROR,"Unrecognisable input format.");
 	if (ok!=TR_OK)
-		*mlb='\0';
+		*mlb_out='\0';
+	else /*TODO: report error on overflow*/
+		strncpy(mlb_out,buf,buf_len);
 	return ok;
 }
 

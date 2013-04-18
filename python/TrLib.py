@@ -137,7 +137,7 @@ def LoadLibrary(lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_AllowUnsafeTransformations.restype=None
 		tr_lib.TR_ForbidUnsafeTransformations.argtypes=None
 		tr_lib.TR_ForbidUnsafeTransformations.restype=None
-		tr_lib.TR_ImportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+		tr_lib.TR_ImportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_int]
 		tr_lib.TR_ImportLabel.restype=ctypes.c_int
 		tr_lib.TR_ExportLabel.argtypes=[ctypes.c_char_p,ctypes.c_char_p,ctypes.c_int,ctypes.c_int]
 		tr_lib.TR_ExportLabel.restype=ctypes.c_int
@@ -354,7 +354,7 @@ def ExportLabel(mlb,type=FRMT_EPSG):
 def ImportLabel(extern_def):
 	if IS_INIT:
 		mlb=ctypes.create_string_buffer(128)
-		retval=tr_lib.TR_ImportLabel(extern_def,mlb)
+		retval=tr_lib.TR_ImportLabel(extern_def,mlb,128)
 		if retval==TR_OK:
 			return mlb.value
 		elif DEBUG:
