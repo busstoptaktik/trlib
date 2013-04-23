@@ -16,6 +16,8 @@
  * 
  */
  
+#if !defined(H_CLENSHAW)
+#define      H_CLENSHAW
 
 
 /* clenshaw.h version 1.0             # page 1   11 Aug 1994 12 54 */
@@ -75,3 +77,6 @@ Given M the sum of the series is :
 
 Prog.: K. Engsager, MAY 1994 
 */
+
+#endif
+

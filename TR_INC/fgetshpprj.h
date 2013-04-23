@@ -16,6 +16,8 @@
  * 
  */
  
+#if !defined(H_FGETSHPPRJ)
+#define      H_FGETSHPPRJ
 
 
 /* fgetshpprj  ver 2008.01          # page 1     6 Jan 2009 11 57 */
@@ -56,3 +58,6 @@ union geo_lab   *g_lab);
       "radian" ? (.gf ==2 && .tf ==3) : (.gf ==2 && .tf ==1)
 
 */
+
+#endif
+

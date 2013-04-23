@@ -15,29 +15,34 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
+
+#if !defined(H_PROJ4_TO_MLB)
+#define      H_PROJ4_TO_MLB
+
+
  struct proj4_entry{
-	char proj[64];
-	char datum[64];
-	char vdatum[64];
-	char ellps[64];
-	char units[16];
-	char nadgrids[64];
-	double towgs84[7];
-	int n_params;
-	int zone;
-	double x_0;
-	double y_0;
-	double lat_0;
-	double lat_ts;
-	double lon_0;
-	double k;
-	double a;
-	double b;
+        char proj[64];
+        char datum[64];
+        char vdatum[64];
+        char ellps[64];
+        char units[16];
+        char nadgrids[64];
+        double towgs84[7];
+        int n_params;
+        int zone;
+        double x_0;
+        double y_0;
+        double lat_0;
+        double lat_ts;
+        double lon_0;
+        double k;
+        double a;
+        double b;
  };
  
  
-	 
-	 
+         
+         
  typedef struct proj4_entry proj4_entry;
 
  
@@ -53,3 +58,5 @@
  /*normalise datum (use specific etrs89 alias)*/
  void normalise_datum(char *datum);
  
+ #endif
+

@@ -18,6 +18,9 @@
  
 /* int get_ellipsoid_data(union geo_lab *plab_in, double *data);*/
 
+#if !defined(H_DOC_DEF_DATA)
+#define      H_DOC_DEF_DATA
+
 #include "parse_def_file.h"
 
 int doc_rgn(char *rgn_name, char *descr, int detail);
@@ -26,3 +29,6 @@ int doc_dtm(char *dtm_name, char *descr, int detail);
 int get_def_numbers(int *n_prj, int *n_dtm, int *n_grs, int *n_rgn);
 int doc_grs(char *ell_name, FILE *out, int detail);
 void present_data(FILE *fp,def_data *data);
+
+#endif
+

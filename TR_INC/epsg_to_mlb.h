@@ -15,6 +15,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
+
+#if !defined(H_EPSG_TO_MLB)
+#define      H_EPSG_TO_MLB
+
+
  #include <stdio.h>
  /*will initialise the epsg definition table*/
  int setup_epsg_table(FILE *f_in); 
@@ -23,3 +28,6 @@
  /*import and export functions*/
  int export_to_epsg(char *mlb, int *h_code, int *v_code);
  int import_from_epsg(int h_code, int v_code, char *mlb);
+
+#endif
+

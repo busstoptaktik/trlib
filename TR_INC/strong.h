@@ -15,6 +15,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  * 
  */
+
+#if !defined(H_STRONG)
+#define      H_STRONG
+
  char **get_items(char *line, char *delimiter, int *item_count);
  void remove_whitespace(char *text, char *out);
  double get_number(char *item);
@@ -22,4 +26,6 @@
  void string_tolower(char *text);
  int replace_pattern(char *in, char *out, char *to_replace, char *replace_with);
  char *path_basename(char *full_path);
- 
+
+#endif
+

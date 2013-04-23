@@ -153,16 +153,16 @@ struct gde_lab          *t_lab,
     pos = 0;
     if ((qr = fread((void *) &f777, sizeof (int),
                     1, tab_file)) - 1) {
-      lord_error(0,LORD("The error is at the input of table-mark blokaddr %8ld number = %4lu size = %4d"),
-                pos, (unsigned long) qr, sizeof (int));
+      lord_error(0,LORD("The error is at the input of table-mark blokaddr %8ld number = %4u size = %4u"),
+                pos, (unsigned int) qr, sizeof (int));
       fclose(tab_file);
       return (-1);
     }
     if (f777 < 768 || 777 < f777) {
       if (all_out) {
-		lord_error(0,LORD("%s not a table_file"), t_lab->mlb);  
-	  }
-	  fclose(tab_file);
+                lord_error(0,LORD("%s not a table_file"), t_lab->mlb);  
+          }
+          fclose(tab_file);
       return (-2);
     }
     /* table file detected */
@@ -171,8 +171,8 @@ struct gde_lab          *t_lab,
     pos = pos + (long) qr;
     if ((qr = fread((void *) BL, 6 * sizeof (double),
                     1, tab_file)) - 1) {
-      lord_error(0,LORD("Error at input of table-limits blokaddr %8ld number = %4lu size = %4d"), 
-		  pos, (unsigned long) qr, 6 * sizeof (double));
+      lord_error(0,LORD("Error at input of table-limits blokaddr %8ld number = %4u size = %4d"), 
+                  pos, (unsigned int) qr, 6 * sizeof (double));
       fclose(tab_file);
       return (-2);
     }
@@ -181,8 +181,8 @@ struct gde_lab          *t_lab,
     pos = pos + (long) qr;
     if ((qr = fread((void *) ezf, sizeof (ezf),
                     1, tab_file)) - 1) {
-      lord_error(0,LORD("Error at input of table-params blokaddr %8ld number  = %4lu size = %4u"),
-                pos, (unsigned long) qr, sizeof (ezf));
+      lord_error(0,LORD("Error at input of table-params blokaddr %8ld number  = %4u size = %4u"),
+                pos, (unsigned int) qr, sizeof (ezf));
       fclose(tab_file);
       return (-2);
     }
@@ -256,10 +256,10 @@ struct gde_lab          *t_lab,
 
     if (t_lab->lab_type != lab_tp || t_lab->f777 != f777) {
       if (all_out) {
-		lord_error(0,LORD("label inconsistent to table_file %s"), pth_mlb);
-	  }
+                lord_error(0,LORD("label inconsistent to table_file %s"), pth_mlb);
+          }
 
-	  fclose(tab_file);
+          fclose(tab_file);
       return (-2);
     }
 
@@ -280,7 +280,7 @@ struct gde_lab          *t_lab,
       else r = 1;
       if (r) {
         lord_error(0,LORD("Unknown coordsys %s"), d_name);
-		fclose(tab_file);
+                fclose(tab_file);
         return(ILL_LAB);
       }
       (void) strcpy(t_lab->clb, d_name);
@@ -340,7 +340,7 @@ struct gde_lab          *t_lab,
                          (union geo_lab *) t_lab, &t_lab->ch_sum)) {
         lord_error(0,LORD("file %s of type %d has sum fault"),
                        t_lab->mlb, t_lab->lab_type);
-		return (ILL_LAB);
+                return (ILL_LAB);
       }
       break;
     default: 

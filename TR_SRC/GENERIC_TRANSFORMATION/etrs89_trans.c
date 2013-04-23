@@ -244,7 +244,7 @@ FILE                     *tr_error
       return((tr_error==NULL) ? TRF_ILLEG_ :
               t_status(tr_error, "",
               "etrs89_trans(unintelligible labels)", TRF_ILLEG_));
-      break;
+      /* break; */
     } /* end switch(action) */
 
     if (res > ies) res = ies;
@@ -258,11 +258,11 @@ FILE                     *tr_error
   *Y = E;
   return(res);
 
-  /* Undef macros */
+}
 
+/* Undef macros */
 #undef PTG
 #undef GTP
 #undef IDT
 #undef ILL
 
-}

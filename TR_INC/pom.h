@@ -20,6 +20,8 @@
 
 /* pom.c: based on code from the boogie-project, originally written by Thomas Knudsen */
 
+if !defined(H_POM)
+define      H_POM
 
 #include <stdio.h>
 #include <ctype.h>
@@ -104,26 +106,26 @@ inline void *pom_pop(POM *s){
 
 
 int ispom(char *filename, FILE *p) {
-	int firstchar = 0, last;
-	if (p) {
-		firstchar = fgetc (p);
-		ungetc (firstchar, p);
+        int firstchar = 0, last;
+        if (p) {
+                firstchar = fgetc (p);
+                ungetc (firstchar, p);
     }
     
     /* does it look like a PPM on stdin? */
-    if ((0==filename)||(0==strlen (filename)))		
-		return 'P'==firstchar ? 0: 1;
-	
-	last = strlen (filename) - 1;
-	if (last < 4)
-	    return 0;
-	
-	/* extension must be 'pom' */    
-	if ((filename[last]!='m') && (filename[last]!='M'))
+    if ((0==filename)||(0==strlen (filename)))          
+                return 'P'==firstchar ? 0: 1;
+        
+        last = strlen (filename) - 1;
+        if (last < 4)
+            return 0;
+        
+        /* extension must be 'pom' */    
+        if ((filename[last]!='m') && (filename[last]!='M'))
         return 0;
-	if ((filename[last-1]!='o') && (filename[last-1]!='O'))
+        if ((filename[last-1]!='o') && (filename[last-1]!='O'))
         return 0;
-	if ((filename[last-2]!='p') && (filename[last-2]!='P'))
+        if ((filename[last-2]!='p') && (filename[last-2]!='P'))
         return 0;
     return 1;
 }
@@ -229,4 +231,6 @@ int main(int argc, char *argv[]){
 #endif
 
 /*SE OGSÅ tiffinfo tiffcp tiffdump*/
+
+#endif
 

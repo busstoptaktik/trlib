@@ -16,8 +16,8 @@
  * 
  */
 
-#if !defined(H_LORD)
-#define      H_LORD
+#if !defined(__H_LORD)
+#define      __H_LORD
 
 
 #include  <stdio.h>
@@ -31,7 +31,7 @@
 void lord_debug(int lord_code, char *frmt, ...);
 
 void lord_info(int lord_code, char *frmt, ...);
-	
+        
 void lord_warning(int lord_code, char *frmt, ...);
 
 void lord_error(int lord_code, char *frmt, ...);
@@ -56,7 +56,7 @@ void set_lord_outputs(FILE * stream_debug, FILE * stream_info, FILE * stream_war
 
 void set_lord_verbosity_levels(int verb_debug, int verb_info, int verb_warning, int verb_error, int verb_critical);
 
-int set_lord_file(char *fullfilename);
+void set_lord_file(char *fullfilename);
 
 int lord_get_last_error();
 
@@ -69,3 +69,4 @@ void set_lord_callback(LORD_CALLBACK fct);
 int is_lord_initialised();
 
 #endif
+

@@ -43,6 +43,9 @@
 /*                 :  init_prj_pos = n_p, init_rgn_pos = 0     */
 /*                 :  init_dtm_pos = 0, init_grs_pos = 0       */
 
+#if !defined(H_CH_TABDIR_PAR)
+#define      H_CH_TABDIR_PAR
+
 #include <stdio.h>
 
 extern void       ch_tabdir_par(
@@ -53,3 +56,6 @@ size_t           *s_p,
 FILE             *n_f,
 size_t            n_p
 );
+
+#endif
+

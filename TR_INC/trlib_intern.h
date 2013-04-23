@@ -36,22 +36,22 @@
 #define GET_LAT0(pr)                ((pr->plab->u_c_lab).B0)
 #define GET_LON0(pr)                ((pr->plab->u_c_lab).L0)
 #define GET_X0(pr)                    ((pr->plab->u_c_lab).E0)
-#define GET_Y0(pr)		      ((pr->plab->u_c_lab).N0)
+#define GET_Y0(pr)                    ((pr->plab->u_c_lab).N0)
 #define GET_SCALE(pr)               ((pr->plab->u_c_lab).scale)
 /*#define GET_ZONE(pr)                ((pr->plab->u_c_lab).zone) - not stored here as expected (use function) */
 #define GET_DTM(pr)                  ((pr->plab->u_c_lab).datum)
 #define GET_PDTM(pr)                ((pr->plab->u_c_lab).p_dtm)
 
 /*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */
-struct PR {
+struct PR_kms_str{
    union geo_lab *plab;
    double dgo[4]; /*space to be used by ptg_d for TM-projections. For other projections, the space can be used for other purposes.*/
 };
 
-typedef struct PR PR;
+typedef struct PR_kms_str PR;
 
 
-struct TR {
+struct TR_kms_str{
     PR *proj_in, *proj_out;
     struct mgde_str *geoid_pt;
     char geoid_name[FILENAME_MAX];
@@ -84,18 +84,15 @@ struct PLATE {
 * Could consider implementing TR *TR_Compose(PR*,PR*) and  void TR_CloseContainer(TR*)  functions for maximal performance and internal use.
 * This would not require any reference counting in constructors and desctructors, as long as TR_CloseProjection is not called before TR_CloseContainer.
 */
-int TR_GeoidTable(struct TR*);
-int TR_SpecialGeoidTable(struct TR *tr, char *geoid_name);
+int TR_GeoidTable(struct TR_kms_str *tr);
+int TR_SpecialGeoidTable(struct TR_kms_str *tr, char *geoid_name);
 int TR_IsMainThread(void);
 int TR_IsThreadSafe(union geo_lab *plab);
-int TR_tr(PR*,PR*, double*, double*, double*, double*, double*,double*, double*, int , int , struct mgde_str*); 
-int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
+int TR_tr(PR* proj_in, PR* proj_out, double* X_in, double* Y_in, double* Z_in, double* X_out, double* Y_out,double* Z_out, int n, int use_geoids, struct mgde_str*); 
+int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE* plate_info);
 PR *TR_OpenProjection(char *mlb);
 void TR_CloseProjection(PR *proj);
-void TR_GetGeoidName(struct TR *tr,char *name);
-/* a simple TR_tr wrapper which also outputs geoid height */
-int TR_TransformGH(struct TR *tr,double *X_in, double *Y_in, double *Z_in, double *gh_out,int n); 
-
-
+void TR_GetGeoidName(struct TR_kms_str *tr,char *name);
 
 #endif
+

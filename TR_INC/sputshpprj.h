@@ -34,14 +34,17 @@
                    for:geo: "dg" or "rad"
    dependening geo_lab->u_c_lab.g_tpd
       (.gf ==2 && .tf ==3) ? "rad" : "dg"
-	
+        
    The caller must ensure that *wkt_out is long enough to hold the output!
 
 */
+
+#if !defined(H_SPUTSHPRJ)
+#define      H_SPUTSHPRJ
  
 #include "geo_lab.h"
  
  int sputshpprj(char *wkt_out, union geo_lab *g_lab);
- 
- 
- 
+
+#endif
+

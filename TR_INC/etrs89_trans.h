@@ -17,6 +17,9 @@
  */
  
 
+#if !defined(H_TRS89_TRANS)
+#define      H_TRS89_TRANS
+
 
 /* etrs89_trans  ver 2009.03          # page 1   04 Mar 2009 11 36 */
 
@@ -78,3 +81,6 @@ FILE                     *tr_error
 
   Prog: Karsten Engsager 2009.
   */
+
+  #endif
+

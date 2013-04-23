@@ -28,6 +28,9 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined(H_ITRF_TRANS)
+#define      H_ITRF_TRANS
+
 #include              "gd_trans.h"
 #include              "conv_lab.h"
 #include              "trlib_intern.h"
@@ -161,4 +164,6 @@ char                     *err_str
 /* (XS)   (X)   (T1)   ( D  -R3  R2) (X)                          */
 /* (YS) = (Y) + (T2) + ( R3  D  -R1)*(Y)                          */
 /* (ZS)   (Z)   (T3)   (-R2  R1  D ) (Z)                          */
+
+#endif
 
