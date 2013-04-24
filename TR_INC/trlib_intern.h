@@ -88,11 +88,13 @@ int TR_GeoidTable(struct TR_kms_str *tr);
 int TR_SpecialGeoidTable(struct TR_kms_str *tr, char *geoid_name);
 int TR_IsMainThread(void);
 int TR_IsThreadSafe(union geo_lab *plab);
-int TR_tr(PR* proj_in, PR* proj_out, double* X_in, double* Y_in, double* Z_in, double* X_out, double* Y_out,double* Z_out, int n, int use_geoids, struct mgde_str*); 
-int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE* plate_info);
+int TR_tr(PR*,PR*, double*, double*, double*, double*, double*,double*, double*, int , int , struct mgde_str*); 
+int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
 PR *TR_OpenProjection(char *mlb);
 void TR_CloseProjection(PR *proj);
 void TR_GetGeoidName(struct TR_kms_str *tr,char *name);
+/* a simple TR_tr wrapper which also outputs geoid height */
+int TR_TransformGH(struct TR_kms_str *tr,double *X_in, double *Y_in, double *Z_in, double *gh_out,int n); 
 
 #endif
 

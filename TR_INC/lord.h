@@ -56,7 +56,8 @@ void set_lord_outputs(FILE * stream_debug, FILE * stream_info, FILE * stream_war
 
 void set_lord_verbosity_levels(int verb_debug, int verb_info, int verb_warning, int verb_error, int verb_critical);
 
-void set_lord_file(char *fullfilename);
+
+int set_lord_file(char *fullfilename);
 
 int lord_get_last_error();
 
