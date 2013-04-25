@@ -78,21 +78,24 @@ void TR_AllowUnsafeTransformations(void);
 void TR_ForbidUnsafeTransformations(void);
 
 /* Typedef for transformation objects - basically a container for pointers to input and output projections. Any of these can be NULL. 
-*  The object is only valid for use in a transformation if both input and output projection are set.
+*  The object is only valid for use in a transformation if both input and output projections are set.
 */
 typedef struct  TR_kms_str TR;
 
-/* Print info on last used geoid to stdout. WARNING: this implementation will change in the future or the function will be deprecated.*/
+/* Print info on last used geoid to stdout. 
+* WARNING: this implementation will change in the future or the function will be deprecated.
+*/
 void TR_GeoidInfo(TR *tr);
 
 /* Get the scale (c) and meridian convergence (m) of a projection. 
  * If the flag is_proj_out is 0 / False, the input projection in the TR object is used, else the output projection is used. 
  */
-int   TR_GetLocalGeometry(TR *tr, double x, double y, double *m, double *c, int is_proj_out);
+int TR_GetLocalGeometry(TR *tr, double x, double y, double *m, double *c, int is_proj_out);
 
 /* Open a transformation object specified by minilabels label_in and label_out.
  *  If any of the labels are NULL or "" the corresponding 'slot' is left unused (NULL).
  *  The last parameter geoid_name should typically be left as NULL or "", but can be used to select a special geoid defined in the geoid library. 
+ *  If geoid_name is "" or NULL trlib will automatically select the geoid according to the scheme defined in manager.tab.
  */
 TR  *TR_Open (char *label_in, char *label_out, char *geoid_name);
  
