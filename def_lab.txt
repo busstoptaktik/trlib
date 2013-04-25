@@ -74,7 +74,7 @@
 * param_txt:def some of: B0, L0, N0, E0, B1, B2, scale        ;
 * param_txt is only nonempty when user defined std projection ;
 
-
+
 * def_prj  ver 2010.01            # page 2    4 Oct 2010 15 35 ;
 
 #def_prj
@@ -116,7 +116,7 @@
  cond
  Condition
 
-
+
 * def_prj  ver 2010.01            # page 3    4 Oct 2010 15 35 ;
 
 * projections                                                 ;
@@ -325,7 +325,7 @@
  lmb        60 dg  0 m  -48 dg  0 m  61.5 dg
  GI conf. con  W-Groenland
 
-
+
 * def_prj  ver 2010.01            # page 4    4 Oct 2010 15 35 ;
 
 
@@ -451,7 +451,7 @@
  FO utm zone 29  top_ed50
 *          topografisk ;
 
-
+
 * def_prj  ver 2010.01            # page 5    4 Oct 2010 15 35 ;
 
 
@@ -555,7 +555,7 @@
  crt2
  Loc. 2-dim crdsys clockwize
 
-
+
 * def_prj  ver 2010.01            # page 6    4 Oct 2010 15 35 ;
 
 
@@ -638,7 +638,7 @@
  gravi
  Normal Gravity
 
-
+
 * def_prj  ver 2010.01            # page 7    4 Oct 2010 15 35 ;
 
 
@@ -687,7 +687,7 @@
  nnr
  Plate_motion-label
 
- 
+ 
 * def_prj  ver 2010.01            # page 8    4 Oct 2010 15 35 ;
 
 
@@ -716,7 +716,7 @@
  stop
  Stop-label
 
-
+
 * def_rgn     ver 2010.1          # page 1   11 Dec 2009 10 36 ;
 
 
@@ -768,7 +768,7 @@ US     US    USA
 ZZ     0        STOP  
 
 
-
+
 * def_dtm     ver 2007.1         # page 1   26 jun 2007 10 19 ;
 
 ***************************************************************
@@ -842,7 +842,7 @@ European Datum 1950
 Naval Weapons Laboratory
 * this DATUM number may NOT be change (used in ctc)  ;
 
-
+
 * def_dtm     ver 2007.1         # page 2   26 jun 2007 10 19 ;
 
 
@@ -910,7 +910,7 @@ TOPEX
   -0.014 ppm        -.0183 sx      .0003 sx      .007 sx    
 Estonian ETRS 1989
 
-
+
 * def_dtm     ver 2007.1         # page 3   26 jun 2007 10 19 ;
 
 
@@ -972,7 +972,7 @@ North American D.1927 Canada
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
 Pulkowo 1942 temporary
 
-
+
 * def_dtm     ver 2007.1         # page 4   26 jun 2007 10 19 ;
 
 
@@ -1033,7 +1033,7 @@ Riks Triangulation 1990 Sweeden
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
 European Datum 1979 (from WGS84)
 
-
+
 * def_dtm     ver 2007.1         # page 5   26 jun 2007 10 19 ;
 
 
@@ -1114,7 +1114,7 @@ Deutsches Hauptdrnetz DOEDOC7p
 North American D.1983 Greenland                              .
 :: OLD                                                       ;
 
-
+
 * def_dtm     ver 2007.1         # page 6   26 jun 2007 10 19 ;
 
 
@@ -1130,7 +1130,7 @@ North American D.1983 Greenland
 32    etrs89     GRS80   7  DK
  7                  0.6002 m      -0.0022 m      -0.6009 m
    0.02113875 ppm  -0.0050227 sx   0.0132378 sx   0.0103357 sx
-Fehmarn Bridge 2010
+Fehmarn Datum 2010
 
 
 #detrs89
@@ -1231,7 +1231,7 @@ Google Spheric Mercator Datum
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
 @ Storebaelts System
 
-
+
 * def_dtm     ver 2007.1         # page 7   26 jun 2007 10 19 ;
 
 
@@ -1271,17 +1271,17 @@ Google Spheric Mercator Datum
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
 @ Konf. con. Faroe 1954
 
-#fu50
+#fu50        * foreloebig ed50 ;
 145    etrs89  Hayford   5  FO
  0                  0.0 m         0.0 m         0.0 m     
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
-@ UTM 29 Topogr. grid ED 50 /* foreloebig ed50 */
+@ UTM 29 Topogr. grid ED 50 
 
-#fk89
+#fk89      * vel naermest fd54a ;
 146    etrs89  Hayford   5  FO
  0                  0.0 m         0.0 m         0.0 m     
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
-@ Konf. con. Faroe 1989  /* vel naermest fd54a */
+@ Konf. con. Faroe 1989  
 
 
 #rt90v
@@ -1290,7 +1290,7 @@ Google Spheric Mercator Datum
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
 @ Riks Triang 1990 Sweeden 2.5 gon west
 
-
+
 * def_dtm     ver 2007.1         # page 8   26 jun 2007 10 19 ;
 
 
@@ -1392,7 +1392,7 @@ Google Spheric Mercator Datum
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
 @ G.I. 1944 kotesystem
 
-
+
 * def_dtm     ver 2007.1         # page 9   26 jun 2007 10 19 ;
 
 
@@ -1460,7 +1460,7 @@ Google Spheric Mercator Datum
 213    fcsvr10  GRS80     0  DK
  0                  0.0000 m      0.0000 m      0.0000 m
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
-@ Fehmarn Bridge Vertical Ref Frame 2010
+@ Fehmarn Vertical Reference Frame 2010
 
 #kms90
 207    dvr90    GRS80     0  DK
@@ -1492,7 +1492,7 @@ Google Spheric Mercator Datum
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
 @ ESTONIA 1977 Vertical Frame
 
-
+
 * def_dtm     ver 2007.1         # page 10   26 jun 2007 10 19 ;
 
 
@@ -1537,7 +1537,7 @@ Special testsys
 dummy
 
 
-
+
 * def_grs   version 1.0          # page 1   26 Jun 2007 13 16 ;
 
 #def_grs
@@ -1594,7 +1594,7 @@ Printing Office  1910. Page 54."
 Geodetic Reference System 1967
 Publication Speciale du Bulletin Geodesique  Paris" 
 
-
+
 * def_grs   version 1.0          # page 2   26 Jun 2007 13 16 ;
 
 
@@ -1651,7 +1651,7 @@ F.W. Bessel: Bestimmung der Axen.... Astronomische Nachrichten
 Nr. 333. Altona 1837  and: Ueber ein Fehler... Astr. N. Nr. 438.
 Altona 1842. Conventional values  different from orig. def." 
 
-
+
 * def_grs   version 1.0          # page 3   26 Jun 2007 13 16 ;
 
 
