@@ -28,12 +28,19 @@ class RedirectStdout(object):
 				pass
 
 def Usage():
-	print("To run:\n%s <shared_library> <geoid_dir>" %(PROG))
-	print("Last parameter is optional, will default to current working dir or dir set in: %s" %TrLib.TABDIR_ENV)
+	print("To run:\n%s <shared_library> <geoid_dir> -no_threads" %(PROG))
+	print("<geoid_dir> is optional, will default to current working dir or dir set in: %s" %TrLib.TABDIR_ENV)
+	print("-no_threads argument is optional. Use to disable thread safety test.")
 	print("Will read the job definition file: %s" %JOB_DEF)
 	sys.exit()
 
 def main(args): #progname, test_lib
+	i=args.index("-no_threads")
+	if (i!=-1):
+		args.pop(i)
+		do_threads=False
+	else:
+		do_threads=True
 	if len(args)<2:
 		Usage()
 	lib=args[1]
@@ -92,12 +99,15 @@ def main(args): #progname, test_lib
 		print("Error:\n%s" %repr(msg))
 	print LS
 	#forbid unsafe transformations#
-	TrLib.SetThreadMode(True)
-	try:
-		ThreadTest.main(["ThreadTest.py"])
-	except Exception,msg:
-		nerr+=1
-		print("Error:\n%s" %repr(msg))
+	if do_threads:
+		TrLib.SetThreadMode(True)
+		try:
+			ThreadTest.main(["ThreadTest.py"])
+		except Exception,msg:
+			nerr+=1
+			print("Error:\n%s" %repr(msg))
+	else:
+		print("-no_threads specified - will not run thread safety tests....")
 	print LS
 	print("Tests finished at %s" %time.asctime())
 	print("Errors: %i" %nerr)
