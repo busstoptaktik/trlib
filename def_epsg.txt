@@ -31,10 +31,10 @@
 2197  kp2000sj
 2198  kp2000b
 #utm (N-hemisphere)-systems can be defined like this... start_epsg mlb end_epsg start_zone
-25828  utm_etrs89  25835  28
-3176    utm_gr96    3189    16
+25828  utm_etrs89  25837  28
+3178    utm_gr96    3189    18
 23028  utm_ed50    23038  28
-32620  utm_wgs84  32660  20
+32601  utm_wgs84  32660  01
 #some other systems
 4093  dktm1
 4094  dktm2
