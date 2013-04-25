@@ -850,14 +850,14 @@ Naval Weapons Laboratory
  4    wgs84     GRS80    0  ZZ
  0                  0.0000 m      0.0000 m      0.0000 m
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
-European Terrestrial Ref Frame 1989
+European Terrestrial Ref System 1989
 * this DATUM number may NOT be change (used in ctc)  ;
 
 #etrs89
  4    wgs84     GRS80    0  ZZ
  0                  0.0000 m      0.0000 m      0.0000 m
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
-European Terrestrial Ref Frame 1989
+European Terrestrial Ref System 1989
 * this DATUM number may NOT be change (used in ctc)  ;
 
 European Terrestrial Ref Frame 1989
@@ -867,7 +867,7 @@ European Terrestrial Ref Frame 1989
  4    wgs84     GRS80    0  ZZ
  0                  0.0000 m      0.0000 m      0.0000 m
    0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
-European Terrestrial Ref Frame 1989
+European Terrestrial Ref System 1989
 * this DATUM number may NOT be change (used in ctc)  ;
 
 #gr96
