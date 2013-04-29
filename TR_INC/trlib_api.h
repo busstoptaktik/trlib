@@ -56,12 +56,14 @@ int TR_GetEsriText(char *label_in, char *wkt_out);
 
 /* Export a mini label to a foreign format defined by a code. Use the predefined macros above. 
  *Be sure to supply a sufficiently large buffer depending on the output format.
+* Returns ane of the error codes defined above.
 */	
 int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len);
 
 /* Import a mini label from a foreign format (the ones defined in the macros above). 
 * Will 'autodetect' the format.
 * For EPSG definitions prepend the definition with "EPSG:" e.g. "EPSG:25832" 
+* Returns ane of the error codes defined above.
 */
 int TR_ImportLabel(char *text, char *mlb_out, int buf_len);
  
@@ -89,6 +91,7 @@ void TR_GeoidInfo(TR *tr);
 
 /* Get the scale (c) and meridian convergence (m) of a projection. 
  * If the flag is_proj_out is 0 / False, the input projection in the TR object is used, else the output projection is used. 
+ * Returns ane of the error codes defined above.
  */
 int TR_GetLocalGeometry(TR *tr, double x, double y, double *m, double *c, int is_proj_out);
 
@@ -96,18 +99,21 @@ int TR_GetLocalGeometry(TR *tr, double x, double y, double *m, double *c, int is
  *  If any of the labels are NULL or "" the corresponding 'slot' is left unused (NULL).
  *  The last parameter geoid_name should typically be left as NULL or "", but can be used to select a special geoid defined in the geoid library. 
  *  If geoid_name is "" or NULL trlib will automatically select the geoid according to the scheme defined in manager.tab.
+ *  Returns NULL if an error was encountered - fetch error with TR_GetLastError.
  */
 TR  *TR_Open (char *label_in, char *label_out, char *geoid_name);
  
 /* Insert a projection into the TR object at the slot defined by the is_out flag.
  * If the slot is occupid (not NULL) the previous projection will be replaced.
  * Enables 'reuse' of TR objects.
+ * Returns ane of the error codes defined above.
  */
  int  TR_Insert (TR *tr, char *mlb, int is_out);
   
 /* Perform a transformation on arrays of doubles.
 The last int parameter specifies array length.  Z can be NULL, in which case a 0 will be inserted for z in the transformation.
  'Copies in place'/overwrites input.
+ * Returns ane of the error codes defined above.
 */
 int   TR_Transform(TR *tr, double *X, double *Y, double *Z, int n);
 
@@ -117,6 +123,7 @@ int   TR_InverseTransform(TR *tr, double *X, double *Y, double *Z, int n);
 /* Perform a transformation on arrays of doubles.
 The last int parameter specifies array length.  Z can be NULL, in which case a 0 will be inserted for z in the transformation.
  Writes output to the specified output pointers.
+ * Returns ane of the error codes defined above.
 */
  int   TR_Transform2(TR *tr, double *X_in, double *Y_in, double *Z_in, double *X_out, double *Y_out, double *Z_out, int n);
  
@@ -125,6 +132,7 @@ The last int parameter specifies array length.  Z can be NULL, in which case a 0
  
  /* Perform a transformation on a single input point.
  Writes output to the specified output pointers.
+ * Returns ane of the error codes defined above.
 */
 int   TR_TransformPoint(TR *tr, double X_in, double Y_in, double Z_in, double *X_out, double *Y_out, double *Z_out);
 
@@ -140,6 +148,7 @@ void TR_Close (TR *tr);
 * Assumes a simple format where coordinates are white space separated.
 * The last int parameter can be used to set a maximum number of points to transform.
 * Use 0 to not set any maximum (and ignore errors/garbage) and -1 to return if errors/garbage is encountered. 
+* Returns ane of the error codes defined above.
 */
 int   TR_Stream(TR *tr, FILE *f_in, FILE *f_out, int n);
 
@@ -191,6 +200,7 @@ typedef void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
 /* Sets the lord output file for ALL reporting types. 
 * Will close previously associated streams - thus the LORD module will take 'ownership' over the file pointers.
 *  Should generally not be mixed with calls to TR_SetLordOutputs
+* Returns ane of the error codes defined above.
 */
  int TR_SetLordFile(char *fullfilename);
 
