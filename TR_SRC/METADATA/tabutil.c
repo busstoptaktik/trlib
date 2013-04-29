@@ -21,7 +21,7 @@
 /* based on code from the boogie-project, originally written by Thomas Knudsen */
 
 
-
+#include <stdio.h>
 
 static unsigned int  first_byte_is_nonzero_if_little_endian = 1;
 static unsigned char *is_little_endian = (unsigned char *) &first_byte_is_nonzero_if_little_endian;
