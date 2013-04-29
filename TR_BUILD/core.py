@@ -46,11 +46,20 @@ def Build(compiler,outname,source,include=[],define=[],is_debug=False,is_library
 	cwd=os.getcwd()
 	if (not isinstance(compiler,cc.ccompiler)):
 		raise ValueError("Compiler must be a subclass of cc.ccompiler")
+	#normalise paths - if not given as absolute paths...
+	includes=map(lambda x:compiler.INCLUDE_SWITCH+os.path.realpath(x),include)
+	defines=map(lambda x:compiler.DEFINE_SWITCH+x,define)
+	source=map(os.path.realpath,source)
+	link_libraries=map(os.path.realpath,link_libraries)
+	if len(def_file)>0:
+		def_file=os.path.realpath(def_file)
+	outname=os.path.realpath(outname)
+	#end normalise paths
+	#change path to buld dir
+	build_dir=os.path.realpath(build_dir)
 	if not os.path.exists(build_dir):
 		os.makedirs(build_dir)
 	os.chdir(build_dir)
-	includes=map(lambda x:compiler.INCLUDE_SWITCH+x,include)
-	defines=map(lambda x:compiler.DEFINE_SWITCH+x,define)
 	#fetch compile and link options...
 	compile_options,link_options=compiler.getOptions(is_library,is_debug)
 	compile=[compiler.COMPILER]+defines+compile_options+includes+source

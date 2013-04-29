@@ -154,7 +154,7 @@ LORD_WARNING=2,
 LORD_ERROR=3,
 LORD_CRITICAL=4} LORD_CLASS;
 
-/* Definition of call back  function type*/
+/* Definition of call back  function type - second argument is the error code (only valid for error messages)*/
 typedef void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
 
 
@@ -181,7 +181,7 @@ typedef void( *LORD_CALLBACK )(LORD_CLASS, int , const char *);
 * The user 'owns' the file pointers and is responsible for closing these. 
 * Do NOT close a FILE pointer which is still in use in the LORD module - should be set to NULL before a call to fclose.
 * Should generally not be mixed with calls to TR_SetLordFile
-* Default behaviour is to print to stdout / stderr - USE this function to overide that.
+* Default behaviour is to print to stdout / stderr - USE this function to override.
 */
  void TR_SetLordOutputs(FILE * stream_debug_outside, FILE * stream_info_outside, FILE * stream_warning_outside, FILE * stream_error_outside, FILE * stream_critical_outside);
 
