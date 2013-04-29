@@ -825,7 +825,7 @@ ZZ     0        STOP
  1    wgs84   WGS84      0  ZZ
  0                  0.0000 m      0.0000 m     0.0000 m      
    0.0 ppm          0.0000 sx     0.0000 sx    0.0000 sx
-World Geodetic System 1984
+World Geodetic System 1984 (G730)
 * this DATUM number may NOT be change (used in ctc)  ;
 
 #ed50
