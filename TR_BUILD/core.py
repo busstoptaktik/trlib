@@ -50,7 +50,7 @@ def Build(compiler,outname,source,include=[],define=[],is_debug=False,is_library
 	includes=map(lambda x:compiler.INCLUDE_SWITCH+os.path.realpath(x),include)
 	defines=map(lambda x:compiler.DEFINE_SWITCH+x,define)
 	source=map(os.path.realpath,source)
-	link_libraries=map(os.path.realpath,link_libraries)
+	#do not normalise link_libraries as it might contains a lot of 'non-path stuff' - use absolute paths her if you must - link_libraries=map(os.path.realpath,link_libraries)
 	if len(def_file)>0:
 		def_file=os.path.realpath(def_file)
 	outname=os.path.realpath(outname)
