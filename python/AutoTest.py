@@ -35,8 +35,8 @@ def Usage():
 	sys.exit()
 
 def main(args): #progname, test_lib
-	i=args.index("-no_threads")
-	if (i!=-1):
+	if "-no_threads" in args:
+		i=args.index("-no_threads")
 		args.pop(i)
 		do_threads=False
 	else:
