@@ -1,3 +1,27 @@
+/*
+ * Copyright (c) 2013, National Geodata Agency, Denmark
+ * (Geodatastyrelsen), gst@gst.dk
+ * 
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * 
+ */
+ 
+ /* 
+* Interface to the TrLib transformation library.
+* Modify library name below 
+* Include this in your project - provided as is for 'inspiration' - feel free to modify/add methods.
+*/
+
 import java.util.*;
 
 public class TrLib {
@@ -7,14 +31,16 @@ public class TrLib {
 	public static native int GetLastError();
 	public static native void TerminateLibrary();
 	public static native void TerminateThread();
-	public static native void AllowUnsafeTransformations();
+	public static native void AllowUnsafeTransformations(); //disabled by default....
 	public static native void ForbidUnsafeTransformations();
 	private static native long Tropen(String mlb1, String mlb2);
 	private static native void Trclose(long addr);
 	private static native int Transform(long addr, double x[], double y[], double z[], int n);
 	
-	public static final String JNI_wrap="KMSTRLIB_java";
-	//Load the library
+	public static final String JNI_wrap="trlib_java"; //library compiled from the jni interface and linked to the main transformation library trlib (modify name if needed.)
+	// Import the relevant functions from the library
+	// It is assumed that the libary (and dependent libraries) are in the
+	// same folder as this __file__ (or in a folder on the system search path)
 	static{
 		System.loadLibrary(JNI_wrap);
 		}

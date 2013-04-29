@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2011, National Survey and Cadastre, Denmark
- * (Kort- og Matrikelstyrelsen), kms@kms.dk
+ * Copyright (c) 2013, National Geodata Agency, Denmark
+ * (Geodatastyrelsen), gst@gst.dk
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -19,6 +19,7 @@
 /* 
 * Interface to the TrLib transformation library.
 * Modify library name below 
+* Include this in your project - provided as is for 'inspiration' - feel free to modify/add methods.
 */
 
 using System;
@@ -33,7 +34,7 @@ namespace Kmstrlib.NET
 		/// <summary>
 		/// KMSTRLIB return values:
 		/// </summary>
-		public const string TRLIB="KMSTRLIB.dll"; //should really be defined at compile time....
+		public const string TRLIB="trlib.dll"; //modify name - really ought to be defined at compile time....
 		
 		public enum TR_Error
 		{
@@ -45,7 +46,7 @@ namespace Kmstrlib.NET
 			
 		};
 
-		// Import the relevant functions from the TrLib.dll 
+		// Import the relevant functions from the library
 		// It is assumed that this dll (and dependent dll's) are in the
 		// same folder as this __file__ (or in a folder on the system search path)
 
