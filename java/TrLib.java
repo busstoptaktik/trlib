@@ -37,7 +37,7 @@ public class TrLib {
 	private static native void Trclose(long addr);
 	private static native int Transform(long addr, double x[], double y[], double z[], int n);
 	
-	public static final String JNI_wrap="trlib_java"; //library compiled from the jni interface and linked to the main transformation library trlib (modify name if needed.)
+	public static final String JNI_wrap="trlib_jni"; //library compiled from the jni interface and linked to the main transformation library trlib (modify name if needed.)
 	// Import the relevant functions from the library
 	// It is assumed that the libary (and dependent libraries) are in the
 	// same folder as this __file__ (or in a folder on the system search path)
