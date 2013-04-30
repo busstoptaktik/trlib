@@ -35,7 +35,7 @@
 #define TRLIB_REV_STRING TOSTRING(TRLIB_REVISION)
 #endif
 
-#define TRLIB_VERSION ( "dev v1.0 (rev: " TRLIB_REV_STRING  ", " __DATE__ ", " __TIME__ ")" )
+#define TRLIB_VERSION ( "v1.1 (rev: " TRLIB_REV_STRING  ", " __DATE__ ", " __TIME__ ")" )
 
 #define TR_TABDIR_ENV  "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE      "def_lab.txt"
