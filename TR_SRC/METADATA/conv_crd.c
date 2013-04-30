@@ -466,6 +466,7 @@ struct coord_lab        *c_lab,
         p_tp          = p_io;
       } /* not empty string */
       else {
+	lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
         c_lab->lab_type = ILL_LAB;
         return (ILL_LAB);
       }

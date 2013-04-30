@@ -34,7 +34,8 @@ TEST_SYSTEMS_2D=[["utm32_wgs84","utm33_wgs84",512200.0,6143200.0,0,1.0],
 ["geo_wgs84","FO_fotm",-6.8,62.0,0,D2M],
 ["geo_wgs84","FO_fk89",-6.8,62.0,0,D2M],
 ["geo_wgs84","FO_fu50",-6.8,62.0,0,D2M],
-["utm32_wgs84","webmrc",512200.0,6143200.0,0,1.0]]
+["utm32_wgs84","webmrc",512200.0,6143200.0,0,1.0],
+["geo_wgs84","lmblaps_wgs84 0dg",10.0,-67.1,0,D2M]]
 TEST_SYSTEMS_3D=[["geoHwgs84_h_dvr90","geoHed50_h_dvr90",12.0,54.0,100.0,D2M],
 ["utm32Ewgs84","utm33Eed50",512200.0,6143200.0,100.0,1.0],
 ["utm32Hetrs89_h_dvr90","utm33Netrs89",512200.0,6143200.0,100,1.0,],
