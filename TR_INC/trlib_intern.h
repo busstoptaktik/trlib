@@ -41,6 +41,7 @@
 /*#define GET_ZONE(pr)                ((pr->plab->u_c_lab).zone) - not stored here as expected (use function) */
 #define GET_DTM(pr)                  ((pr->plab->u_c_lab).datum)
 #define GET_PDTM(pr)                ((pr->plab->u_c_lab).p_dtm)
+#define GET_HDTM(pr)                ((pr->plab->u_c_lab).h_dtm)
 
 /*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */
 struct PR_kms_str{
