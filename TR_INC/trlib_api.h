@@ -45,7 +45,9 @@ extern "C" {
 */
 int TR_InitLibrary(char *path);
 
-/* Change the geoid library (and definition files like def_lab.txt) - not thread safe. Should be called from main thread. */
+/* Change the geoid library (and definition files like def_lab.txt) - not thread safe. Should be called from main thread. 
+* Any opened TR objects should be closed before or immedialtely after a call to this function. They will contain references to memory which is freed.
+*/
 int TR_SetGeoidDir(char *path);
 
 /* Fetch version info. A buffer string of length 128 should suffice. */
