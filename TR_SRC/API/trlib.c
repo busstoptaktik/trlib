@@ -178,6 +178,8 @@ int TR_InitLibrary(char *path) {
 
 /*
 * A function to change the tab-dir has turned out to be useful - this is done here: set or change the current tab-dir
+* UNSAFE TO CALL IF THERE ARE ANY OPENED TR OBJECTS! These will have references to data which is freed!
+* We might consider having a geoid table pr. TR object to avoid this!
 */
 
 int TR_SetGeoidDir(char *path){
@@ -210,6 +212,7 @@ int TR_SetGeoidDir(char *path){
 	if (DEF_DATA) 
 		close_def_data(DEF_DATA);
 	/* close previously opened tab-dir files */
+	TR_GeoidTable(NULL);
 	c_tabdir_file(0,NULL);
 	DEF_DATA=open_def_data(fp,&rc);
 	fclose(fp);
@@ -280,14 +283,16 @@ int TR_GeoidTable(TR *tr){
 	static THREAD_SAFE int init=0;
 	static THREAD_SAFE int ngeoids=0;
 	/*if called with NULL close evrything down */
-	if (0==tr && init){
-		geoid_c(GeoidTable,0,NULL);
-		if (GeoidTable)
-			free(GeoidTable);
+	if (0==tr){
+		if (init){
+			geoid_c(GeoidTable,0,NULL);
+			if (GeoidTable)
+				free(GeoidTable);
+		}
 		GeoidTable=NULL;
 		init=0;
 		return TR_OK;
-		}
+	}
 	/*Initialise on first call, makes geoid table thread local */
 	if (!init){
 		GeoidTable=malloc(sizeof(struct mgde_str));
