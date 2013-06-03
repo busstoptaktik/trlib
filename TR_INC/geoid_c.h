@@ -29,6 +29,8 @@
 /* indicate an intention of publishing this code.              */
 
 
+#if !defined     (H_GEOID_C)
+#define           H_GEOID_C
 
 extern int               geoid_c(
 /*____________________________*/
@@ -49,4 +51,4 @@ FILE                    *out
 
 /* PROG: Karsten Engsager, OCT 2001 */
 
-
+#endif

@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
+#if !defined     (H_SPUTCW)
+#define           H_SPUTCW
+
 extern int         sputcw(
 /*______________________*/
 char              *str,
@@ -54,3 +57,4 @@ MD            1 00045 89 02 3 012   max < 900 00000 00 00 0 000
 
 */
 
+#endif

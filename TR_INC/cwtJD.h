@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
+#if !defined     (H_CWTJD)
+#define           H_CWTJD
 
 extern double    cwtJD(
 /*___________________*/
@@ -61,3 +63,4 @@ _            :  DK     : Denmark.
 
 */
 
+#endif

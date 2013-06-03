@@ -30,6 +30,8 @@
 /* This copyright claim does not indicate an intention of        */
 /* publishing this code.                                         */
 
+#if !defined     (H_TABDD_C)
+#define           H_TABDD_C
 
 extern int               tabdd_c(
 /*____________________________*/
@@ -44,4 +46,4 @@ struct mtabdd_str       *tab_table
 
 /* PROG: Karsten Engsager, JUL 2006 */
 
-
+#endif

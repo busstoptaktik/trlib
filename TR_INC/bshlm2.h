@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_BSHLM2)
+#define           H_BSHLM2
+
 extern int              bshlm2(
 /*___________________________*/
 double                  a,
@@ -76,3 +79,4 @@ S       the length of the geodesic between the stations in units
 Prog: Knud Poder NOV 1990
 */
 
+#endif

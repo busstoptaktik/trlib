@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_GTC_FNC_)
+#define           H_GTC_FNC_
+
 extern int                gtc(
 /*__________________________*/
 union geo_lab             *g_lab,
@@ -93,3 +96,5 @@ is 0.5 micro arcsec, i.e. 15 microns on the earth.
 Algol version (ctg) by RF, august 1981.
 C-version KP JAN 1991.
 */
+
+#endif

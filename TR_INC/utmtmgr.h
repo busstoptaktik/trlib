@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_UTMTMGR)
+#define           H_UTMTMGR
+
 extern int          utmtmgr(
 /*________________________*/
 union geo_lab       *c_lab_u,
@@ -94,4 +97,4 @@ PROG:  Knud Poder, AUG 1994
 
 */
 
-
+#endif

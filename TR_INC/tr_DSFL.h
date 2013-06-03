@@ -17,6 +17,8 @@
  */
  
 
+#if !defined     (H_TR_DSFL)
+#define           H_TR_DSFL
 
 #include "geo_lab.h"
 
@@ -62,3 +64,5 @@ example of call:
   if (res) fprintf(stdout, err_txt);
 
 */
+
+#endif

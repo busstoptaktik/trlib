@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_H_TRANS)
+#define           H_H_TRANS
 
 extern int               h_trans(
 /*_____________________________*/
@@ -64,3 +66,4 @@ Programmer: Karsten Engsager, KMS, 2004.
 
 */
 
+#endif

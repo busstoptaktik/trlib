@@ -29,6 +29,8 @@
 /* indicate an intention of publishing this code.              */
 
 
+#if !defined     (H_TAB3D_C)
+#define           H_TAB3D_C
 
 extern int               tab3d_c(
 /*____________________________*/
@@ -43,4 +45,4 @@ struct mtab3d_str       *tab_table
 
 /* PROG: Karsten Engsager, JUN 2004 */
 
-
+#endif

@@ -27,6 +27,9 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined     (H_SET_ITRF_C)
+#define           H_SET_ITRF_C
+
 #include        "geo_lab.h"
 #include        "geoid_d.h"
 
@@ -133,3 +136,4 @@ char                    *err_str
   and reverse  . . .
   */
   
+  #endif

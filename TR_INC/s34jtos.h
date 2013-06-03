@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_S34JTOS)
+#define           H_S34JTOS
+
 extern int                  s34jtos(
 /*________________________________*/
 double                      y,
@@ -92,3 +95,4 @@ produces os coordinates Y,X from the s34j coordinates y,x.
 Note the operator & on Y and X.
 */
 
+#endif

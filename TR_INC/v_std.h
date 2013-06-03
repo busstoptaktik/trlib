@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_V_STD)
+#define           H_V_STD
+
 extern double      v_std(
 /*_____________________*/
 double             v
@@ -44,3 +47,4 @@ Prog KP, 1989
 
 */
 
+#endif

@@ -16,9 +16,14 @@
  * 
  */
  
+#if !defined     (H_SGETSHPPRJ)
+#define           H_SGETSHPPRJ
+ 
  #include "geo_lab.h"
  int              sgetshpprj(
 /*______________________*/
 char            *wkt_in,
 union geo_lab   *g_lab,
 char            *mlb_out);
+
+#endif

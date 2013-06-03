@@ -28,6 +28,8 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined     (H_SAND_AREAL)
+#define           H_SAND_AREAL
 
 extern double   sand_areal(
 /*_______________________*/
@@ -57,3 +59,4 @@ double         *pol_base
 Programmed by: Karsten Engsager, 7. febr. 2005
 */
 
+#endif

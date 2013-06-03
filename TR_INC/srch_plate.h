@@ -28,6 +28,9 @@
 /* National Space Research Institute, Denmark. This copyright    */
 /* claim does not indicate an intention of publishing this code. */
 
+#if !defined     (H_SRCH_PLATE)
+#define           H_SRCH_PLATE
+
 #include <stdio.h>
 #include <string.h>
 #include "geo_lab.h"
@@ -54,3 +57,4 @@ char                     *err_txt
 
 /* progr. K. Engsager. Feb. 2003, 2008 */
 
+#endif

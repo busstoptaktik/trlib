@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_EE_TRANS)
+#define           H_EE_TRANS
 
 extern int         ee_trans(
 /*________________________*/
@@ -55,3 +57,4 @@ FILE               *tr_error
 
 /* PROG: Knud Poder, SEP 1995                                 */
 
+#endif

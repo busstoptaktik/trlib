@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_SETDTRC)
+#define           H_SETDTRC
+
 extern int              setDtrc(
 /*____________________________*/
 struct coord_lab         *c_lab,
@@ -52,4 +55,4 @@ Prog: K. Engsager  1994.
 
 */
 
-
+  #endif

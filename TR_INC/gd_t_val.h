@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_GD_T_VAL)
+#define           H_GD_T_VAL
+
 #include "geo_lab.h"
 #include "geoid_d.h"
 
@@ -46,3 +49,4 @@ char                     *eer_txt
 /* grid_tab   label and buffer initiated to table */
 /* err_txt    return error report */
 
+#endif

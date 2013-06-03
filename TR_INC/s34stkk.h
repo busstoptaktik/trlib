@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_S34JTKK)
+#define           H_S34JTKK
+
 extern int                 s34stkk(
 /*_______________________________*/
 double                     y,
@@ -90,3 +93,5 @@ Note the operator & on Y and X.
   C-version  KP 1989
 
 */
+
+#endif

@@ -60,6 +60,9 @@
 /*   to poly loops (txt) in o_name                            */
 /*                                                            */
 
+#if !defined     (H_PLA_ADM_F)
+#define           H_PLA_ADM_F
+
 extern int           pla_adm_f(
 /*___________________________*/
 char                 mode,
@@ -71,3 +74,4 @@ char                *err_txt
 
 /* progr.:  Karsten Engsager, feb. 2003                       */
 
+#endif

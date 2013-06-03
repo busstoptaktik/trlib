@@ -28,6 +28,8 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
+#if !defined     (H_CONV_RGN)
+#define           H_CONV_RGN
 
 extern short     conv_rgn(
 /*______________________*/
@@ -78,3 +80,4 @@ char            *rgn_name
 /* Prog. Knud Poder, 16 NOV 1994, after ideas by K.E and F.S.       */
 /* Modified, KE SEP 2010                                            */
 
+#endif

@@ -28,6 +28,8 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
+#if !defined     (H_PTG_D_FUNC_)
+#define           H_PTG_D_FUNC_
 
 extern int             ptg_d(
 /*_________________________*/
@@ -124,3 +126,4 @@ AUG 1994, calculating m and c in utm projection. KE.
 Karsten Engsager  12 Jan 2010. updated
 */
 
+#endif

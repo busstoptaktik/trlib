@@ -28,6 +28,9 @@
 /* National Spacecenter.  This copyright claim does not        */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_PUTSINEXVAL)
+#define           H_PUTSINEXVAL
+
 extern void        putsinexval(
 /*___________________________*/
 char              *ftx,
@@ -39,3 +42,4 @@ double             val);
 /* *ftx         :: 1 :: SINEX HEADER                            */
 /* val          :: Value to be writtena FORTRAN 21.15E          */
 
+#endif

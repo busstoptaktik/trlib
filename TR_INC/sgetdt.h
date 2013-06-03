@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
+#if !defined     (H_SGETDT)
+#define           H_SGETDT
 
 extern double         sgetdt(
 /*_________________________*/
@@ -66,3 +68,4 @@ char array must not hold 'spaces'. Use fgetln_kms to this end.
 
 */
 
+#endif

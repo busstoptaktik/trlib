@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_FGETG)
+#define           H_FGETG
 
 extern double               fgetg(
 /*______________________________*/
@@ -54,3 +56,4 @@ for mean error values in units of 1
 
 */
 
+#endif

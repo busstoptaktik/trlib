@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_TCTS_U)
+#define           H_TCTS_U
+
 extern int             tcts_u(
 /*__________________________*/
 double       Nin,
@@ -142,4 +145,4 @@ Prog: Knud Poder, APR 1991
 
 */
 
-
+#endif
