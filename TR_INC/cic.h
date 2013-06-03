@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_CIC)
+#define           H_CIC
+
 extern int            cic(
 /*______________________*/
 struct dsh_str        *shp,  
@@ -51,4 +54,4 @@ FILE                  *tr_error
 /* usertxt:  to be printed on error                         */
 /* tr_error: file for usertxt on error                      */
 
-
+#endif

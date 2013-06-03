@@ -39,6 +39,8 @@
 /*        "tabtab", "bagtab", "t3dtab", "t2dtab", "tddtab"     */
 /* *pos           : after "REC_TABLE" for next recursive call  */
 
+#if !defined     (H_SRCH_TAB_TYP)
+#define           H_SRCH_TAB_TYP
 
 extern int               srch_tab_typ(
 /*__________________________________*/
@@ -46,3 +48,5 @@ int                     *lab_typ,
 char                    *tab_typ_txt,
 long                    *pos
 );
+
+#endif

@@ -28,7 +28,8 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
-
+#if !defined     (H_FH_TRANS)
+#define           H_FH_TRANS
 
 extern int          fh_trans(
 /*___________________________*/
@@ -61,3 +62,4 @@ N, E, H      :  from coordinates
 
 */
 
+#endif

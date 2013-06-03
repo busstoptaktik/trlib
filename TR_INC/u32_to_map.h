@@ -87,6 +87,8 @@
 /* u32_to_map.c                     # page 2   04 Jul 1997 12 34 */
 
 
+#if !defined     (H_U32_TO_MAP)
+#define           H_U32_TO_MAP
 
 #define FALSE 0
 #define TRUE  1
@@ -97,3 +99,4 @@ double                e,
 char                  kvartstg[20]
 );
 
+#endif

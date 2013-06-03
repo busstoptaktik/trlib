@@ -30,7 +30,8 @@
 /* indicate an intention of publishing this code.              */
 
 
-
+#if !defined     (H_DK_TRANS)
+#define           H_DK_TRANS
 
 extern int          dk_trans(
 /*___________________________*/
@@ -59,3 +60,5 @@ N, E, H      :  from coordinates
              :  tr_error == NULL: NO REPORT IS PRINTED
 
 */
+
+#endif

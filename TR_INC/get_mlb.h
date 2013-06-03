@@ -27,6 +27,8 @@
 /* indicate an intention of publishing this code.              */
 
 
+#if !defined     (H_GET_MLB)
+#define           H_GET_MLB
 
 extern int           get_mlb(
 /*_________________________*/
@@ -51,5 +53,4 @@ The items of the label *mlb_str are put into the parameters:
 
 */
 
-
-
+#endif

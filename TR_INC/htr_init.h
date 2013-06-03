@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_HTR_INIT)
+#define           H_HTR_INIT
+
 #include    "geo_lab.h"
 
 extern int               htr_init(
@@ -72,3 +75,4 @@ oh_dtm         :   to datum
 
 */
 
+#endif

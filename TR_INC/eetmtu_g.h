@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_EETMTU_G)
+#define           H_EETMTU_G
 
 /* Definition of the permissible area for the transformation */
 
@@ -61,4 +63,4 @@ FILE                    *tr_error
 
 /*  Prog: Knud Poder  5 OCT 1995                               */
 
-
+#endif

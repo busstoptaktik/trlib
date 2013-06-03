@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_BH_LMB)
+#define           H_BH_LMB
 
 extern double                bh_lmb(
 /*________________________________*/
@@ -61,3 +63,4 @@ s      the length of the great circle on the auxiliary sphere from
 
 */
 
+#endif

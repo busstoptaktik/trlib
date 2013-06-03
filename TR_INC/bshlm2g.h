@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_BSHLM2G)
+#define           H_BSHLM2G
+
 extern int     bshlm2g(
 /*___________________*/
 double         a,
@@ -78,3 +81,4 @@ Prog: Knud Poder APR 1993.
 
 */
 
+#endif

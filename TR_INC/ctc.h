@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
+#if !defined     (H_CTC_FNC_)
+#define           H_CTC_FNC_
+
 extern int            ctc(
 /*______________________*/
 union geo_lab         *i_lab_u,
@@ -51,3 +54,4 @@ FILE                  *tr_error
 /* usertxt:  to be printed on error                         */
 /* tr_error: file for usertxt on error                      */
 
+#endif

@@ -29,6 +29,8 @@
 /* indicate an intention of publishing this code.              */
 
 
+#if !defined     (H_UTSB)
+#define           H_UTSB
 
 extern int               utsb(
 /*__________________________*/
@@ -77,3 +79,4 @@ FILE                     *tr_error
         Prog: Knud Poder  DEC 1992
   */
 
+#endif

@@ -28,6 +28,8 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined     (H_FGETDT)
+#define           H_FGETDT
 
 extern double       fgetdt(
 /*_______________________*/
@@ -66,3 +68,4 @@ Upddated: KE 2010
 
 */
 
+#endif

@@ -28,6 +28,9 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined     (H_KMSSHP_TR)
+#define           H_KMSSHP_TR
+
 #include "geo_lab.h"
 
 extern int       kmsshp_tr(
@@ -69,3 +72,5 @@ kmsshp_tr transforms the shape file <shpin_txt> from the coord sys
 
    *qTrn     Number of trf OK
 */
+
+#endif

@@ -52,6 +52,9 @@
 /*   *f_in         : NOT USED  in mode 0 | 1 | 2 | 3           */
 /*                 : else the file pointer to be closed        */
 
+#if !defined     (H_C_TABDIR_FILE)
+#define           H_C_TABDIR_FILE
+
 #include <stdio.h>
 
 extern void       c_tabdir_file(
@@ -60,3 +63,4 @@ int               mode,
 FILE             *f_in
 );
 
+#endif
