@@ -185,7 +185,7 @@ int TR_InitLibrary(char *path) {
 int TR_SetGeoidDir(char *path){
 	FILE *fp;
 	int rc;
-	char buf[FILENAME_MAX],fname[FILENAME_MAX],*init_path=0;
+	char buf[TR_MAX_FILENAME],fname[TR_MAX_FILENAME],*init_path=0;
 	if (path && strlen(path)>0) 
 		init_path=path;
 	else
@@ -331,7 +331,7 @@ int TR_SpecialGeoidTable(TR *tr, char *geoid_name){
 	tr->geoid_pt=special_geoid_table;
 	tr->close_table=1;
 	tr->use_geoids=(has_geoids>0)?0:-1;
-	strncpy(tr->geoid_name,geoid_name,FILENAME_MAX);
+	strncpy(tr->geoid_name,geoid_name,TR_MAX_FILENAME);
 	return TR_OK;
 }
 
