@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_BH_LAT)
+#define           H_BH_LAT
 
 extern double           bh_lat(
 /*___________________________*/
@@ -63,4 +65,4 @@ Prog.: Knud Poder SEP 1991.
 
 */
 
-
+#endif

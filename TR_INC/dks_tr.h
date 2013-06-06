@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_DKS_TR)
+#define           H_DKS_TR
+
 extern int              dks_tr(
 /*___________________________*/
 char           *in_lab,
@@ -100,4 +103,5 @@ Prog: K. Engsager, OCT 1999
 
 */
 
+#endif
 

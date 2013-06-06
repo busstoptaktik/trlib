@@ -28,6 +28,9 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
+#if !defined     (H_PTG_FUNC_)
+#define           H_PTG_FUNC_
+
 #include "geo_lab.h"
 
 extern int             ptg(
@@ -126,4 +129,4 @@ Knud Poder 4 NOV 1977 (algol version), OCT 1989 (C-version);
 AUG 1990, generalizing  from utm to 4 regular projections.
 */
 
-
+#endif

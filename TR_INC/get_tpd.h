@@ -28,6 +28,9 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
+#if !defined     (H_GET_TPD)
+#define           H_GET_TPD
+
 #include "geo_lab.h"
 
 extern int             get_tpd(
@@ -54,3 +57,5 @@ of the typ_dec *gtfd.
 PROG:  KP 1989
 
 */
+
+#endif

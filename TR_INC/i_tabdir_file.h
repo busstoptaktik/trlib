@@ -57,6 +57,9 @@
 /*                 : else the name of the file to be opened    */
 /*   *dir_name     : path to the file ( == "" when local)      */
 
+#if !defined     (H_I_TAB_DIR_FILE)
+#define           H_I_TAB_DIR_FILE
+
 #include <stdio.h>
 
 extern FILE      *i_tabdir_file(
@@ -66,3 +69,5 @@ char             *name,
 int              *result,
 char             *dir_name
 );
+
+#endif

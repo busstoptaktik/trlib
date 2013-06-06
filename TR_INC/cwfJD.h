@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
+#if !defined     (H_CWFJD)
+#define           H_CWFJD
 
 extern double    cwfJD(
 /*___________________*/
@@ -64,3 +66,4 @@ REF.: Fliegel, H.F. and van Flandern, T.C. (1968).
 Progr.: K.Engsager, Feb. 2004.
 */
 
+#endif

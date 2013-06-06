@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_SET_TRC)
+#define           H_SET_TRC
+
 extern int              set_trc(
 /*____________________________*/
 struct coord_lab         *c_lab
@@ -54,4 +57,4 @@ Prog: Knud Poder  1992.
 
 */
 
-
+  #endif

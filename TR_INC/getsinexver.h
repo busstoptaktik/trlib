@@ -28,6 +28,8 @@
 /* National Spacecenter.  This copyright claim does not        */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_GETSINEXVER)
+#define           H_GETSINEXVER
 
 extern void        getsinexver(
 /*___________________________*/
@@ -41,3 +43,4 @@ int               *version);
 /* *state       :: 1 :: at input                                */
 /* version      :: number ver*100+serial to be written on ftx   */
 
+#endif

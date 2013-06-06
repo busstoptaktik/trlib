@@ -28,6 +28,9 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined     (H_ERAD)
+#define           H_ERAD
+
 extern double               erad(
 /*_____________________________*/
 double               a,
@@ -97,4 +100,4 @@ int                  ft
 
  */
 
-
+#endif

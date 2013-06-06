@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_GATG)
+#define           H_GATG
+
 extern double        gatg(
 /*_______________*/
 double               *TC,
@@ -93,4 +96,4 @@ modf: Knud Poder  1 JUN 1992, automatic init now by conv_lab;:
 modf: Knud Poder  3 MAR 1994, protyping.
 */
 
-
+#endif

@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_FGETLN_KMS)
+#define           H_FGETLN_KMS
+
 extern int                  fgetln_kms(
 /*_______________________________*/
 char                        *outstr,
@@ -70,4 +73,4 @@ F. Steffensen SEP. 1998 (MI/ITK) return strings unformated
 
 */
 
-
+#endif

@@ -17,16 +17,13 @@
  */
  
 
+#if !defined     (H_FPUTSHPPRJ)
+#define           H_FPUTSHPPRJ
 
 /* fputshpprj  now based on sputshpprj, which is based on prev. verison of fputshpprj, simlk, oct 2011 */
 
 #include <stdio.h>
 #include "geo_lab.h"
-/* 
-These includes have been deleted. Are they assumed in other programs?? simlk, oct. 2011.
-#include "geoid_d.h"
-#include "conv_lab.h"
-*/
 
 
 extern int       fputshpprj(
@@ -55,3 +52,4 @@ union geo_lab   *g_lab);
 
 */
 
+#endif

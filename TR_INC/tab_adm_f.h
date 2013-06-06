@@ -63,6 +63,9 @@
 /* produces a documentation of the table                     */
 /*   from the binary file tab_name, controloutput to fo      */
 
+#if !defined     (H_TAB_ADM_F)
+#define           H_TAB_ADM_F
+
 extern int           tab_adm_f(
 /*___________________________*/
   char *tab_name,    /*  name of table                                    */
@@ -77,3 +80,4 @@ extern int           tab_adm_f(
 
 /* progr. K.Engsager, Dec, 2001, */
 
+#endif

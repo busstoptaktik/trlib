@@ -28,6 +28,8 @@
 /* National Spacecenter.  This copyright claim does not        */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_PUTSINEXVER)
+#define           H_PUTSINEXVER
 
 extern void        putsinexver(
 /*___________________________*/
@@ -42,4 +44,4 @@ int                version);
 /* *state       :: -9999 error line type                        */
 /* version      :: number ver*100+serial to be written on ftx   */
 
-
+#endif

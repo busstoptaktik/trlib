@@ -28,6 +28,8 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined     (H_SAND_AFST)
+#define           H_SAND_AFST
 
 extern double  sand_afst(
 /*_____________________*/
@@ -55,3 +57,4 @@ double         E_middel
 Programmed by: Karsten Engsager, 7. febr. 2005
 */
 
+#endif

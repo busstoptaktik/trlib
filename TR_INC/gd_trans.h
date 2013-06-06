@@ -28,6 +28,9 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
+#if !defined     (H_GD_TRANS)
+#define           H_GD_TRANS
+
 #include <stdio.h>
 #include "geo_lab.h"
 #include "geoid_d.h"
@@ -181,3 +184,4 @@ Former versions:   Knud Poder & Karsten Engsager.
 
 */
 
+#endif

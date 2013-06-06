@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
+#if !defined     (H_CGETCW)
+#define           H_CGETCW
+
 extern double           sgetcw(
 /*___________________________*/
 char                   *out,
@@ -65,3 +68,4 @@ char array must not hold 'spaces'.
 
 */
 
+#endif

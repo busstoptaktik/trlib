@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_UTGS)
+#define           H_UTGS
+
 extern int               utgs(
 /*___________________________*/
 double                    Nin,
@@ -74,5 +77,6 @@ direct, call by value indicating
           direct = 0  => no transformation,
           i. e. yout = Nin and xout = Ein (no alarm occurs)
 
-
 */
+
+#endif
