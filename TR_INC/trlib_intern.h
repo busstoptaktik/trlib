@@ -58,7 +58,7 @@ typedef struct PR_kms_str PR;
 struct TR_kms_str{
     PR *proj_in, *proj_out;
     struct mgde_str *geoid_pt;
-    char geoid_name[FILENAME_MAX];
+    char geoid_name[TR_MAX_FILENAME];
     int close_table;
     int use_geoids;
     int err;
