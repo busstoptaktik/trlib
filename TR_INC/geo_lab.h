@@ -260,8 +260,33 @@ struct typ_dec {
 };
 #endif
 
-
-/* geo_lab   ver 2010.01          # page 5   5 Jan 2010 11 57 */
+/* 'FRANDS' object */
+struct gd_state {
+   union geo_lab    H0_lab, H1_lab;
+   union geo_lab    H2_lab, H3_lab; /* grid cstm dh*/
+   union geo_lab   *i_Rlab;  /* beg REG of ETPL  */
+   union geo_lab   *G_Rlab;  /* end REG of E geoid */
+   union geo_lab   *T_Rlab;  /* end REG of ETPL dh */
+   union geo_lab   *O_Rlab;  /* end REG of ETPL tr */
+   union geo_lab   *i_Nlab;  /* beg NON of ETPL  */
+   union geo_lab   *G_Nlab;  /* end NON of E geoid */
+   union geo_lab   *T_Nlab;  /* end NON of ETPL dh */
+   union geo_lab   *O_Nlab;  /* end NON of ETPL tr */
+   union geo_lab    t_lab;   /* non-reg gateway */
+   union geo_lab    g_lab;   /* geo_* PRE/ANT   */
+   struct mgde_str *s_grid_tab = NULL;
+   struct mgde_str  h_grid_tab;
+   struct htr_c_str htr_const;
+   int              i_chsum = 0;
+   int              o_chsum = 0, b_lev, s_lev;
+   short            init = 0, iEh_req =0, oEh_req =0;
+   short            s_req_gh = 0, ghr = 0;
+   short            s_req_dh = 0, s_req_tv = 0;
+   short            sta[4], stp[4], ptp[4];
+   char             i_sep, nonp_i[4];
+   char             o_sep, nonp_o[4];
+   struct coord_lab    *i_clb, *o_clb;
+};
 
 
 struct  coord_lab {
