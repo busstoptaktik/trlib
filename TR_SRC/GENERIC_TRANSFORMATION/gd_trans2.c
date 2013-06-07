@@ -216,65 +216,6 @@ FILE                     *tr_error
 
   *X = *Y = *Z = 0.0;
 
-
-#ifdef DEBUGGDTRANS
-	(void) lord_debug(0, LORD("sta,sto,ptp(0) = %d, %d, %d;"), sta[0], stp[0], ptp[0]);
-	(void) lord_debug(0, LORD("sta,sto,ptp(1) = %d, %d, %d;"), sta[1], stp[1], ptp[1]);
-	(void) lord_debug(0, LORD("sta,sto,ptp(2) = %d, %d, %d;"), sta[2], stp[2], ptp[2]);
-	(void) lord_debug(0, LORD("sta,sto,ptp(3) = %d, %d, %d;"), sta[3], stp[3], ptp[3]);
-#endif
-#ifdef DEBUGGDTRANS
-	(void) lord_debug(0, LORD("ghr :: i/o_sep = %c %d   %c %d;"), i_sep, i_sep, o_sep, o_sep);
-#endif
-    /* final setting of ghr for transformation */
-    /* dsh is showing iff datum_shift[level=3] */
-    switch (i_sep) {
-    case '_':
-    case 'N':
-    case 'H':
-      ghr = (short) ((dsh || o_sep == 'E') ? 1 : 0);
-      break;
-    case 'E':
-      ghr = (short) ((dsh || o_sep == 'H' || o_sep == 'N') ? 1 : 0);
-    } /* switch i_sep */
-    if (req_gh > 0) ghr = 1;
-    else
-    if (req_gh < 0) ghr = 0;
-    if ( s_req_tv ) ghr = 0;
-
-    iEh_req = ghr && (i_clb->cstm == (short) 1 /* CRT */);
-    oEh_req = (short) (((stp[3] == (short) CTC ||
-                         stp[3] == (short) GTC) && ghr)
-            ? 2 : ((ghr) ? 1 : 0));
-
-    /* reset region */
-    if (i_rgn != i_clb->p_rgn) i_rgn = i_clb->p_rgn;
-    if (o_rgn != o_clb->p_rgn) o_rgn = o_clb->p_rgn;
-
-    /* save checksums */
-    i_chsum = i_clb->ch_tsum;
-    o_chsum = o_clb->ch_tsum;
-
-    if (ghr && !grid_tab->init) {
-      res = geoid_i("STD", GDE_LAB, grid_tab, err_txt);
-      if (res < 0) {
-        i_chsum = -i_clb->ch_tsum;
-        init    = (short) res;
-        return((tr_error==NULL) ? TRF_GEOID_ :
-                t_status(tr_error, "",
-                "gd_trans(unintelligible labels)", TRF_GEOID_));
-      }
-    }
-
-    if (!init) {
-      i_chsum = -i_clb->ch_tsum;
-      return((tr_error==NULL) ? TRF_PROGR_ :
-              t_status(tr_error, "",
-              "gd_trans(unintelligible labels)", TRF_PROGR_));
-    }
-
-  } /* end of init of tables */
-
   if (i_sep == '_') H_in = 0.0;
   igh    = gh = *ogh = 0.0;
   iEhr   = iEh_req;
