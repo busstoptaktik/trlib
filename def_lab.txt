@@ -99,6 +99,10 @@
  rg
  Red. geom. Geodesy (to geoid)
 
+#lg      0  9  7  0  0  ZZ  ZZ  "  0  "
+ lg
+ Red. geom. Geodesy (to level)
+
 #ni      0  9  3  0  0  ZZ  ZZ  "  0  "
  ni
  Levelling observ.
