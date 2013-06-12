@@ -296,6 +296,8 @@ struct gd_state {
   );
 };
 
+typedef struct gd_state gd_state;
+
 
 struct  coord_lab {
   short     lab_type;    /* Type of label */
