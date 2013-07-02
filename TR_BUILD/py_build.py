@@ -6,15 +6,13 @@
 ## simlk, sep. 2012
 ##############################
 import sys,os,glob,shutil,subprocess
-from cc import *
 from core import *
+import cc
+
 OPTIONS={"-thread_safe": "Compile a thread safe library.",
-"-msvc":"Use MSVC compiler (windows only).",
 "-debug":"Include debug symbols.",
 "-debuggd":"Extra output from gd_trans.",
 "-o": "<shared_object> :Specify output name.",
-"-x64":"Use cross compiler (windows only).",
-"-x86":"Default compiler (windows only).",
 "-build": "Build shared libaray- default: modified source only.",
 "-all":"Build all c-source.",
 "-buildtest":"<path(s)> Build (single file) test programs in specified by <path(s)> (globbing allowed).",
@@ -24,10 +22,10 @@ OPTIONS={"-thread_safe": "Compile a thread safe library.",
 "-kmsfncs":"(DEPRECATED) Expose KE's functions (windows).",
 "-gprof":"Include symbols for gprof.",
 "-compiler_version":"Echo compiler selection.",
-"-cc":"Override default compiler - e.g. 'gcc' - for example to use a gcc-like cross compiler.",
 "-java":"Build java (jni) bindings.",
 "-java_external":"Build and link a separate library for jni-bindings.",
 "-build_java":"Build java source (not implemented)."}
+OPTIONS.update(COMPILER_SELECTION_OPTS)
 CWD=os.path.realpath(os.getcwd())
 #THIS IS WHERE YOU WILL GET YOUR OBJECT FILES
 BUILD_DIR=os.path.realpath("./BUILD_PY")
@@ -135,40 +133,23 @@ def main(args):
 		Usage()
 	log_fp=open(BUILD_LOG,"w")
 	sys.stdout=RedirectStdout(log_fp,True)
-	is_msvc="-msvc" in args
-	if is_msvc:
-		if "-x64" in args:
-			compiler=msvc64()
-		else:
-			compiler=msvc32()
-	else:
-		if "-x64" in args:
-			compiler=mingw64()
-		elif IS_WINDOWS:
-			compiler=mingw32()
-		elif IS_MAC:
-			compiler=gcc_mac()
-		else:
-			compiler=gcc_nix()
+	compiler=SelectCompiler(args)
 	if "-x64" in args:
 		build_dir=BUILD_DIR_CROSS
 		lib_dir=LIB_DIR_CROSS
 	else:
 		build_dir=BUILD_DIR
-		lib_dir=LIB_DIR
-	if "-cc" in args:
-		override=args[args.index("-cc")+1]
-		compiler.overrideCompiler(override)
+	is_msvc=isinstance(compiler,cc.msvc)
 	if "-compiler_version" in args:
 		print GetCompiler(compiler)
-	#ALWAYS PUT LIBRARY IN LIBDIR#
 	if "-o" in args:
 		outname=args[args.index("-o")+1]
-	else: #improve here.... define extension in cc or core
+	else: 
 		if "win" in sys.platform:
-			outname=os.path.join(lib_dir,"TrLib.dll")
+			outname=os.path.join(lib_dir,"trlib")
 		else:
-			outname=os.path.join(lib_dir,"TrLib.so")
+			outname=os.path.join(lib_dir,"libtr")
+		outname+=DLL
 	outname=os.path.realpath(outname)
 	defines=DEFINES
 	if "-debug" in args:
