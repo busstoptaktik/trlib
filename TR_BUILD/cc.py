@@ -42,7 +42,31 @@ class ccompiler(object):
 				return self.COMPILE_EXE_RELEASE,self.LINK_EXE_RELEASE
 	def linkOutput(self,outname):
 		return [self.LINK_OUTPUT_SWITCH+outname] #works for everything but MAC gcc!
-		
+
+class sunc(ccompiler):
+	COMPILER="cc"
+	LINKER="cc"
+	ALL_BUILD=["-c"]
+	COMPILE_LIBRARY_RELEASE=ALL_BUILD+["-O3","-fpic"]
+	COMPILE_LIBRARY_DEBUG=ALL_BUILD+["-g","-O1","-fpic"]
+	COMPILE_EXE_RELEASE=ALL_BUILD+["-O3"]
+	COMPILE_EXE_DEBUG=ALL_BUILD+["-g","-O1"]
+	LINK_LIBRARY_RELEASE=["-shared"]
+	LINK_LIBRARY_DEBUG=["-shared"]
+	LINK_EXE_RELEASE=[]
+	LINK_EXE_DEBUG=[]
+	LINK_LIBRARIES=["-lm"]
+	DEFINE_SWITCH="-D"
+	INCLUDE_SWITCH="-I"
+	LINK_OUTPUT_SWITCH="-o"
+	OBJ_EXTENSION=".o"
+
+
+class sunc32(sunc):
+	sunc.ALL_BUILD+["-m64"]
+	
+class sunc64(sunc):
+	ALL_BUILD=sunc.ALL_BUILD+["-m64"]
 	
 #core gcc class
 class gcc(ccompiler):
@@ -62,9 +86,8 @@ class gcc(ccompiler):
 	IMPLIB_EXT=".a"
 	LINK_OUTPUT_SWITCH="-o"
 	LINK_LIBRARIES=[]
-	VERSION_SWITCH="--version"
 	DEF_FILE_SWITCH=""
-	IMPLIB_SWITCH="-Wl,--out-implib,"
+	IMPLIB_SWITCH=""
 	OBJ_EXTENSION=".o"
 
 #gcc subvariants
