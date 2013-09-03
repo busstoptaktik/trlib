@@ -29,6 +29,8 @@
 /* indicate an intention of publishing this code.              */
 
 
+#if !defined     (H_GMB2)
+#define           H_GMB2
 
 extern int                 gmb2(
 /*____________________________*/
@@ -90,3 +92,5 @@ Frede Madsen 1981 , where 5th order terms were included.
 5th order terms removed, as bshlm2 is used for long lines.
 
 */
+
+#endif

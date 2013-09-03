@@ -28,6 +28,8 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined     (H_S_STATUS)
+#define           H_S_STATUS
 
 extern int               s_status(
 /*______________________________*/
@@ -103,4 +105,4 @@ SPECIAL::  c_unit == "non"  ==>>  SKIPS add params writing
 /*  Prog: Knud Poder  30 SEP 1995                             */
 /*  Updated: Karsten Engsager jan 2009                        */
 
- 
+#endif

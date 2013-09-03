@@ -99,6 +99,10 @@
  rg
  Red. geom. Geodesy (to geoid)
 
+#lg      0  9  7  0  0  ZZ  ZZ  "  0  "
+ lg
+ Red. geom. Geodesy (to level)
+
 #ni      0  9  3  0  0  ZZ  ZZ  "  0  "
  ni
  Levelling observ.
@@ -1549,12 +1553,6 @@ Clarke80 NO TRF
 Special testsys
 ;
 
-#stop
- -1    stop     STOP   0  ZZ
- 0                  0.0000 m      0.0000 m      0.0000 m
-   0.0 ppm          0.0000 sx     0.0000 sx     0.0000 sx
-dummy
-
 
 
 * def_grs   version 1.0          # page 1   26 Jun 2007 13 16 ;
@@ -1735,9 +1733,6 @@ Almanac 1980."                                               .
 Connaissance des Temps 1995  p. XXIV-XXV + Astronomical 
 Almanac 1980." 
 
-#stop
--1     0     0.0  0.0  0.0  0.0  
-"
 
 
 *
@@ -1813,10 +1808,3 @@ Fehmarn Bridge Project Height to DHDHHN92
   -0.038 m
 DVR90 to Koebenhavns Nul 1944
 
-#stop  
-               stop    0    0    0
-0   0   0   0    0
-stop
-
-
-#stop

@@ -28,6 +28,8 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
+#if !defined     (H_SET_TPD)
+#define           H_SET_TPD
 
 extern struct typ_dec      *set_tpd(
 /*________________________________*/
@@ -48,4 +50,4 @@ PROG: KP 1989
 Karsten Engsager: updated 2010.
 */
 
-
+  #endif

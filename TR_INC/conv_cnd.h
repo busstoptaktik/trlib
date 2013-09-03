@@ -40,6 +40,9 @@
 /* progr. Karsten Engsager, 2005.                              */
 /* updt.  Karsten Engsager, 2010.                              */
 
+#if !defined     (H_CONV_CND)
+#define           H_CONV_CND
+
 #include "geo_lab.h"
 
 extern int               conv_cnd(
@@ -50,3 +53,4 @@ struct obs_lab          *o_lab,
 ...
 );
 
+#endif

@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_GET_AREAF)
+#define           H_GET_AREAF
 
 extern int       get_areaf(
 /*_______________________*/
@@ -70,4 +72,4 @@ progr.: Karsten engsager, 2. Feb 2004
 
 */
 
-
+#endif

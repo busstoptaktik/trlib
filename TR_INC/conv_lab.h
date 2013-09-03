@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_CONV_LAB)
+#define           H_CONV_LAB
+
 #include "geo_lab.h"
 
 extern int            conv_lab(
@@ -175,3 +178,4 @@ hjælp labels
 
 */
 
+#endif

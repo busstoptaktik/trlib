@@ -28,6 +28,8 @@
 /* This copyright claim does not indicate an intention of      */
 /* publishing this code.                                       */
 
+#if !defined     (H_FO_G_TR)
+#define           H_FO_G_TR
 
 extern int               fo_g_tr(
 /*______________________________*/
@@ -61,3 +63,4 @@ FILE                    *tr_error
 /*  Prog: Knud Poder  5 OCT 1995                              */
 /*  Prog: K. Engsager 4 MAY 2011                              */
 
+#endif

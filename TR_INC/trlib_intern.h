@@ -43,6 +43,9 @@
 #define GET_PDTM(pr)                ((pr->plab->u_c_lab).p_dtm)
 #define GET_HDTM(pr)                ((pr->plab->u_c_lab).h_dtm)
 
+/*String length macros*/
+#define TR_MAX_FILENAME         (256)   /*Our definition of a max filename length which otherwise be os dependent */
+
 /*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */
 struct PR_kms_str{
    union geo_lab *plab;
@@ -55,7 +58,7 @@ typedef struct PR_kms_str PR;
 struct TR_kms_str{
     PR *proj_in, *proj_out;
     struct mgde_str *geoid_pt;
-    char geoid_name[FILENAME_MAX];
+    char geoid_name[TR_MAX_FILENAME];
     int close_table;
     int use_geoids;
     int err;

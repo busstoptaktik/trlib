@@ -185,7 +185,7 @@ int TR_InitLibrary(char *path) {
 int TR_SetGeoidDir(char *path){
 	FILE *fp;
 	int rc;
-	char buf[FILENAME_MAX],fname[FILENAME_MAX],*init_path=0;
+	char buf[TR_MAX_FILENAME],fname[TR_MAX_FILENAME],*init_path=0;
 	if (path && strlen(path)>0) 
 		init_path=path;
 	else
@@ -331,7 +331,7 @@ int TR_SpecialGeoidTable(TR *tr, char *geoid_name){
 	tr->geoid_pt=special_geoid_table;
 	tr->close_table=1;
 	tr->use_geoids=(has_geoids>0)?0:-1;
-	strncpy(tr->geoid_name,geoid_name,FILENAME_MAX);
+	strncpy(tr->geoid_name,geoid_name,TR_MAX_FILENAME);
 	return TR_OK;
 }
 
@@ -453,13 +453,15 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
 	    return 0;
 }
 
+
+/* Insert 'projection' into TR-object. Allows reuse... */
 int TR_Insert(TR *tr, char *mlb, int is_out){
 	PR *proj=NULL, *to_be_replaced=NULL;
-	if (!mlb)
-		return TR_LABEL_ERROR;
-	proj=TR_OpenProjection(mlb);
-	if (!proj){
-		return TR_LABEL_ERROR;
+	/*only open if given a proper string - otherwise the slot is just NULL'ed which can be useful also*/
+	if (mlb && *mlb){
+		proj=TR_OpenProjection(mlb);
+		if (!proj)
+			return TR_LABEL_ERROR;
 	}
 	to_be_replaced=(is_out)  ?  (tr->proj_out)  : (tr->proj_in);
 	if (to_be_replaced)

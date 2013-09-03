@@ -29,6 +29,9 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
+#if !defined     (H_FE_TRANS)
+#define           H_FE_TRANS
+
 #include "geo_lab.h"
 
 extern int          fe_trans(
@@ -58,3 +61,5 @@ N, E, H      :  from coordinates
              :  tr_error == NULL: NO REPORT IS PRINTED
 
 */
+
+#endif

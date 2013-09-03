@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_SPUTG_)
+#define           H_SPUTG_
+
 extern int                 sputg(
 /*_____________________________*/
 char                       *outstr,         
@@ -47,3 +50,4 @@ char                       *layout
 
 */
 
+#endif

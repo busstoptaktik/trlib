@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_GMB1)
+#define           H_GMB1
 
 extern int                 gmb1(
 /*____________________________*/
@@ -78,3 +80,4 @@ Frede Madsen 1981 , where 5th order terms were included.
 
 */
 
+#endif

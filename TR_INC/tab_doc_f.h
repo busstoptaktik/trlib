@@ -58,6 +58,8 @@
 
 /* see allso geoid_d.h                                         */
 
+#if !defined     (H_TAB_DOC_F)
+#define           H_TAB_DOC_F
 
 extern int               tab_doc_f(
 /*_______________________________*/
@@ -66,3 +68,5 @@ FILE                    *fh_out
 );
 
 /* progr. K.Engsager, Mar, 2009, */
+
+#endif

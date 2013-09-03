@@ -13,28 +13,11 @@ def Usage():
 	sys.exit(1)
 	
 def main(args):
-	is_msvc="-msvc" in args
-	if is_msvc:
-		if "-x64" in args:
-			compiler=msvc64()
-		else:
-			compiler=msvc32()
-	else:
-		if "-x64" in args:
-			compiler=mingw64()
-		elif IS_WINDOWS:
-			compiler=mingw32()
-		elif IS_MAC:
-			compiler=gcc_mac()
-		else:
-			compiler=gcc_nix()
+	compiler=SelectCompiler(args)
 	if "-build" in args:
 		build_dir=args[args.index("-build")+1]
 	else:
 		build_dir=os.getcwd()
-	if "-cc" in args:
-		override=args[args.index("-cc")+1]
-		compiler.overrideCompiler(override)
 	if "-o" in args:
 		outname=args[args.index("-o")+1]
 	else: #improve here.... define extension in cc or core

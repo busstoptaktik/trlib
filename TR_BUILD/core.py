@@ -102,3 +102,42 @@ def Clean(dir):
 		files.extend(glob.glob(os.path.join(dir,"*"+ext)))
 	for fname in files:
 		os.remove(fname)
+
+COMPILER_SELECTION_OPTS={"-msvc":"Use MSVC compiler (windows only).",
+"-sunc":"Use sun c compiler",
+"-x64":"Compile 64 bit binaries",
+"-cc":"Override default compiler - e.g. 'gcc' - for example to use a gcc-like cross compiler.",
+"-cop":"<args> Comma separated list of extra options passed on to build (object file compilation only)."
+}
+
+def SelectCompiler(args):
+	compiler=None
+	is_64="-x64" in args
+	if "-msvc" in args:
+		if is_64:
+			compiler=cc.msvc64()
+		else:
+			compiler=cc.msvc32()
+	elif  "-sunc" in args:
+		if is_64:
+			compiler=cc.sunc64()
+		else:
+			compiler=cc.sunc32()
+	else: #defaults
+		if IS_WINDOWS:
+			if is_64:
+				compiler=cc.mingw64()
+			else:
+				compiler=cc.mingw32()
+		elif IS_MAC:
+			compiler=cc.gcc_mac()
+		else:
+			compiler=cc.gcc_nix()
+	if "-cc" in args:
+		override=args[args.index("-cc")+1]
+		compiler.overrideCompiler(override)
+	#add extra compiler options#
+	if "-cop" in args:
+		compiler.ALL_BUILD+=args[args.index("-cop")].split(",")
+	return compiler
+	

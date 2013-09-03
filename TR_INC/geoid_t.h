@@ -34,6 +34,8 @@
 /*    result == -1      : name is not found                    */
 /*    result == -4      : manager.tab file error               */
 
+#if !defined     (H_GEOID_T)
+#define           H_GEOID_T
 
 extern int               geoid_t(
 /*____________________________*/
@@ -45,3 +47,4 @@ char                    *descr
 
 /* see allso geoid_d.h                                         */
 
+#endif

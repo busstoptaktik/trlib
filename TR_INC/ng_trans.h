@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does  */
 /* not indicate an intention of publishing this code.      */
 
+#if !defined     (H_NG_TRANS)
+#define           H_NG_TRANS
+
 /*
 #define  DEBUGFETRANS
 */
@@ -61,3 +64,4 @@ N, E, H             :  from coordinates
 Progr.: K.Engsager, Danish National Space Center, 2006
 */
 
+#endif

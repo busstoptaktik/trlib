@@ -28,6 +28,8 @@
 /* National Spacecenter.  This copyright claim does not        */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_GETSINEXLIN)
+#define           H_GETSINEXLIN
 
 extern int        getsinexlin(
 /*___________________________*/
@@ -76,3 +78,5 @@ FILE             *fh_in);
 /*       :: 124 :: SOLUTION/MATRIX_APRIORI                      */
 /*       :: 125 :: SOLUTION/NORMAL_EQUATION_VECTOR              */
 /*       :: 126 :: SOLUTION/NORMAL_EQUATION_MATRIX              */
+
+#endif

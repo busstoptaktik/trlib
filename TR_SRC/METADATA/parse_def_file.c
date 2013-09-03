@@ -28,7 +28,7 @@
 #define MODE_DTM "def_dtm"
 #define MODE_HTH "def_hth"
 #define MODE_DEF_LAB "def_lab"
-#define MODE_STOP "stop"
+/*#define MODE_STOP "stop"*/
 #define N_TOKENS_PRJ 12
 #define N_TOKENS_DTM 14
 #define N_TOKENS_RGN 3
@@ -208,7 +208,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	int n_prealloc[5]={256,128,128,128,64};
 	int n_alloc[5]={256,128,128,128,64};
 	int mode_sizes[5]={sizeof( def_projection),sizeof( def_grs),sizeof(def_rgn),sizeof( def_datum), sizeof( def_hth_tr)};
-	char *mode_names[7]={MODE_PRJ,MODE_GRS,MODE_RGN,MODE_DTM,MODE_HTH,MODE_STOP,NULL},*mode_name;
+	char *mode_names[7]={MODE_PRJ,MODE_GRS,MODE_RGN,MODE_DTM,MODE_HTH,NULL},*mode_name;
 	/*some other needed stuff for buffering etc */
 	char buf[4096],savelines[MAX_LINE_DEF][1024];
 	int n_lines=0;

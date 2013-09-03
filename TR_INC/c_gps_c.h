@@ -28,6 +28,8 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
+#if !defined     (H_C_GPS_C)
+#define           H_C_GPS_C
 
 extern int       c_gps_c(
 /*_____________________*/
@@ -48,4 +50,4 @@ double                *Zo
 /* (*Yo) = (Yi) + (T2) + ( R3  D  -R1) (Yi)             */
 /* (*Zo) = (Zi) + (T3) + (-R2  R1  D ) (Zi)             */
 
-
+#endif

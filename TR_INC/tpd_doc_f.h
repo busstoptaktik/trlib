@@ -38,6 +38,8 @@
 /* head_txt must be declared at least 128 chars                */
 /* tpd_txt  must be declared at least 128 chars                */
 
+#if !defined     (H_TPD_DOC_F)
+#define           H_TPD_DOC_F
 
 extern int                   tpd_doc_f(
 /*___________________________________*/
@@ -48,3 +50,5 @@ char                        *tpd_txt
 /*
 Progr. Karsten Engsager jan 2010
 */
+
+#endif

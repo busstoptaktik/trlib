@@ -28,6 +28,9 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not */
 /* indicate an intention of publishing this code.             */
 
+#if !defined     (H_FPUTCW)
+#define           H_FPUTCW
+
 extern int           fputcw(
 /*________________________*/
 FILE                *fp,
@@ -55,3 +58,4 @@ PROG: Frands Steffensen    1994
 
 */
 
+#endif
