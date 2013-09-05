@@ -64,6 +64,8 @@ def main(args): #progname, test_lib
 	ok=TrLib.InitLibrary(geoids,lib_obj,lib_dir)
 	if not ok:
 		return 1
+	TrLib.SetDebugMode()
+	TrLib.SetMaxMessages(10000)
 	print("Files in geoid-dir %s:\n%s" %(TrLib.GEOIDS,repr(os.listdir(TrLib.GEOIDS))))
 	print LS
 	mlb="utm32_ed50"
