@@ -35,7 +35,7 @@
 
 extern int             ptg(
 /*_______________________*/
-union geo_lab          *TC,
+struct coord_lab          *TC,
 int                    direct,
 double                 N,
 double                 E,

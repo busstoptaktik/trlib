@@ -65,8 +65,8 @@ FILE                     *tr_error
 
   static THREAD_SAFE  char                 si_lab_str[MLBLNG];
   static THREAD_SAFE  char                 so_lab_str[MLBLNG];
-  static THREAD_SAFE  union geo_lab        i_lab;
-  static THREAD_SAFE  union geo_lab        o_lab;
+  static THREAD_SAFE  struct coord_lab        i_lab;
+  static THREAD_SAFE  struct coord_lab         o_lab;
 
   static THREAD_SAFE  short                init = 0;
   static THREAD_SAFE  short                sta, stp, ptp, ste;
@@ -156,14 +156,14 @@ FILE                     *tr_error
                      "etrs89_trans(unintelligible output_str)", TRF_ILLEG_));
 
     (void) sprintf(mlb_str, "%s_etrs89", i_lab_str);
-    res = conv_lab(mlb_str, &i_lab, "");
+    res = conv_w_crd(mlb_str, &i_lab);
     if (res != CRD_LAB) return((tr_error==NULL) ? TRF_ILLEG_ :
                t_status(tr_error, "",
                "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));
     (void) strcpy(si_lab_str, i_lab_str);
 
     (void) sprintf(mlb_str, "%s_etrs89", o_lab_str);
-    res = conv_lab(mlb_str, &o_lab, "");
+    res = conv_w_crd(mlb_str, &o_lab);
     if (res != CRD_LAB) return((tr_error==NULL) ? TRF_ILLEG_ :
                t_status(tr_error, "",
                "etrs89_trans(unintelligible input_str)", TRF_ILLEG_));

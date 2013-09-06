@@ -27,8 +27,8 @@
 
 int                   ctc(
 /*______________________*/
-union geo_lab         *i_lab_u,
-union geo_lab         *o_lab_u,
+struct coord_lab        *i_lab,
+struct coord_lab        *o_lab,
 double                Xi,
 double                Yi,
 double                Zi,
@@ -40,8 +40,6 @@ FILE                  *tr_error
 )
 {
 
-  struct coord_lab   *i_lab = &(i_lab_u->u_c_lab);
-  struct coord_lab   *o_lab = &(o_lab_u->u_c_lab);
 
   double                   X, Y, Z;
   int                      act, nst, ost, result = 0, res;

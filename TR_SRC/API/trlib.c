@@ -67,13 +67,13 @@ int TR_IsMainThread(void){
 
 /* A function  which checks whether input is in list of coordinate systems deemed thread unsafe */
 
-int TR_IsThreadSafe(union geo_lab *plab){
+int TR_IsThreadSafe(PR *plab){
 	int i;
 	int n=sizeof(UNSAFE)/sizeof(int);
 	if (!plab)
 		return 1;
 	for (i=0;i<n;i++){
-		if (UNSAFE[i]==(plab->u_c_lab).imit)
+		if (UNSAFE[i]==(plab->imit))
 			return 0;
 	}
 	return 1;
@@ -339,38 +339,27 @@ int TR_SpecialGeoidTable(TR *tr, char *geoid_name){
        
 PR *TR_OpenProjection(char *mlb){
 	int label_check;
-	union geo_lab *plab=NULL;
-	PR *proj=NULL;
-	plab= malloc(sizeof(union geo_lab));
-	if (!plab){
+	struct coord_lab *plab=NULL;
+	PR *proj= malloc(sizeof(PR));
+	
+	if (!proj){
 		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
 		return 0;
 	}
-	label_check = conv_lab(mlb,plab,"");
-	if ((label_check==0) || (label_check==-1)) {
-		free(plab);
+	label_check = conv_w_crd(mlb,proj);
+	if (label_check!=CRD_LAB) {
+		free(proj);
 		lord_error(TR_LABEL_ERROR,"Failed to open projection %s.",mlb);
 		return 0;
 	}
-	if (!TR_IsThreadSafe(plab) && !ALLOW_UNSAFE){
+	if (!TR_IsThreadSafe(proj) && !ALLOW_UNSAFE){
 		lord_error(TR_LABEL_ERROR,"%s not allowed in multithreaded mode!",mlb);
-		free(plab);
+		free(proj);
 		return 0;
 	}
-	proj= malloc(sizeof(PR));
-	if (!proj){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
-		free(plab);
-		return 0;
-	}
-	/*This only does something for TM-projections - the space could be used for something else for other types*/
-	proj->plab=plab;
-	/*If implementing reference counting: proj->n_references=1;*/
-	/* test for allowed transformation - can only fail for non null input*/
-       
-		
+	
 	if (IS_TM(proj))
-		setDtrc(&(plab->u_c_lab),proj->dgo);
+		setDtrc(proj,proj->dgo);
 	return proj;
 }
 
@@ -379,10 +368,6 @@ PR *TR_OpenProjection(char *mlb){
 void TR_CloseProjection(PR *proj){
 	if (!proj)
 		return;
-	/* Implement reference counting like this: 
-	proj->n_references--
-	if (proj->n_references==0){*/
-	free(proj->plab);
 	free(proj);
 }
 
@@ -565,7 +550,7 @@ int TR_tr(
    ) 
  {
 	 
-    union geo_lab *plab_in,*plab_out;
+   
     double *x_in, *y_in,*x_out,*y_out,z, GH = 0, z1 = 0, z2 = 0;
     int err, ERR = 0, i; /*use_geoids; */
 
@@ -574,8 +559,7 @@ int TR_tr(
 	    lord_error(TR_LABEL_ERROR,"TR_tr: TR-object not fully composed.\n");
 	    return TR_LABEL_ERROR;
     }
-    plab_in=proj_in->plab;
-    plab_out=proj_out->plab;
+    
     if (IS_CARTESIC(proj_in)){
         x_in=Y_in;
         y_in=X_in;
@@ -595,13 +579,11 @@ int TR_tr(
   
    for (i = 0;  i < n;  i++) {
       	z = Z_in? Z_in[i]: z1;
-        err = gd_trans(plab_in, plab_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z_out? Z_out+i: &z2), (GH_out?GH_out+i: &GH) ,use_geoids,geoid_pt, "", ERR_LOG);
+        err = gd_trans(proj_in, proj_out,  y_in[i], x_in[i], z,  y_out+i, x_out+i, (Z_out? Z_out+i: &z2), (GH_out?GH_out+i: &GH) ,use_geoids,geoid_pt, "", ERR_LOG);
 	#ifdef _ROUT
 	if (err)
 		lord_debug(0,"\nProj: %s->%s, last err: %d, out: %.5f %.5f %.3f\n",GET_MLB(proj_in),GET_MLB(proj_out),err,x_in[i],y_in[i],z);
 	#endif
-        /*err = gd_trans(tr->plab_in, tr->plab_out,  x,y,z,  X+i,Y+i, (Z? Z+i: &z2), &GH, -1, &GeoidTable, 0, 0);
-         *   KE siger at arg 0 for GeoidTable er bedre end -1. Ved -1 er det "forbudt" at bruge geoidetabeller */
         if (err)
            ERR = err;
    }
@@ -659,10 +641,7 @@ int TR_itrf(
         if(n_vel==n){
             velx_out[i]=o_vel[0]; vely_out[i]=o_vel[1]; velz_out[i]=o_vel[2];
         }
-    #ifdef _ROUT
-    if (err)
-        lord_debug(0,"\nProj: %s->%s, last err: %d, error str: %s, out: %.3f %.3f %.3f\n",(plab_in->u_c_lab).mlb,(plab_out->u_c_lab).mlb,err,err_str,x_in[i],y_in[i],z_in[i]);
-    #endif
+   
         if (err)
            ERR = err;
    }
@@ -749,7 +728,7 @@ int TR_GetEsriText(char *mlb, char *wkt_out){
     PR *TC=TR_OpenProjection(mlb);
     if (!TC)
 	return TR_LABEL_ERROR;
-    err=sputshpprj(wkt_out,TC->plab); /* See fputshpprj.h for details on return value */
+    err=sputshpprj(wkt_out,TC); /* See fputshpprj.h for details on return value */
     TR_CloseProjection(TC);
     return (err==0)?(TR_OK):(TR_LABEL_ERROR);
 }
@@ -778,7 +757,7 @@ int TR_GetLocalGeometry(TR *trf, double x, double y, double *s, double *mc, int 
 		*mc=0;
 		return TR_OK;
 	}
-	ret=ptg_d(proj->plab,1,y,x,&yo,&xo,"",ERR_LOG,out,proj->dgo);
+	ret=ptg_d(proj,1,y,x,&yo,&xo,"",ERR_LOG,out,proj->dgo);
 	*s=out[0];
 	*mc=out[1];
 	return (ret==0)?TR_OK:TR_ERROR;

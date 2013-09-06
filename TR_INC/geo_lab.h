@@ -301,6 +301,7 @@ struct  coord_lab {
   double    tcgg[10];    /* Constants for Gauss <-> Geo lat. NB: hgt*/
   double    utg[5];      /* Constants for transv. merc. -> geo  _lab*/
   double    gtu[5];      /* Constants for geo -> transv. merc.  ----*/
+  double   dgo[4];      /*Constants set by setDtrc - check med Karsten!!!*/
   struct dsh_str dsh_con;/* Structure of datum shift constants */
   int       ch_sum;      /* Checksum for identification of label */
   short     h_ix;        /* index of Height system char in mlb */

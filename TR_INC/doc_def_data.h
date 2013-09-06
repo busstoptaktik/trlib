@@ -16,7 +16,7 @@
  * 
  */
  
-/* int get_ellipsoid_data(union geo_lab *plab_in, double *data);*/
+/* int get_ellipsoid_data(struct coord_lab *plab_in, double *data);*/
 
 #if !defined(H_DOC_DEF_DATA)
 #define      H_DOC_DEF_DATA

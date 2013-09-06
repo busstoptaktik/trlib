@@ -35,8 +35,8 @@
 
 extern int          dk_trans(
 /*___________________________*/
-union geo_lab      *in_lab,
-union geo_lab      *outlab,
+struct coord_lab      *in_lab,
+struct coord_lab      *outlab,
 double              N,
 double              E,
 double              H,

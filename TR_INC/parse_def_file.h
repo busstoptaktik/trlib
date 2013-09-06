@@ -74,6 +74,8 @@ struct def_projection{
 struct  def_hth_tr{
 	char from_mlb[MLBLNG];
 	char to_dtm[MLBLNG];
+	int ih_dtm;
+	int oh_dtm;
 	int type;
 	double B0;
 	double L0;

@@ -31,7 +31,7 @@
 
 int                    ptg_d(
 /*_________________________*/
-union geo_lab         *TC_u,
+struct coord_lab         *TC,
 int                    direct,
 double                 N,
 double                 E,
@@ -55,7 +55,7 @@ The constants for the trig series to calc 1/m and c.
 
 static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
 
-  struct coord_lab  *TC = &(TC_u->u_c_lab);
+  
   int               res = 0, i, s, h, cstm, mode, ell_trf, auth = 0;
   int               mrc, lmb, ste, spl, non_p, neg;
   double            Cn, Ce, dCn = 0.0, dCe = 0.0, dCt, Z, ZZ;
@@ -63,7 +63,7 @@ static THREAD_SAFE  int        D_init = 0, s_ell_no = 0;
   double            *GP, *utg, *gtu;
   char              *ptx;
 
-  /* test labtype of TC_u */
+  /* test labtype of TC */
   if (TC->lab_type == CRD_LAB) {
 
     /* Transf. parameters */

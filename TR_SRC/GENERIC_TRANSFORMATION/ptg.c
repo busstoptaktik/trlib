@@ -36,7 +36,7 @@
 
 int                    ptg(
 /*_______________________*/
-union geo_lab          *TC_u,
+struct coord_lab          *TC,
 int                    direct,
 double                 N,
 double                 E,
@@ -47,7 +47,7 @@ FILE                   *tr_error
 )
 {
 
-  struct coord_lab  *TC = &(TC_u->u_c_lab);
+
   int               res = 0, i, s, h, cstm, mode, ell_trf, auth = 0;
   int               mrc, lmb, ste, spl, non_p, neg;
   double            Cn, Ce, dCn = 0.0, dCe = 0.0, Z, ZZ;
@@ -55,7 +55,7 @@ FILE                   *tr_error
   double            *GP, *utg, *gtu;
   char              *ptx;
 
-  /* test labtype of TC_u */
+  /* test labtype of TC*/
   if (TC->lab_type == CRD_LAB) {
 
     /* Transf. parameters */

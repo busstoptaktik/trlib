@@ -26,7 +26,7 @@
 int              sgetshpprj(
 /*______________________*/
 char            *wkt_in,
-union geo_lab   *g_lab,
+struct coord_lab   *g_lab,
 char            *mlb_out)
 {
 
@@ -42,7 +42,7 @@ char            *mlb_out)
 
    coordinates unit is:deafault: "m",
                    for:geo: "dg" or "rad"
-   dependening geo_lab->u_c_lab.g_tpd
+   dependening geo_lab->g_tpd
       (.gf ==2 && .tf ==3) ? "rad" : "dg"
 
 */
@@ -57,7 +57,7 @@ char            *mlb_out)
   double val;
   FILE  *fp;
   if (g_lab!=NULL)
-	  g_lab->u_c_lab.g_tpd = *set_tpd("dg", 2, 7);
+	  g_lab->g_tpd = *set_tpd("dg", 2, 7);
   k = 0;
   *mlb_out='\0';
   /*added some extra bullet-proofing - simlk, ,arch 2013*/
@@ -125,7 +125,7 @@ char            *mlb_out)
           if (p_txt3 != NULL) {
             p_txt4 = strchr(p_txt3+2, '"');
             if (strncmp(p_txt3, "radian", p_txt4-p_txt3-2)==0 && g_lab!=NULL)
-                g_lab->u_c_lab.g_tpd = *set_tpd("rad", 2, 7);
+                g_lab->g_tpd = *set_tpd("rad", 2, 7);
           }
           (void) fgetlhtx(fp, entry);
           break;
@@ -302,7 +302,7 @@ char            *mlb_out)
       }
       if (sep == 'H') (void) strcat(lab_str, mlb2);
       if (g_lab!=NULL){
-	      i = conv_lab(lab_str, g_lab, param);
+	      i = conv_w_crd(lab_str, g_lab, param);
 	      i = (i == CRD_LAB) ? ((params == r_params) ? 0 : +3): +4;
       }
       else{

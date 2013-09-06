@@ -33,8 +33,8 @@
 
 extern int          fh_trans(
 /*___________________________*/
-union geo_lab       *in_lab_u,
-union geo_lab       *outlab_u,
+struct coord_lab       *in_lab_u,
+struct coord_lab       *outlab_u,
 double              N,
 double              E,
 double              H,

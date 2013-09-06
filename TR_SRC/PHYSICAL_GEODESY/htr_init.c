@@ -25,7 +25,7 @@ int                      htr_init(
 /*______________________________*/
 struct coord_lab        *i_clb,
 struct coord_lab        *o_clb,
-union  geo_lab          *htr_lab,
+struct coord_lab          *htr_lab,
 struct htr_c_str        *htr_const,
 char                    *dh_table_name,
 char                    *dh_tr_info
@@ -33,7 +33,7 @@ char                    *dh_tr_info
 {
  
   //static THREAD_SAFE  short          sh_dtm = 0;
-  union  geo_lab        test_lab;
+  struct coord_lab   test_lab;
   char                *p_tp;
   int                   tr_type = HTRF_ILLEG_, l_inv;
   short                 p_no, i_hdtm, o_hdtm, rgn;
@@ -133,20 +133,20 @@ char                    *dh_tr_info
       
       htr_def=DEF_DATA->hth_entries+(n_hth++);
 	
-      (void) conv_lab(htr_def->from_mlb, &test_lab, "");
-      if (test_lab.u_c_lab.lab_type == 1) {
+      conv_w_crd(htr_def->from_mlb, &test_lab);
+      if (test_lab.lab_type == 1) {
       
-        l_inv = test_lab.u_c_lab.h_dtm == o_hdtm;
-        if (test_lab.u_c_lab.h_dtm == i_hdtm || l_inv) {
+        l_inv = test_lab.h_dtm == o_hdtm;
+        if (test_lab.h_dtm == i_hdtm || l_inv) {
         
             if (!strcmp((l_inv) ? i_nm : o_nm, htr_def->to_dtm)) { // FOUND
               // The grid_val accepts NO height label part::
-              p_tp = test_lab.u_c_lab.mlb+test_lab.u_c_lab.sepix;
-              if (test_lab.u_c_lab.sepix+2 == test_lab.u_c_lab.h_ix)
-                *(test_lab.u_c_lab.mlb+test_lab.u_c_lab.sepix)   = '\0';
+              p_tp = test_lab.mlb+test_lab.sepix;
+              if (test_lab.sepix+2 == test_lab.h_ix)
+                *(test_lab.mlb+test_lab.sepix)   = '\0';
               else {
-                *(test_lab.u_c_lab.mlb+test_lab.u_c_lab.sepix)   = '_';
-                *(test_lab.u_c_lab.mlb+test_lab.u_c_lab.h_ix -1) = '\0';
+                *(test_lab.mlb+test_lab.sepix)   = '_';
+                *(test_lab.mlb+test_lab.h_ix -1) = '\0';
               }
               htr_const->inv   = l_inv;
               *htr_lab         = test_lab;
@@ -190,13 +190,13 @@ char                    *dh_tr_info
          
            strncpy(dh_tr_info, "Not available.",127); 
         }
-      } else test_lab.u_c_lab.lab_type = STP_LAB;
-    } while (test_lab.u_c_lab.lab_type != STP_LAB && tr_type <= 0 && n_hth<DEF_DATA->n_hth);
+      } else test_lab.lab_type = STP_LAB;
+    } while (test_lab.lab_type != STP_LAB && tr_type <= 0 && n_hth<DEF_DATA->n_hth);
   }
 
   if (tr_type < 0) {
-    htr_lab->u_c_lab.h_dtm    = 0;
-    htr_lab->u_c_lab.lab_type = ILL_LAB;
+    htr_lab->h_dtm    = 0;
+    htr_lab->lab_type = ILL_LAB;
   }
 
   return(tr_type);

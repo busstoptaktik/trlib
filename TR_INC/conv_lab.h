@@ -40,6 +40,9 @@ union geo_lab                  *g_lab,
   ...
 );
 
+int conv_w_crd(char *mlb, struct coord_lab *c_lab);
+int conv_w_tab(char *mlb, struct gde_lab *t_lab);
+
 /* conv_lab(name, lab) converts the name of a lab to the lab   */
 /*    result ==  -2     : def_prj.txt file not correct content */
 /*    result ==  -1     : def_prj.txt file not found           */

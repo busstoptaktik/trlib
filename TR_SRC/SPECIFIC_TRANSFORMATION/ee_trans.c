@@ -60,8 +60,8 @@ static char          *ACTION[] = {
 
 int                    ee_trans(
 /*___________________________*/
-union geo_lab       *in_lab_u,
-union geo_lab       *outlab_u,
+struct coord_lab      *in_lab,
+struct coord_lab       *outlab,
 double               N,
 double               E,
 double               H,
@@ -84,13 +84,12 @@ FILE                *tr_error
   int                      nst, gst, act, level;
   int                      result = 0, res = 0;
 
-  struct coord_lab        *in_lab = &(in_lab_u->u_c_lab);
-  struct coord_lab        *outlab = &(outlab_u->u_c_lab);
+  
 
-  static union geo_lab     TC_u35;
-  static union geo_lab     TC_eetm;
-  static union geo_lab     TC_eold;
-  static union geo_lab     TC_elmn;
+  static struct coord_lab   TC_u35;
+  static struct coord_lab   TC_eetm;
+  static struct coord_lab   TC_eold;
+  static struct coord_lab   TC_elmn;
 
 
   /* minilabels */
@@ -189,10 +188,10 @@ FILE                *tr_error
 
   if (init == 0) {
     /* Internal wrk-labels */
-    act = (conv_lab("eetm27",        &TC_eetm, "") == CRD_LAB
-       &&  conv_lab("tm27_eeold42",  &TC_eold, "") == CRD_LAB
-       &&  conv_lab("eelmne",        &TC_elmn, "") == CRD_LAB
-       &&  conv_lab("utm35_euref89", &TC_u35,  "") == CRD_LAB);
+    act = (conv_w_crd("eetm27",        &TC_eetm) == CRD_LAB
+       &&  conv_w_crd("tm27_eeold42",  &TC_eold) == CRD_LAB
+       &&  conv_w_crd("eelmne",        &TC_elmn) == CRD_LAB
+       &&  conv_w_crd("utm35_euref89", &TC_u35) == CRD_LAB);
 
     /* State/action table size and width */
     ee_z = sizeof(gr_tab)/sizeof(struct act_nst);

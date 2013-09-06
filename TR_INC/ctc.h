@@ -33,8 +33,8 @@
 
 extern int            ctc(
 /*______________________*/
-union geo_lab         *i_lab_u,
-union geo_lab         *o_lab_u,
+struct coord_lab         *i_lab_u,
+struct coord_lab         *o_lab_u,
 double                Xi,
 double                Yi,
 double                Zi,

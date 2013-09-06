@@ -22,7 +22,7 @@
 
 int                       gtc(
 /*__________________________*/
-union geo_lab            *g_lab,
+struct coord_lab           *c_lab,
 int                       direct,
 double                    B,
 double                    L,
@@ -83,7 +83,7 @@ errors    KE JAN 2001.
 
 {
 
-  struct coord_lab         *c_lab = &(g_lab->u_c_lab);
+
   double                   a, f, e2;
   int                      i, s, h, res = 0;
   double                   Cx, Cy, Cz, Co;

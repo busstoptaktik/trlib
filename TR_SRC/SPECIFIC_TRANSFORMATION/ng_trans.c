@@ -38,8 +38,8 @@
 
 int                    ng_trans(
 /*___________________________*/
-union geo_lab       *in_lab_u,
-union geo_lab       *outlab_u,
+struct coord_lab     *in_lab,
+struct coord_lab     *outlab,
 double               N_in,
 double               E_in,
 double               H_in,
@@ -65,8 +65,7 @@ FILE                *tr_error
   int                      res = 0, ies = 0;
   double                   N, E, H, N_g, E_g, val[3];
 
-  struct coord_lab        *in_lab = &(in_lab_u->u_c_lab);
-  struct coord_lab        *outlab = &(outlab_u->u_c_lab);
+
 
   struct nr_mlb {
     short        trgr;
@@ -128,7 +127,7 @@ FILE                *tr_error
       /* State/action table size and width */
       ng_z = sizeof(ngtab)/sizeof(struct act_nst);
       ng_w = (int) sqrt(1.0000001*ng_z);
-      (void) conv_lab("geo_nad83g", &w_lab, "");
+      (void) conv_w_crd("geo_nad83g", &w_lab);
       init = (res > 0) && (ng_z == ng_w*ng_w);
       if (!init)
         return(t_status(

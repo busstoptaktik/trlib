@@ -55,8 +55,8 @@
 
 int                    fe_trans(
 /*___________________________*/
-union geo_lab       *in_lab_u,
-union geo_lab       *outlab_u,
+struct coord_lab        *in_lab,
+struct coord_lab        *outlab,
 double              N,
 double              E,
 double              H,
@@ -80,13 +80,10 @@ FILE                *tr_error
   int                      nst, gst, act;
   int                      res = 0, ies = 0;
 
-  struct coord_lab        *in_lab = &(in_lab_u->u_c_lab);
-  struct coord_lab        *outlab = &(outlab_u->u_c_lab);
-
-  static union geo_lab     TC_u29;
-  static union geo_lab     TC_fke;
-  static union geo_lab     TC_u50;
-  static union geo_lab     TC_f54;
+  static struct coord_lab     TC_u29;
+  static struct coord_lab     TC_fke;
+  static struct coord_lab     TC_u50;
+  static struct coord_lab     TC_f54;
 
   /* minilabels */
 
@@ -250,10 +247,10 @@ FILE                *tr_error
 
     if (init == 0) {
       /* Internal wrk-labels */
-      init = (conv_lab("utm29_etrs89", &TC_u29, "") == CRD_LAB
-          &&  conv_lab("fke",          &TC_fke, "") == CRD_LAB
-          &&  conv_lab("fu50",         &TC_u50, "") == CRD_LAB
-          &&  conv_lab("fk54",         &TC_f54, "") == CRD_LAB);
+      init = (conv_w_crd("utm29_etrs89", &TC_u29) == CRD_LAB
+          &&  conv_w_crd("fke",          &TC_fke) == CRD_LAB
+          &&  conv_w_crd("fu50",         &TC_u50) == CRD_LAB
+          &&  conv_w_crd("fk54",         &TC_f54) == CRD_LAB);
       /* State/action table size and width */
       fe_z = sizeof(fetab)/sizeof(struct act_nst);
       fe_w = (int) sqrt(1.0000001*fe_z);
@@ -289,7 +286,7 @@ FILE                *tr_error
       /* Datum and region check */
       switch (outgr) {
       case 0: /* Datum check */
-        if (outlab->datum != TC_u29.u_c_lab.datum) {
+        if (outlab->datum != TC_u29.datum) {
           switch(outlab->datum) {
           case  13: /* fd54 */
           case 142: /* fg54 */
@@ -312,7 +309,7 @@ FILE                *tr_error
         break;
 
       case 1: /* Region check */
-        /* NOT needed: set in conv_lab 
+        /* NOT needed: set in conv_w_crd 
         if (outlab->p_rgn != TC_fke.p_rgn)
            res = TRF_ILLEG_; */
         break;
@@ -353,7 +350,7 @@ FILE                *tr_error
       /* Datum and region check */
       switch (in_gr) {
       case 0: /* Datum check */
-        if (in_lab->datum != TC_u29.u_c_lab.datum) {
+        if (in_lab->datum != TC_u29.datum) {
           switch(in_lab->datum) {
           case  13: /* fd54 */
           case 142: /* fg54 */
@@ -376,7 +373,7 @@ FILE                *tr_error
         break;
 
       case 1: /* Region check */
-        /* NOT needed: set in conv_lab 
+        /* NOT needed: set in conv_w_crd 
         if (in_lab->p_rgn != TC_fke.p_rgn)
            res = TRF_ILLEG_; */
         break;

@@ -29,7 +29,7 @@
 extern int       fputshpprj(
 /*________________________*/
 FILE            *fh_out,
-union geo_lab   *g_lab);
+struct coord_lab   *g_lab);
 
 /* fputshpprj writes the .prj file to a shape file
    from the geo_lab.

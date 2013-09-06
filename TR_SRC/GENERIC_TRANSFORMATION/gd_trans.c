@@ -54,8 +54,8 @@ TEST */
 
 int                        gd_trans(
 /*________________________________*/
-union geo_lab            *i_lab,
-union geo_lab            *o_lab,
+struct coord_lab            *i_lab,
+struct coord_lab            *o_lab,
 double                    N_in,
 double                    E_in,
 double                    H_in,
@@ -71,8 +71,8 @@ FILE                     *tr_error
 {
 
   static THREAD_SAFE  int      (*dfb_trf)(
-    union geo_lab      *in_lab,
-    union geo_lab      *outlab,
+    struct coord_lab      *in_lab,
+    struct coord_lab      *outlab,
     double              N,    double   E,    double   H,
     double             *Nout, double  *Eout, double  *Hout,
     char               *usertxt,
@@ -81,18 +81,18 @@ FILE                     *tr_error
 
   char                        err_txt[1024];
                                        /* grid systems geoid/table */
-  static THREAD_SAFE  union geo_lab    H0_lab, H1_lab;
-  static THREAD_SAFE  union geo_lab    H2_lab, H3_lab; /* grid cstm dh*/
-  static THREAD_SAFE  union geo_lab   *i_Rlab;  /* beg REG of ETPL  */
-  static THREAD_SAFE  union geo_lab   *G_Rlab;  /* end REG of E geoid */
-  static THREAD_SAFE  union geo_lab   *T_Rlab;  /* end REG of ETPL dh */
-  static THREAD_SAFE  union geo_lab   *O_Rlab;  /* end REG of ETPL tr */
-  static THREAD_SAFE  union geo_lab   *i_Nlab;  /* beg NON of ETPL  */
-  static THREAD_SAFE  union geo_lab   *G_Nlab;  /* end NON of E geoid */
-  static THREAD_SAFE  union geo_lab   *T_Nlab;  /* end NON of ETPL dh */
-  static THREAD_SAFE  union geo_lab   *O_Nlab;  /* end NON of ETPL tr */
-  static THREAD_SAFE  union geo_lab    t_lab;   /* non-reg gateway */
-  static THREAD_SAFE  union geo_lab    g_lab;   /* geo_* PRE/ANT   */
+  static THREAD_SAFE  struct coord_lab    H0_lab, H1_lab;
+  static THREAD_SAFE  struct coord_lab    H2_lab, H3_lab; /* grid cstm dh*/
+  static THREAD_SAFE  struct coord_lab   *i_Rlab;  /* beg REG of ETPL  */
+  static THREAD_SAFE  struct coord_lab   *G_Rlab;  /* end REG of E geoid */
+  static THREAD_SAFE  struct coord_lab   *T_Rlab;  /* end REG of ETPL dh */
+  static THREAD_SAFE  struct coord_lab   *O_Rlab;  /* end REG of ETPL tr */
+  static THREAD_SAFE  struct coord_lab   *i_Nlab;  /* beg NON of ETPL  */
+  static THREAD_SAFE  struct coord_lab   *G_Nlab;  /* end NON of E geoid */
+  static THREAD_SAFE  struct coord_lab   *T_Nlab;  /* end NON of ETPL dh */
+  static THREAD_SAFE  struct coord_lab   *O_Nlab;  /* end NON of ETPL tr */
+  static THREAD_SAFE  struct coord_lab    t_lab;   /* non-reg gateway */
+  static THREAD_SAFE  struct coord_lab    g_lab;   /* geo_* PRE/ANT   */
 
   static THREAD_SAFE  struct mgde_str *s_grid_tab = NULL;
   static THREAD_SAFE  struct mgde_str  h_grid_tab;
@@ -108,15 +108,15 @@ FILE                     *tr_error
   static THREAD_SAFE  char             o_sep, nonp_o[4];
 
   static THREAD_SAFE  struct coord_lab    *i_clb, *o_clb;
-  struct coord_lab           *H_clb  = &(H0_lab.u_c_lab);
-  struct coord_lab           *H1_clb = &(H1_lab.u_c_lab);
-  struct coord_lab           *t_clb  = &(t_lab.u_c_lab);
+  struct coord_lab           *H_clb  = &(H0_lab);
+  struct coord_lab           *H1_clb = &(H1_lab);
+  struct coord_lab           *t_clb  = &(t_lab);
 
-  union geo_lab              *i_wlab = NULL;  /* begin REG of ETPL  */
-  union geo_lab              *o_wlab = NULL;  /* end   REG of ETPL  */
-  union geo_lab             **o_nlab = NULL;  /* end   REG of ETPL  */
-  union geo_lab             **o_rlab = NULL;  /* end   REG of ETPL  */
-  union geo_lab               w_lab;   /* work label         */
+  struct coord_lab              *i_wlab = NULL;  /* begin REG of ETPL  */
+  struct coord_lab              *o_wlab = NULL;  /* end   REG of ETPL  */
+  struct coord_lab             **o_nlab = NULL;  /* end   REG of ETPL  */
+  struct coord_lab             **o_rlab = NULL;  /* end   REG of ETPL  */
+  struct coord_lab               w_lab;   /* work label         */
   struct coord_lab           *w_oclb;
   union rgn_un                rgn_DE, rgn_EE, rgn_GR;
 
@@ -226,24 +226,24 @@ FILE                     *tr_error
 
   /* Init of tables */
   /*________________*/
-  if (i_clb      != &(i_lab->u_c_lab) ||
-      i_chsum    !=  (i_lab->u_c_lab).ch_tsum ||
+  if (i_clb      != &(i_lab) ||
+      i_chsum    !=  (i_lab).ch_tsum ||
       s_grid_tab != grid_tab ||
       ((s_req_tv) ? (req_gh == 0 ||
                      strcmp(grid_tab->table_u[0].clb, H_clb->mlb))
                   : (req_gh  != s_req_gh ||
-                     o_clb   != &(o_lab->u_c_lab) ||
-                     o_chsum != (o_lab->u_c_lab).ch_tsum ||
+                     o_clb   != &(o_lab) ||
+                     o_chsum != (o_lab).ch_tsum ||
                      ((req_gh > 0) &&
                       grid_tab->table_u[0].lab_type != GDE_LAB)))) {
 
     if (grid_tab->init != 0 && grid_tab->init != 1)
         grid_tab->init = 0;
     i_chsum    = o_chsum = 0;
-    i_clb      = &(i_lab->u_c_lab);
+    i_clb      = &(i_lab);
     s_grid_tab = grid_tab;
     s_req_gh   = req_gh;
-    o_clb      = &(o_lab->u_c_lab);
+    o_clb      = &(o_lab);
     s_req_tv   = (grid_tab->init == 1) &&
                   grid_tab->table_u[0].lab_type != (short) GDE_LAB;
     s_lev      = (s_req_tv) ? 0 : 3;
@@ -302,7 +302,7 @@ FILE                     *tr_error
       switch (b_lev) {
       case 0:
         if (s_req_tv) {
-          (void) conv_lab(grid_tab->table_u[0].clb, &H0_lab, "");
+          (void) conv_w_crd(grid_tab->table_u[0].clb, &H0_lab);
           if (128 <= H_clb->datum && H_clb->datum <= 129) {
             H1_lab = H0_lab;
             (void) strcpy(H1_clb->mlb, "s34");
@@ -329,8 +329,8 @@ FILE                     *tr_error
                                 rgn_p, "geoEeuref89");
             } else
               (void) strcpy(dstr, "geoEeuref89");
-            (void) conv_lab(dstr, i_wlab, "");
-            (void) conv_lab("EE_geoEeuref89", o_wlab, "");
+            (void) conv_w_crd(dstr, i_wlab);
+            (void) conv_w_crd("EE_geoEeuref89", o_wlab);
           } else {
             if (i_clb->imit == FHMASK || o_clb->imit == FHMASK) {
               /* USE: fehmarngeoid10.bin */
@@ -355,7 +355,7 @@ FILE                     *tr_error
               t_status(tr_error, "",
                        "gd_trans(unintelligible labels)", TRF_GEOID_));
             }
-            (void) conv_lab(grid_tab->table_u[0].clb, &H0_lab, "");
+            (void) conv_w_crd(grid_tab->table_u[0].clb, &H0_lab);
           }
           G_Nlab = &H0_lab;
         }
@@ -373,7 +373,7 @@ FILE                     *tr_error
         if (i_clb->h_dtm == 0) s_req_dh = -7;
         else {
           s_req_dh = htr_init(i_clb, o_clb, &H2_lab,
-                              &htr_const, H3_lab.u_c_lab.mlb, dstr);
+                              &htr_const, H3_lab.mlb, dstr);
           if (s_req_dh < 0) { /* ILLEGAL */
             return((tr_error==NULL) ? TRF_ILLEG_ :
                     t_status(tr_error, "",
@@ -383,19 +383,19 @@ FILE                     *tr_error
         switch(s_req_dh) {
         case 1: // DH_TAB height transformation
           if (h_grid_tab.init == 1 &&
-             strcmp(H3_lab.u_c_lab.mlb, h_grid_tab.table_u[0].mlb) != 0)
+             strcmp(H3_lab.mlb, h_grid_tab.table_u[0].mlb) != 0)
             (void) geoid_c(&h_grid_tab, 0, NULL);
 
           if (h_grid_tab.init == 0) {
-            res = geoid_i(H3_lab.u_c_lab.mlb,
+            res = geoid_i(H3_lab.mlb,
                           DHH_LAB, &h_grid_tab, usertxt);
             if (res < 0) return(res);
           }
            
-          if (128 <= H2_lab.u_c_lab.datum
-                  && H2_lab.u_c_lab.datum <= 129) {
+          if (128 <= H2_lab.datum
+                  && H2_lab.datum <= 129) {
             H3_lab = H2_lab;
-            (void) strcpy(H3_lab.u_c_lab.mlb, "s34");
+            (void) strcpy(H3_lab.mlb, "s34");
             T_Nlab = &H3_lab;
           }
           else T_Nlab = &H2_lab;
@@ -422,7 +422,7 @@ FILE                     *tr_error
         o_rlab = &O_Rlab;
         break;
       }
-      w_oclb  = &((*o_rlab)->u_c_lab);
+      w_oclb  = &((*o_rlab));
 
       if (sta[b_lev] != stp[b_lev]) continue;
 
@@ -507,21 +507,21 @@ FILE                     *tr_error
 
       case DKMASK: /* dk_trans */
       case EDMASK: /* dk_trans */
-        init = (short) ((conv_lab("DK_tcgeo_ed50", &t_lab,"")==CRD_LAB)
-                     && (conv_lab("DK_geo_ed50",  &g_lab,"")==CRD_LAB));
+        init = (short) ((conv_w_crd("DK_tcgeo_ed50", &t_lab)==CRD_LAB)
+                     && (conv_w_crd("DK_geo_ed50",  &g_lab)==CRD_LAB));
         dfb_trf = dk_trans;
         break;
 
       case FEMASK: /* fe_trans */
-        init    = (short) conv_lab("FO_utm29_etrs89", &t_lab,"")==CRD_LAB;
+        init    = (short) conv_w_crd("FO_utm29_etrs89", &t_lab)==CRD_LAB;
         /* utm29_etrs89 => nonp_i/o must be zero */
         if ((R_N == REG_NON || R_N == NON_NON) && w_oclb->cstm == 1) {
           (void) sprintf(dstr, "geoE%s", w_oclb->mlb+4);
-          init &= (short) conv_lab(dstr, &g_lab,"")==CRD_LAB;
+          init &= (short) conv_w_crd(dstr, &g_lab)==CRD_LAB;
           if (i_clb->cstm == 1) {
             /* WARN: ONLY POSSIBLE when no gh */
             (void) sprintf(dstr, "geoE%s", i_clb->mlb+4);
-            init &= (short) conv_lab(dstr, &t_lab,"")==CRD_LAB;
+            init &= (short) conv_w_crd(dstr, &t_lab)==CRD_LAB;
             if (req_gh) return((tr_error==NULL) ? TRF_ILLEG_ :
               t_status(tr_error, usertxt,
                        "geoid NOT posible", TRF_ILLEG_));
@@ -529,28 +529,28 @@ FILE                     *tr_error
         } else
         if ((R_N == NON_REG || R_N == NON_NON) && i_clb->cstm == 1) {
           (void) sprintf(dstr, "geoE%s", i_clb->mlb+4);
-          init &= (short) conv_lab(dstr, &g_lab,"")==CRD_LAB;
+          init &= (short) conv_w_crd(dstr, &g_lab)==CRD_LAB;
         }
         else g_lab = t_lab;
         dfb_trf = fe_trans;
         break;
 
       case NGMASK: /* ng_trans */
-        init    = (short) conv_lab("GR_geo_gr96", &t_lab,"") == CRD_LAB;
+        init    = (short) conv_w_crd("GR_geo_gr96", &t_lab) == CRD_LAB;
         if ((R_N == NON_REG && i_clb->datum != 62) ||
             (R_N == REG_NON && w_oclb->datum != 62)) g_lab = t_lab;
         else
-        init   &= (short) conv_lab("GR_geo_nad83g", &g_lab,"")==CRD_LAB;
+        init   &= (short) conv_w_crd("GR_geo_nad83g", &g_lab)==CRD_LAB;
         dfb_trf = ng_trans;
         break;
 
       case EEMASK: /* ee_trans */
-        init = (short) conv_lab("EE_utm35_euref89", &t_lab,"")==CRD_LAB;
+        init = (short) conv_w_crd("EE_utm35_euref89", &t_lab)==CRD_LAB;
         dfb_trf = ee_trans;
         break;
 
       case FHMASK: /* fh_trans */
-        init = (short) conv_lab("DK_geo_feh10", &t_lab,"") == CRD_LAB;
+        init = (short) conv_w_crd("DK_geo_feh10", &t_lab) == CRD_LAB;
         /* Here o_clb must be used: to get the correct limits! */
         i_clb->date  = (i_clb->datum == 33 || o_clb->datum == 33)
                      ? 0.0 : 200.0;
@@ -569,7 +569,7 @@ FILE                     *tr_error
       } /* end rs switch */
 
 #ifdef DEBUGGDTRANS
-	(void) lord_debug(0, LORD("rs = %d, nonp = %d, %d, t,g=%s,%s;"), rs, nonp_i[b_lev], nonp_o[b_lev], t_clb->mlb, (g_lab.u_c_lab).mlb);
+	(void) lord_debug(0, LORD("rs = %d, nonp = %d, %d, t,g=%s,%s;"), rs, nonp_i[b_lev], nonp_o[b_lev], t_clb->mlb, (g_lab).mlb);
 #endif
       switch(R_N) {
       case REG_REG : /* reg->reg */
@@ -748,7 +748,7 @@ FILE                     *tr_error
             res           = i_clb->ch_hsum;
             ies           = i_clb->ch_tsum;
             i_clb->region = 0;
-            rs            = labchsum(i_lab, &i_clb->ch_sum);
+            rs            = labchsum((union geo_lab*) i_lab, &i_clb->ch_sum);
             if (rs == w_oclb->ch_sum) {
               sta[b_lev] = IDT;
               stp[b_lev] = IDT;
@@ -885,7 +885,7 @@ FILE                     *tr_error
         /*_____________________*/
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("case 0: CRT -> GEO"));
-	(void) lord_debug(0, LORD("   %s;"), (g_lab.u_c_lab).mlb);
+	(void) lord_debug(0, LORD("   %s;"), (g_lab).mlb);
 	(void) lord_debug(0, LORD(" %7.2f  %7.2f   %7.2f;"), N, E, H);
 #endif
         ies = gtc(&g_lab, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
@@ -903,7 +903,7 @@ FILE                     *tr_error
         /*______________________________*/
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("case 1: NON -> PRJ"));
-	(void) lord_debug(0, LORD("   %s -> %s;"), (i_Nlab->u_c_lab).mlb, (i_wlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("   %s -> %s;"), (i_Nlab).mlb, (i_wlab).mlb);
 	(void) lord_debug(0, LORD(" %7.2f  %7.2f   %7.2f;"), N, E, H);
 #endif
         ies = (*dfb_trf)(i_Nlab, i_wlab,
@@ -922,7 +922,7 @@ FILE                     *tr_error
         /*______________________________*/
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("\n*case 2: PRJ -> GEO"));
-	(void) lord_debug(0, LORD("   %s;"), (i_Rlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("   %s;"), (i_Rlab).mlb);
 #endif
         ies = ptg(i_Rlab, +1, N, E, &N, &E, usertxt, tr_error);
         if (ptp[lev]) action += 3;
@@ -933,7 +933,7 @@ FILE                     *tr_error
         /*_____________________*/
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("\n*case 3: GEO -> CRT"));
-	(void) lord_debug(0, LORD("   %s;"), (i_Rlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("   %s;"), (i_Rlab).mlb);
 	(void) lord_debug(0, LORD("\n*  %10.5f  %10.5f    %8.5f  %8.5f;"), N, E, N*180.0/M_PI, E*180.0/M_PI);
 #endif
         if (req_th < 0 && stp[3] == GTC) { /* dh from 3D table_trf */
@@ -947,7 +947,7 @@ FILE                     *tr_error
         /*______________________*/
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("case 4: CRT -> CRT"));
-	(void) lord_debug(0, LORD("   %s -> %s;"), (i_Rlab->u_c_lab).mlb, (o_wlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("   %s -> %s;"), (i_Rlab).mlb, (o_wlab).mlb);
 #endif
         if (iEhr) {
           (void) gtc(i_lab, -1, N, E, H, &NN, &EE, &HH, "", NULL);
@@ -962,7 +962,7 @@ FILE                     *tr_error
         /*_____________________*/
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("case 5: CRT -> GEO"));
-	(void) lord_debug(0, LORD("   %s;"), (o_wlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("   %s;"), (o_wlab).mlb);
 #endif
         ies = gtc(o_wlab, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
         break;
@@ -972,7 +972,7 @@ FILE                     *tr_error
         if (!nonp_o[lev]) {
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("case 6: GEO -> PRJ"));
-	(void) lord_debug(0, LORD("   %s;"), (o_wlab->u_c_lab).mlb);
+	(void) lord_debug(0, LORD("   %s;"), (o_wlab).mlb);
 #endif
           ies = ptg(o_wlab, -1, N, E, &N, &E, usertxt, tr_error);
         }
@@ -983,7 +983,7 @@ FILE                     *tr_error
 #ifdef DEBUGGDTRANS
   (void) fprintf(stdout, "case 7: PRJ -> NON");
   (void) fprintf(stdout, "   %s -> %s;",
-         (i_Nlab->u_c_lab).mlb, (i_wlab->u_c_lab).mlb);
+         (i_Nlab).mlb, (i_wlab).mlb);
   (void) fprintf(stdout, "  %10.5f  %10.5f    %8.5f  %8.5f  %6.2f;",
   N, E, N*180.0/M_PI, E*180.0/M_PI, H);
 #endif
@@ -1002,7 +1002,7 @@ FILE                     *tr_error
         /*_____________________*/
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("case 8: GEO -> CRT"));
-	(void) lord_debug(0, LORD("   %s;"), (g_lab.u_c_lab).mlb);
+	(void) lord_debug(0, LORD("   %s;"), (g_lab).mlb);
 	(void) lord_debug(0, LORD(" %10.5f  %10.5f    %8.5f  %8.5f  %6.2f;"), N, E, N*180.0/M_PI, E*180.0/M_PI, H);
 #endif
         if (oEhr == 1) {

@@ -33,7 +33,7 @@
 
 extern int                gtc(
 /*__________________________*/
-union geo_lab             *g_lab,
+struct coord_lab             *g_lab,
 int                       direct,
 double                    B,
 double                    L,
@@ -59,7 +59,7 @@ Return value
         1<<2 => tolerance exceeded.
         -1   => severe error, gtc cannot work.
 
-g_lab       (call)           union geo_lab
+g_lab       (call)           struct coord_lab
 The geo_lab union must contain a a coordinate label. Only the
 type ( == 1), the init (== 1), the semi major-axis and the
 flattening are used, but the imit-mask may be necessary.

@@ -44,7 +44,7 @@
  
 #include "geo_lab.h"
  
- int sputshpprj(char *wkt_out, union geo_lab *g_lab);
+ int sputshpprj(char *wkt_out, struct coord_lab *g_lab);
 
 #endif
 

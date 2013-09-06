@@ -33,7 +33,7 @@
 
 extern int               h_trans(
 /*_____________________________*/
-union geo_lab           *i_lab,
+struct coord_lab           *i_lab,
 short                    oh_dtm,
 double                   B_in,
 double                   L_in,

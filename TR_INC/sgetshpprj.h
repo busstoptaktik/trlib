@@ -23,7 +23,7 @@
  int              sgetshpprj(
 /*______________________*/
 char            *wkt_in,
-union geo_lab   *g_lab,
+struct coord_lab   *g_lab,
 char            *mlb_out);
 
 #endif

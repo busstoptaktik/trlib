@@ -37,8 +37,8 @@
 
 extern int                 gd_trans(
 /*________________________________*/
-union geo_lab            *i_lab,
-union geo_lab            *o_lab,
+struct coord_lab            *i_lab,
+struct coord_lab            *o_lab,
 double                    N_in,
 double                    E_in,
 double                    H_in,
@@ -112,7 +112,7 @@ transformation in the chain is checked.
 
 Parameters:
 
-*i_lab_u, *o_lab_u         (call & return)          union geo_lab
+*i_lab_u, *o_lab_u         (call & return)          struct coord_lab
 Geo_labels describing the input system and the output system generated
 by conv_lab.
 */

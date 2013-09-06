@@ -43,8 +43,8 @@
 
 int                    fh_trans(
 /*___________________________*/
-union geo_lab       *in_lab_u,
-union geo_lab       *outlab_u,
+struct coord_lab       *in_lab,
+struct coord_lab       *outlab,
 double              N,
 double              E,
 double              H,
@@ -66,8 +66,6 @@ FILE                *tr_error
   int                      outnr = 0, fh_z, RES = 0, IES = 0;
   int                      act, nst, res = 0, ies = 0, rrs = 0;
   struct typ_dec           tpd;
-  struct coord_lab        *in_lab = &(in_lab_u->u_c_lab);
-  struct coord_lab        *outlab = &(outlab_u->u_c_lab);
 
   struct act_nst {
     short     action;
@@ -162,12 +160,12 @@ FILE                *tr_error
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
            ies = (tr_error==NULL) ? TRF_AREA_ :
                   t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
-        res = ptg(outlab_u, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(outlab, -1, N, E, &N, &E, usertxt, tr_error);
         *Nout = N;
         *Eout = E;
         break;
       case PTG: /* prj -> geo */
-        res = ptg(in_lab_u, +1, N, E, &N, &E,  usertxt, tr_error);
+        res = ptg(in_lab, +1, N, E, &N, &E,  usertxt, tr_error);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
            ies = (tr_error==NULL) ? TRF_AREA_ :
                   t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
@@ -178,13 +176,13 @@ FILE                *tr_error
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
            ies = (tr_error==NULL) ? TRF_AREA_ :
                   t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
-        res   = gtc(in_lab_u, +1, N, E, H, &N, &E, &H, usertxt, tr_error);
+        res   = gtc(in_lab, +1, N, E, H, &N, &E, &H, usertxt, tr_error);
         *Nout = N;
         *Eout = E;
         *Hout = H;
         break;
       case CTG: /* crt -> geo */
-        res = gtc(outlab_u, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
+        res = gtc(outlab, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
            ies = (tr_error==NULL) ? TRF_AREA_ :
                   t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
@@ -195,12 +193,12 @@ FILE                *tr_error
       case TSP: /* prj -> prj */
         *Nout = N;
         *Eout = E;
-        res = ptg(in_lab_u, +1, N, E, &N, &E,  usertxt, tr_error);
+        res = ptg(in_lab, +1, N, E, &N, &E,  usertxt, tr_error);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
            ies = (tr_error==NULL) ? TRF_AREA_ :
                   t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
-        if (in_lab_u->u_c_lab.cstm != outlab_u->u_c_lab.cstm) {
-          rrs   = ptg(outlab_u, -1, N, E, &N, &E,  usertxt, tr_error); 
+        if (in_lab->cstm != outlab->cstm) {
+          rrs   = ptg(outlab, -1, N, E, &N, &E,  usertxt, tr_error); 
           if (rrs < res) res = rrs;
           *Nout = N;
           *Eout = E;

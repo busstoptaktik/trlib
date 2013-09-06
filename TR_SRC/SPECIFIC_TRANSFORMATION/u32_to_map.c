@@ -114,7 +114,7 @@ char           kvartstg[20])
   char       *p_k;
   int         ch;
 
-  union     geo_lab    i_reg, o_reg;
+  struct coord_lab     i_reg, o_reg;
 
   /* Følgende variable er tilføjet d. 24/07/00 for at kunne hånd- */
   /* tere ny version af gd_trans til erstatning af unitrans. frs. */
@@ -145,16 +145,16 @@ char           kvartstg[20])
 
 /* ind_label er altid u32 */
 
-  if (conv_lab(inlab, &i_reg, "") == ILL_LAB) {
-      (void) lord_error(0, LORD("label ej kendt (conv_lab), %s"), inlab);
+  if (conv_w_crd(inlab, &i_reg) == ILL_LAB) {
+      (void) lord_error(0, LORD("label ej kendt (conv_w_crd), %s"), inlab);
      exit(0);
    }
 
   if (e < 790000.0) {
     (void) strcpy(outlab, "gs");
 
-    if (conv_lab(outlab, &o_reg, "") == ILL_LAB) {
-      (void) lord_error(0, LORD("label ej kendt (conv_lab), %s"), outlab);
+    if (conv_w_crd(outlab, &o_reg) == ILL_LAB) {
+      (void) lord_error(0, LORD("label ej kendt (conv_w_lab), %s"), outlab);
       exit(0);
     }
     retur = gd_trans(&i_reg, &o_reg, n, e, 0.0, &y_ud, &x_ud, &dummy, 
@@ -262,8 +262,8 @@ char           kvartstg[20])
     */
     (void) strcpy(outlab, "utm33_ed50");
 
-    if (conv_lab(outlab, &o_reg, "") == ILL_LAB) {
-      (void) lord_error(0, LORD("label ej kendt (conv_lab), %s"), outlab);
+    if (conv_w_crd(outlab, &o_reg) == ILL_LAB) {
+      (void) lord_error(0, LORD("label ej kendt (conv_w_crd), %s"), outlab);
       return(-1);
     }
 

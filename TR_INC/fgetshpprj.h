@@ -34,7 +34,7 @@
 extern int       fgetshpprj(
 /*________________________*/
 FILE            *fh_in,
-union geo_lab   *g_lab);
+struct coord_lab   *g_lab);
 
 /* fgetshpprj reads the .prj file to a shape file
    and sets the geo_lab accordingly.

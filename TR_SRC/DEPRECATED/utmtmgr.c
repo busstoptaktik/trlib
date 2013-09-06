@@ -72,7 +72,7 @@ int                  cif
     /* LAT and LNG */
     N1 = *N;
     E1 = *E;
-    (void) ptg(u_lab, 1, N1, E1, &B1, &L1, "mgrtest", stderr);
+    (void) ptg( u_lab, 1, N1, E1, &B1, &L1, "mgrtest", stderr);
 
     /* LAT-BELT letter */
     b   = (int) (B1*180.0/M_PI);

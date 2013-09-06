@@ -67,8 +67,8 @@
 
 int                   dk_trans(
 /*___________________________*/
-union geo_lab       *in_lab_a,
-union geo_lab       *outlab_a,
+struct coord_lab        *in_lab,
+struct coord_lab        *outlab,
 double               N,
 double               E,
 double               H,
@@ -94,11 +94,10 @@ FILE                *tr_error
   double  N32[] = {6219861.0,6146376.0,6122487.0,6109593.0,6033467.0};
   double  E32[] = { 641594.0, 617062.0, 622538.0, 627794.0, 622297.0};
 
-  struct coord_lab        *in_lab = &(in_lab_a->u_c_lab);
-  struct coord_lab        *outlab = &(outlab_a->u_c_lab);
+ 
 
   static THREAD_SAFE char  outcs[32], in_cs[32];
-  static union geo_lab     TC_u32, TC_u33, TC_tr2, TC__gs, TC_gsb;
+  static struct coord_lab      TC_u32, TC_u33, TC_tr2, TC__gs, TC_gsb;
 
 #ifdef   DEBUGDKTRANS
   static char          *ACTION[] = {
@@ -253,11 +252,11 @@ FILE                *tr_error
   };
 
   if (!TC_init) {
-    act = conv_lab("DK_tc32_ed50",  &TC_tr2, "") == 1
-        &&    conv_lab("DK_utm32_ed50", &TC_u32, "") == 1
-        &&    conv_lab("DK_utm33_ed50", &TC_u33, "") == 1
-        &&    conv_lab("DK_gs",         &TC__gs, "") == 1
-        &&    conv_lab("DK_gsb",        &TC_gsb, "") == 1;
+    act = conv_w_crd("DK_tc32_ed50",  &TC_tr2) == 1
+        &&    conv_w_crd("DK_utm32_ed50", &TC_u32) == 1
+        &&    conv_w_crd("DK_utm33_ed50", &TC_u33) == 1
+        &&    conv_w_crd("DK_gs",         &TC__gs) == 1
+        &&    conv_w_crd("DK_gsb",        &TC_gsb) == 1;
 
     ed_z    = sizeof(edtab)/sizeof(struct act_nst);
     ed_w    = (int) sqrt(1.0000001*ed_z);
@@ -319,7 +318,7 @@ FILE                *tr_error
 
     /* Datum actions */
     if (outgr == -1) {
-      if (outlab->datum == TC_u32.u_c_lab.datum) {
+      if (outlab->datum == TC_u32.datum) {
         outgr = 0;  // ed50
         outnr = 4;
 #ifdef DEBUGDKTRANS
@@ -360,7 +359,7 @@ pml->trgr, pml->trnr, pml->s_lab, in_cs);
 
     /* Datum actions */
     if (in_gr == -1) {
-      if (in_lab->datum == TC_u32.u_c_lab.datum) {
+      if (in_lab->datum == TC_u32.datum) {
         in_gr = 0;  // ed50
         in_nr = 4;
 #ifdef DEBUGDKTRANS

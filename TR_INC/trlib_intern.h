@@ -25,34 +25,29 @@
 #include "geoid_d.h"
 
 /*Utility macros implemented in order the hide the detailed composition of a PR-object (which may change) */
-#define IS_CARTESIC(pr)           ((pr->plab->u_c_lab).cstm==1)
-#define IS_GEOGRAPHIC(pr)       ((pr->plab->u_c_lab).cstm==2)
-#define IS_TM(pr)                    ((pr->plab->u_c_lab).cstm==3)
-#define IS_MERCATOR(pr)          ((pr->plab->u_c_lab).cstm==4)
-#define GET_MLB(pr)                 ((pr->plab->u_c_lab).mlb)
-#define HAS_HEIGHTS(pr)          ((pr->plab->u_c_lab).h_dtm>200)
-#define IS_3D(pr)                     (pr!=NULL && (pr->plab->u_c_lab).ncoord==3)
-#define COORD_ORDER(pr)          ((pr->plab->u_c_lab).p_seq)
-#define GET_LAT0(pr)                ((pr->plab->u_c_lab).B0)
-#define GET_LON0(pr)                ((pr->plab->u_c_lab).L0)
-#define GET_X0(pr)                    ((pr->plab->u_c_lab).E0)
-#define GET_Y0(pr)                    ((pr->plab->u_c_lab).N0)
-#define GET_SCALE(pr)               ((pr->plab->u_c_lab).scale)
-/*#define GET_ZONE(pr)                ((pr->plab->u_c_lab).zone) - not stored here as expected (use function) */
-#define GET_DTM(pr)                  ((pr->plab->u_c_lab).datum)
-#define GET_PDTM(pr)                ((pr->plab->u_c_lab).p_dtm)
-#define GET_HDTM(pr)                ((pr->plab->u_c_lab).h_dtm)
+#define IS_CARTESIC(pr)           (pr->cstm==1)
+#define IS_GEOGRAPHIC(pr)       (pr->cstm==2)
+#define IS_TM(pr)                    (pr->cstm==3)
+#define IS_MERCATOR(pr)          (pr->cstm==4)
+#define GET_MLB(pr)                 (pr->mlb)
+#define HAS_HEIGHTS(pr)          (pr->h_dtm>200)
+#define IS_3D(pr)                     (pr!=NULL && (pr->ncoord==3))
+#define COORD_ORDER(pr)          (pr->p_seq)
+#define GET_LAT0(pr)                (pr->B0)
+#define GET_LON0(pr)                (pr->L0)
+#define GET_X0(pr)                    (pr->E0)
+#define GET_Y0(pr)                    (pr->N0)
+#define GET_SCALE(pr)               (pr->scale)
+#define GET_DTM(pr)                  (pr->datum)
+#define GET_PDTM(pr)                (pr->p_dtm)
+#define GET_HDTM(pr)                (pr->h_dtm)
 
 /*String length macros*/
 #define TR_MAX_FILENAME         (256)   /*Our definition of a max filename length which otherwise be os dependent */
 
-/*An internal PR-object (whose implementation might change). Reference counting can easily be implemented by adding a n_references field */
-struct PR_kms_str{
-   union geo_lab *plab;
-   double dgo[4]; /*space to be used by ptg_d for TM-projections. For other projections, the space can be used for other purposes.*/
-};
 
-typedef struct PR_kms_str PR;
+
+typedef struct coord_lab PR;
 
 
 struct TR_kms_str{
@@ -91,9 +86,9 @@ struct PLATE {
 int TR_GeoidTable(struct TR_kms_str *tr);
 int TR_SpecialGeoidTable(struct TR_kms_str *tr, char *geoid_name);
 int TR_IsMainThread(void);
-int TR_IsThreadSafe(union geo_lab *plab);
+int TR_IsThreadSafe(struct coord_lab *plab);
 int TR_tr(PR*,PR*, double*, double*, double*, double*, double*,double*, double*, int , int , struct mgde_str*); 
-int TR_itrf(union geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
+int TR_itrf(union  geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
 PR *TR_OpenProjection(char *mlb);
 void TR_CloseProjection(PR *proj);
 void TR_GetGeoidName(struct TR_kms_str *tr,char *name);

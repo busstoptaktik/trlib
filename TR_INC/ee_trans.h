@@ -33,8 +33,8 @@
 
 extern int         ee_trans(
 /*________________________*/
-union geo_lab      *in_lab_a,
-union geo_lab      *outlab_a,
+struct coord_lab      *in_lab_a,
+struct coord_lab      *outlab_a,
 double              N_in,
 double              E_in,
 double              H_in,
