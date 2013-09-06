@@ -55,7 +55,7 @@ FILE                *tr_error
   static THREAD_SAFE  int                 outchsum = 0L;
   static  int                 init = 0;
   static struct mtab3d_str   nadg_gr96_tab;
-  static union  geo_lab      w_lab;
+  static struct coord_lab     w_lab;
 
   char                     in_cs[MLBLNG], outcs[MLBLNG];
   char                    *p_str, err_str[512];
@@ -332,7 +332,7 @@ pml->trgr, pml->trnr, pml->s_lab);
 
       case  PTG: /* PRJ -> GEO */
         /*______________________________*/
-        ies = ptg(in_lab_u, +1, N, E, &N, &E,
+        ies = ptg(in_lab, +1, N, E, &N, &E,
                   "\nng_trans error:", tr_error);
         N_g = N;
         E_g = E;
@@ -344,7 +344,7 @@ pml->trgr, pml->trnr, pml->s_lab);
 
       case  GTP: /* GEO -> PRJ */
         /*______________________________*/
-        ies = ptg(outlab_u, -1, N, E, &N, &E,
+        ies = ptg(outlab, -1, N, E, &N, &E,
                   "\nng_trans error:", tr_error);
 #ifdef  DEBUGNGTRANS
 (void) lord_debug(0, LORD("\n*NG_TRANS ACTION  GTP:   %s, res=%d;"), outlab->mlb, ies);

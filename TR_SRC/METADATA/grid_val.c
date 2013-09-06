@@ -23,7 +23,7 @@
 
 int                       grid_val(
 /*_______________________________*/
-union  geo_lab           *c_lab_u,
+struct coord_lab         *crd_lab,
 struct mgde_str          *grid_table,
 double                    N,
 double                    E,
@@ -47,9 +47,6 @@ char                     *err_str
   int                        *victim  = &(grid_table->victim);
   int                        *tab_max = &(grid_table->tab_max); /* 1 */
   int                        *tab_nr  = &(grid_table->tab_nr);  /* 1 */
-
-  /* Labels and descriptors */
-  struct coord_lab           *crd_lab = &(c_lab_u->u_c_lab);
 
   int                         val_mode, nw_idx, idx = 0;
   long                        nw_pos, pos = 0;

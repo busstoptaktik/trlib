@@ -8,7 +8,7 @@
 #include    "KmsFncs.h"
 #include	"lord.h"
 
-static int srch_def(int mode, char *p_sys, char *w_sys, struct lab_def_str *p_lb);
+int srch_def(int mode, char *p_sys, char *w_sys, struct lab_def_str *p_lb);
 
 int conv_w_crd(char *mlb, struct coord_lab *c_lab){
 	int lab_lng,res=-1,h_type=-1;
@@ -64,7 +64,7 @@ int conv_w_crd(char *mlb, struct coord_lab *c_lab){
 	 return res;
 }
 
-static int srch_def(
+int srch_def(
   int                 srch_type,
   char               *p_sys,
   char               *w_sys,

@@ -71,8 +71,6 @@ FILE                     *tr_error
   static THREAD_SAFE  short                init = 0;
   static THREAD_SAFE  short                sta, stp, ptp, ste;
 
-  static THREAD_SAFE  struct coord_lab    *i_clb, *o_clb;
-
   struct cstm_lng {
     char cstm_str[16];
     int  str_lng;
@@ -86,7 +84,6 @@ FILE                     *tr_error
     {"etrs-lcc", 8}, {"ETRS-LCC", 8},
     {"etrs-laea", 9}, {"ETRS-LAEA", 9}, {"", 0}};
 
-  struct coord_lab           *o_wclb;
   char                        mlb_str[MLBLNG];
   int                         action;
   int                         ies = 0, res;
@@ -128,11 +125,8 @@ FILE                     *tr_error
   if (init == 0 ||
       (strcmp(i_lab_str, si_lab_str) != 0) ||
       (strcmp(o_lab_str, so_lab_str) != 0)) {
-
-    i_clb = &(i_lab.u_c_lab);
-    o_clb = &(o_lab.u_c_lab);
-
-    /* Test for leagal systems */
+    
+    /* Test for legal systems */
     for (p_cstm_lst = cstm_lst, res = 1;
          p_cstm_lst->str_lng && res > 0; ++ p_cstm_lst) {
       if (strncmp(i_lab_str,
@@ -171,19 +165,16 @@ FILE                     *tr_error
 
     init =  1;
 
-    /* init of transformation  (b_lev == 3) */
-    o_wclb  = &(o_lab.u_c_lab);
-
 #ifdef DEBUGTRANS
-  (void) lord_debug(0, LORD("\n*etrs89_trans inlab = %s  outlab = (%s) %s;"), i_clb->mlb, o_wclb->mlb, o_clb->mlb);
+  (void) lord_debug(0, LORD("\n*etrs89_trans inlab = %s  outlab = (%s);"), i_lab.mlb, o_lab.mlb);
 #endif
     /* reg->reg */
-    sta = *(io_nr_tab + i_clb->cstm);
-    stp = *(io_nr_tab + o_wclb->cstm) - (short) 1;
-    ptp = (short) (((2<i_clb->cstm) && (2<o_wclb->cstm)) ? 1 : 0);
+    sta = *(io_nr_tab + i_lab.cstm);
+    stp = *(io_nr_tab + o_lab.cstm) - (short) 1;
+    ptp = (short) (((2<i_lab.cstm) && (2<o_lab.cstm)) ? 1 : 0);
     if (ptp) {
       stp = -stp + 7;
-      ste = (*(stop_ell + i_clb->cstm) && *(stop_ell + o_clb->cstm)) ? 1 : 2;
+      ste = (*(stop_ell + i_lab.cstm) && *(stop_ell + o_lab.cstm)) ? 1 : 2;
     } else {
       if (sta > stp + 1) {
         /* e.g.: (CRT=3)->(GEO=2)->(PRJ=1): */
@@ -195,7 +186,7 @@ FILE                     *tr_error
     }
 
     /* test for identical systems */
-    if (i_clb->ch_sum == o_wclb->ch_sum) {
+    if (i_lab.ch_sum == o_lab.ch_sum) {
       sta = IDT;
       stp = IDT;
     }
@@ -219,7 +210,7 @@ FILE                     *tr_error
       /*______________________________*/
 #ifdef DEBUGTRANS
   (void) lord_debug(0, LORD("\n*case 2: PRJ -> GEO"));
-  (void) lord_debug(0, LORD("   %s;"), (i_lab.u_c_lab).mlb);
+  (void) lord_debug(0, LORD("   %s;"), i_lab.mlb);
 #endif
       ies = ptg(&i_lab, (int) ste, N, E, &N, &E, "etrs89_trans", tr_error);
       if (ptp) action += 3;
@@ -229,7 +220,7 @@ FILE                     *tr_error
       /*______________________________*/
 #ifdef DEBUGTRANS
   (void) lord_debug(0, LORD("\n*case 6: GEO -> PRJ"));
-  (void) lord_debug(0, LORD("   %s;"), (o_lab.u_c_lab).mlb);
+  (void) lord_debug(0, LORD("   %s;"), o_lab.mlb);
 #endif
       ies = ptg(&o_lab, (int) (-ste), N, E, &N, &E, "etrs89_trans", tr_error);
       break;

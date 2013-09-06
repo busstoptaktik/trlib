@@ -35,11 +35,10 @@
 
 int                     get_zone(
 /*_____________________________*/
-union geo_lab          *u_lab
+struct coord_lab         *c_lab
 )
 {
 
-  struct coord_lab          *c_lab = &(u_lab->u_c_lab);
   int                        zone = -1, i;
   char                      *p_sys = c_lab->mlb, rgn_name[16];
 

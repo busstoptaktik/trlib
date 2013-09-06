@@ -67,7 +67,10 @@ def Build(compiler,outname,source,include=[],define=[],is_debug=False,is_library
 	if IS_WINDOWS and is_library:
 		if len(def_file)>0:
 			def_file=compiler.DEF_FILE_SWITCH+def_file
-		implib=compiler.IMPLIB_SWITCH+os.path.splitext(outname)[0]+compiler.IMPLIB_EXT
+		if compiler.IS_MSVC:
+			implib=compiler.IMPLIB_SWITCH+os.path.splitext(outname)[0]+compiler.IMPLIB_EXT
+		else:
+			implib=""
 	else:
 		implib=""
 		def_file=""

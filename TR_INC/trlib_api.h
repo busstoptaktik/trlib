@@ -86,11 +86,6 @@ void TR_ForbidUnsafeTransformations(void);
 */
 typedef struct  TR_kms_str TR;
 
-/* Print info on last used geoid to stdout. 
-* WARNING: this implementation will change in the future or the function will be deprecated.
-*/
-void TR_GeoidInfo(TR *tr);
-
 /* Get the scale (c) and meridian convergence (m) of a projection. 
  * If the flag is_proj_out is 0 / False, the input projection in the TR object is used, else the output projection is used. 
  * Returns ane of the error codes defined above.

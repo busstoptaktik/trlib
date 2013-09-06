@@ -109,7 +109,8 @@ Prog. KP OCT 1989/JAN 1992.
     }
 
     cos2_b = 2.*cos(2.0*lat);
-    for (p = gtm + 5, h1 = *--p; p - gtm; h2 = h1, h1 = h)
+    /* gtm + 5 gives warning in pedantic mode */
+	for (p = gtm + 5, h1 = *--p; p - gtm; h2 = h1, h1 = h)
       h = -h2 + cos2_b*h1 + *--p;
     lat += h*sin(2.0*lat);
     lat *= a*FQ;

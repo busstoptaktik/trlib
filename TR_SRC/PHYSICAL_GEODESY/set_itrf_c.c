@@ -147,7 +147,6 @@ char                    *err_str
  
 #define YEAR(yy) ((yy) +(((yy)<88) ? 2000 : (((yy)<100) ? 1900 : 0)))
 
-  union geo_lab           *geo_lb;
   struct gde_lab          *ipl_lb = &ipl_table->table_u;
   union rgn_un             i_rgn, o_rgn, rgn_EU;
   char                     from_str[32], to___str[32], plm_nam[MLBLNG];
@@ -607,9 +606,9 @@ char                    *err_str
   if (gps_table->req_plm_tr && strcmp(plm_nam, s_used_plm_nam)) {
     if (*plm_nam != '\0') {
       (void) strcpy(from_str, plm_nam);
-      geo_lb = (union geo_lab *) plm_lb;
-      i      = conv_lab(from_str, geo_lb, "");
-      if (i == PLM_LAB) {
+      i      = conv_w_plm(from_str, plm_lb);
+      
+	  if (i == PLM_LAB) {
         (void) strcpy(plm_nam, plm_lb->mlb);
         if (plm_lb->f_poly == NULL) {
           plm_lb->f_poly =
@@ -656,7 +655,12 @@ char                    *err_str
       (void) sprintf(err_str, "\nunknown intra plate: %s", ipl_nam);
       return(i);
     }
-    (void) conv_lab(ipl_lb->clb, Hipl_lab, "  20000101");
+    
+	{
+	    char d_name_d[2*MLBLNG];
+		sprintf(d_name_d,"%s   20130128", ipl_lb->clb);
+		(void) conv_w_crd(d_name_d, &(Hipl_lab->u_c_lab));
+	}
   }
   return(i_seq);
 #undef    YEAR

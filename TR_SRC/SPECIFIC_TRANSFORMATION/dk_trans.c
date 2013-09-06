@@ -465,16 +465,16 @@ ACTION[act], nst, level);
         res = ptg(&TC_u33, -2, N, E, &N, &E, usertxt, tr_error);
         break;
       case P_TG: /* proj -> geo */
-        res = ptg(in_lab_a, +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(in_lab, +1, N, E, &N, &E, usertxt, tr_error);
         break;
       case G_TP: /* geo -> proj */
-        res = ptg(outlab_a, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(outlab, -1, N, E, &N, &E, usertxt, tr_error);
         break;
       case P_TP: /* proj -> proj (or IDNT) */
         if (proj_proj) {
-          res = ptg(in_lab_a, +1, N, E, &N, &E, usertxt, tr_error);
+          res = ptg(in_lab, +1, N, E, &N, &E, usertxt, tr_error);
           if (res < result) result = res;
-          res = ptg(outlab_a, -1, N, E, &N, &E, usertxt, tr_error);
+          res = ptg(outlab, -1, N, E, &N, &E, usertxt, tr_error);
         }
         act   = IDNT; /* stop */
         *Nout = N;

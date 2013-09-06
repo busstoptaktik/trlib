@@ -28,8 +28,8 @@ int ipl_move(union geo_lab *Hipl_lab, struct mtab3d_str *tab3d_table,
 
 int                      itrf_trans(
 /*________________________________*/
-union geo_lab            *i_lab,
-union geo_lab            *o_lab,
+struct coord_lab         *i_lab,
+struct coord_lab         *o_lab,
 int                       stn_vel,      /* velocity for stn in i_vel */
 double                   *i_crd,        /* input coords:: 0:2 */
 double                   *i_vel,        /* velocity to coords:: 0:2 */
@@ -59,7 +59,7 @@ char           *u_ipl_nam = plate_info->ipl_nam;
   /* o_lab = NULL or i_lab = NULL closes the tables            */
 
   /* itrf_trans transforms i_crd[3] coordinates from:          */
-  /*     i_lab   i_JD  to  o_lab   o_lab->u_c_lab.JD (= o_JD)  */
+  /*     i_lab   i_JD  to  o_lab   o_lab->JD (= o_JD)  */
   /* using the official convertions between the ITRF's and IGS */
   /*     and ETRF89 and nationsl realisations DK_ETRF89,       */
   /*     NO_ETRF89, SE_ETRF89, SF_ETRF89 and gr96              */
@@ -69,7 +69,7 @@ char           *u_ipl_nam = plate_info->ipl_nam;
   /* and  1) the STD intra plate velocities                    */
   /* or   2) no intra plate velocities : NON                   */
   /* National ETRF89 is governed by the i_lab and/or o_lab     */
-  /*      region: lab->u_c_lab.rgn = {DK/NO/FI/SE/GR}          */
+  /*      region: lab->rgn = {DK/NO/FI/SE/GR}          */
   /*      else the EUREF recommandations are used              */
 
   /* usertxt: at ERROR: put first in err_str                   */ 
@@ -102,7 +102,7 @@ char           *u_ipl_nam = plate_info->ipl_nam;
   /*     tab_i != '\0':  ipl_tr   i_JD to o_JD table tab_t vel        */
   /*     tab_i == '\0':  NO ipl_tr                                    */
 
-  /* Exceptions:  region: (i_lab/o_lab)->u_c_lab.rgn                  */
+  /* Exceptions:  region: (i_lab/o_lab)->rgn                  */
   /* 1) NATIONAL ETRF89 : DK, NO, SV, SF::                            */
   /*     tab_t == {"" or "std"} used_plm_nam == nnr_itrf00            */
   /*              to:  i_JD to nkg_dt;  fr: nkg_dt to o_JD            */
@@ -228,17 +228,17 @@ char           *u_ipl_nam = plate_info->ipl_nam;
 
   /* Init of tables */
   /*________________*/
-  if (i_clb     != &(i_lab->u_c_lab) ||
-      i_chsum   != (i_lab->u_c_lab).ch_sum ||
-      o_clb     != &(o_lab->u_c_lab) ||
-      o_chsum   != (o_lab->u_c_lab).ch_sum ||
+  if (i_clb     != i_lab ||
+      i_chsum   != i_lab->ch_sum ||
+      o_clb     != o_lab ||
+      o_chsum   != o_lab->ch_sum ||
       s_stn_vel != stn_vel ||
-      sate_in   != i_JD || sate_out != o_lab->u_c_lab.JD ||
+      sate_in   != i_JD || sate_out != o_lab->JD ||
       strcmp(tab_t, s_tab_t) || strcmp(tab_i, s_tab_i)) {  
 
 	/* Init of IGS and ITRF-tables */
-    i_clb                = &(i_lab->u_c_lab);
-    o_clb                = &(o_lab->u_c_lab);
+    i_clb                = i_lab;
+    o_clb                = o_lab;
     i_chsum              = o_chsum = 0;
     gps_table.req_plm_tr = -2;
     gps_table.req_ipl_tr = 0;
@@ -572,7 +572,7 @@ char                     *err_str
 
   tr_yy *= 0.001; /* vel in mm/year: conv to m/year */
 
-  res    = tab3d_val(Hipl_lab, tab3d_table, B, L, dc, err_str);
+  res    = tab3d_val(&(Hipl_lab->u_c_lab), tab3d_table, B, L, dc, err_str);
   (void) strcpy(used_ipl_nam, tab3d_table->table_u.mlb);
 if (TU)
 	(void) lord_info(0, LORD("ipl_move  dc = %f, %f, %f, res = %d;"), dc[0], dc[1],dc[2], res);

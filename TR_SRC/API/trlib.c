@@ -232,22 +232,21 @@ int TR_SetGeoidDir(char *path){
 	return (DEF_DATA ? TR_OK: TR_ERROR);
 }
 	
-
-
 /* Mock up - not fully implemented! */
-void TR_GeoidInfo(TR *tr) {
+/*void TR_GeoidInfo(TR *tr) {
     char req[512];
     char geoid_name[256];
     int res;
     strcpy(req,"*");
     TR_GetGeoidName(tr,geoid_name);
-    /*strcat(req,tr->geoid_name); */
+    /*strcat(req,tr->geoid_name); * /
     strcat(req,geoid_name);
     res=tab_doc_f(req,stdout);
     #ifdef _ROUT
     lord_debug(0,"Request: %s, res: %d\n",req,res);
     #endif
     }
+*/
 
 /*Function which copies the last used geoid name to input buffer.*/    
 
@@ -600,8 +599,8 @@ int TR_tr(
 
 /* transform ITRF one or more xyz-tables */
 int TR_itrf(
-   union geo_lab *plab_in,      /* In label */
-   union geo_lab *plab_out,     /* Out label */
+   struct coord_lab *plab_in,      /* In label */
+   struct coord_lab *plab_out,     /* Out label */
    double *x_in,                /* X in array */
    double *y_in,                /* Y in array */
    double *z_in,                /* Z in array */

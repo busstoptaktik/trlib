@@ -46,7 +46,7 @@
 int              fputshpprj(
 /*______________________*/
 FILE            *fh_out,
-union geo_lab   *g_lab)
+struct coord_lab   *g_lab)
 {
 	int ret_val;
 	char esri_wkt[MAX_WKT_LEN]; 

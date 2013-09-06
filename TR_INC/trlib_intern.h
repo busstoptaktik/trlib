@@ -88,7 +88,7 @@ int TR_SpecialGeoidTable(struct TR_kms_str *tr, char *geoid_name);
 int TR_IsMainThread(void);
 int TR_IsThreadSafe(struct coord_lab *plab);
 int TR_tr(PR*,PR*, double*, double*, double*, double*, double*,double*, double*, int , int , struct mgde_str*); 
-int TR_itrf(union  geo_lab*, union geo_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
+int TR_itrf(struct coord_lab*, struct coord_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
 PR *TR_OpenProjection(char *mlb);
 void TR_CloseProjection(PR *proj);
 void TR_GetGeoidName(struct TR_kms_str *tr,char *name);

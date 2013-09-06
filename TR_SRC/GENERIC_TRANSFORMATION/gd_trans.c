@@ -71,8 +71,8 @@ FILE                     *tr_error
 {
 
   static THREAD_SAFE  int      (*dfb_trf)(
-    struct coord_lab      *in_lab,
-    struct coord_lab      *outlab,
+    struct coord_lab      *i_lab,
+    struct coord_lab      *o_lab,
     double              N,    double   E,    double   H,
     double             *Nout, double  *Eout, double  *Hout,
     char               *usertxt,
@@ -170,7 +170,7 @@ FILE                     *tr_error
 
   /* Geoid Height gh is not transformed at Datum Shifts of Height*/
 
-  /*                     Geoid requested ::  (allso -g param)   */
+  /*                     Geoid requested ::  (also -g param)   */
   /* crt_          :: is treated as sepch == E                  */
   /* H             :: is treated as sepch == N                  */
   /* in_sepch_out dsh  ghr H_in  igh  gh  H_in   Nh    Hout     */
@@ -226,24 +226,24 @@ FILE                     *tr_error
 
   /* Init of tables */
   /*________________*/
-  if (i_clb      != &(i_lab) ||
-      i_chsum    !=  (i_lab).ch_tsum ||
+  if (i_clb      != i_lab ||
+      i_chsum    !=  i_lab->ch_tsum ||
       s_grid_tab != grid_tab ||
       ((s_req_tv) ? (req_gh == 0 ||
                      strcmp(grid_tab->table_u[0].clb, H_clb->mlb))
                   : (req_gh  != s_req_gh ||
-                     o_clb   != &(o_lab) ||
-                     o_chsum != (o_lab).ch_tsum ||
+                     o_clb   != o_lab ||
+                     o_chsum != o_lab->ch_tsum ||
                      ((req_gh > 0) &&
                       grid_tab->table_u[0].lab_type != GDE_LAB)))) {
 
     if (grid_tab->init != 0 && grid_tab->init != 1)
         grid_tab->init = 0;
     i_chsum    = o_chsum = 0;
-    i_clb      = &(i_lab);
+    i_clb      = i_lab;
     s_grid_tab = grid_tab;
     s_req_gh   = req_gh;
-    o_clb      = &(o_lab);
+    o_clb      = o_lab;
     s_req_tv   = (grid_tab->init == 1) &&
                   grid_tab->table_u[0].lab_type != (short) GDE_LAB;
     s_lev      = (s_req_tv) ? 0 : 3;
@@ -422,7 +422,7 @@ FILE                     *tr_error
         o_rlab = &O_Rlab;
         break;
       }
-      w_oclb  = &((*o_rlab));
+      w_oclb  = *o_rlab;
 
       if (sta[b_lev] != stp[b_lev]) continue;
 
@@ -484,7 +484,7 @@ FILE                     *tr_error
       } /* end switch(R_N) */
 
 #ifdef DEBUGGDTRANS
-	(void) lord_debug(0, LORD("\n*gd_trans (lev:%d) inlab = %s  outlab = (%s) %s, R_N = %d;"), b_lev, i_clb->mlb, w_oclb->mlb, o_clb->mlb, R_N);
+	(void) lord_debug(0, LORD("\n*gd_trans (lev:%d) i_lab = %s  o_lab = (%s) %s, R_N = %d;"), b_lev, i_clb->mlb, w_oclb->mlb, o_clb->mlb, R_N);
 #endif
 
 

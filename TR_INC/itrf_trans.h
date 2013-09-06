@@ -37,8 +37,8 @@
 
 extern int               itrf_trans(
 /*________________________________*/
-union geo_lab            *i_lab,
-union geo_lab            *o_lab,
+struct coord_lab         *i_lab,
+struct coord_lab         *o_lab,
 int                       stn_vel,      /* velocity for stn in i_vel */
 double                   *i_crd,        /* input coords:: 0:2 */
 double                   *i_vel,        /* velocity to coords:: 0:2 */

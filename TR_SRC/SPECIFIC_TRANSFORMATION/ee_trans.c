@@ -418,10 +418,10 @@ ACTION[act], gst, nst, level);
         res = ptg(&TC_elmn, -1, N, E, &N, &E, usertxt, tr_error);
         break;
       case TTG: /* eetm -> eegeo */
-        res = ptg(in_lab_u,  +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(in_lab,  +1, N, E, &N, &E, usertxt, tr_error);
         break;
       case GTT: /* eegeo -> eetm */
-        res = ptg(outlab_u,  -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(outlab,  -1, N, E, &N, &E, usertxt, tr_error);
         break;
 
       case UPE: /* utm35_euref89 -> eetm27 */

@@ -16,18 +16,18 @@
  * 
  */
  
-//------------------------------------------------------------------------------
-//                          K M S  F N C S . H
-//------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
+                          K M S  F N C S . H
+------------------------------------------------------------------------------ */
 
-// Connects the release or debug version of the LIB file 
-// (for further connection to KmsFncs.dll).
-// This DLL contains many functions for i/o of KMS textfiles, 
-// fncs used in the KMS transformation system etc
+/* Connects the release or debug version of the LIB file 
+ (for further connection to KmsFncs.dll).
+ This DLL contains many functions for i/o of KMS textfiles, 
+ fncs used in the KMS transformation system etc
 
-// - the debug version of the LIB and the DLL file are :
-// KmsFncsD.lib and KmsFncsD.dll
-
+ - the debug version of the LIB and the DLL file are :
+ KmsFncsD.lib and KmsFncsD.dll
+*/
 
 
 #if !defined(__KMSFNCS_H)
@@ -118,7 +118,6 @@ extern "C" {
 #include "lord.h"
 #include "ng_trans.h"
 #include "parse_def_file.h"
-#include "pla_adm_f.h"
 #include "prn_cho.h"
 #include "ptg.h"
 #include "ptg_d.h"
@@ -146,7 +145,6 @@ extern "C" {
 #include "srch_plate.h"
 #include "srch_tab_typ.h"
 #include "t_status.h"
-#include "tab_adm_f.h"
 #include "tab_doc_f.h"
 #include "tab3d_c.h"
 #include "tab3d_i.h"

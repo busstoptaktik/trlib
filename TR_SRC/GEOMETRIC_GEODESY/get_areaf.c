@@ -152,7 +152,7 @@ FILE            *tr_error
 
   for (i = 0; i < max; i ++) {
     if (ctrf)
-      trr = gd_trans(ilb_p, &glb_a, *(B+i), *(L+i), 0.0, &Z->n, &Z->e,
+      trr = gd_trans(icl, clb, *(B+i), *(L+i), 0.0, &Z->n, &Z->e,
                      &H, &gh, -1, &geoid_table, usertxt, tr_error);
     else {
       Z->n = *(B+i);
@@ -223,7 +223,7 @@ FILE            *tr_error
   (void) fprintf(tr_error, "\n\nlambert polar authalic : %s", csb->mlb);
   (void) fprintf(tr_error, "\nusing geographical triangels\n");
 
-  trr = ptg(sflb, -1, Bm, 0.0, &n1, &e1, "", tr_error);
+  trr = ptg(csb, -1, Bm, 0.0, &n1, &e1, "", tr_error);
   Pm  = M_PI_2 - n1;
   if (trr) {
     res = 5;
@@ -242,7 +242,7 @@ FILE            *tr_error
         res = 4;
         goto RES;
       }
-      trr  |= ptg(sflb, -1, Z->n, Z->e, &n1, &e1, "", tr_error);
+      trr  |= ptg(csb, -1, Z->n, Z->e, &n1, &e1, "", tr_error);
       P1    = M_PI_2 - n1;
       s1    = sftr(e1, Pm, P1, &az, &az1);
       Smax  = *tot_sum = 0.0;
@@ -252,7 +252,7 @@ FILE            *tr_error
           res = 4;
           goto RES;
         }
-        trr     |= ptg(sflb, -1, Z->n, Z->e, &n2, &e2, "", tr_error);
+        trr     |= ptg(csb, -1, Z->n, Z->e, &n2, &e2, "", tr_error);
         P2       = M_PI_2 - n2;
         s3       = sftr(e2-e1, P1, P2, &az, &az);
         s2       = sftr(e2, Pm, P2, &az, &az2);

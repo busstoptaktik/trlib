@@ -35,7 +35,7 @@
 
 extern int                grid_val(
 /*_______________________________*/
-union  geo_lab           *c_lab_u,
+struct coord_lab         *c_lab_u,
 struct mgde_str          *tab_table,
 double                    N,
 double                    E,

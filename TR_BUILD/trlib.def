@@ -2,7 +2,6 @@ EXPORTS
 	TR_InitLibrary
 	TR_SetGeoidDir
 	TR_Transform
-	TR_GeoidInfo
 	TR_GetEsriText
 	TR_GetVersion
 	TR_TerminateLibrary
@@ -99,7 +98,6 @@ EXPORTS
 	gmb2
 	grid_val
 	gtc
-	h_trans
 	hlm_tr
 	htr_init
 	i_tabdir_file
@@ -108,7 +106,6 @@ EXPORTS
 	labchsum
 	mlb_to_proj4
 	ng_trans
-	pla_adm_f
 	prn_cho
 	proj4_to_mlb
 	ptg
@@ -142,7 +139,6 @@ EXPORTS
 	tab3d_c
 	tab3d_i
 	tab3d_val
-	tab_adm_f
 	tab_doc_f
 	tabdd_c
 	tabdd_i
@@ -151,7 +147,6 @@ EXPORTS
 	tpd_doc_f
 	u32_to_map
 	utgs
-	utmtmgr
 	utsb
 	v_red
 	v_std

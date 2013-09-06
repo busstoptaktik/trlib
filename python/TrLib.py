@@ -111,8 +111,6 @@ def LoadLibrary(lib=STD_LIB,lib_dir=STD_DIRNAME):
 		tr_lib.TR_GetEsriText.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
 		tr_lib.TR_GetLocalGeometry.restype=ctypes.c_int
 		tr_lib.TR_GetLocalGeometry.argtypes=[ctypes.c_void_p,ctypes.c_double,ctypes.c_double,LP_c_double,LP_c_double,ctypes.c_int] #todo get type of last arg
-		tr_lib.TR_GeoidInfo.argtypes=[ctypes.c_void_p]
-		tr_lib.TR_GeoidInfo.restype=None
 		tr_lib.TR_GetGeoidName.argtypes=[ctypes.c_void_p,ctypes.c_char_p]
 		tr_lib.TR_GetGeoidName.restype=None
 		tr_lib.TR_Open.restype=ctypes.c_void_p
@@ -745,8 +743,7 @@ class CoordinateTransformation(object):
 	def GetReturnCode(self):
 		return self.rc
 	def GetGeoidInfo(self):
-		if self.tr is not None:
-			tr_lib.TR_GeoidInfo(self.tr)
+		pass
 	def GetGeoidName(self):
 		if self.tr is not None:
 			name=ctypes.create_string_buffer(256)

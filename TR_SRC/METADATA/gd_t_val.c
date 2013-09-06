@@ -22,7 +22,7 @@
 
 int                       gd_t_val(
 /*_______________________________*/
-union geo_lab            *i_lab,
+struct coord_lab         *i_lab,
 double                    N_in,
 double                    E_in,
 double                   *t_val,

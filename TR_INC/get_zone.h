@@ -40,10 +40,10 @@
 
 extern int            get_zone(
 /*___________________________*/
-union geo_lab        *u_lab
+struct coord_lab       *c_lab
 );
 
-/*  SEE also conv_lab.c and conv_lab.h for details                 */
+/*  SEE also conv_crd.c and conv_crd.h for details                 */
 
 
 /*

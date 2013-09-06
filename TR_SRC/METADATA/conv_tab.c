@@ -265,17 +265,20 @@ struct gde_lab          *t_lab,
 
     /* datum, ellipsoid, proj */
     {
-      union geo_lab   lab1;
-      if (conv_lab(d_name, &lab1, "  20000101") == CRD_LAB) {
+      struct coord_lab lab1;
+      char d_name_d[2*MLBLNG];
+
+	  sprintf(d_name_d,"%s   20130128", d_name);
+	  if (conv_w_crd(d_name_d, &lab1) == CRD_LAB) {
         if (t_lab->cstm == 0) /* geo */
-          r = lab1.u_c_lab.cstm != 2 ||
-              t_lab->mode != lab1.u_c_lab.mode;
+          r = lab1.cstm != 2 ||
+              t_lab->mode != lab1.mode;
         else
         if (t_lab->cstm > 0) /* utm */
-          r = lab1.u_c_lab.cstm != 3 || t_lab->cstm != get_zone(&lab1);
+          r = lab1.cstm != 3 || t_lab->cstm != get_zone(&lab1);
         else
-          r = lab1.u_c_lab.cstm != -t_lab->cstm ||
-              t_lab->mode != lab1.u_c_lab.mode;
+          r = lab1.cstm != -t_lab->cstm ||
+              t_lab->mode != lab1.mode;
       }
       else r = 1;
       if (r) {
@@ -284,8 +287,8 @@ struct gde_lab          *t_lab,
         return(ILL_LAB);
       }
       (void) strcpy(t_lab->clb, d_name);
-      t_lab->datum     = (lab1.u_c_lab).datum;
-      t_lab->ellipsoid = (lab1.u_c_lab).ellipsoid;
+      t_lab->datum     = lab1.datum;
+      t_lab->ellipsoid = lab1.ellipsoid;
       (void) set_dtm_1(-1, h_dtm, &t_lab->p_dtm, p_name, e_name,
                        rgn_pref.prfx, &mask, &trp_a);
     }

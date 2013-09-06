@@ -22,7 +22,7 @@
 
 int                       tab3d_val(
 /*________________________________*/
-union  geo_lab           *c_lab_u,
+struct coord_lab         *c_lab,
 struct mtab3d_str        *tab3d_table,
 double                    B_89,
 double                    L_89,
@@ -46,8 +46,6 @@ char                     *err_str
   int                        *victim = &(tab3d_table->victim);
 
   /* Labels and descriptors */
-  struct coord_lab           *crd_lab = &(c_lab_u->u_c_lab);
-
   int                         nw_idx, idx = 0;
   long                        nw_pos, pos = 0;
   int                         n_i, e_i, geo;
@@ -68,7 +66,7 @@ char                     *err_str
   if (tab3d_table->init == 0) 
      return(s_status(err_str, "tab3d_val", TRF_PROGR_));
 
-  geo = (crd_lab->cstm == 2) ? 1 : 0;
+  geo = (c_lab->cstm == 2) ? 1 : 0;
 
   /* select the tab3d */
   t_lab    = &(tab3d_table->table_u);
@@ -90,8 +88,8 @@ char                     *err_str
 
   /* TEST datum */               /* !s34j / !s34s */
   if (  t_lab->datum < 128 || 129 <   t_lab->datum || 
-      crd_lab->datum < 128 || 129 < crd_lab->datum) {
-    if (strcmp(t_lab->clb, crd_lab->mlb)) {
+      c_lab->datum < 128 || 129 < c_lab->datum) {
+    if (strcmp(t_lab->clb, c_lab->mlb)) {
       return(s_status(err_str, "tab3d_val", TAB_C_PRJ_));
     }
   }

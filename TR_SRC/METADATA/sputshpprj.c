@@ -31,11 +31,11 @@ int get_val_str(char* val_str, double val);
 int              sputshpprj(
 /*________________________*/
 char            *wkt_out,
-union geo_lab   *g_lab)
+struct coord_lab   *c_lab)
 {
 
 /* sputshpprj writes the .prj Esri wkt
-   from the geo_lab.
+   from the coord_lab.
 
    The reference names for label recognition is found
    in the file def_sjp.txt in the geoid catalouge.
@@ -69,7 +69,6 @@ union geo_lab   *g_lab)
   int               mode, used, i, k, params = 0;
   int               str_state = 0;
   double            e[9];
-  struct coord_lab *c_lab = &(g_lab->u_c_lab);
   struct dsh_str    trp;
   union rgn_un      rgn_pref;
   FILE             *fp;

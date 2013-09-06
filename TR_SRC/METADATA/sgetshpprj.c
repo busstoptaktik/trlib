@@ -47,7 +47,7 @@ char            *mlb_out)
 
 */
 
-  char   prj_txt[2048], temp[128], param[128], std_lat[16];
+  char   prj_txt[2048], temp[128], std_lat[16];
   char  *p_tmp, c, sep = '_';
   char  *p_txt = prj_txt, *p_txt1 = prj_txt, *p_txt2 = prj_txt, *p_txt3 = prj_txt, *p_txt4 = prj_txt;
   char   entry[128], lab_str[MLBLNG], mlb2[MLBLNG], dtm[MLBLNG];
@@ -95,7 +95,6 @@ char            *mlb_out)
     fp = i_tabdir_file(5, "def_shp.txt", &i, temp);
     if (i) return ((i == -1) ? -2 : -3);
 
-    *param = '\0';
     (void) strcpy(mlb2, "_h_msl");
     /*p_txt1 = strchr(p_txt, '[');
     k      = (int)((ptrdiff_t)p_txt1 - (ptrdiff_t)p_txt); - moved above...*/
@@ -172,34 +171,34 @@ char            *mlb_out)
                   p_txt4 = strchr(p_txt3, ',') +1;
                   p_txt3 = strchr(p_txt4, ']');
                   (void) strncpy(std_lat, p_txt4, p_txt3 - p_txt4);
-                  (void) strncpy(param,   p_txt4, p_txt3 - p_txt4);
-                  (void) strcat(param, "dg  ");
+                  (void) strncpy(lab_str,   p_txt4, p_txt3 - p_txt4);
+                  (void) strcat(lab_str, "dg  ");
                   ++ r_params;
                   if (itm == 1) {
                     (void) sscanf(p_txt4, "%lf", &val);
                     if (val != 0.0) itm = 0;
                   }
                 }
-                else (void) strcpy(param, "0dg  ");
+                else (void) strcpy(lab_str, "0dg  ");
                 p_txt3 = strstr(p_tmp, "FalseNorthing");
                 if (p_txt3 != NULL) {
                   p_txt4 = strchr(p_txt3, ',') +1;
                   p_txt3 = strchr(p_txt4, ']');
-                  (void) strncat(param, p_txt4, p_txt3 - p_txt4);
-                  (void) strcat(param, "m  ");
+                  (void) strncat(lab_str, p_txt4, p_txt3 - p_txt4);
+                  (void) strcat(lab_str, "m  ");
                   ++ r_params;
                   if (itm == 1) {
                     (void) sscanf(p_txt4, "%lf", &val);
                     if (val != 0.0) itm = 0;
                   }
                 }
-                else (void) strcat(param, "0km  ");
+                else (void) strcat(lab_str, "0km  ");
                 p_txt3 = strstr(p_tmp, "CentralMeridian");
                 if (p_txt3 != NULL) {
                   p_txt4 = strchr(p_txt3, ',') +1;
                   p_txt3 = strchr(p_txt4, ']');
-                  (void) strncat(param, p_txt4, p_txt3 - p_txt4);
-                  (void) strcat(param, "dg  ");
+                  (void) strncat(lab_str, p_txt4, p_txt3 - p_txt4);
+                  (void) strcat(lab_str, "dg  ");
                   ++ r_params;
                   if (itm == 1) {
                     (void) sscanf(p_txt4, "%lf", &val);
@@ -207,28 +206,28 @@ char            *mlb_out)
                     if (zone > 60) zone -= 60;
                   }
                 } else {
-                  (void) strcat(param, "0dg  ");
+                  (void) strcat(lab_str, "0dg  ");
                   itm = 0;
                 }
                 p_txt3 = strstr(p_tmp, "FalseEasting");
                 if (p_txt3 != NULL) {
                   p_txt4 = strchr(p_txt3, ',') +1;
                   p_txt3 = strchr(p_txt4, ']');
-                  (void) strncat(param, p_txt4, p_txt3 - p_txt4);
-                  (void) strcat(param, "m  ");
+                  (void) strncat(lab_str, p_txt4, p_txt3 - p_txt4);
+                  (void) strcat(lab_str, "m  ");
                   ++ r_params;
                   if (itm == 1) {
                     (void) sscanf(p_txt4, "%lf", &val);
                     if (val != 500000.0) itm = 0;
                   }
                 }
-                else (void) strcat(param, "0km  ");
+                else (void) strcat(lab_str, "0km  ");
                 p_txt3 = strstr(p_tmp, "ScaleFactor");
                 if (p_txt3 != NULL) {
                   p_txt4 = strchr(p_txt3, ',') +1;
                   p_txt3 = strchr(p_txt4, ']');
-                  (void) strncat(param, p_txt4, p_txt3 - p_txt4);
-                  (void) strcat(param, "  ");
+                  (void) strncat(lab_str, p_txt4, p_txt3 - p_txt4);
+                  (void) strcat(lab_str, "  ");
                   ++ r_params;
                   if (itm == 1) {
                     (void) sscanf(p_txt4, "%lf", &val);
@@ -236,7 +235,7 @@ char            *mlb_out)
                   }
                 } else
                 if (params == 5) {
-                  (void) strcat(param, "1.0  ");
+                  (void) strcat(lab_str, "1.0  ");
                   itm = 0;
                 }
                 if (params == 6) {
@@ -244,27 +243,26 @@ char            *mlb_out)
                   if (p_txt3 != NULL) {
                     p_txt4 = strchr(p_txt3, ',') +1;
                     p_txt3 = strchr(p_txt4, ']');
-                    (void) strncat(param, p_txt4, p_txt3 - p_txt4);
+                    (void) strncat(lab_str, p_txt4, p_txt3 - p_txt4);
                     ++ r_params;
                   }
-                  else (void) strcat(param, std_lat);
-                  (void) strcat(param, "dg  ");
+                  else (void) strcat(lab_str, std_lat);
+                  (void) strcat(lab_str, "dg  ");
                   p_txt3 = strstr(p_tmp, "standardparallel2");
                   if (p_txt3 != NULL) {
                     p_txt4 = strchr(p_txt3, ',') +1;
                     p_txt3 = strchr(p_txt4, ']');
-                    (void) strncat(param, p_txt4, p_txt3 - p_txt4);
+                    (void) strncat(lab_str, p_txt4, p_txt3 - p_txt4);
                     ++ r_params;
                   }
-                  else (void) strcat(param, std_lat);
-                  (void) strcat(param, "dg  ");
+                  else (void) strcat(lab_str, std_lat);
+                  (void) strcat(lab_str, "dg  ");
                 }
                 lab_state = 2;
-                if (itm == 1 && 0 <= zone && zone <= 60) {
+                if (itm == 1 && 0 <= zone && zone <= 60)
                   (void) sprintf(lab_str, "utm%02dH", zone);
-                  *param = '\0';
-                }
-              }
+
+			  }
             }
           } while (lab_state == 1 && strcmp(temp, "stop"));
           break;
@@ -302,21 +300,16 @@ char            *mlb_out)
       }
       if (sep == 'H') (void) strcat(lab_str, mlb2);
       if (g_lab!=NULL){
-	      i = conv_w_crd(lab_str, g_lab, param);
+	      i = conv_w_crd(lab_str, g_lab);
 	      i = (i == CRD_LAB) ? ((params == r_params) ? 0 : +3): +4;
       }
       else{
 	      i=(params==r_params) ? 0: +3;
 	      
       }
-      if (mlb_out!=NULL){
+      if (mlb_out!=NULL)
 	      strcpy(mlb_out,lab_str);
-	      
-	      if (params>0){
-		      strcat(mlb_out," ");
-		      strcat(mlb_out,param);
-	      }
-      }
+
     } else i = 1;
     (void) c_tabdir_file(5, fp);
     return(i);

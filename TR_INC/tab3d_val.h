@@ -33,7 +33,7 @@
 
 extern int                tab3d_val(
 /*______________________________*/
-union  geo_lab           *c_lab_u,
+struct coord_lab         *c_lab_u,
 struct mtab3d_str        *tab3d_table,
 double                    B_in,
 double                    L_in,
