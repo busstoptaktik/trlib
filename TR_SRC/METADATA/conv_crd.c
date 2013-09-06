@@ -23,8 +23,8 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
-/* conv_crd(name, p_lb, lab) service function for conv_lab     */
-/* NB should be called only from conv_lab                      */
+/* conv_crd(name, p_lb, lab) service function for conv_lab  - well not anymore. Congrats conv_crd :-)   */
+/* NB should be called only from conv_lab - nope, thats not what we agreed - don't do it unless you're conv_lib.so*/
 /*    result ==  0 : no lab                                    */
 /*    result ==  1 : coord lab             in lab              */
 /*    UNDEFSYS     : unrecognized name                         */
@@ -381,7 +381,7 @@ struct coord_lab        *c_lab,
           if (io_lng > 2)
              (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
           else {
-            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
             return(ILL_LAB);
           }
           break;
@@ -395,7 +395,7 @@ struct coord_lab        *c_lab,
           if (io_lng > 2)
              c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
           else {
-            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
             return(ILL_LAB);
           }
           p_tp    += used;
@@ -403,7 +403,7 @@ struct coord_lab        *c_lab,
           if (io_lng > 2)
              (void) sscanf(p_tp, "%lf%n", &(c_lab->scale), &used);
           else {
-            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
             return(ILL_LAB);
           }
           break;
@@ -416,7 +416,7 @@ struct coord_lab        *c_lab,
           if (io_lng > 2)
              c_lab->N0  = sgetg(p_tp, &(c_lab->m_tpd), &used, "m");
           else {
-            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
             return(ILL_LAB);
           }
           p_tp   += used;
@@ -424,7 +424,7 @@ struct coord_lab        *c_lab,
           if (io_lng > 2)
              c_lab->L0  = sgetg(p_tp, &g_tpd, &used, "sx");
           else {
-            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
             return(ILL_LAB);
           }
           p_tp    += used;
@@ -432,7 +432,7 @@ struct coord_lab        *c_lab,
           if (io_lng > 2)
               c_lab->E0  = sgetg(p_tp, &m_tpd, &used, "m");
           else {
-            lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+            lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
             return(ILL_LAB);
           }
           if (p_lb->q_par >= 5) {
@@ -449,13 +449,13 @@ struct coord_lab        *c_lab,
                   if (io_lng > 2)
                   c_lab->B2  = sgetg(p_tp, &g_tpd, &used, "sx");
                   else {
-                    lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+                    lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
                     return(ILL_LAB);
                   }
                 }
               }
             } else {
-              lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+              lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
               return(ILL_LAB);
             }
           }
@@ -466,7 +466,7 @@ struct coord_lab        *c_lab,
         p_tp          = p_io;
       } /* not empty string */
       else {
-	lord_error(0,LORD("conv_lab %s too few par."), c_lab->mlb);
+	lord_error(0,LORD("conv_crd %s too few par."), c_lab->mlb);
         c_lab->lab_type = ILL_LAB;
         return (ILL_LAB);
       }
