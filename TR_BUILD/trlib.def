@@ -42,14 +42,10 @@ EXPORTS
 	ch_tabdir_par
 	cic
 	clenshaw
-	conv_cnd
 	conv_crd
 	conv_hgt
-	conv_lab
-	conv_obs
 	conv_plm
 	conv_rgn
-	conv_spc
 	conv_tab
 	ctc
 	cwfJD
@@ -84,8 +80,6 @@ EXPORTS
 	geoid_c
 	geoid_i
 	geoid_t
-	get_areacf
-	get_areaf
 	get_ha_s
 	get_mlb
 	get_tpd
@@ -139,7 +133,6 @@ EXPORTS
 	tab3d_c
 	tab3d_i
 	tab3d_val
-	tab_doc_f
 	tabdd_c
 	tabdd_i
 	tabdd_val

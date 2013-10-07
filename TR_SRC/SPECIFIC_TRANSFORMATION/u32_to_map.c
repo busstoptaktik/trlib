@@ -74,10 +74,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "geo_lab.h"
-#include "geoid_d.h"
-#include "conv_lab.h"
-#include "gd_trans.h"
+#include "KmsFncs.h"
 #include "trthread.h"
 #include "lord.h"
 

@@ -32,7 +32,6 @@
 #define      H_ITRF_TRANS
 
 #include              "gd_trans.h"
-#include              "conv_lab.h"
 #include              "trlib_intern.h"
 
 extern int               itrf_trans(

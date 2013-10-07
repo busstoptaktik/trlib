@@ -28,23 +28,19 @@
 /* Matrikelstyrelsen, Denmark.  This copyright claim does not  */
 /* indicate an intention of publishing this code.              */
 
-#if !defined     (H_CONV_LAB)
-#define           H_CONV_LAB
+#if !defined     (H_METADATA)
+#define           H_METADATA
 
 #include "geo_lab.h"
 
-extern int            conv_lab(
-/*____________________________*/
-char                           *lab_name,
-union geo_lab                  *g_lab,
-  ...
-);
+
 
 int conv_w_crd(char *mlb, struct coord_lab *c_lab);
 int conv_w_tab(char *mlb, struct gde_lab *t_lab);
 int conv_w_plm(char *mlb, struct plm_lab *p_lab);
+int srch_def(int srch_type, char *p_sys, struct lab_def_str *p_lb);
 
-/* conv_lab(name, lab) converts the name of a lab to the lab   */
+
 /*    result ==  -2     : def_prj.txt file not correct content */
 /*    result ==  -1     : def_prj.txt file not found           */
 /*    result ==   0     : no lab                               */
@@ -154,8 +150,7 @@ Labels ::
    .
 */
 
-
-/* conv_lab  ver 2010.01            # page 3    12 jan 2010 17 25 */
+
 
 
 /*  (LABELS CONTINUED)
@@ -171,14 +166,14 @@ Labels ::
 
    h_dvr90                     Othometric heights DVR 1990
    h_gm91                      Othometric heights G.M. 1891 (Jylland)
-   h_gi44                      Othometric heights G.I. 1944 (Fyn/Sjæll.)
+   h_gi44                      Othometric heights G.I. 1944 (Fyn/Sjl.)
    DK_h_msl                    Othometric heights in known local system
-   DK_h_kn44                   Københavns Heights e.a.
+   DK_h_kn44                   Koebenhavns Heights e.a.
    DK_ellh_euref89             Ellipsoid heights in euref89.
 
 For KMS computers ::
 special labels and observation labels may be seen by 
-hjælp labels
+hjaelp labels
 
 */
 
