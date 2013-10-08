@@ -108,6 +108,7 @@ FILE                     *tr_error
   static THREAD_SAFE  char             o_sep, nonp_o[4];
 
   static THREAD_SAFE  struct coord_lab    *i_clb, *o_clb;
+  
   struct coord_lab           *H_clb  = &(H0_lab);
   struct coord_lab           *H1_clb = &(H1_lab);
   struct coord_lab           *t_clb  = &(t_lab);
@@ -209,7 +210,7 @@ FILE                     *tr_error
   /*                     ogh = H_tr - Nh                   */
 
   /* In prg is iEh replacing H_in (CRT causes troubles)    */
-
+  /* move to gd_close */
   if (i_lab == NULL) {
     (void) ng_trans(NULL, NULL, 0.0, 0.0, 0.0, &N, &E, &H, "", NULL);
     i_clb           = NULL;
@@ -221,6 +222,7 @@ FILE                     *tr_error
         if (grid_tab->init != 0) (void) geoid_c(grid_tab, 0, NULL);
     return(0);
   }
+  /*end move to gd_close*/
 
   *X = *Y = *Z = 0.0;
 

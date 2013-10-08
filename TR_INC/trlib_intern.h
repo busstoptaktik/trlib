@@ -52,6 +52,7 @@ typedef struct coord_lab PR;
 
 struct TR_kms_str{
     PR *proj_in, *proj_out;
+    gd_state     *gd_tr_state;
     struct mgde_str *geoid_pt;
     char geoid_name[TR_MAX_FILENAME];
     int close_table;
