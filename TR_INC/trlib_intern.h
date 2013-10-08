@@ -21,6 +21,7 @@
 
 /* Intern API header som definerer TR-objektet, thokn, simlk, sep. 2011 */
 #include <stdio.h>
+#include "metadata.h"
 #include "geo_lab.h"
 #include "geoid_d.h"
 

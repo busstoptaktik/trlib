@@ -33,7 +33,58 @@
 
 #include "geo_lab.h"
 
+struct gd_state{
+	struct coord_lab    *i_lab, *o_lab; 
+	struct coord_lab    H0_lab;
+	struct coord_lab    H2_lab, H3_lab; /* grid cstm dh*/
+	struct coord_lab   *i_Rlab;  /* beg REG of ETPL  */
+	struct coord_lab   *G_Rlab;  /* end REG of E geoid */
+	struct coord_lab   *T_Rlab;  /* end REG of ETPL dh */
+	struct coord_lab   *O_Rlab;  /* end REG of ETPL tr */
+	struct coord_lab   *i_Nlab;  /* beg NON of ETPL  */
+	struct coord_lab   *G_Nlab;  /* end NON of E geoid */
+	struct coord_lab   *T_Nlab;  /* end NON of ETPL dh */
+	struct coord_lab   *O_Nlab;  /* end NON of ETPL tr */
+	struct coord_lab    t_lab;   /* non-reg gateway */
+	struct coord_lab    g_lab;   /* geo_* PRE/ANT   */
 
+        struct mgde_str   *grid_tab;
+	/*struct mgde_str *s_grid_tab = NULL;*/
+	struct mgde_str  h_grid_tab;
+	struct htr_c_str htr_const;
+	int               b_lev, s_lev;
+	short            init, iEh_req, oEh_req;
+	short            s_req_dh;
+        /*                     START, STOP, ProjTilProj*/
+	short            sta[3], stp[3], ptp[3];
+	char             i_sep, nonp_i[3];
+	char             o_sep, nonp_o[3];
+	/*handle to non-standard transformations*/
+	int      (*dfb_trf)(
+		struct coord_lab      *i_lab,
+		struct coord_lab      *o_lab,
+		double              N,    double   E,    double   H,
+		double             *Nout, double  *Eout, double  *Hout,
+		char               *usertxt,
+		FILE               *tr_error
+	);
+
+	/*struct coord_lab    *i_lab, *o_lab;*/
+};
+
+typedef struct gd_state gd_state;
+
+gd_state                      *gd_open(
+/*___________________________*/
+struct coord_lab            *i_lab,
+struct coord_lab            *o_lab,
+char                            *special_table
+);
+
+void gd_close(gd_state *self);
+struct mgde_str *gd_global_stdgeoids(void);
+struct mgde_str *gd_global_fehmarngeoid(void);
+struct mgde_str *gd_global_fbeltgeoid(void);
 
 int conv_w_crd(char *mlb, struct coord_lab *c_lab);
 int conv_w_tab(char *mlb, struct gde_lab *t_lab);
