@@ -112,7 +112,9 @@ def main(args):
 		return -1
 	if "-trace" in args:
 		threading.settrace(tracer)
+	
 	RandomTests.SetThreadMode()
+	TrLib.SetThreadMode(False)
 	now=time.asctime()
 	nows=now.replace(" ","_").replace(":","_")
 	log_name=LOG_FILE+"_"+nows+".log"
