@@ -53,11 +53,7 @@ typedef struct coord_lab PR;
 
 struct TR_kms_str{
     PR *proj_in, *proj_out;
-    gd_state     *gd_tr_state;
-    struct mgde_str *geoid_pt;
-    char geoid_name[TR_MAX_FILENAME];
-    int close_table;
-    int use_geoids;
+    gd_state     *state,*etats;
     int err;
 };
 
@@ -85,11 +81,9 @@ struct PLATE {
 * Could consider implementing TR *TR_Compose(PR*,PR*) and  void TR_CloseContainer(TR*)  functions for maximal performance and internal use.
 * This would not require any reference counting in constructors and desctructors, as long as TR_CloseProjection is not called before TR_CloseContainer.
 */
-int TR_GeoidTable(struct TR_kms_str *tr);
-int TR_SpecialGeoidTable(struct TR_kms_str *tr, char *geoid_name);
 int TR_IsMainThread(void);
 int TR_IsThreadSafe(struct coord_lab *plab);
-int TR_tr(PR*,PR*, double*, double*, double*, double*, double*,double*, double*, int , int , struct mgde_str*); 
+int TR_tr(gd_state*, double*, double*, double*, double*, double*,double*, double*, int); 
 int TR_itrf(struct coord_lab*, struct coord_lab*, double*, double*, double*, double*, double*, double*, int, double*, double*, double*, double*, double*, double*, int, double*, int, struct PLATE*);
 PR *TR_OpenProjection(char *mlb);
 void TR_CloseProjection(PR *proj);

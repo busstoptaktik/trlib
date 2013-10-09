@@ -48,8 +48,8 @@ struct gd_state{
 	struct coord_lab   *O_Nlab;  /* end NON of ETPL tr */
 	struct coord_lab    t_lab;   /* non-reg gateway */
 	struct coord_lab    g_lab;   /* geo_* PRE/ANT   */
-
-  struct mgde_str    *grid_tab;
+        char   geoid_name[MLBLNG];
+        struct mgde_str    *grid_tab;
 	/*struct mgde_str  *s_grid_tab = NULL;*/
 	struct mgde_str     h_grid_tab;
 	struct htr_c_str    htr_const;
@@ -81,9 +81,9 @@ char                            *special_table
 );
 
 void gd_close(gd_state *self);
-struct mgde_str *gd_global_stdgeoids(void);
-struct mgde_str *gd_global_fehmarngeoid(void);
-struct mgde_str *gd_global_fbeltgeoid(void);
+struct mgde_str *gd_global_stdgeoids(int open_g);
+struct mgde_str *gd_global_fehmarngeoid(int open_g);
+struct mgde_str *gd_global_fbeltgeoid(int open_g);
 
 int conv_w_crd(char *mlb, struct coord_lab *c_lab);
 int conv_w_tab(char *mlb, struct gde_lab *t_lab);

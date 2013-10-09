@@ -69,14 +69,9 @@ double                   *ogh
   struct coord_lab              *o_wlab = NULL;  /* end   REG of ETPL  */
   struct coord_lab             **o_nlab = NULL;  /* end   REG of ETPL  */
   struct coord_lab             **o_rlab = NULL;  /* end   REG of ETPL  */
-  struct coord_lab               w_lab;   /* work label         */
-  struct coord_lab           *w_oclb;
-  union rgn_un                rgn_DE, rgn_EE, rgn_GR;
 
-  short                       i_rgn, o_rgn;
-  int                         action, lev, R_N, rs = 0, RES, RGH = 0;
+  int                         action, lev, rs = 0, RES, RGH = 0;
   int                         ies = 0, res, dsh = 0, iEhr, oEhr, req_th = 0;
-  char                        dstr[128];
   double                      N, E, H, gh, igh, dh = 0.0, Nh = 0.0;
   double                      NN, EE, HH, iEh, oEh = 0.0, th = 0.0;
   char                        err_txt[1024];
@@ -156,15 +151,15 @@ double                   *ogh
   /* but Nh should be replaced by Nh_false                 */
   /* and      Nh = H_in                                    */
 
-  /* req_gh  > 0    :: calculate gh in o_lab               */
-  /* req_gh == 0    :: calculate gh in o_lab if needed     */
-  /* req_gh  < 0    :: DO NOT get gh                       */
+
+  /*  gh always calculated in o_lab system when state->grid_tab is set */
+  
   /* H_in/(H_in+igh) transformed to o_lab                  */
   /*                     ogh = H_tr - Nh                   */
 
   /* In prg is iEh replacing H_in (CRT causes troubles)    */
  
-  if (tr_state->i_lab == NULL) {
+  if (tr_state == NULL) {
     (void) ng_trans(NULL, NULL, 0.0, 0.0, 0.0, &N, &E, &H, "", NULL);
      return(0);
   }

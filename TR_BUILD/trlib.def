@@ -74,7 +74,6 @@ EXPORTS
 	fputg
 	fputshpprj
 	gatg
-	gd_t_val
 	gd_trans
 	gen_pol
 	geoid_c
@@ -138,7 +137,6 @@ EXPORTS
 	tabdd_val
 	tcts_u
 	tpd_doc_f
-	u32_to_map
 	utgs
 	utsb
 	v_red

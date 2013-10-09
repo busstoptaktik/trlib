@@ -56,7 +56,7 @@ void gd_close(gd_state *self){
 		free(self);
 		return;
 	}
-	if (self->grid_tab==gd_global_fehmarngeoid() || self->grid_tab==gd_global_fbeltgeoid() || self->grid_tab==gd_global_stdgeoids()){
+	if (self->grid_tab==gd_global_fehmarngeoid(1) || self->grid_tab==gd_global_fbeltgeoid(1) || self->grid_tab==gd_global_stdgeoids(1)){
 		free(self);
 		return;
 	}
@@ -66,58 +66,77 @@ void gd_close(gd_state *self){
 	return;
 }
 
-struct mgde_str *gd_global_stdgeoids(void){
+struct mgde_str *gd_global_stdgeoids(int open_g){
 	static struct mgde_str *self=NULL;
-	if (!self){
-		self=malloc(sizeof(struct mgde_str));
-		if (!self) {
-			lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+	if(open_g){
+		if (!self){
+			self=malloc(sizeof(struct mgde_str));
+			if (!self) {
+				lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+				return NULL;
+			}
+			self->init = 0;
+			if (geoid_i("STD", GDE_LAB, self, NULL) > 0) 
+				return self;
+			geoid_c(self, 0, NULL);
+			free(self);
+			lord_error(TR_ALLOCATION_ERROR,LORD("Can not open geoids."));
 			return NULL;
 		}
-		if (geoid_i("STD", GDE_LAB, self, NULL) > 0) 
-			return self;
-		geoid_c(self, 0, NULL);
-		free(self);
-		lord_error(TR_ALLOCATION_ERROR,LORD("Can not open geoids"));
-		return NULL;
+		return self;
 	}
-	return self;
+	geoid_c(self, 0, NULL);
+	free(self);
+	return NULL;
 }
 
-struct mgde_str *gd_global_fehmarngeoid(void){
+struct mgde_str *gd_global_fehmarngeoid(int open_g){
 	static struct mgde_str *self=NULL;
-	if (!self){
-		self=malloc(sizeof(struct mgde_str));
-		if (!self) {
-			lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+	if(open_g){
+		if (!self){
+			self=malloc(sizeof(struct mgde_str));
+			if (!self) {
+				lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+				return NULL;
+			}
+			self->init = 0;
+			if (geoid_i("fehmarngeoid10.bin", GDE_LAB, self, NULL) > 0) 
+				return self;
+				
+			geoid_c(self, 0, NULL);
+			free(self);
+			lord_error(TR_ALLOCATION_ERROR,LORD("Can not open fehmarngeoid."));
 			return NULL;
 		}
-		if (geoid_i("fehmarngeoid10.bin", GDE_LAB, self, NULL) > 0) 
-			return self;
-		geoid_c(self, 0, NULL);
-		free(self);
-		lord_error(TR_ALLOCATION_ERROR,LORD("Can not open fehmarngeoid."));
-		return NULL;
+		return self;
 	}
-	return self;
+	geoid_c(self, 0, NULL);
+	free(self);
+	return NULL;
 }
 
-struct mgde_str *gd_global_fbeltgeoid(void){
+struct mgde_str *gd_global_fbeltgeoid(int open_g){
 	static struct mgde_str *self=NULL;
-	if (!self){
-		self=malloc(sizeof(struct mgde_str));
-		if (!self) {
-			lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+	if(open_g){
+		if (!self){
+			self=malloc(sizeof(struct mgde_str));
+			if (!self) {
+				lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+				return NULL;
+			}
+			self->init = 0;
+			if (geoid_i("fbeltgeoid.bin", GDE_LAB, self, NULL) > 0) 
+				return self;
+			geoid_c(self, 0, NULL);
+			free(self);
+			lord_error(TR_ALLOCATION_ERROR,LORD("Can not open fbeltgeoid."));
 			return NULL;
 		}
-		if (geoid_i("fbeltgeoid.bin", GDE_LAB, self, NULL) > 0) 
-			return self;
-		geoid_c(self, 0, NULL);
-		free(self);
-		lord_error(TR_ALLOCATION_ERROR,LORD("Can not open fbeltgeoid."));
-		return NULL;
+		return self;
 	}
-	return self;
+	geoid_c(self, 0, NULL);
+	free(self);
+	return NULL;
 }
 
 struct mgde_str *gd_special_table(char *geoid_name){
@@ -127,6 +146,7 @@ struct mgde_str *gd_special_table(char *geoid_name){
 		lord_error(TR_ALLOCATION_ERROR,LORD("SpecialGeoidTable: Failed to allocate space."));
 		return NULL;
 	}
+	self->init = 0;
 	if (geoid_i(geoid_name, GDE_LAB, self, NULL) > 0) return self;
 	
 	geoid_c(self, 0, NULL);
@@ -152,17 +172,16 @@ char                            *special_table
     /* 8 - 15, non-reg transf. */  1, 1, 1, 1,  1, 1, 1, 1
   };
   struct coord_lab           *H_clb, *t_clb ;
-  struct coord_lab              *i_wlab = NULL;  /* begin REG of ETPL  */
   struct coord_lab              *o_wlab = NULL;  /* end   REG of ETPL  */
   struct coord_lab             **o_nlab = NULL;  /* end   REG of ETPL  */
   struct coord_lab             **o_rlab = NULL;  /* end   REG of ETPL  */
-  struct coord_lab               w_lab;   /* work label         */
+  
   struct coord_lab           *w_oclb;
   union rgn_un                rgn_DE, rgn_EE, rgn_GR;
 
   short                       i_rgn, o_rgn;
-  int                         action, lev, R_N, rs = 0, RES, RGH = 0;
-  int                         ies = 0, res, dsh = 0, iEhr, oEhr, req_th = 0, use_geoids=0;
+  int                         lev, R_N, rs = 0, RGH = 0;
+  int                         ies = 0, res, dsh = 0, req_th = 0, use_geoids=0;
   char                        dstr[128];
   
   self=calloc(sizeof(gd_state),1);
@@ -176,6 +195,10 @@ char                            *special_table
   H_clb  = &(self->H0_lab);
   t_clb  = &(self->t_lab);
 
+  (void) strcpy(rgn_DE.prfx, "DE");
+  (void) strcpy(rgn_EE.prfx, "EE");
+  (void) strcpy(rgn_GR.prfx, "GR");
+    
  
   /* ++++++++++++++        WARNING          ++++++++++++++ */
   /* call with non std geoids may give erroneous Heights   */
@@ -260,36 +283,53 @@ char                            *special_table
   /*__IS SET ONLY__*/
   i_rgn      = i_lab->p_rgn;
   o_rgn      = o_lab->p_rgn;
+  ies        = (i_rgn == rgn_EE.r_nr[0]) || (o_rgn == rgn_EE.r_nr[0]);
+  self->geoid_name[0]='\0';
   use_geoids=(HAS_HEIGHTS(i_lab) || HAS_HEIGHTS(o_lab)) && (GET_HDTM(i_lab)!=GET_HDTM(o_lab)) 
   && (GET_DTM(i_lab)!=GET_DTM(o_lab));
   if (use_geoids){
-	  if (special_table && *special_table){
+        if (special_table && *special_table){
 	    self->grid_tab = gd_special_table(special_table);
+	    strncpy(self->geoid_name,special_table,MLBLNG);
 	   }
 	  else if (i_lab->imit == FHMASK || o_lab->imit == FHMASK) {
               /* USE: fehmarngeoid10.bin */
               /* because: dvr90g.01 is out by 1cm */
-		  self->grid_tab=gd_global_fehmarngeoid();
+		  self->grid_tab=gd_global_fehmarngeoid(1);
 	  }
 	  else  if  (i_rgn == rgn_DE.r_nr[0] || o_rgn == rgn_DE.r_nr[0]){
-		  self->grid_tab=gd_global_fbeltgeoid();
+		  self->grid_tab=gd_global_fbeltgeoid(1);
 	  }
 	  else
-		  self->grid_tab=gd_global_stdgeoids();
+		  self->grid_tab=gd_global_stdgeoids(1);
 	   if (0 == self->grid_tab) {
 		    free(self);
 		    return NULL;
 	    }
+
+	    if (i_lab->imit == FHMASK || o_lab->imit == FHMASK)
+                     (void) strcpy(dstr, self->grid_tab->table_u[0].clb);
+	    else
+	    if (i_rgn == rgn_GR.r_nr[0] || o_rgn == rgn_GR.r_nr[0])
+                    (void) strcpy(dstr, "geoEgr96");
+            else if (ies) 
+		    (void) strcpy(dstr, "geoEeetrf89");
+	    else if (i_rgn != 0) {
+              char     rgn_p[8], rgn_name[24];
+              if (conv_rgn(i_rgn, rgn_p, rgn_name) > 0)
+                 (void) sprintf(dstr, "%-2s_%s",
+                                rgn_p, "geoEetrf89");
+            } else
+                  (void) strcpy(dstr, "geoEetrf89");
+            (void) conv_w_crd(dstr, &self->H0_lab);
   }
   else
 	  self->grid_tab=NULL;
   
     self->b_lev      = use_geoids ? 0 : 1;
     self->s_lev      =   2;
-   
     self->i_sep      = (i_lab->cstm != 1)
                ? *(i_lab->mlb+i_lab->sepix) : (char) 'E';
-    
     self->o_sep      = (o_lab->cstm != 1)
                ? *(o_lab->mlb+o_lab->sepix) : (char) 'E';
     if (self->i_sep == '\0' || self->i_sep == 'L') self->i_sep = '_';
@@ -322,10 +362,6 @@ char                            *special_table
 	return(NULL);
     }
 
-    (void) strcpy(rgn_DE.prfx, "DE");
-    (void) strcpy(rgn_EE.prfx, "EE");
-    (void) strcpy(rgn_GR.prfx, "GR");
-    ies        = (i_rgn == rgn_EE.r_nr[0]) || (o_rgn == rgn_EE.r_nr[0]);
     if (!ies) {
       if (i_rgn == 0 && o_rgn != 0) i_rgn = o_rgn;
       else
@@ -340,25 +376,6 @@ char                            *special_table
       self->sta[lev] = self->stp[lev] = 0;
       switch (lev) {
       case 0:
-      
-          
-          
-            i_wlab =  &self->H0_lab; 
-            
-            if (i_rgn == rgn_GR.r_nr[0] || o_rgn == rgn_GR.r_nr[0])
-                    (void) strcpy(dstr, "geoEgr96");
-            else if (ies) 
-		    (void) strcpy(dstr, "geoEeetrf89");
-	    else if (i_rgn != 0) {
-              char     rgn_p[8], rgn_name[24];
-              if (conv_rgn(i_rgn, rgn_p, rgn_name) > 0)
-                 (void) sprintf(dstr, "%-2s_%s",
-                                rgn_p, "geoEetrf89");
-            } else
-                  (void) strcpy(dstr, "geoEetrf89");
-	    
-            (void) conv_w_crd(dstr, i_wlab);
-	
 	self->G_Nlab = &self->H0_lab;
         self->G_Rlab = &self->H0_lab;
         o_nlab = &self->G_Nlab;
@@ -506,21 +523,21 @@ char                            *special_table
 
       case DKMASK: /* dk_trans */
       case EDMASK: /* dk_trans */
-        (void) ((conv_w_crd("DK_tcgeo_ed50", &self->t_lab)==CRD_LAB)
-                 && (conv_w_crd("DK_geo_ed50",  &self->g_lab)==CRD_LAB));
-        self->dfb_trf = dk_trans;
+         conv_w_crd("DK_tcgeo_ed50", &self->t_lab);
+	 conv_w_crd("DK_geo_ed50",  &self->g_lab);
+         self->dfb_trf = dk_trans;
         break;
 
       case FEMASK: /* fe_trans */
-        (void) conv_w_crd("FO_utm29_etrf89", &self->t_lab)==CRD_LAB;
+          conv_w_crd("FO_utm29_etrf89", &self->t_lab);
         /* utm29_etrs89 => self->nonp_i/o must be zero */
         if ((R_N == REG_NON || R_N == NON_NON) && w_oclb->cstm == 1) {
           (void) sprintf(dstr, "geoE%s", w_oclb->mlb+4);
-          (void) conv_w_crd(dstr, &self->g_lab)==CRD_LAB;
+            conv_w_crd(dstr, &self->g_lab);
           if (i_lab->cstm == 1) {
             /* WARN: ONLY POSSIBLE when no gh */
             (void) sprintf(dstr, "geoE%s", i_lab->mlb+4);
-            (void) conv_w_crd(dstr, &self->t_lab)==CRD_LAB;
+             conv_w_crd(dstr, &self->t_lab);
 	    if (use_geoids){
 		    lord_error(TRF_ILLEG_,LORD("Impossible to use geoids here! %s->%s"),i_lab->mlb,o_lab->mlb);
 		    gd_close(self);
@@ -529,28 +546,28 @@ char                            *special_table
         } else
         if ((R_N == NON_REG || R_N == NON_NON) && i_lab->cstm == 1) {
           (void) sprintf(dstr, "geoE%s", i_lab->mlb+4);
-          (void) conv_w_crd(dstr, &self->g_lab)==CRD_LAB;
+           conv_w_crd(dstr, &self->g_lab);
         }
         else self->g_lab = self->t_lab;
         self->dfb_trf = fe_trans;
         break;
 
       case NGMASK: /* ng_trans */
-        (void) conv_w_crd("GR_geo_gr96", &self->t_lab) == CRD_LAB;
+	conv_w_crd("GR_geo_gr96", &self->t_lab);
         if ((R_N == NON_REG && i_lab->datum != 62) ||
             (R_N == REG_NON && w_oclb->datum != 62)) self->g_lab = self->t_lab;
         else
-        (void) conv_w_crd("GR_geo_nad83g", &self->g_lab)==CRD_LAB;
+           conv_w_crd("GR_geo_nad83g", &self->g_lab);
         self->dfb_trf = ng_trans;
         break;
 
       case EEMASK: /* ee_trans */
-        (void) conv_w_crd("EE_utm35_eetrf89", &self->t_lab)==CRD_LAB;
+        conv_w_crd("EE_utm35_eetrf89", &self->t_lab);
         self->dfb_trf = ee_trans;
         break;
 
       case FHMASK: /* fh_trans */
-        (void) conv_w_crd("DK_geo_feh10", &self->t_lab) == CRD_LAB;
+        conv_w_crd("DK_geo_feh10", &self->t_lab);
         /* Here o_lab must be used: to get the correct limits! */
         i_lab->date  = (i_lab->datum == 33 || o_lab->datum == 33)
                      ? 0.0 : 200.0;

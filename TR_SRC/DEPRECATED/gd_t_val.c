@@ -26,8 +26,8 @@ struct coord_lab         *i_lab,
 double                    N_in,
 double                    E_in,
 double                   *t_val,
-struct mgde_str          *grid_tab,
-char                     *err_txt
+struct mgde_str       *grid_tab,
+char                      *err_txt
 )
 {
 
@@ -37,7 +37,7 @@ char                     *err_txt
 /* err_txt    return error report */
 
   int                   res = 0;
-  double                N_out, E_out, H_out;
+  double             N_out, E_out, H_out;
 
 
   if (grid_tab->init) {
