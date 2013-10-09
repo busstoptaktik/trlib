@@ -32,6 +32,7 @@
 #define           H_METADATA
 
 #include "geo_lab.h"
+#include "geoid_d.h"
 
 struct gd_state{
 	struct coord_lab    *i_lab, *o_lab; 
@@ -48,17 +49,17 @@ struct gd_state{
 	struct coord_lab    t_lab;   /* non-reg gateway */
 	struct coord_lab    g_lab;   /* geo_* PRE/ANT   */
 
-        struct mgde_str   *grid_tab;
-	/*struct mgde_str *s_grid_tab = NULL;*/
-	struct mgde_str  h_grid_tab;
-	struct htr_c_str htr_const;
-	int               b_lev, s_lev;
-	short            init, iEh_req, oEh_req;
-	short            s_req_dh;
-        /*                     START, STOP, ProjTilProj*/
-	short            sta[3], stp[3], ptp[3];
-	char             i_sep, nonp_i[3];
-	char             o_sep, nonp_o[3];
+  struct mgde_str    *grid_tab;
+	/*struct mgde_str  *s_grid_tab = NULL;*/
+	struct mgde_str     h_grid_tab;
+	struct htr_c_str    htr_const;
+	int                 b_lev, s_lev;
+	short               iEh_req, oEh_req;
+	short               s_req_dh;
+  /*                  START, STOP, ProjToProj*/
+	short               sta[3], stp[3], ptp[3];
+	char                i_sep, nonp_i[3];
+	char                o_sep, nonp_o[3];
 	/*handle to non-standard transformations*/
 	int      (*dfb_trf)(
 		struct coord_lab      *i_lab,
@@ -68,8 +69,6 @@ struct gd_state{
 		char               *usertxt,
 		FILE               *tr_error
 	);
-
-	/*struct coord_lab    *i_lab, *o_lab;*/
 };
 
 typedef struct gd_state gd_state;

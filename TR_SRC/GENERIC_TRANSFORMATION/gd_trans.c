@@ -52,9 +52,9 @@
 #define  DEBUGGDTRANS
 TEST */
 
-int                        gd_trans(
-/*________________________________*/
-gd_state                *tr_state,
+int                       gd_trans(
+/*_______________________________*/
+gd_state                 *tr_state,
 double                    N_in,
 double                    E_in,
 double                    H_in,
@@ -65,13 +65,6 @@ double                   *ogh
 
 )
 {
-
- 
-  
-  struct coord_lab           *H_clb  = &(H0_lab);
- 
-  struct coord_lab           *t_clb  = &(t_lab);
-
   struct coord_lab              *i_wlab = NULL;  /* begin REG of ETPL  */
   struct coord_lab              *o_wlab = NULL;  /* end   REG of ETPL  */
   struct coord_lab             **o_nlab = NULL;  /* end   REG of ETPL  */
@@ -86,6 +79,7 @@ double                   *ogh
   char                        dstr[128];
   double                      N, E, H, gh, igh, dh = 0.0, Nh = 0.0;
   double                      NN, EE, HH, iEh, oEh = 0.0, th = 0.0;
+  char                        err_txt[1024];
 
   /* ++++++++++++++        WARNING          ++++++++++++++ */
   /* call with non std geoids may give erroneous Heights   */
@@ -146,8 +140,8 @@ double                   *ogh
   /*  E        N   .    +        0.0   +        Htr-gh =Nh      */
   /*  E        E   .             0.0                   =H_tr    */
 
-  /*  gh : +       :: calculate gh in system t_lab              */
-  /*  igh          :: calculate gh in system i_lab              */
+  /*  gh : +       :: calculate gh in system tr_state->t_lab    */
+  /*  igh          :: calculate gh in system tr_state->i_lab    */
 
   /* Asume  H_in is Ellipsoidal height !!!!!               */
   /* then   H_in = h = H + N = Nh + igh                    */
@@ -170,7 +164,7 @@ double                   *ogh
 
   /* In prg is iEh replacing H_in (CRT causes troubles)    */
  
-  if (i_lab == NULL) {
+  if (tr_state->i_lab == NULL) {
     (void) ng_trans(NULL, NULL, 0.0, 0.0, 0.0, &N, &E, &H, "", NULL);
      return(0);
   }
@@ -245,7 +239,7 @@ double                   *ogh
 	(void) lord_debug(0, LORD("case 1: NON -> PRJ: th = %f"), th);
 #endif
         }
-        if (tr_state->nonp_i[b_lev]) action ++;
+        if (tr_state->nonp_i[tr_state->b_lev]) action ++;
         break;
 
       case  PTG: /* PRJ (or GEO) -> GEO */
@@ -299,7 +293,7 @@ double                   *ogh
 
       case  GTP: /* GEO -> PRJ (or GEO) */
         /*______________________________*/
-        if (!nonp_o[lev]) {
+        if (!tr_state->nonp_o[lev]) {
 #ifdef DEBUGGDTRANS
 	(void) lord_debug(0, LORD("case 6: GEO -> PRJ"));
 	(void) lord_debug(0, LORD("   %s;"), (o_wlab).mlb);
@@ -382,7 +376,7 @@ double                   *ogh
     case 0:
       if (RES >= TRF_TOLLE_) {
         RGH = grid_val(&tr_state->H0_lab,tr_state->grid_tab, N, E, &gh, err_txt);
-        if (sta[0] == CTG && iEhr) {
+        if (tr_state->sta[0] == CTG && iEhr) {
           iEh  = H;
           iEhr = 0;
         }
@@ -392,7 +386,7 @@ double                   *ogh
             if (!tr_state->s_req_dh) ++ lev;
             Nh  = (tr_state->i_sep != 'E') ? iEh : H - gh;
             igh = iEh - H + gh;
-            if (tr_state->oEhr && tr_state->stp[2] <= GTC) {
+            if (oEhr && tr_state->stp[2] <= GTC) {
               oEh  = Nh + igh;
               oEhr = 0;
             }

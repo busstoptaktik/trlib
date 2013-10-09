@@ -50,9 +50,9 @@
 void gd_close(gd_state *self){
 	if (!self)
 		return;
-	if (self->h_grid_tab)
-		geoid_c(self->h_grid_tab,0,NULL);
-	if (!self->grid_table){
+	if (&self->h_grid_tab)
+		geoid_c(&self->h_grid_tab,0,NULL);
+	if (!self->grid_tab){
 		free(self);
 		return;
 	}
@@ -60,7 +60,7 @@ void gd_close(gd_state *self){
 		free(self);
 		return;
 	}
-	geoid_c(self->grid_table,0,NULL);
+	geoid_c(self->grid_tab,0,NULL);
 	free(self->grid_tab);
 	free(self);
 	return;
@@ -74,7 +74,6 @@ struct mgde_str *gd_global_stdgeoids(void){
 			lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
 			return NULL;
 		}
-		self->init=0;
 		if (geoid_i("STD", GDE_LAB, self, NULL) > 0) 
 			return self;
 		geoid_c(self, 0, NULL);
@@ -93,7 +92,6 @@ struct mgde_str *gd_global_fehmarngeoid(void){
 			lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
 			return NULL;
 		}
-		self->init=0;
 		if (geoid_i("fehmarngeoid10.bin", GDE_LAB, self, NULL) > 0) 
 			return self;
 		geoid_c(self, 0, NULL);
@@ -112,7 +110,6 @@ struct mgde_str *gd_global_fbeltgeoid(void){
 			lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
 			return NULL;
 		}
-		self->init=0;
 		if (geoid_i("fbeltgeoid.bin", GDE_LAB, self, NULL) > 0) 
 			return self;
 		geoid_c(self, 0, NULL);
@@ -130,7 +127,6 @@ struct mgde_str *gd_special_table(char *geoid_name){
 		lord_error(TR_ALLOCATION_ERROR,LORD("SpecialGeoidTable: Failed to allocate space."));
 		return NULL;
 	}
-	self->init=0;
 	if (geoid_i(geoid_name, GDE_LAB, self, NULL) > 0) return self;
 	
 	geoid_c(self, 0, NULL);
@@ -171,7 +167,7 @@ char                            *special_table
   
   self=calloc(sizeof(gd_state),1);
   if (0==self){
-	  lord_error(0,TR_ALLOCATION_ERROR,LORD("Failed to allocate memory."));
+	  lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate memory."));
 	  return self;
   }
 
@@ -303,26 +299,26 @@ char                            *special_table
     if (i_lab->cstm < 1 || 16 < i_lab->cstm ||
         (6 <= i_lab->datum && i_lab->datum <= 8)) {
          gd_close(self);
-	 lord_error( TRF_ILLEG_, "gd_trans(unintelligible input label)");
+	 lord_error(TRF_ILLEG_, "gd_trans(unintelligible input label)");
 	 return(NULL);
 	}
     if  (o_lab->cstm < 1 || 16 < o_lab->cstm ||
                         (6 <= o_lab->datum && o_lab->datum <= 8)) {
         gd_close(self);
-	lord_error( TRF_ILLEG_, "gd_trans(unintelligible output label)");
+	lord_error(TRF_ILLEG_, "gd_trans(unintelligible output label)");
 	return(NULL);
     }
 
     /* Test for regular systems */
     if (i_lab->imit == 0 && 7 < i_lab->cstm) {
         gd_close(self);
-	lord_error( TRF_ILLEG_, "gd_trans(ill. regular system)");
+	lord_error(TRF_ILLEG_, "gd_trans(ill. regular system)");
 	return(NULL);
     }
     
     if (o_lab->imit == 0 && 7 < o_lab->cstm) {
         gd_close(self);
-	lord_error( TRF_ILLEG_, "gd_trans(ill. regular system)");
+	lord_error(TRF_ILLEG_, "gd_trans(ill. regular system)");
 	return(NULL);
     }
 
@@ -353,7 +349,7 @@ char                            *special_table
                     (void) strcpy(dstr, "geoEgr96");
             else if (ies) 
 		    (void) strcpy(dstr, "geoEeetrf89");
-	    else if (i_rgn != 0)) {
+	    else if (i_rgn != 0) {
               char     rgn_p[8], rgn_name[24];
               if (conv_rgn(i_rgn, rgn_p, rgn_name) > 0)
                  (void) sprintf(dstr, "%-2s_%s",
@@ -370,7 +366,7 @@ char                            *special_table
         break;
 
     case 1:
-        htr_const.inv = 0;
+        self->htr_const.inv = 0;
         if (i_lab->h_dtm == o_lab->h_dtm) self->s_req_dh = 0;
         else
         if (o_lab->h_dtm == 0) self->s_req_dh = 0;
@@ -378,7 +374,7 @@ char                            *special_table
         if (i_lab->h_dtm == 0) self->s_req_dh = -7;
         else {
           self->s_req_dh = htr_init(i_lab, o_lab, &self->H2_lab,
-                              &htr_const, self->H3_lab.mlb, dstr);
+                              &self->htr_const, self->H3_lab.mlb, dstr);
           if (self->s_req_dh < 0) { /* ILLEGAL */
             lord_error(HTRF_ILLEG_ , "gd_trans(ill. height TRF)");
 	    gd_close(self);
@@ -388,7 +384,7 @@ char                            *special_table
         switch(self->s_req_dh) {
         case 1: // DH_TAB height transformation
               res = geoid_i(self->H3_lab.mlb,
-                          DHH_LAB, &h_grid_tab, NULL);
+                          DHH_LAB, &self->h_grid_tab, NULL);
               if (res < 0){ 
 		  lord_error(TR_ALLOCATION_ERROR ,"Failed to open dh-table.");
 	          gd_close(self);
@@ -437,13 +433,13 @@ char                            *special_table
       /* non-reg     2           3      */
       R_N           = ((w_oclb->imit == 0) ? 0 : 2)
                     + (( i_lab->imit == 0) ? 0 : 1);
-      /* FE uses utm29 => nonp_i/o must be zero */
-      /* when     geo  => nonp_i/o must be one  */
-      nonp_o[lev] = (char) (w_oclb->imit == EDMASK
+      /* FE uses utm29 => self->nonp_i/o must be zero */
+      /* when     geo  => self->nonp_i/o must be one  */
+      self->nonp_o[lev] = (char) (w_oclb->imit == EDMASK
                            || w_oclb->imit == DKMASK
                            || w_oclb->imit == NGMASK
                            || w_oclb->imit == FHMASK);
-      nonp_i[lev] = (char) ( i_lab->imit == EDMASK
+      self->nonp_i[lev] = (char) ( i_lab->imit == EDMASK
                            ||  i_lab->imit == DKMASK
                            ||  i_lab->imit == NGMASK
                            ||  i_lab->imit == FHMASK);
@@ -456,7 +452,7 @@ char                            *special_table
         else { /* same datum */
           rs            = 0;
           R_N           = 0;
-          nonp_i[lev] = nonp_o[lev] = 0;
+          self->nonp_i[lev] = self->nonp_o[lev] = 0;
         }
         break;
       case REG_NON: /* regular -> non-regular */
@@ -464,7 +460,7 @@ char                            *special_table
         else { // same datum
           rs            = 0;
           R_N           = 0;
-          nonp_i[lev] = nonp_o[lev] = 0;
+          self->nonp_i[lev] = self->nonp_o[lev] = 0;
         }
         break;
 
@@ -472,7 +468,7 @@ char                            *special_table
         if ((i_lab->imit == NGMASK && w_oclb->imit == NGMASK)) {
           rs            = 0;
           R_N           = 0;
-          nonp_i[lev] = nonp_o[lev] = 0;
+          self->nonp_i[lev] = self->nonp_o[lev] = 0;
         } else
         if (i_lab->imit == EDMASK  ||
             i_lab->imit == w_oclb->imit) rs = w_oclb->imit;
@@ -510,21 +506,21 @@ char                            *special_table
 
       case DKMASK: /* dk_trans */
       case EDMASK: /* dk_trans */
-        init = (short) ((conv_w_crd("DK_tcgeo_ed50", &self->t_lab)==CRD_LAB)
-                     && (conv_w_crd("DK_geo_ed50",  &self->g_lab)==CRD_LAB));
+        (void) ((conv_w_crd("DK_tcgeo_ed50", &self->t_lab)==CRD_LAB)
+                 && (conv_w_crd("DK_geo_ed50",  &self->g_lab)==CRD_LAB));
         self->dfb_trf = dk_trans;
         break;
 
       case FEMASK: /* fe_trans */
-        init    = (short) conv_w_crd("FO_utm29_etrf89", &self->t_lab)==CRD_LAB;
-        /* utm29_etrs89 => nonp_i/o must be zero */
+        (void) conv_w_crd("FO_utm29_etrf89", &self->t_lab)==CRD_LAB;
+        /* utm29_etrs89 => self->nonp_i/o must be zero */
         if ((R_N == REG_NON || R_N == NON_NON) && w_oclb->cstm == 1) {
           (void) sprintf(dstr, "geoE%s", w_oclb->mlb+4);
-          init &= (short) conv_w_crd(dstr, &self->g_lab)==CRD_LAB;
+          (void) conv_w_crd(dstr, &self->g_lab)==CRD_LAB;
           if (i_lab->cstm == 1) {
             /* WARN: ONLY POSSIBLE when no gh */
             (void) sprintf(dstr, "geoE%s", i_lab->mlb+4);
-            init &= (short) conv_w_crd(dstr, &self->t_lab)==CRD_LAB;
+            (void) conv_w_crd(dstr, &self->t_lab)==CRD_LAB;
 	    if (use_geoids){
 		    lord_error(TRF_ILLEG_,LORD("Impossible to use geoids here! %s->%s"),i_lab->mlb,o_lab->mlb);
 		    gd_close(self);
@@ -533,28 +529,28 @@ char                            *special_table
         } else
         if ((R_N == NON_REG || R_N == NON_NON) && i_lab->cstm == 1) {
           (void) sprintf(dstr, "geoE%s", i_lab->mlb+4);
-          init &= (short) conv_w_crd(dstr, &self->g_lab)==CRD_LAB;
+          (void) conv_w_crd(dstr, &self->g_lab)==CRD_LAB;
         }
         else self->g_lab = self->t_lab;
         self->dfb_trf = fe_trans;
         break;
 
       case NGMASK: /* ng_trans */
-        init    = (short) conv_w_crd("GR_geo_gr96", &self->t_lab) == CRD_LAB;
+        (void) conv_w_crd("GR_geo_gr96", &self->t_lab) == CRD_LAB;
         if ((R_N == NON_REG && i_lab->datum != 62) ||
             (R_N == REG_NON && w_oclb->datum != 62)) self->g_lab = self->t_lab;
         else
-        init   &= (short) conv_w_crd("GR_geo_nad83g", &self->g_lab)==CRD_LAB;
+        (void) conv_w_crd("GR_geo_nad83g", &self->g_lab)==CRD_LAB;
         self->dfb_trf = ng_trans;
         break;
 
       case EEMASK: /* ee_trans */
-        init = (short) conv_w_crd("EE_utm35_eetrf89", &self->t_lab)==CRD_LAB;
+        (void) conv_w_crd("EE_utm35_eetrf89", &self->t_lab)==CRD_LAB;
         self->dfb_trf = ee_trans;
         break;
 
       case FHMASK: /* fh_trans */
-        init = (short) conv_w_crd("DK_geo_feh10", &self->t_lab) == CRD_LAB;
+        (void) conv_w_crd("DK_geo_feh10", &self->t_lab) == CRD_LAB;
         /* Here o_lab must be used: to get the correct limits! */
         i_lab->date  = (i_lab->datum == 33 || o_lab->datum == 33)
                      ? 0.0 : 200.0;
@@ -565,7 +561,6 @@ char                            *special_table
         break;
 
       case 0: /* all regular */
-        init =  1;
         break;
 
       default: /* error report */
@@ -575,7 +570,7 @@ char                            *special_table
       } /* end rs switch */
 
 #ifdef DEBUGGDTRANS
-	(void) lord_debug(0, LORD("rs = %d, nonp = %d, %d, t,g=%s,%s;"), rs, nonp_i[lev], nonp_o[lev], t_clb->mlb, (self->g_lab).mlb);
+	(void) lord_debug(0, LORD("rs = %d, nonp = %d, %d, t,g=%s,%s;"), rs, self->nonp_i[lev], self->nonp_o[lev], t_clb->mlb, (self->g_lab).mlb);
 #endif
       switch(R_N) {
       case REG_REG : /* reg->reg */
@@ -603,14 +598,14 @@ char                            *special_table
 
       case NON_REG : /* non-reg input */
         /* o_nlab[lev]: 0 : self->G_Nlab, 2 : self->T_Nlab, 3 : self->O_Nlab(o_lab) */
-        *o_nlab    = &self->t_lab;
-        self->i_Nlab     = i_lab;
-        self->i_Rlab     = &self->t_lab;
-        dsh        = (t_clb->datum != w_oclb->datum);
+        *o_nlab        = &self->t_lab;
+        self->i_Nlab   = i_lab;
+        self->i_Rlab   = &self->t_lab;
+        dsh            = (t_clb->datum != w_oclb->datum);
         self->sta[lev] =  NTP;
         self->stp[lev] = *(io_nr_tab + w_oclb->cstm) - (short) 1;
         if ((i_lab->cstm == 1) &&
-            ((i_lab->imit == FEMASK) || nonp_i[lev])) {
+            ((i_lab->imit == FEMASK) || self->nonp_i[lev])) {
           /* crt_ed50, crt_nad83g, crt_feh10 */
           self->i_Nlab     = &self->g_lab;
           self->sta[lev] = PRE;
@@ -623,7 +618,7 @@ char                            *special_table
           self->ptp[lev] = (short) ((2 < t_clb->cstm) && (2 < w_oclb->cstm)
                            &&   (t_clb->ch_sum !=     w_oclb->ch_sum));
           if (self->ptp[lev]) self->stp[lev] = -self->stp[lev] + (short) PTN;
-          if (nonp_i[lev]) {
+          if (self->nonp_i[lev]) {
             if (w_oclb->cstm != 1) self->O_Nlab = *o_rlab;
           }
         }
@@ -638,7 +633,7 @@ char                            *special_table
         self->sta[lev] = *(io_nr_tab + i_lab->cstm);
         self->stp[lev] = PTN;
         if (w_oclb->cstm == 1 && lev == 3 &&
-            (w_oclb->imit == FEMASK || nonp_o[lev])) {
+            (w_oclb->imit == FEMASK || self->nonp_o[lev])) {
           /* o_nlab[lev]: 0 : self->G_Nlab, 1 : self->T_Nlab, 2 : self->O_Nlab */
           *o_nlab    = &self->g_lab;
           self->stp[lev] = ANT;
@@ -649,13 +644,13 @@ char                            *special_table
                            &&   (i_lab->ch_sum !=     t_clb->ch_sum));
           if (!self->ptp[lev]) {
             self->sta[lev] = -self->sta[lev] + (short) IDT;
-            if (nonp_o[lev] && i_lab->cstm != 1) 
+            if (self->nonp_o[lev] && i_lab->cstm != 1) 
 		    self->i_Nlab = i_lab;
             
 /* else */
 /* +++ HER kunne ch_sum i_lab imod self->t_lab => stop ved NTP */
           }
-          nonp_i[lev] = nonp_o[lev] = 0;
+          self->nonp_i[lev] = self->nonp_o[lev] = 0;
         }
        break;
 
@@ -667,7 +662,7 @@ char                            *special_table
         self->stp[lev] = NTP;
 
         if ((w_oclb->cstm == 1 /* crt_* */) &&
-            ((w_oclb->imit == FEMASK) || nonp_o[lev])) {
+            ((w_oclb->imit == FEMASK) || self->nonp_o[lev])) {
           /* o_nlab[lev]: 0 : self->G_Nlab, 1 : self->T_Nlab, 2 : self->O_Nlab */
           *o_nlab    = &self->g_lab;
           self->sta[lev] = PTN;
@@ -675,12 +670,12 @@ char                            *special_table
           if (i_lab->cstm == 1 && i_lab->datum != w_oclb->datum) {
             *o_rlab       = &self->t_lab;     /* reg_s feeds gate-sys */
             self->i_Nlab        = &self->t_lab;
-            nonp_o[lev] = 1;
+            self->nonp_o[lev] = 1;
             self->sta[lev]    = CTG;
           }
         } else
         if ((i_lab->cstm == 1) &&
-            ((i_lab->imit == FEMASK) || nonp_i[lev])) {
+            ((i_lab->imit == FEMASK) || self->nonp_i[lev])) {
           /* crt_ed50, crt_fodtm, crt_nad83g, crt_feh10 */
           /* NB.:: crt skulle includeres i dk_trans, ng_trans */
           self->i_Nlab     = &self->g_lab;
@@ -739,7 +734,7 @@ char                            *special_table
         }
       }
     } /* end of lev loop */
-    self->iEh_req = use_geoids && (i_clb->cstm == (short) 1 /* CRT */);
+    self->iEh_req = use_geoids && (i_lab->cstm == (short) 1 /* CRT */);
     self->oEh_req = (short) (((self->stp[2] == (short) CTC || self->stp[2] == (short) GTC) && use_geoids) ? 2 : (use_geoids ? 1 : 0));
     self->b_lev  = (use_geoids) ? 0 : ((self->s_req_dh) ? 1 : 2);
     self->i_lab=i_lab;

@@ -35,21 +35,16 @@
 #include "geo_lab.h"
 #include "geoid_d.h"
 
-extern int                 gd_trans(
-/*________________________________*/
-struct coord_lab            *i_lab,
-struct coord_lab            *o_lab,
+extern int                gd_trans(
+/*_______________________________*/
+gd_state                 *tr_state,
 double                    N_in,
 double                    E_in,
 double                    H_in,
 double                   *X,
 double                   *Y,
 double                   *Z,
-double                   *gh,
-char                      req_gh,
-struct mgde_str          *grid_tab,
-char                     *usertxt,
-FILE                     *tr_error
+double                   *gh
 );
 
 
