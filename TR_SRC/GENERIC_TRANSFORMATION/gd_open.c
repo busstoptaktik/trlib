@@ -189,8 +189,8 @@ char                            *special_table
 	  lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate memory."));
 	  return self;
   }
-
-  
+  /* Should not be necesary*/
+  self->h_grid_tab.init = 0;
   
   H_clb  = &(self->H0_lab);
   t_clb  = &(self->t_lab);
@@ -403,7 +403,7 @@ char                            *special_table
               res = geoid_i(self->H3_lab.mlb,
                           DHH_LAB, &self->h_grid_tab, NULL);
               if (res < 0){ 
-		  lord_error(TR_ALLOCATION_ERROR ,"Failed to open dh-table.");
+		  lord_error(TR_ALLOCATION_ERROR ,LORD("Allocation error: Failed to open dh-table. %s"), self->H3_lab.mlb);
 	          gd_close(self);
 	          return NULL;
 	      }		      

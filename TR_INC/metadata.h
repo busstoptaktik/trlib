@@ -69,7 +69,7 @@ struct gd_state{
 		char               *usertxt,
 		FILE               *tr_error
 	);
-};
+  };
 
 typedef struct gd_state gd_state;
 

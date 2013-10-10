@@ -58,14 +58,25 @@ FILE                *tr_error
 
   /* Fehmarn Bridge Projection test of AREA */
   /* and transf to/from geo                 */
-  static THREAD_SAFE  int               in_chsum = 0L;
-  static THREAD_SAFE  int               outchsum = 0L;
-  static THREAD_SAFE  int               init = 0;
-  static THREAD_SAFE  double            lim[4], date = -10.0;
-
+  
+  static const double c_lim[] = {0.948877337, 0.952077107, 0.190531777, 0.199258423, 0.948295560, 0.957022207, 0.186168454, 0.209439510};
+/*
+  Germany
+  lim[0] = sgetg("5422nt", &tpd, &nst, "nt");
+  lim[1] = sgetg("5433nt", &tpd, &nst, "nt");
+  lim[2] = sgetg("1055nt", &tpd, &nst, "nt");
+  lim[3] = sgetg("1125nt", &tpd, &nst, "nt");
+Fehmarn:
+          lim[0] = sgetg("5420nt", &tpd, &nst, "nt");
+        lim[1] = sgetg("5450nt", &tpd, &nst, "nt");
+        lim[2] = sgetg("1040nt", &tpd, &nst, "nt");
+        lim[3] = sgetg("1200nt", &tpd, &nst, "nt");
+*/ 
+  
   int                      outnr = 0, fh_z, RES = 0, IES = 0;
   int                      act, nst, res = 0, ies = 0, rrs = 0;
-  struct typ_dec           tpd;
+  int 				init;
+  const double 				*lim;
 
   struct act_nst {
     short     action;
@@ -73,9 +84,9 @@ FILE                *tr_error
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE  struct act_nst *ptab;
-  static THREAD_SAFE  int             in_nr;
-  static int                          fh_w;
+  struct act_nst *ptab;
+  int             in_nr;
+  int                          fh_w;
 
   /* Action/state table */
   static struct act_nst fhtab[] = {
@@ -87,33 +98,29 @@ FILE                *tr_error
     /* prj_feh10: 2 */ {CTG,1},{GTP,0},{TSP,0}
   };
 
+  
   /* Test io-labels */
   if (in_lab->lab_type == CRD_LAB && outlab->lab_type == CRD_LAB) {
 
-    if (init == 0) {
       /* State/action table size and width */
       fh_z = sizeof(fhtab)/sizeof(struct act_nst);
       fh_w = (int) sqrt(1.0000001*fh_z);
       init = fh_z == fh_w*fh_w;
-      if (!init)
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, "",
-                "fh_trans(internal labels)", TRF_ILLEG_));
-    }
-
-    /* Check i/o labels, init of actual transf. systems */
-    if (in_chsum != in_lab->ch_sum || date != in_lab->date ||
-        outchsum != outlab->ch_sum) {
+      
+	if (!init){
+		lord_error(TRF_PROGR_ ,LORD("Program error,  internal labels"));
+		return TRF_PROGR_ ;
+	}
 
       /* Out-system */
       /*____________*/
       outnr = outlab->cstm -1;
       if (outnr > 2) outnr = 2;
 
-      if (outlab->datum != 32)
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, "",
-                "fh_trans(outsys)", TRF_ILLEG_));
+      if (outlab->datum != 32){
+	lord_error(TRF_ILLEG_,LORD("Illegal outsys"));
+	return TRF_ILLEG_;
+      }
 
       /* In-system */
       /*___________*/
@@ -124,30 +131,18 @@ FILE                *tr_error
 (void) printf("\n*IN   nr = %4d   navn = %s;", in_nr, in_lab->mlb);
 #endif
 
-      if (in_lab->datum != 32)
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, "",
-                "fh_trans(in_sys)", TRF_ILLEG_));
-
-      if (in_lab->date < 50.0) {
-        lim[0] = sgetg("5422nt", &tpd, &nst, "nt");
-        lim[1] = sgetg("5433nt", &tpd, &nst, "nt");
-        lim[2] = sgetg("1055nt", &tpd, &nst, "nt");
-        lim[3] = sgetg("1125nt", &tpd, &nst, "nt");
-      } else {
-        lim[0] = sgetg("5420nt", &tpd, &nst, "nt");
-        lim[1] = sgetg("5450nt", &tpd, &nst, "nt");
-        lim[2] = sgetg("1040nt", &tpd, &nst, "nt");
-        lim[3] = sgetg("1200nt", &tpd, &nst, "nt");
+      if (in_lab->datum != 32){
+	lord_error(TRF_ILLEG_, LORD("Illegal insys"));
+        return TRF_ILLEG_;
       }
+      
+     /*Dette er smukt*/
+      lim = &c_lim[(in_lab->imit == FHMASK || outlab->imit == FHMASK) ? 4:0];
 
-      /* Save check-sums */
-      in_chsum = in_lab->ch_sum;
-      outchsum = outlab->ch_sum;
-      date     = in_lab->date;
-
+/*     lord_debug(0,LORD("fh_limit init area %9.5lf %9.5lf %9.5lf %9.5lf"),lim[0]*DOUT,lim[1] *DOUT,lim[2]*DOUT,lim[3]*DOUT);
+*/
       ptab = fhtab + fh_w*outnr;  /* output row */
-    } /* End of init actions */
+    /* End of init actions */
 
     /* transformation module */
     *Hout = H;
@@ -157,25 +152,28 @@ FILE                *tr_error
       nst = (ptab + nst)->nstate;
       switch(act) {
       case GTP: /* geo -> prj */
-        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = (tr_error==NULL) ? TRF_AREA_ :
-                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
+           ies = TRF_AREA_;
+           lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
+	}
         res = ptg(outlab, -1, N, E, &N, &E, usertxt, tr_error);
         *Nout = N;
         *Eout = E;
         break;
       case PTG: /* prj -> geo */
         res = ptg(in_lab, +1, N, E, &N, &E,  usertxt, tr_error);
-        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = (tr_error==NULL) ? TRF_AREA_ :
-                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
+           ies = TRF_AREA_;
+           lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
+	}
         *Nout = N;
         *Eout = E;
         break;
       case GTC: /* geo -> crt */
-        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = (tr_error==NULL) ? TRF_AREA_ :
-                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
+           ies = TRF_AREA_;
+           lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
+	}
         res   = gtc(in_lab, +1, N, E, H, &N, &E, &H, usertxt, tr_error);
         *Nout = N;
         *Eout = E;
@@ -183,9 +181,10 @@ FILE                *tr_error
         break;
       case CTG: /* crt -> geo */
         res = gtc(outlab, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
-        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = (tr_error==NULL) ? TRF_AREA_ :
-                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
+           ies = TRF_AREA_;
+           lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
+	}
         *Nout = N;
         *Eout = E;
         *Hout = H;
@@ -194,9 +193,10 @@ FILE                *tr_error
         *Nout = N;
         *Eout = E;
         res = ptg(in_lab, +1, N, E, &N, &E,  usertxt, tr_error);
-        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = (tr_error==NULL) ? TRF_AREA_ :
-                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
+           ies = TRF_AREA_;
+           lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
+	}
         if (in_lab->cstm != outlab->cstm) {
           rrs   = ptg(outlab, -1, N, E, &N, &E,  usertxt, tr_error); 
           if (rrs < res) res = rrs;
@@ -205,24 +205,26 @@ FILE                *tr_error
         }
         break;
       case IDT: /* ident, geo -> geo */
-        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E)
-           ies = (tr_error==NULL) ? TRF_AREA_ :
-                  t_status(tr_error, usertxt, "fh_trans", TRF_AREA_, "sx", "", N, E); 
+        if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
+		ies = TRF_AREA_;
+		lord_debug(0,LORD("limits er %9.5lf %9.5lf %9.5lf %9.5lf"),lim[0]*DOUT,lim[1] *DOUT,lim[2]*DOUT,lim[3]*DOUT);
+		lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
+	}
         *Nout = N;
         *Eout = E;
         break;
       default: /* programme error */
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, "",
-                "fh_trans(prog error)", TRF_ILLEG_));
+	   lord_error(TRF_ILLEG_,LORD("Program error")); 
+	   return TRF_ILLEG_;
       } /* end switch(action) */
 
       if (res < RES) RES = res;
       if (ies < IES) IES = ies;
     } while (nst && RES >= TRF_TOLLE_);
-  } else return((tr_error==NULL) ? TRF_ILLEG_ :
-                 t_status(tr_error, "",
-                 "fh_trans(i/o labels)", TRF_ILLEG_));
+  } else {
+	lord_error(TRF_ILLEG_,LORD("fh_trans(i/o labels)"));
+	return TRF_ILLEG_;
+  }
   /* Return coord and result */
   if (IES < RES) RES = IES;
   return (RES);

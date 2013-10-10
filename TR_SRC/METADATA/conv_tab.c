@@ -293,7 +293,7 @@ struct gde_lab          *t_lab,
                        rgn_pref.prfx, &mask, &trp_a);
     }
 
-    t_lab->fd = tab_file; // NOW SET THE FILE POINTER
+    t_lab->fd = tab_file; /* NOW SET THE FILE POINTER  */
 
     r_size = abs(t_lab->rec_size);
     t_3d   = (t_lab->lab_type == T3D_LAB) ? 3
