@@ -20,9 +20,9 @@
 
 typedef struct{
 	GRIM geoids[128];
-	GRIM dh_tabs[30];
-	GRIM t3d[30];
-	int  geoid_seq_std[10];
+	GRIM dhtabs[30];
+	GRIM t3dtabs[30];
+	GRIM  geoid_seq_std[10];
 	int n_geoids,n_dhtabs,n_3dtabs,n_geoid_seq_std;
 } tab_dir;
 

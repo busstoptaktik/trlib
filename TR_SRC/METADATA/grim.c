@@ -274,9 +274,6 @@ double grim_column (const GRIM g, double northing, double easting) {
     return affine_column   (g->affine, northing, easting);
 }
 
-char *grim_name(const GRIM g){
-	return g->filename;
-}
 	
 
 /* premature optimization: define as macros for slightly faster grim.c-internal use */
@@ -514,9 +511,17 @@ size_t grim_channels (GRIM g) {
     return g->channels;
 }
 
+char *grim_filename(const GRIM g){
+	return g->filename;
+}
 
+char *grim_proj(const GRIM g){
+	return pomval(g->pom, "proj_mlb");
+}
 
-
+char *grim_h_mlb(const GRIM g){
+	return pomval(g->pom, "h_mlb");
+}
 
 #ifdef TEST_GRIM
 const char pomfilecontents[] = {

@@ -389,8 +389,9 @@ of northing and easting values.
 %-----------------------------------------------------
 #endif
 
-char *grim_name(const GRIM g);
-
+char *grim_filename(const GRIM g);
+char *grim_proj(const GRIM g);
+char *grim_h_mlb(const GRIM g);
 
 #if !0xD0C
 .FILE pre.tex \renewcommand{\reportnumber}{GRIM}

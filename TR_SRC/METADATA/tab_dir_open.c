@@ -24,7 +24,7 @@
 #include "tab_dir_open.h"
 #include "KmsFncs.h"
 
-void tab_dir_close(char *self){
+void tab_dir_close(tab_dir *self){
 	free(self);
 }
 
@@ -89,14 +89,14 @@ tab_dir *tab_dir_open(char *path){
 			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to memory map %s."),name);
 			goto CLEANUP;
 		}
-		self->dh_tabs[i]=g;
+		self->dhtabs[i]=g;
 		g=grim_open(name);
 		tag_l2=get_next_child(&tag_l1,&tag_l2);
 	}
 	self->n_dhtabs = i;
-	tag_l1=get_named_child(&root,"t3dtab");
+	tag_l1=get_named_child(&root,"t3dtabs");
 	if (!tag_l1.valid){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 't3dtab' not found."));
+		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 't3dtabs' not found."));
 		goto CLEANUP;
 	}
 	tag_l2=get_next_child(&tag_l1,NULL);
@@ -107,7 +107,7 @@ tab_dir *tab_dir_open(char *path){
 			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to memory map %s."),name);
 			goto CLEANUP;
 		}
-		self->t3d[i]=g;
+		self->t3dtabs[i]=g;
 		/*TODO: err check*/
 		tag_l2=get_next_child(&tag_l1,&tag_l2);
 	}
@@ -122,8 +122,8 @@ tab_dir *tab_dir_open(char *path){
 		get_value_as_string(&tag_l2,name,len);
 		self->geoid_seq_std[j]=-1;
 		for(i=0; i<self->n_geoids && self->geoid_seq_std[j]==-1; i++){
-			if (!strcmp(name,grim_name(self->geoids[i])))
-				self->geoid_seq_std[j]=i;
+			if (!strcmp(name,grim_filename(self->geoids[i])))
+				self->geoid_seq_std[j]=self->geoids[i];
 		}
 		if (self->geoid_seq_std[j]==-1){
 			lord_error(TR_LABEL_ERROR,LORD("Undefined table %s in std-sequence."),name);
@@ -134,7 +134,7 @@ tab_dir *tab_dir_open(char *path){
 		tag_l2=get_next_child(&tag_l1,&tag_l2);
 	}
 	self->n_geoid_seq_std = j;
-	lord_debug(0,LORD("Geoids: %d, dh_tabs: %d, 3d_tabs: %d"),self->n_geoids,self->n_dhtabs,self->n_3dtabs);
+	lord_debug(0,LORD("Geoids: %d, dhtabs: %d, 3d_tabs: %d"),self->n_geoids,self->n_dhtabs,self->n_3dtabs);
 	free(xml);
 	return self;
 	

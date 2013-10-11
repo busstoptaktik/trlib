@@ -21,11 +21,13 @@
 /* National Space Center  DTU  Denmark.  This copyright claim  */
 /* does not indicate an intention of publishing this code.     */
 
+
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <string.h>
 #include    "KmsFncs.h"
 #include    "trthread.h"
+#include    "tab_dir_open.h"
 
 /*             Actions                     */
 #define PRE    0   /* crt_???? -> geoE???? */
@@ -46,122 +48,108 @@
 #define REG_NON   2 /* Regular->Non-reg */
 #define NON_NON   3 /* Non-reg->Non-reg */
 
+#define FEHMARN_NAME "fehmarngeoid10.bin"
+#define FBELT_NAME "fbeltgeoid.bin"
+
+table_adm_str *table_adm_open(char *name, tab_dir *tdir){
+	table_adm_str *self=NULL;
+	int found = -1, i;
+		
+	if (!tdir){
+		lord_error(TAB_N_MAN_,LORD("Tabdir is null."));
+		return NULL;
+	}
+	self=calloc(sizeof(table_adm_str),1);
+	if (!self){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+		return NULL;
+	}
+	if (!name || !*name || !strcmp("STD",name)){ /*STD*/
+		found=0;
+		self->n_tables=tdir->n_geoid_seq_std;
+		self->table_sequence=tdir->geoid_seq_std;
+		self->free_sequence=0;
+	}
+	else{ /* find the name and type */
+		for (i=0; i< tdir->n_geoids;  i++){
+			if(!strcmp(name, grim_filename(tdir->geoids[i]))){
+				found=i;
+				break;
+			}
+		}
+		if(found>=0){ /* Special geoid */
+			self->table_sequence=calloc(tdir->n_geoid_seq_std+1,sizeof(GRIM));
+			if (!self->table_sequence){
+				lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+				free(self);
+				return NULL;
+			}
+			self->n_tables=tdir->n_geoid_seq_std+1;
+			self->table_sequence=&tdir->geoids[found];
+			for (i=0; i< tdir->n_geoid_seq_std; i++)
+				self->table_sequence[i+1]=tdir->geoid_seq_std[i];
+			self->free_sequence=1;
+		}
+		else {
+			for (i=0; i< tdir->n_dhtabs;  i++){
+				if(!strcmp(name, grim_filename(tdir->dhtabs[i]))){
+					found=i;
+					break;
+				}
+			}
+			
+			if(found >= 0){
+				self->n_tables=1;
+				self->table_sequence=&tdir->dhtabs[found];
+				self->free_sequence=0;
+			}
+			else {
+				for (i=0; i< tdir->n_3dtabs;  i++){
+					if(!strcmp(name, grim_filename(tdir->t3dtabs[i]))){
+						found=i;
+						break;
+					}
+				}
+				if(found >= 0){
+					self->n_tables=1;
+					self->table_sequence=&tdir->t3dtabs[found];
+					self->free_sequence=0;
+				}
+			}
+		}
+	}
+		
+	if(found==-1){
+		lord_error(TAB_N_NAM_,LORD("Table not found: %s"),name);
+		free(self);
+		return NULL;
+	}
+	return self;
+}
 
 void gd_close(gd_state *self){
 	if (!self)
 		return;
-	if (&self->h_grid_tab)
-		geoid_c(&self->h_grid_tab,0,NULL);
+	
 	if (!self->grid_tab){
 		free(self);
 		return;
 	}
-	if (self->grid_tab==gd_global_fehmarngeoid(1) || self->grid_tab==gd_global_fbeltgeoid(1) || self->grid_tab==gd_global_stdgeoids(1)){
-		free(self);
-		return;
-	}
-	geoid_c(self->grid_tab,0,NULL);
+	
+	if(self->grid_tab->free_sequence)
+		free(self->grid_tab->table_sequence);
+	
 	free(self->grid_tab);
 	free(self);
 	return;
 }
 
-struct mgde_str *gd_global_stdgeoids(int open_g){
-	static struct mgde_str *self=NULL;
-	if(open_g){
-		if (!self){
-			self=malloc(sizeof(struct mgde_str));
-			if (!self) {
-				lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
-				return NULL;
-			}
-			self->init = 0;
-			if (geoid_i("STD", GDE_LAB, self, NULL) > 0) 
-				return self;
-			geoid_c(self, 0, NULL);
-			free(self);
-			lord_error(TR_ALLOCATION_ERROR,LORD("Can not open geoids."));
-			return NULL;
-		}
-		return self;
-	}
-	geoid_c(self, 0, NULL);
-	free(self);
-	return NULL;
-}
-
-struct mgde_str *gd_global_fehmarngeoid(int open_g){
-	static struct mgde_str *self=NULL;
-	if(open_g){
-		if (!self){
-			self=malloc(sizeof(struct mgde_str));
-			if (!self) {
-				lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
-				return NULL;
-			}
-			self->init = 0;
-			if (geoid_i("fehmarngeoid10.bin", GDE_LAB, self, NULL) > 0) 
-				return self;
-				
-			geoid_c(self, 0, NULL);
-			free(self);
-			lord_error(TR_ALLOCATION_ERROR,LORD("Can not open fehmarngeoid."));
-			return NULL;
-		}
-		return self;
-	}
-	geoid_c(self, 0, NULL);
-	free(self);
-	return NULL;
-}
-
-struct mgde_str *gd_global_fbeltgeoid(int open_g){
-	static struct mgde_str *self=NULL;
-	if(open_g){
-		if (!self){
-			self=malloc(sizeof(struct mgde_str));
-			if (!self) {
-				lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
-				return NULL;
-			}
-			self->init = 0;
-			if (geoid_i("fbeltgeoid.bin", GDE_LAB, self, NULL) > 0) 
-				return self;
-			geoid_c(self, 0, NULL);
-			free(self);
-			lord_error(TR_ALLOCATION_ERROR,LORD("Can not open fbeltgeoid."));
-			return NULL;
-		}
-		return self;
-	}
-	geoid_c(self, 0, NULL);
-	free(self);
-	return NULL;
-}
-
-struct mgde_str *gd_special_table(char *geoid_name){
-	struct mgde_str *self;
-	self=malloc(sizeof(struct mgde_str));
-	if (!self) {
-		lord_error(TR_ALLOCATION_ERROR,LORD("SpecialGeoidTable: Failed to allocate space."));
-		return NULL;
-	}
-	self->init = 0;
-	if (geoid_i(geoid_name, GDE_LAB, self, NULL) > 0) return self;
-	
-	geoid_c(self, 0, NULL);
-	free(self);
-	lord_error(TR_ALLOCATION_ERROR,LORD("Can not open: %s."), geoid_name);
-	return NULL;
-}
-
-
-
 gd_state                      *gd_open(
 /*___________________________*/
 struct coord_lab            *i_lab,
 struct coord_lab            *o_lab,
-char                            *special_table
+char                            *special_table,
+tab_dir                         *tdir
 )
 {
 
@@ -189,8 +177,6 @@ char                            *special_table
 	  lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate memory."));
 	  return self;
   }
-  /* Should not be necesary*/
-  self->h_grid_tab.init = 0;
   
   H_clb  = &(self->H0_lab);
   t_clb  = &(self->t_lab);
@@ -288,27 +274,24 @@ char                            *special_table
   use_geoids=(HAS_HEIGHTS(i_lab) || HAS_HEIGHTS(o_lab)) && (GET_HDTM(i_lab)!=GET_HDTM(o_lab)) 
   && (GET_DTM(i_lab)!=GET_DTM(o_lab));
   if (use_geoids){
-        if (special_table && *special_table){
-	    self->grid_tab = gd_special_table(special_table);
-	    strncpy(self->geoid_name,special_table,MLBLNG);
-	   }
-	  else if (i_lab->imit == FHMASK || o_lab->imit == FHMASK) {
+	  if (i_lab->imit == FHMASK || o_lab->imit == FHMASK) {
               /* USE: fehmarngeoid10.bin */
               /* because: dvr90g.01 is out by 1cm */
-		  self->grid_tab=gd_global_fehmarngeoid(1);
+		  self->grid_tab=table_adm_open(FEHMARN_NAME, tdir);
 	  }
 	  else  if  (i_rgn == rgn_DE.r_nr[0] || o_rgn == rgn_DE.r_nr[0]){
-		  self->grid_tab=gd_global_fbeltgeoid(1);
+		  self->grid_tab=table_adm_open(FBELT_NAME, tdir);
 	  }
 	  else
-		  self->grid_tab=gd_global_stdgeoids(1);
-	   if (0 == self->grid_tab) {
+		self->grid_tab=table_adm_open(name, tdir);
+
+	  if (0 == self->grid_tab) {
 		    free(self);
 		    return NULL;
 	    }
 
 	    if (i_lab->imit == FHMASK || o_lab->imit == FHMASK)
-                     (void) strcpy(dstr, self->grid_tab->table_u[0].clb);
+                     (void) strcpy(dstr, self->grid_tab->table_sequence[0].clb);
 	    else
 	    if (i_rgn == rgn_GR.r_nr[0] || o_rgn == rgn_GR.r_nr[0])
                     (void) strcpy(dstr, "geoEgr96");
@@ -568,11 +551,6 @@ char                            *special_table
 
       case FHMASK: /* fh_trans */
         conv_w_crd("DK_geo_feh10", &self->t_lab);
-        /* Here o_lab must be used: to get the correct limits! */
-        i_lab->date  = (i_lab->datum == 33 || o_lab->datum == 33)
-                     ? 0.0 : 200.0;
-        w_oclb->date = i_lab->date;
-        t_clb->date  = i_lab->date;
         self->g_lab        = self->t_lab;
         self->dfb_trf      = fh_trans;
         break;

@@ -33,6 +33,15 @@
 
 #include "geo_lab.h"
 #include "geoid_d.h"
+#include "grim.h"
+
+typedef struct {
+ GRIM *table_sequence;
+ int n_tables;
+ int cur_table;
+ int free_sequence;
+}
+table_adm_str;
 
 struct gd_state{
 	struct coord_lab    *i_lab, *o_lab; 
@@ -49,9 +58,8 @@ struct gd_state{
 	struct coord_lab    t_lab;   /* non-reg gateway */
 	struct coord_lab    g_lab;   /* geo_* PRE/ANT   */
         char   geoid_name[MLBLNG];
-        struct mgde_str    *grid_tab;
-	/*struct mgde_str  *s_grid_tab = NULL;*/
-	struct mgde_str     h_grid_tab;
+        table_adm_str   *grid_tab;
+	GRIM   h_grid_tab;
 	struct htr_c_str    htr_const;
 	int                 b_lev, s_lev;
 	short               iEh_req, oEh_req;
@@ -81,9 +89,9 @@ char                            *special_table
 );
 
 void gd_close(gd_state *self);
-struct mgde_str *gd_global_stdgeoids(int open_g);
-struct mgde_str *gd_global_fehmarngeoid(int open_g);
-struct mgde_str *gd_global_fbeltgeoid(int open_g);
+table_adm_str *gd_global_stdgeoids(int open_g);
+table_adm_str *gd_global_fehmarngeoid(int open_g);
+table_adm_str *gd_global_fbeltgeoid(int open_g);
 
 int conv_w_crd(char *mlb, struct coord_lab *c_lab);
 int conv_w_tab(char *mlb, struct gde_lab *t_lab);
