@@ -27,6 +27,7 @@
 #include    <stdlib.h>
 #include    <string.h>
 #include    "KmsFncs.h"
+#include    "grim.h"
 #include    "trthread.h"
 
 /*             Actions                     */
@@ -370,7 +371,7 @@ double                   *ogh
     switch (lev) {
     case 0:
       if (RES >= TRF_TOLLE_) {
-        RGH = grid_val(&tr_state->H0_lab,tr_state->grid_tab, N, E, &gh, err_txt);
+        RGH = grid_val2(&tr_state->H0_lab,tr_state->grid_tab, N, E, &gh);
         if (tr_state->sta[0] == CTG && iEhr) {
           iEh  = H;
           iEhr = 0;
@@ -404,7 +405,8 @@ double                   *ogh
       if (RES >= TRF_TOLLE_) {
         switch (tr_state->s_req_dh) {
         case 1: /* DVR90 <-> DNN, DVR90 <-> FCSVR10, FVR09 <-> MSL */
-          RGH = grid_val(&tr_state->H2_lab, &tr_state->h_grid_tab, N, E, &dh, err_txt);
+	  /*TODO: encapsulate this in a wrapper, perhaps use grid_val2....*/
+          RGH=grid_val2(&tr_state->H2_lab,tr_state->h_grid_tab,N, E, &dh);
           /* table will give std dh to dvr90 */
           break;
         case 2: /* constant:: DVR90 <-> KN44 */

@@ -91,7 +91,7 @@ endif
 #include <math.h>       /*  for HUGE_VAL            */
 #include "pom.h"
 #include "grim.h"
-
+#include "lord.h"
 
 #ifdef USE_MMAP
 #include <unistd.h>
@@ -346,13 +346,15 @@ Feel free to find this either amusing or confusing.
 GRIM grim_open (char *pomfilename) {
     GRIM g;
 	POM *p;
-
+    int res;
     if (0==pomfilename)
         return 0;
 
     p = pomread (pomfilename);
-    if (0==p)
+    if (0==p){
+	lord_error(0,LORD("Failed to read pomfile: %s"),pomfilename);
         return 0;
+    }
 
     g = calloc (1, sizeof(struct GRIM));
     if (0==g)
@@ -381,8 +383,10 @@ GRIM grim_open (char *pomfilename) {
     g->affine[4] = - g->ycellsize;
     g->affine[5] = g->yllcenter + (g->nrows - 1) * g->ycellsize;
 
-    if (0!=memory_map_file (g, pomfilename))
+    if (0!=(res=memory_map_file (g, pomfilename))){
+	lord_error(res,LORD("Memory mapping failed..."));
         return grim_close (g);
+    }
 
     return g;
 }
@@ -507,7 +511,7 @@ void grim_free_record_buffer (double *p) {
 }
 
 
-size_t grim_channels (GRIM g) {
+size_t grim_channels (const GRIM g) {
     return g->channels;
 }
 
@@ -521,6 +525,14 @@ char *grim_proj(const GRIM g){
 
 char *grim_h_mlb(const GRIM g){
 	return pomval(g->pom, "h_mlb");
+}
+
+double grim_rows(const GRIM g){
+	return g->nrows;
+}
+
+double grim_columns(const GRIM g){
+	return g->ncols;
 }
 
 #ifdef TEST_GRIM

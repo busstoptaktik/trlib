@@ -392,6 +392,8 @@ of northing and easting values.
 char *grim_filename(const GRIM g);
 char *grim_proj(const GRIM g);
 char *grim_h_mlb(const GRIM g);
+double grim_rows(const GRIM g);
+double grim_columns(const GRIM g);
 
 #if !0xD0C
 .FILE pre.tex \renewcommand{\reportnumber}{GRIM}

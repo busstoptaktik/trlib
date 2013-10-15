@@ -34,12 +34,14 @@
 #include "geo_lab.h"
 #include "geoid_d.h"
 #include "grim.h"
+#include "tab_dir_open.h"
 
 typedef struct {
  GRIM *table_sequence;
  int n_tables;
  int cur_table;
  int free_sequence;
+ int type;
 }
 table_adm_str;
 
@@ -57,9 +59,9 @@ struct gd_state{
 	struct coord_lab   *O_Nlab;  /* end NON of ETPL tr */
 	struct coord_lab    t_lab;   /* non-reg gateway */
 	struct coord_lab    g_lab;   /* geo_* PRE/ANT   */
-        char   geoid_name[MLBLNG];
+        char   geoid_name[MLBLNG]; /* should  be used to something */
         table_adm_str   *grid_tab;
-	GRIM   h_grid_tab;
+	table_adm_str   *h_grid_tab;
 	struct htr_c_str    htr_const;
 	int                 b_lev, s_lev;
 	short               iEh_req, oEh_req;
@@ -85,13 +87,20 @@ gd_state                      *gd_open(
 /*___________________________*/
 struct coord_lab            *i_lab,
 struct coord_lab            *o_lab,
-char                            *special_table
+char                            *special_table,
+tab_dir                         *tdir
 );
 
 void gd_close(gd_state *self);
+  
+table_adm_str *table_adm_open(char *name, tab_dir *tdir);
+GRIM *get_specific_table(char *name, int type, tab_dir *tdir);
+int grid_val2(struct coord_lab*,table_adm_str*,double,double,double*);
+  
+/*
 table_adm_str *gd_global_stdgeoids(int open_g);
 table_adm_str *gd_global_fehmarngeoid(int open_g);
-table_adm_str *gd_global_fbeltgeoid(int open_g);
+table_adm_str *gd_global_fbeltgeoid(int open_g);*/
 
 int conv_w_crd(char *mlb, struct coord_lab *c_lab);
 int conv_w_tab(char *mlb, struct gde_lab *t_lab);

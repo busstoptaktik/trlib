@@ -54,7 +54,7 @@
 table_adm_str *table_adm_open(char *name, tab_dir *tdir){
 	table_adm_str *self=NULL;
 	int found = -1, i;
-		
+	GRIM *table=NULL;	
 	if (!tdir){
 		lord_error(TAB_N_MAN_,LORD("Tabdir is null."));
 		return NULL;
@@ -65,72 +65,90 @@ table_adm_str *table_adm_open(char *name, tab_dir *tdir){
 		return NULL;
 	}
 	if (!name || !*name || !strcmp("STD",name)){ /*STD*/
-		found=0;
+		self->type=GDE_LAB;
 		self->n_tables=tdir->n_geoid_seq_std;
 		self->table_sequence=tdir->geoid_seq_std;
 		self->free_sequence=0;
+		
+		return self;
 	}
-	else{ /* find the name and type */
-		for (i=0; i< tdir->n_geoids;  i++){
-			if(!strcmp(name, grim_filename(tdir->geoids[i]))){
-				found=i;
-				break;
-			}
+	/* find the name and type */
+	table=get_specific_table(name,GDE_LAB,tdir);
+	if(table!=NULL){ /* Special geoid */
+		self->table_sequence=calloc(tdir->n_geoid_seq_std+1,sizeof(GRIM));
+		if (!self->table_sequence){
+			lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
+			free(self);
+			return NULL;
 		}
-		if(found>=0){ /* Special geoid */
-			self->table_sequence=calloc(tdir->n_geoid_seq_std+1,sizeof(GRIM));
-			if (!self->table_sequence){
-				lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
-				free(self);
-				return NULL;
-			}
-			self->n_tables=tdir->n_geoid_seq_std+1;
-			self->table_sequence=&tdir->geoids[found];
-			for (i=0; i< tdir->n_geoid_seq_std; i++)
-				self->table_sequence[i+1]=tdir->geoid_seq_std[i];
+		self->type=GDE_LAB;
+		self->n_tables=tdir->n_geoid_seq_std+1;
+		self->table_sequence=table;
+		for (i=0; i< tdir->n_geoid_seq_std; i++){
+			self->table_sequence[i+1]=tdir->geoid_seq_std[i];
 			self->free_sequence=1;
 		}
-		else {
-			for (i=0; i< tdir->n_dhtabs;  i++){
-				if(!strcmp(name, grim_filename(tdir->dhtabs[i]))){
-					found=i;
-					break;
-				}
-			}
-			
-			if(found >= 0){
-				self->n_tables=1;
-				self->table_sequence=&tdir->dhtabs[found];
-				self->free_sequence=0;
-			}
-			else {
-				for (i=0; i< tdir->n_3dtabs;  i++){
-					if(!strcmp(name, grim_filename(tdir->t3dtabs[i]))){
-						found=i;
-						break;
-					}
-				}
-				if(found >= 0){
-					self->n_tables=1;
-					self->table_sequence=&tdir->t3dtabs[found];
-					self->free_sequence=0;
-				}
-			}
-		}
+		return self;
 	}
-		
-	if(found==-1){
-		lord_error(TAB_N_NAM_,LORD("Table not found: %s"),name);
-		free(self);
-		return NULL;
+	/* Why are these 1 member list objects needed instead of just a GRIM object??*/
+	table=get_specific_table(name,DHH_LAB,tdir);
+	if(table!=NULL){
+		self->type=DHH_LAB;
+		self->n_tables=1;
+		self->table_sequence=table;
+		self->free_sequence=0;
+		return self;
 	}
-	return self;
+	table=get_specific_table(name,T3D_LAB,tdir);
+	if (table!=NULL){
+		self->type=T3D_LAB;
+		self->n_tables=1;
+		self->table_sequence=table;
+		self->free_sequence=0;
+		return self;
+	}
+	lord_error(TAB_N_NAM_,LORD("Table not found: %s"),name);
+	free(self);
+	return NULL;
 }
+
+GRIM *get_specific_table(char *name, int type, tab_dir *tdir){
+	GRIM *tables, *found=NULL;
+	int i,n_tables;
+	if (!name || !(*name) || !tdir)
+		return NULL;
+	switch(type){
+		case GDE_LAB:
+			tables=tdir->geoids;
+			n_tables=tdir->n_geoids;
+			break;
+		case DHH_LAB:
+			tables=tdir->dhtabs;
+			n_tables=tdir->n_dhtabs;
+			break;
+		case T3D_LAB:
+			tables=tdir->t3dtabs;
+			n_tables=tdir->n_3dtabs;
+			break;
+		default:
+			lord_error(TR_LABEL_ERROR,LORD("Table type %d not supported."),type);
+			return NULL;
+	}
+	for(i=0; i<n_tables && !found; i++){
+		if(!strcmp(name, grim_filename(tables[i])))
+			found=tables+i;
+	}
+	return found;
+}
+
+
+
 
 void gd_close(gd_state *self){
 	if (!self)
 		return;
-	
+	if (self->h_grid_tab)
+		free(self->h_grid_tab);
 	if (!self->grid_tab){
 		free(self);
 		return;
@@ -283,7 +301,7 @@ tab_dir                         *tdir
 		  self->grid_tab=table_adm_open(FBELT_NAME, tdir);
 	  }
 	  else
-		self->grid_tab=table_adm_open(name, tdir);
+		self->grid_tab=table_adm_open(special_table, tdir);
 
 	  if (0 == self->grid_tab) {
 		    free(self);
@@ -291,7 +309,7 @@ tab_dir                         *tdir
 	    }
 
 	    if (i_lab->imit == FHMASK || o_lab->imit == FHMASK)
-                     (void) strcpy(dstr, self->grid_tab->table_sequence[0].clb);
+                     (void) strncpy(dstr, grim_proj(self->grid_tab->table_sequence[0]),MLBLNG);
 	    else
 	    if (i_rgn == rgn_GR.r_nr[0] || o_rgn == rgn_GR.r_nr[0])
                     (void) strcpy(dstr, "geoEgr96");
@@ -382,11 +400,10 @@ tab_dir                         *tdir
           }
         }
         switch(self->s_req_dh) {
-        case 1: // DH_TAB height transformation
-              res = geoid_i(self->H3_lab.mlb,
-                          DHH_LAB, &self->h_grid_tab, NULL);
-              if (res < 0){ 
-		  lord_error(TR_ALLOCATION_ERROR ,LORD("Allocation error: Failed to open dh-table. %s"), self->H3_lab.mlb);
+        case 1: /* DH_TAB height transformation*/
+              self->h_grid_tab =table_adm_open(self->H3_lab.mlb, tdir);
+              if (!self->h_grid_tab){ 
+		  lord_error(TR_ALLOCATION_ERROR ,LORD("Failed to open dh-table. %s"), self->H3_lab.mlb);
 	          gd_close(self);
 	          return NULL;
 	      }		      
@@ -400,13 +417,13 @@ tab_dir                         *tdir
           }
           else self->T_Nlab = &self->H2_lab;
           break;
-        case 2: // CONSTANT height transformation
-          self->H2_lab = *i_lab; // ident trf
+        case 2: /*CONSTANT height transformation*/
+          self->H2_lab = *i_lab; /*ident trf*/
           break;
-        case 3: // LINEAR height transformation
+        case 3: /* LINEAR height transformation*/
           self->T_Nlab = &self->H2_lab;
           break;
-        default: // IDT
+        default: /* IDT*/
           self->sta[lev] = 1;
           self->stp[lev] = 0;
         }

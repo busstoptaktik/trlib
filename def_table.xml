@@ -1,0 +1,15 @@
+<!-- manager tab  template-->
+<def_tab_manager>
+   <geoids>
+      <geoid> dvr90g2013.02</geoid>
+   </geoids>
+   <dhtables>
+         <dhtable> dhdnndvr.02</dhtable>
+   </dhtables>
+   <t3dtables>
+   </t3dtables>
+   <geoid_sequence>
+        <geoid> dvr90g2013.02</geoid>
+   </geoid_sequence>
+</def_tab_manager>
+    

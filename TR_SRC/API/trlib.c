@@ -26,6 +26,8 @@
 #include    "epsg_to_mlb.h"
 #include    "proj4_to_mlb.h"
 #include    "sgetshpprj.h"
+#include    "grim.h"
+#include    "tab_dir_open.h"
 /*   
 * Defines
 */
@@ -40,6 +42,7 @@
 #define TR_TABDIR_ENV  "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
 #define TR_DEF_FILE      "def_lab.txt"
 #define TR_EPSG_FILE    "def_epsg.txt"
+#define TR_MAN_TAB_FILE   "def_table.xml"
 
 /* R2D equals the geo_lab define DOUT = (180.0/M_PI) */
 
@@ -49,7 +52,8 @@
 /*various global state variables */
 
 static int ALLOW_UNSAFE=0; /*do we allow transformations which are not thread safe?*/
-static int UNSAFE[]={FHMASK}; /*list of imit-attrs of transformations deemed unsafe.*/
+static int UNSAFE[]={-1}; /*list of imit-attrs of transformations deemed unsafe.*/
+static int N_UNSAFE=0;
 static int HAS_GEOIDS=0; /*global flag which signals if we have geoids available*/
 static THREAD_SAFE int THREAD_ID=0; /*used to distinguish the thread that initialised the library from other threads.*/
 static int *MAIN_THREAD_ID=0; /* same as above - also signals whether the library has been succesfully initialised.*/
@@ -58,6 +62,7 @@ static int *MAIN_THREAD_ID=0; /* same as above - also signals whether the librar
 FILE *ERR_LOG=0;
 
 def_data *DEF_DATA=0;
+tab_dir    *TAB_DIR=0;
 
 
 /* only used in InitLibrary at the moment- but could be useful */
@@ -69,10 +74,9 @@ int TR_IsMainThread(void){
 
 int TR_IsThreadSafe(PR *plab){
 	int i;
-	int n=sizeof(UNSAFE)/sizeof(int);
 	if (!plab)
 		return 1;
-	for (i=0;i<n;i++){
+	for (i=0;i<N_UNSAFE;i++){
 		if (UNSAFE[i]==(plab->imit))
 			return 0;
 	}
@@ -107,11 +111,10 @@ int TR_InitLibrary(char *path) {
     set_lord_modes(1,1,1,1,1);
     set_lord_verbosity_levels(3,3,3,3,3);
     #endif
-    puts("streng");
-    fflush(stdout);
+    
+  
     ok=TR_SetGeoidDir(path);
-    puts("strong");
-    fflush(stdout);
+    
     if (ok!=TR_OK){
 	    lord_error(TR_ERROR,"Failed to parse def-file!");
 	    return TR_ERROR;
@@ -215,9 +218,7 @@ int TR_SetGeoidDir(char *path){
 	if (DEF_DATA) 
 		close_def_data(DEF_DATA);
 	/* close previously opened tab-dir files */
-	gd_global_fehmarngeoid(0);
-	gd_global_fbeltgeoid(0);
-	gd_global_stdgeoids(0);
+	/*TODO close previous TAB_DIR */
 
 	c_tabdir_file(0,NULL);
 	DEF_DATA=open_def_data(fp,&rc);
@@ -234,12 +235,12 @@ int TR_SetGeoidDir(char *path){
 		fclose(fp);
 	}
 	lord_debug(0,"Parsed def_lab , errs: %d",rc);
+	/*init tab_dir var*/
+	strcpy(fname,init_path);
+	strcat(fname,TR_MAN_TAB_FILE);
+	TAB_DIR=tab_dir_open(fname);
 	settabdir(init_path);
-
-	gd_global_fehmarngeoid(1);
-	gd_global_fbeltgeoid(1);
-	gd_global_stdgeoids(1);
-	return (DEF_DATA ? TR_OK: TR_ERROR);
+	return (DEF_DATA && TAB_DIR )? TR_OK: TR_ERROR;
 }
 	
 /* Mock up - not fully implemented! */
@@ -261,9 +262,7 @@ int TR_SetGeoidDir(char *path){
 /*Function which copies the last used geoid name to input buffer.*/    
 
 void TR_GetGeoidName(TR *tr,char *name) {
-	struct gde_lab *g_lab;
-	g_lab=&((tr->state->grid_tab->table_u)[tr->state->grid_tab->tab_nr]);
-	strcpy(name,g_lab->mlb);
+	strcpy(name,grim_filename(tr->state->grid_tab->table_sequence[tr->state->grid_tab->cur_table]));
 	return;
 }
 	
@@ -337,10 +336,10 @@ TR *TR_Open (char *label_in, char *label_out, char *geoid_name) {
     }
     
     if(proj_in && proj_out){
-	    T = gd_open(proj_in, proj_out, geoid_name);
+	    T = gd_open(proj_in, proj_out, geoid_name, TAB_DIR);
 	    if(!T)
                 goto CLEANUP;
-	    I= gd_open(proj_out,proj_in, geoid_name);
+	    I= gd_open(proj_out,proj_in, geoid_name, TAB_DIR);
 	    if (!I)
 		goto CLEANUP;
 	    
@@ -388,10 +387,10 @@ int TR_Insert(TR *tr, char *mlb, int is_out){
 	TR_CloseProjection(to_be_replaced);
 	(is_out) ? (tr->proj_out=proj) : (tr->proj_in=proj);
 	if (tr->proj_in && tr->proj_out){
-		tr->state=gd_open(tr->proj_in,tr->proj_out,geoid_name);
+		tr->state=gd_open(tr->proj_in,tr->proj_out,geoid_name, TAB_DIR);
 		if (!tr->state)
 			return TR_LABEL_ERROR;
-		tr->etats=gd_open(tr->proj_out,tr->proj_in,geoid_name);
+		tr->etats=gd_open(tr->proj_out,tr->proj_in,geoid_name, TAB_DIR);
 		if (!tr->etats)
 			return TR_LABEL_ERROR;
 	}
@@ -646,10 +645,6 @@ void TR_TerminateLibrary(void) {
 	TR_TerminateThread(); /*terminate the 'main' thread - assuming this haven't been done already (perhaps check for this??) */
 	if (DEF_DATA)
 		close_def_data(DEF_DATA);
-	
-	gd_global_fehmarngeoid(0);
-	gd_global_fbeltgeoid(0);
-	gd_global_stdgeoids(0);
 	release_epsg_table();
 }
 

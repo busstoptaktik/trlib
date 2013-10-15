@@ -16,6 +16,10 @@
  * 
  */
 
+#if !defined     (H_TAB_DIR_OPEN)
+#define           H_TAB_DIR_OPEN
+
+#include <stdio.h>
 #include "grim.h"
 
 typedef struct{
@@ -27,3 +31,4 @@ typedef struct{
 } tab_dir;
 
 tab_dir *tab_dir_open(char *path);
+#endif
