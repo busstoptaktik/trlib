@@ -21,7 +21,7 @@
 #include <string.h>
 #include "set_grs.h"
 #include "trlib_api.h"
-#include "parse_def_file.h"
+#include "metadata.h"
 #include "geo_lab.h"
 #include "doc_def_data.h"
 

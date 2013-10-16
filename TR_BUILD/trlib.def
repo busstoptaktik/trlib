@@ -76,9 +76,6 @@ EXPORTS
 	gatg
 	gd_trans
 	gen_pol
-	geoid_c
-	geoid_i
-	geoid_t
 	get_ha_s
 	get_mlb
 	get_tpd
@@ -89,7 +86,7 @@ EXPORTS
 	gettabdir
 	gmb1
 	gmb2
-	grid_val
+	grid_val2
 	gtc
 	hlm_tr
 	htr_init
@@ -132,9 +129,6 @@ EXPORTS
 	tab3d_c
 	tab3d_i
 	tab3d_val
-	tabdd_c
-	tabdd_i
-	tabdd_val
 	tcts_u
 	tpd_doc_f
 	utgs

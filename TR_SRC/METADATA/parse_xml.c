@@ -18,22 +18,22 @@ static struct tag new_tag(int level);
 static xml_error go_deeper(struct tag *t);
 
 /*get value */
-int get_value(struct tag *t, void *out, size_t size, item_converter conv, void *conv_data){
+int get_value(struct tag t, void *out, size_t size, item_converter conv, void *conv_data){
 	int res=0;
-	char *pos=t->pos[1]+1;
-	ptrdiff_t len=item_len(t);
-	if (len==0 || t->is_simple){
-		t->err_no=XML_EMPTY_ITEM;
+	char *pos=t.pos[1]+1;
+	ptrdiff_t len=item_len(&t);
+	if (len==0 || t.is_simple){
+		/*t->err_no=XML_EMPTY_ITEM;*/
 		return 0;
 	}
-	if (!t->valid || (get_next_child(t,NULL)).valid){
-		t->err_no=XML_BAD_HIERARCHY;
+	if (!t.valid || (get_next_child(&t,NULL)).valid){
+		/*t.err_no=XML_BAD_HIERARCHY;*/
 		return 0;
 	}
 	SKIP_SPACE(pos);
-	*(t->pos[2])='\0'; /*insert break*/
+	*(t.pos[2])='\0'; /*insert break*/
 	res=conv(pos,out,size,conv_data); /*number of items converted*/
-	*(t->pos[2])='<';
+	*(t.pos[2])='<';
 	return res;
 }
 
@@ -71,7 +71,7 @@ static int copy_string(char *in, void *out, size_t len, void *nothing){
 }
 
 /* copy the content of a tag */
-char *get_value_as_string( struct tag *t, char *out, size_t buf_len){
+char *get_value_as_string( struct tag t, char *out, size_t buf_len){
 	if (get_value(t,(void*)out,buf_len,copy_string,NULL))
 		return out;
 	return NULL;

@@ -21,14 +21,10 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
-#include "geo_lab.h"
-#include "proj4_to_mlb.h"
+#include "KmsFncs.h"
 #include "strong.h"
-#include "trlib_intern.h"
-#include "trlib_api.h"
-#include "lord.h"
-#include "parse_def_file.h"
-#include "get_mlb.h"
+#include "proj4_to_mlb.h"
+
 
 /* A sketchy implementation of proj4 to mlb translation. 
 * lots of hardcoded stuff, which should perhaps be made more visible....

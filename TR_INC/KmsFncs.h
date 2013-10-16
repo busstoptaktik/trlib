@@ -113,7 +113,6 @@ extern "C" {
 #include "lord.h"
 #include "metadata.h"
 #include "ng_trans.h"
-#include "parse_def_file.h"
 #include "prn_cho.h"
 #include "ptg.h"
 #include "ptg_d.h"

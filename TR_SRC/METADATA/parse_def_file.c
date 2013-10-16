@@ -20,22 +20,8 @@
 #include    <string.h>
 #include    <ctype.h>
 #include    "KmsFncs.h"
-#include    "strong.h"
+#include    "parse_xml.h"
 
-#define MODE_PRJ "def_prj"
-#define MODE_GRS "def_grs"
-#define MODE_RGN "def_rgn"
-#define MODE_DTM "def_dtm"
-#define MODE_HTH "def_hth"
-#define MODE_DEF_LAB "def_lab"
-/*#define MODE_STOP "stop"*/
-#define N_TOKENS_PRJ 12
-#define N_TOKENS_DTM 14
-#define N_TOKENS_RGN 3
-#define N_TOKENS_GRS 7
-#define N_TOKENS_HTH 6
-#define MAX_LINE_DEF 4
-#define RGN_STOP "STOP"
 /*Values  below copy-pasted from def_lab.txt */
 #define KM_HERE       (3986005.e8)
 #define OMEGA_HERE (7292115.0e-11)
@@ -43,150 +29,208 @@
 #define GEQ84_HERE  (979764.5e-5)
 #define KMW84_HERE (3986004.418e8)
 #define KMMOON       KM_HERE*0.0122298 /* Moon parameter relative to Earth - fix of '*' char in def_lab which was interpreted as a */
+#define SKIP_SPACE(pos) while(isspace(*pos)) pos++
 
-int set_ellipsoid(char **items,  def_grs *ellip, int n_items){
-	strncpy(ellip->mlb,items[0],MLBLNG);
-	ellip->no=(short)atoi(items[1]);
-	ellip->mode=(short)atoi(items[2]);
-	ellip->axis=atof(items[3]);
-	ellip->flattening=atof(items[4]);
-	/* todo: implement +.-,* operators. * is problematic since fgetln_kms interprets it as the beginning of a comment! */
-	/* only seems to be used in grs MOON so perhaps overkill to write code for that!! */
-	if (!isalpha(items[5][0]))
-		ellip->km=atof(items[5]);
-	else if (!strcmp(items[5],"KM"))
+static int set_ellipsoid(struct tag *grs_tag,  def_grs *ellip);
+static int int_converter(char *in, int *out, size_t buf_size, void *extra);
+static int double_converter(char *in, double *out, size_t buf_size, void *extra);
+static int set_projection(struct tag *prj_tag,  def_projection *proj);
+static int set_datum(struct tag *dtm_tag, def_datum *dtm);
+static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr);
+static int set_rgn(struct tag *rgn_tag, def_rgn *rgn);
+
+
+/* 'single' int converter. A 'sep-char' could be input to extra, if more values were to be extracted from a string...*/
+static int int_converter(char *in, int *out, size_t buf_size, void *extra){
+	char *end;
+	SKIP_SPACE(in);
+	*out=(int) strtol(in,&end,0);
+	return (end>in)? 1:0;
+}
+
+static int double_converter(char *in, double *out, size_t buf_size, void *extra){
+	char *end;
+	struct typ_dec type_in;
+	int used;
+	SKIP_SPACE(in);
+	if (extra==NULL){
+		*out=strtod(in, &end);
+		return (end>in)?1:0;
+	}
+	*out=sgetg(in,&type_in,&used,(char*) extra);
+	return (type_in.gf>0)? 1: 0;
+}
+
+
+
+static int set_ellipsoid(struct tag *grs_tag,  def_grs *ellip){
+	char buf[128];
+	if (!get_value_as_string(get_named_child(grs_tag,"mlb"),ellip->mlb,MLBLNG))
+		return 0;
+	if (1!=get_value(get_named_child(grs_tag,"id"),&ellip->no,1,int_converter,NULL))
+		return 0;
+	if (1!=get_value(get_named_child(grs_tag,"mode"),&ellip->mode,1,int_converter,NULL))
+		return 0;
+	if (1!=get_value(get_named_child(grs_tag,"semi_major_axis"),&ellip->axis,1,double_converter,NULL))
+		return 0;
+	if (1!=get_value(get_named_child(grs_tag,"flattening"),&ellip->flattening,1,double_converter,NULL))
+		return 0;
+	if (!get_value_as_string(get_named_child(grs_tag,"gravity"),buf,128))
+		return 0;
+	if (!isalpha(buf[0])){
+		if (1!=double_converter(buf,&ellip->km,1,NULL))
+			return 0;
+	}
+	else if (!strcmp(buf,"KM"))
 		ellip->km=KM_HERE;
-	else if (!strcmp(items[5],"KMMOON"))
+	else if (!strcmp(buf,"KMMOON"))
 		ellip->km=KMMOON;
-	else if (!strcmp(items[5],"GEQ"))
+	else if (!strcmp(buf,"GEQ"))
 		ellip->km=GEQ_HERE;
-	else if (!strcmp(items[5],"KMW84"))
+	else if (!strcmp(buf,"KMW84"))
 		ellip->km=KMW84_HERE;
-	else if (!strcmp(items[5],"GEQ84"))
+	else if (!strcmp(buf,"GEQ84"))
 		ellip->km=GEQ84_HERE;
 	else
-		return 1;
-	if (!isalpha(items[6][0]))
-		ellip->omega=get_number(items[6]);
-	else if (!strcmp(items[6],"OMEGA"))
+		return 0;
+	if (!get_value_as_string(get_named_child(grs_tag,"rotation"),buf,128))
+		return 0;
+	if (!isalpha(buf[0])){
+		if (1!=double_converter(buf,&ellip->omega,1,NULL))
+			return 0;
+	}
+	else if (!strcmp(buf,"OMEGA"))
 		ellip->omega=OMEGA_HERE;
 	else
-		return 1;
-	return 0;
-}
-	
-int set_projection(char **items,  def_projection *proj, int n_items, char *descr){
-	int i,n_param;
-	strncpy(proj->mlb,items[0],MLBLNG);
-	if (descr!=NULL){
-		strncpy(proj->descr,descr,MAX_DSCR_LEN);
-		proj->descr[MAX_DSCR_LEN-1]='\0';
-		}
-	else *(proj->descr)='\0';
-	proj->cha_str=atoi(items[1]);
-	proj->type=atoi(items[2]);
-	proj->cstm=atoi(items[3]);
-	proj->mode=atoi(items[4]);
-	proj->mask=atoi(items[5]);
-	strncpy(proj->seq,items[6],4);
-	strncpy(proj->rgn,items[7],3);
-	strncpy(proj->p_datum,items[8],16);
-	proj->q_par= atoi(items[9]);
-	proj->param_tokens[0]='\0';
-	if (items[10][0]!='"')
-		n_param=proj->q_par;
-	else
-		n_param=1;
-	/*test for proper number of items */
-	if (n_param==1 && n_items!=N_TOKENS_PRJ && n_items!=N_TOKENS_PRJ+proj->q_par){
-		
-		return 1;
-	}
-	
-	if (n_param>1 && (n_items!=N_TOKENS_PRJ+n_param-1)){
-		
-		return 1;
-	}
-	
-	for (i=0; i<n_param && i<n_items-10; i++){
-		strcat(proj->param_tokens,items[i+10]);
-		if (i<n_param-1)
-			strcat(proj->param_tokens," ");
-	}
-	
-	if (n_items>10+n_param)
-		strncpy(proj->native_proj,items[10+n_param],MLBLNG);
-	else
-		return 1;
-	proj->param_text[0]='\0';
-	for(i=0; i<n_items-11-n_param; i++){
-		proj->native_params[i]=get_number(items[i+11+n_param]);
-		strcat(proj->param_text,items[i+11+n_param]);
-		if (i<n_items-11-n_param-1)
-			strcat(proj->param_text," ");
-	}
-	return 0;
-	
-}
-	
-int set_datum(char **tokens,  def_datum *dtm, int n_items, char *descr){
-	int i;
-	strncpy(dtm->mlb,tokens[0],MLBLNG);
-	if (descr!=NULL){
-		strncpy(dtm->descr,descr,MAX_DSCR_LEN);
-		dtm->descr[MAX_DSCR_LEN-1]='\0';
-	}
-	else *(dtm->descr)='\0';
-	dtm->no= atoi(tokens[1]);
-	dtm->p_no=-1;
-	strncpy(dtm->p_datum,tokens[2],MLBLNG);
-	strncpy(dtm->ellipsoid,tokens[3],MLBLNG);
-	dtm->imit= atoi(tokens[4]);
-	strncpy(dtm->rgn,tokens[5],3);
-	dtm->type=atoi(tokens[6]);
-	dtm->scale=get_number(tokens[10]);
-	for (i=0;i<3;i++){
-		dtm->translation[i]=get_number(tokens[7+i]);
-		dtm->rotation[i]=get_number(tokens[11+i]);
-	}
-	return 0;
+		return 0;
+	return 1;
 }
 
-int set_hth(char **tokens,  def_hth_tr *entry, int n_items, char *descr){
-	int i;
-	double val;
-	strncpy(entry->from_mlb,tokens[0],MLBLNG);
-	if (descr!=NULL){
-		strncpy(entry->descr,descr,MAX_DSCR_LEN);
-		entry->descr[MAX_DSCR_LEN-1]='\0';
+
+
+static int set_projection(struct tag *prj_tag,  def_projection *proj){
+	if (!get_value_as_string(get_named_child(prj_tag,"description"),proj->descr,MAX_DSCR_LEN))
+		*(proj->descr)='\0';
+	if (!get_value_as_string(get_named_child(prj_tag,"mlb"),proj->mlb,MLBLNG))
+		return 0;
+	if (1!=get_value(get_named_child(prj_tag,"cha_str"),&proj->cha_str,1,int_converter,NULL))
+		return 0;
+	if (1!=get_value(get_named_child(prj_tag,"type"),&proj->type,1,int_converter,NULL))
+		return 0;
+	if (1!=get_value(get_named_child(prj_tag,"cstm"),&proj->cstm,1,int_converter,NULL))
+		return 0;
+	if (1!=get_value(get_named_child(prj_tag,"mode"),&proj->mode,1,int_converter,NULL))
+		return 0;
+	if (1!=get_value(get_named_child(prj_tag,"mask"),&proj->mask,1,int_converter,NULL))
+		return 0;
+	if (!get_value_as_string(get_named_child(prj_tag,"kms_seq"),proj->seq,4))
+		strcpy(proj->seq,"ZZ");
+	if (!get_value_as_string(get_named_child(prj_tag,"native"),proj->native_proj,MLBLNG))
+		strcpy(proj->native_proj,proj->mlb);
+	if (!get_value_as_string(get_named_child(prj_tag,"region"),proj->rgn,3))
+		strcpy(proj->native_proj,"ZZ");
+	if (!get_value_as_string(get_named_child(prj_tag,"parameters"),proj->param_text,128))
+		*proj->param_text='\0';
+	if (!get_value_as_string(get_named_child(prj_tag,"parent_datum"),proj->p_datum,16))
+		strcpy(proj->p_datum,"\"");
+	if (1!=get_value(get_named_child(prj_tag,"n_parameters"),&proj->q_par,1,int_converter,NULL))
+		return 0;
+	strcpy(proj->param_tokens,"\"");
+	if ((proj->q_par)>0 && strlen(proj->param_text)==0){
+		if (!get_value_as_string(get_named_child(prj_tag,"parameter_tokens"),proj->param_tokens,32))
+			return 0;
 	}
-	else *(entry->descr)='\0';
-	entry->descr[MAX_DSCR_LEN-1]='\0';
-	strncpy(entry->to_dtm,tokens[1],MLBLNG);
-	entry->type=atoi(tokens[2]);
-	entry->B0=get_number(tokens[3]);
-	entry->L0=get_number(tokens[4]);
-	switch (entry->type){
+	return 1;
+}
+	
+static int set_datum(struct tag *dtm_tag, def_datum *dtm){
+	if (!get_value_as_string(get_named_child(dtm_tag,"mlb"),dtm->mlb,MLBLNG))
+		return 0;
+	if (!get_value_as_string(get_named_child(dtm_tag,"description"),dtm->descr,MAX_DSCR_LEN))
+		*dtm->descr='\0';
+	if (1!=get_value(get_named_child(dtm_tag,"id"),&dtm->no,1,int_converter,NULL))
+		return 0;
+	dtm->p_no=-1;
+	if (!get_value_as_string(get_named_child(dtm_tag,"parent"),dtm->p_datum,MLBLNG))
+		return 0;
+	if (!get_value_as_string(get_named_child(dtm_tag,"ellipsoid"),dtm->ellipsoid,MLBLNG))
+		return 0;
+	if (1!=get_value(get_named_child(dtm_tag,"imit"),&dtm->imit,1,int_converter,NULL))
+		return 0;
+	if (!get_value_as_string(get_named_child(dtm_tag,"region"),dtm->rgn,3))
+		strcpy(dtm->rgn,"ZZ");
+	if (1!=get_value(get_named_child(dtm_tag,"type"),&dtm->type,1,int_converter,NULL))
+		return 0;
+	if (dtm->type!=0){
+		if (1!=get_value(get_named_child(dtm_tag,"t_x"),dtm->translation,1,double_converter,NULL))
+			return 0;
+		if (1!=get_value(get_named_child(dtm_tag,"t_y"),dtm->translation+1,1,double_converter,NULL))
+			return 0;
+		if (1!=get_value(get_named_child(dtm_tag,"t_z"),dtm->translation+2,1,double_converter,NULL))
+			return 0;
+		if (dtm->type!=3){
+			if (1!=get_value(get_named_child(dtm_tag,"rot_x"),dtm->rotation,1,double_converter,"sx"))
+				return 0;
+			if (1!=get_value(get_named_child(dtm_tag,"rot_y"),dtm->rotation+1,1,double_converter,"sx"))
+				return 0;
+			if (1!=get_value(get_named_child(dtm_tag,"rot_z"),dtm->rotation+2,1,double_converter,"sx"))
+				return 0;
+			if (1!=get_value(get_named_child(dtm_tag,"scale"),&dtm->scale,1,double_converter,"ppm"))
+				return 0;
+		} /*end should have 7 parameters */
+	} /*end should have datum shift parameters */
+	return 1;
+}
+
+static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr){
+	if (!get_value_as_string(get_named_child(hth_tag,"from"),hth_tr->from_mlb,MLBLNG))
+		return 0;
+	if (!get_value_as_string(get_named_child(hth_tag,"description"),hth_tr->descr,MAX_DSCR_LEN))
+		*(hth_tr->descr)='\0';
+	if (!get_value_as_string(get_named_child(hth_tag,"to"),hth_tr->to_dtm,MLBLNG))
+		return 0;
+	if (1!=get_value(get_named_child(hth_tag,"type"),&hth_tr->type,1,int_converter,NULL))
+		return 0;
+	if (1!=get_value(get_named_child(hth_tag,"lat_0"),&hth_tr->B0,1,double_converter,"nt"))
+		return 0;
+	if (1!=get_value(get_named_child(hth_tag,"lon_0"),&hth_tr->L0,1,double_converter,"nt"))
+		return 0;
+	switch (hth_tr->type){
 		case 1:
-			strncpy(entry->table,tokens[5],MAX_TABLE_LEN);
+			if (!get_value_as_string(get_named_child(hth_tag,"table"),hth_tr->table,MAX_TABLE_LEN))
+				return 0;
 			break;
 		case 2:
-			entry->constants[0]=get_number(tokens[5]);
+			if (1!=get_value(get_named_child(hth_tag,"k0"),hth_tr->constants,1,double_converter,NULL))
+				return 0;
 			break;
 		case 3:
-			if (n_items<N_TOKENS_HTH+4)
-				return 1;
-			for(i=0;i<5 && i<n_items-5; i++){
-				val=get_number(tokens[5+i]);
-				(entry->constants)[i]=val;
-			}
+			if (1!=get_value(get_named_child(hth_tag,"M0"),hth_tr->constants,1,double_converter,NULL))
+				return 0;
+			if (1!=get_value(get_named_child(hth_tag,"N0"),hth_tr->constants+1,1,double_converter,NULL))
+				return 0;
+			if (1!=get_value(get_named_child(hth_tag,"k0"),hth_tr->constants+2,1,double_converter,NULL))
+				return 0;
+			if (1!=get_value(get_named_child(hth_tag,"kN"),hth_tr->constants+3,1,double_converter,"sx"))
+				return 0;
+			if (1!=get_value(get_named_child(hth_tag,"kE"),hth_tr->constants+4,1,double_converter,"sx"))
+				return 0;
 			break;
 		default:
-			return 1;
+			return 0;
 	}
-	return 0;
+	return 1;
 }
 
+static int set_rgn(struct tag *rgn_tag, def_rgn *rgn){
+	if (!get_value_as_string(get_named_child(rgn_tag,"new"),rgn->rgn_new,3))
+		return 0;
+	if (!get_value_as_string(get_named_child(rgn_tag,"old"),rgn->rgn_old,3))
+		return 0;
+	if (!get_value_as_string(get_named_child(rgn_tag,"country"),rgn->country,64))
+		return 0;
+	return 1;
+}
 
 /* 
 Function that parses def_lab file. All is well as long as we can determine via a min_tokens attribute if 'entries' spanning more than one line
@@ -195,90 +239,80 @@ If formatting in the file is changed, this logic should be reconsidered :-)
 Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus regions could be considered as one 'entry' spanning an unpredictable number of lines. 
 */
 
- def_data *open_def_data(FILE *fp, int *n_err){
+ def_data *open_def_data(struct tag *root, int *n_err){
 	/*stuff that match the formatting and 'modes' of the def_lab file */
-	void *entries[5]={NULL,NULL,NULL,NULL,NULL};
+	struct tag def_tag,item_tag;
 	def_data *data=NULL;
-	enum modes {mode_prj,mode_grs,mode_rgn,mode_dtm,mode_hth,mode_none};
-	enum modes mode=mode_none;
-	int n_modes=6,new_mode;
-	int min_tokens[5]={N_TOKENS_PRJ,N_TOKENS_GRS,N_TOKENS_RGN,N_TOKENS_DTM,N_TOKENS_HTH};
-	int n_set[5]={0,0,0,0,0};
+	int n_set[5]={0,0,0,0,0},mode,i;
+	enum modes {mode_prj=0,mode_grs=1,mode_rgn=2,mode_dtm=3,mode_hth=4};
+	void *entries[5]={NULL,NULL,NULL,NULL,NULL};
+	char *mode_names[5]={"def_prj","def_grs","def_rgn","def_dtm","def_hth"};
+	char *item_names[5]={"prj","grs","rgn","dtm","hth"};
 	/* specifications for how much to preallocate */
 	int n_prealloc[5]={256,128,128,128,64};
 	int n_alloc[5]={256,128,128,128,64};
 	int mode_sizes[5]={sizeof( def_projection),sizeof( def_grs),sizeof(def_rgn),sizeof( def_datum), sizeof( def_hth_tr)};
-	char *mode_names[7]={MODE_PRJ,MODE_GRS,MODE_RGN,MODE_DTM,MODE_HTH,NULL},*mode_name;
-	/*some other needed stuff for buffering etc */
-	char buf[4096],savelines[MAX_LINE_DEF][1024];
-	int n_lines=0;
-	char **tokens=NULL,**next_tokens=NULL,*sub_str, *descr;
-	int n_items=0,n_items2,n_items_line;
-	int n_chars,i;
-	int err;
-	int completed=1; /* needed for entries (all) that span more than one line */ 
+	
 	*n_err=0; /* set no errors - yet! */
 	/* allocate memory for objects */
-	for(i=0;i<n_modes-1;i++){
-		entries[i]=malloc(n_prealloc[i]*mode_sizes[i]);
-		if (entries[i]==NULL)
+	for(mode=0;mode<5;mode++){
+		entries[mode]=malloc(n_prealloc[mode]*mode_sizes[mode]);
+		if (entries[mode]==NULL)
 			goto error;
 	}
 	data=malloc(sizeof( def_data));
 	if (data==NULL){
 		goto error;
 	}
-	/*loop over def-file */
-	while ((n_chars=fgetln_kms(buf,&n_items_line,fp))!=EOF){
-		if (strlen(buf)==0 || n_items_line==0)
-			continue;
-		if (buf[0]=='#'){
-			/* OK: so we might have found the beginning of the def_data - perhaps use this later */
-			if (strstr(buf+1,MODE_DEF_LAB)!=NULL)
-				continue;
-			
-			/*If we got here, we have either found a new item or should start a new mode */
-			if (!completed){
-				lord_debug(0,LORD("mode: %d, cmplt: %d\n%s\n"),mode,n_set[mode],buf);
-				(*n_err)++;
+	if (!(root->valid) || !compare_tag(root,"def_lab")){
+		lord_error(XML_MALFORMED,LORD("Seems to be an invalid def-file.."));
+		goto error;
+	}
+	/*iterate over modes*/
+	for(mode=0; mode<5; mode++){
+		def_tag=get_named_child(root,mode_names[mode]);
+		if (!def_tag.valid){
+			lord_error(XML_ROOT_NOT_FOUND,LORD("Failed to find tag %s."),mode_names[mode]);
+			goto error;
+		}
+		item_tag=get_next_child(&def_tag,NULL);
+		while(item_tag.valid){
+			if (!compare_tag(&item_tag,item_names[mode])){
+				lord_error(XML_MALFORMED,LORD("Unexpected tag (not %s) in mode %s"),item_names[mode],mode_names[mode]);
+				*n_err++;
 			}
-			completed=1;
-			
-			new_mode=0;
-			while((mode_name=mode_names[new_mode])){
-				if ((sub_str=strstr(buf+1,mode_name))!=NULL)
-					break;
-				new_mode++;
+			else{
+				int ok;
+				void *entry=entries[mode];
+				switch(mode){
+					case 0:
+						ok=set_projection(&item_tag,(def_projection*) entry+n_set[mode]);
+						break;
+					case 1:
+						ok=set_ellipsoid(&item_tag,(def_grs*) entry+n_set[mode]);
+						break;
+					case 2:
+						ok=set_rgn(&item_tag, (def_rgn*) entry+n_set[mode]);
+						break;
+					case 3:
+						ok=set_datum(&item_tag, (def_datum*) entry+n_set[mode]);
+						break;
+					case 4:
+						ok=set_hth(&item_tag, (def_hth_tr*) entry+n_set[mode]);
+						break;
+					default:
+						lord_error(TR_LABEL_ERROR,LORD("Invalid mode."));
+						goto error;
+					
+				} /*end switch */
+				if (!ok){
+					lord_error(TR_LABEL_ERROR,LORD("Invalid xml format of entry in mode %d"),mode);
+					goto error;
+				}
 			}
-			
-			/*if mode_rgn - start reading */
-			if (new_mode==mode_rgn)
-				completed=0;
-			/*on new mode - continue */
-			if (mode_name!=NULL){
-				mode=new_mode;
-				continue;
-			}
-			/*this shouldn't happen! */
-			if (mode==mode_none){
-				(*n_err)++;
-				continue;
-			}
-			/*else we might have encountered a new item in some mode */
-			n_lines=0;
-			strncpy(savelines[0],buf+1,1024);
-			if (tokens!=NULL)
-				free(tokens);
-			tokens=get_items(savelines[0]," \n\r", &n_items);
-			if (tokens==NULL || n_items==0)
-				continue;
-			/*set completion flag to allow finishing up the element after reading next lines*/
-			completed=0;
-			/* check to see if we should reallocate */
-			if (n_set[mode]<n_alloc[mode])
-				continue;
-			/*else re-allocate data*/
-			{
+			n_set[mode]++;
+			/* allocate more space if needed*/
+			if (n_set[mode]==n_alloc[mode]){
 				void *more_space;
 				more_space=realloc(entries[mode],mode_sizes[mode]*(n_alloc[mode]+n_prealloc[mode]));
 				if (more_space!=NULL){
@@ -286,91 +320,15 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 					entries[mode]=more_space;
 				}
 				else{
-					(*n_err)++;
-					completed=1;
-					mode=mode_none;
-				}
-			continue;
-			} /*end re-allocation */
-
-		}/*end found hash */
-	if (completed || mode==mode_none) /*keep going if entry is completed */
-		continue;
-	if (mode==mode_rgn){
-		if (tokens!=NULL)
-			free(tokens);
-		tokens=get_items(buf," \n\r",&n_items);
-		if (n_items>=N_TOKENS_RGN){
-			if (!strcmp(tokens[2],RGN_STOP)){
-				mode=mode_none;
-				completed=1;
-			}
-			else if (n_set[mode_rgn]<n_alloc[mode_rgn]){
-				/*strncpy(((char*) entries[mode_rgn])+(n_set[mode_rgn]++)*mode_sizes[mode_rgn],tokens[0],mode_sizes[mode_rgn]);*/
-				{
-					def_rgn *this_rgn;
-					this_rgn=((def_rgn*) entries[mode_rgn])+(n_set[mode_rgn]++);
-					strncpy(this_rgn->rgn_new,tokens[0],3);
-					strncpy(this_rgn->rgn_old,tokens[1],3);
-					strncpy(this_rgn->country,tokens[2],64);
-				}
+					lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space"));
+					goto error;
 				}
 			}
-		free(tokens); tokens=NULL;
-		continue;
-		}
-	/*something wrong?*/
-	if (n_lines>=MAX_LINE_DEF){
-		n_lines=0;
-		(*n_err)++;
-		completed=1;
-		continue;
-	}
-	/*append items from  next line */
-	strncpy(savelines[++n_lines],buf,1024);
-	next_tokens=get_items(savelines[n_lines]," \n\r", &n_items2);
-	if (next_tokens!=NULL && n_items2>0){
-		tokens=append_items(tokens,next_tokens,n_items,n_items2);
-		n_items+=n_items2;
-		free(next_tokens);
-	}
-	/*important logic here! We must be able to decide after reading some lines if we have the minimal number of items! */
-	if (n_items<min_tokens[mode]) 
-		continue;
-	
-	/* and - the descr text line is the line immedeately after we have found the minimal number of items */
-	if (mode!=mode_grs){
-		descr=fgets(buf,MAX_DSCR_LEN,fp);
-	}
-	
-	if (mode==mode_prj)
-		err=set_projection(tokens,((def_projection*) entries[mode])+n_set[mode],n_items,descr);
-	
-	else if (mode==mode_grs)
-		err=set_ellipsoid(tokens,((def_grs*) entries[mode])+n_set[mode],n_items);
-	
-	else if (mode==mode_dtm)
-		err=set_datum(tokens,((def_datum*) entries[mode])+n_set[mode],n_items,descr);
-	
-	else if (mode==mode_hth)	
-		err=set_hth(tokens,((def_hth_tr*) entries[mode])+n_set[mode],n_items,descr);
-	
-	else{
-		lord_debug(0,"parse_def: Something wrong!\n"); /*TODO: use GLOBAL error handling system! */
-		continue;
-	}
-	if (!err)
-		n_set[mode]++;
-	else{
-		(*n_err)++;
-		}
-	completed=1;
-	/*end main loop over lines */
-	}
-	if (tokens!=NULL)
-		free(tokens);
+			item_tag=get_next_child(&def_tag,&item_tag);
+		} /* end iteration over items */ 
+	}/*end mode iteration*/
 	/*reallocate sizes of objects */
-	for(i=0;i<n_modes-1;i++)
+	for(i=0;i<5;i++)
 		entries[i]=realloc(entries[i],mode_sizes[i]*n_set[i]);
 	/*set parent no of datums*/
 	
@@ -407,13 +365,15 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	return data;
 	error:
 	    (*n_err)++;
-	    for(i=0;i<n_modes-1;i++)
+	    for(i=0;i<5;i++)
 	        free(entries[i]);
 	    free(data);
 	    return NULL;
 }
 
 void close_def_data( def_data *data){
+	if (!data)
+		return;
 	free(data->projections);
 	free(data->datums);
 	free(data->ellipsoids);

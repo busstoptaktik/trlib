@@ -21,8 +21,6 @@
 #if !defined(H_DOC_DEF_DATA)
 #define      H_DOC_DEF_DATA
 
-#include "parse_def_file.h"
-
 int doc_rgn(char *rgn_name, char *descr, int detail);
 int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail);
 int doc_dtm(char *dtm_name, char *descr, int detail);

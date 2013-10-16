@@ -27,7 +27,7 @@
 #include    "proj4_to_mlb.h"
 #include    "sgetshpprj.h"
 #include    "grim.h"
-#include    "tab_dir_open.h"
+
 /*   
 * Defines
 */

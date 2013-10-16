@@ -27,7 +27,7 @@
 #include    <string.h>
 #include    "KmsFncs.h"
 #include    "trthread.h"
-#include    "tab_dir_open.h"
+/*#include    "metadata.h"*/
 
 /*             Actions                     */
 #define PRE    0   /* crt_???? -> geoE???? */

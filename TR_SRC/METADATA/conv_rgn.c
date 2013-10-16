@@ -19,7 +19,7 @@
 #include    <string.h>
 #include    <stdio.h>
 #include    "geo_lab.h"
-#include    "parse_def_file.h"
+#include    "metadata.h"
 
 short            conv_rgn(
 /*______________________*/

@@ -1,3 +1,7 @@
+
+#if !defined     (H_PARSE_XML)
+#define           H_PARSE_XML
+
 #include <stdio.h>
 
 typedef enum{ 
@@ -30,8 +34,8 @@ typedef int( *item_converter)(char *val , void *out, size_t buf_size, void *conv
 struct tag get_root_tag(char *xml);
 struct tag get_named_child(struct tag *parent, char *name);
 struct tag get_next_child(struct tag *parent, struct tag *last_tag);
-int get_value(struct tag *t, void *out, size_t size, item_converter conv, void *conv_data);
-char *get_value_as_string( struct tag *, char *out, size_t buf_len);
+int get_value(struct tag t, void *out, size_t size, item_converter conv, void *conv_data);
+char *get_value_as_string( struct tag , char *out, size_t buf_len);
 int compare_tag(struct tag *t, char *name);
 xml_error validate_xml(struct tag *root);
 
@@ -48,3 +52,4 @@ while (i_tag.valid){
     i_tag=get_next_tag(root,i_tag);
 }
 */
+#endif
