@@ -195,7 +195,7 @@ tab_dir                         *tdir
 	  lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate memory."));
 	  return self;
   }
-  
+  self->TAB_DIR=tdir;
   H_clb  = &(self->H0_lab);
   t_clb  = &(self->t_lab);
 
@@ -322,7 +322,7 @@ tab_dir                         *tdir
                                 rgn_p, "geoEetrf89");
             } else
                   (void) strcpy(dstr, "geoEetrf89");
-            (void) conv_w_crd(dstr, &self->H0_lab);
+            (void) conv_w_crd(dstr, &self->H0_lab,tdir->def_lab);
   }
   else
 	  self->grid_tab=NULL;
@@ -392,7 +392,7 @@ tab_dir                         *tdir
         if (i_lab->h_dtm == 0) self->s_req_dh = -7;
         else {
           self->s_req_dh = htr_init(i_lab, o_lab, &self->H2_lab,
-                              &self->htr_const, self->H3_lab.mlb, dstr);
+                              &self->htr_const, self->H3_lab.mlb, dstr,tdir);
           if (self->s_req_dh < 0) { /* ILLEGAL */
             lord_error(HTRF_ILLEG_ , "gd_trans(ill. height TRF)");
 	    gd_close(self);
@@ -523,21 +523,21 @@ tab_dir                         *tdir
 
       case DKMASK: /* dk_trans */
       case EDMASK: /* dk_trans */
-         conv_w_crd("DK_tcgeo_ed50", &self->t_lab);
-	 conv_w_crd("DK_geo_ed50",  &self->g_lab);
+         conv_w_crd("DK_tcgeo_ed50", &self->t_lab,tdir->def_lab);
+	 conv_w_crd("DK_geo_ed50",  &self->g_lab, tdir->def_lab);
          self->dfb_trf = dk_trans;
         break;
 
       case FEMASK: /* fe_trans */
-          conv_w_crd("FO_utm29_etrf89", &self->t_lab);
+          conv_w_crd("FO_utm29_etrf89", &self->t_lab, tdir->def_lab);
         /* utm29_etrs89 => self->nonp_i/o must be zero */
         if ((R_N == REG_NON || R_N == NON_NON) && w_oclb->cstm == 1) {
           (void) sprintf(dstr, "geoE%s", w_oclb->mlb+4);
-            conv_w_crd(dstr, &self->g_lab);
+            conv_w_crd(dstr, &self->g_lab,tdir->def_lab);
           if (i_lab->cstm == 1) {
             /* WARN: ONLY POSSIBLE when no gh */
             (void) sprintf(dstr, "geoE%s", i_lab->mlb+4);
-             conv_w_crd(dstr, &self->t_lab);
+             conv_w_crd(dstr, &self->t_lab,tdir->def_lab);
 	    if (use_geoids){
 		    lord_error(TRF_ILLEG_,LORD("Impossible to use geoids here! %s->%s"),i_lab->mlb,o_lab->mlb);
 		    gd_close(self);
@@ -546,28 +546,28 @@ tab_dir                         *tdir
         } else
         if ((R_N == NON_REG || R_N == NON_NON) && i_lab->cstm == 1) {
           (void) sprintf(dstr, "geoE%s", i_lab->mlb+4);
-           conv_w_crd(dstr, &self->g_lab);
+           conv_w_crd(dstr, &self->g_lab,tdir->def_lab);
         }
         else self->g_lab = self->t_lab;
         self->dfb_trf = fe_trans;
         break;
 
       case NGMASK: /* ng_trans */
-	conv_w_crd("GR_geo_gr96", &self->t_lab);
+	conv_w_crd("GR_geo_gr96", &self->t_lab,tdir->def_lab);
         if ((R_N == NON_REG && i_lab->datum != 62) ||
             (R_N == REG_NON && w_oclb->datum != 62)) self->g_lab = self->t_lab;
         else
-           conv_w_crd("GR_geo_nad83g", &self->g_lab);
+           conv_w_crd("GR_geo_nad83g", &self->g_lab,tdir->def_lab);
         self->dfb_trf = ng_trans;
         break;
 
       case EEMASK: /* ee_trans */
-        conv_w_crd("EE_utm35_eetrf89", &self->t_lab);
+        conv_w_crd("EE_utm35_eetrf89", &self->t_lab,tdir->def_lab);
         self->dfb_trf = ee_trans;
         break;
 
       case FHMASK: /* fh_trans */
-        conv_w_crd("DK_geo_feh10", &self->t_lab);
+        conv_w_crd("DK_geo_feh10", &self->t_lab,tdir->def_lab);
         self->g_lab        = self->t_lab;
         self->dfb_trf      = fh_trans;
         break;

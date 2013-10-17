@@ -6,7 +6,9 @@
 int srch_def(
   int                 srch_type,
   char               *p_sys,
-  struct lab_def_str *p_lb){
+  struct lab_def_str *p_lb,
+   def_data *DEF_DATA
+  ){
 
 
 
@@ -15,7 +17,6 @@ int srch_def(
   int                        n_prj=0; 
   int                        l_cstm, l_mode, l_type;
   union rgn_un               rgn_pref, dum_rgn;
-  extern def_data *DEF_DATA;
   def_projection *prj;
   
   

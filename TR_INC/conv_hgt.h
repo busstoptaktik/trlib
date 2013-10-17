@@ -43,6 +43,7 @@ extern int               conv_hgt(
 char                    *lab_info,
 struct lab_def_str      *p_lb,
 struct hgt_lab          *h_lab,
+def_data                 *data,
 ...
 );
 

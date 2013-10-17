@@ -51,8 +51,7 @@ double              H,
 double              *Nout,
 double              *Eout,
 double              *Hout,
-char                *usertxt,
-FILE                *tr_error
+tab_dir               *tdir
 )
 {
 
@@ -156,12 +155,12 @@ Fehmarn:
            ies = TRF_AREA_;
            lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
 	}
-        res = ptg(outlab, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(outlab, -1, N, E, &N, &E, "", NULL);
         *Nout = N;
         *Eout = E;
         break;
       case PTG: /* prj -> geo */
-        res = ptg(in_lab, +1, N, E, &N, &E,  usertxt, tr_error);
+        res = ptg(in_lab, +1, N, E, &N, &E,  "", NULL);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
            ies = TRF_AREA_;
            lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
@@ -174,13 +173,13 @@ Fehmarn:
            ies = TRF_AREA_;
            lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
 	}
-        res   = gtc(in_lab, +1, N, E, H, &N, &E, &H, usertxt, tr_error);
+        res   = gtc(in_lab, +1, N, E, H, &N, &E, &H, "", NULL);
         *Nout = N;
         *Eout = E;
         *Hout = H;
         break;
       case CTG: /* crt -> geo */
-        res = gtc(outlab, -1, N, E, H, &N, &E, &H, usertxt, tr_error);
+        res = gtc(outlab, -1, N, E, H, &N, &E, &H, "", NULL);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
            ies = TRF_AREA_;
            lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
@@ -192,13 +191,13 @@ Fehmarn:
       case TSP: /* prj -> prj */
         *Nout = N;
         *Eout = E;
-        res = ptg(in_lab, +1, N, E, &N, &E,  usertxt, tr_error);
+        res = ptg(in_lab, +1, N, E, &N, &E,  "", NULL);
         if (N < lim[0] || lim[1] < N || E < lim[2] || lim[3] < E){
            ies = TRF_AREA_;
            lord_error(TRF_AREA_,LORD("Out of area lat: %9.5lf long: %9.5lf"), N*DOUT, E*DOUT); 
 	}
         if (in_lab->cstm != outlab->cstm) {
-          rrs   = ptg(outlab, -1, N, E, &N, &E,  usertxt, tr_error); 
+          rrs   = ptg(outlab, -1, N, E, &N, &E,  "", NULL); 
           if (rrs < res) res = rrs;
           *Nout = N;
           *Eout = E;

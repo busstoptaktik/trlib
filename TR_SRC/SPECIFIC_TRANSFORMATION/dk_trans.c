@@ -64,7 +64,7 @@
 #define  LT32   37
 
 /* #define  DEBUGDKTRANS */
-
+/*TODO: see if we can get rid of THREAD_SAFE */
 int                   dk_trans(
 /*___________________________*/
 struct coord_lab        *in_lab,
@@ -75,8 +75,7 @@ double               H,
 double              *Nout,
 double              *Eout,
 double              *Hout,
-char                *usertxt,
-FILE                *tr_error
+tab_dir              *tdir
 )
 {
 
@@ -252,11 +251,11 @@ FILE                *tr_error
   };
 
   if (!TC_init) {
-    act = conv_w_crd("DK_tc32_ed50",  &TC_tr2) == 1
-        &&    conv_w_crd("DK_utm32_ed50", &TC_u32) == 1
-        &&    conv_w_crd("DK_utm33_ed50", &TC_u33) == 1
-        &&    conv_w_crd("DK_gs",         &TC__gs) == 1
-        &&    conv_w_crd("DK_gsb",        &TC_gsb) == 1;
+        act = conv_w_crd("DK_tc32_ed50",  &TC_tr2,tdir->def_lab) == 1
+        &&    conv_w_crd("DK_utm32_ed50", &TC_u32,tdir->def_lab) == 1
+        &&    conv_w_crd("DK_utm33_ed50", &TC_u33,tdir->def_lab) == 1
+        &&    conv_w_crd("DK_gs",         &TC__gs,tdir->def_lab) == 1
+        &&    conv_w_crd("DK_gsb",        &TC_gsb,tdir->def_lab) == 1;
 
     ed_z    = sizeof(edtab)/sizeof(struct act_nst);
     ed_w    = (int) sqrt(1.0000001*ed_z);
@@ -274,11 +273,11 @@ FILE                *tr_error
     bs_w    = (int) sqrt(1.0000001*ed_z);
     TC_init = act && ed_z == bs_w*bs_w;
 
-    if (!TC_init)
-      return((tr_error==NULL) ? TRF_PROGR_ :
-              t_status(tr_error, usertxt,
-              "dk_trans(init labels)", TRF_PROGR_));
-    }
+    if (!TC_init){
+	lord_error(TRF_PROGR_,LORD("dk_trans(init labels)"));
+	return TRF_PROGR_;
+    }  
+ }
 
   /* Check i/o labels, init of actual transf. systems */
   if (in_chsum != in_lab->ch_sum || outchsum != outlab->ch_sum) {
@@ -286,9 +285,8 @@ FILE                *tr_error
     /* Coord labels */
     if   ( in_lab->lab_type != CRD_LAB
         || outlab->lab_type != CRD_LAB) {
-      return((tr_error==NULL) ? TRF_PROGR_ :
-              t_status(tr_error, usertxt,
-              "dk_trans(i/o labels error)", TRF_PROGR_));
+		lord_error(TRF_PROGR_,LORD("dk_trans(i/o labels error)"));
+		return TRF_PROGR_ ;
     }
 
     /* Out-system */
@@ -297,7 +295,7 @@ FILE                *tr_error
     (void) strcpy(outcs, outlab->mlb);
     pl = outcs + outlab->sepix;
     if (outlab->h_ix) *(outcs + outlab->h_ix -1) = (char) '\0';
-    if (isupper(*pl)) *pl = (char) ((*(pl+1) != (char) '\0') ? '_' : '\0');		// C_UPPER udskiftet med isupper 20120529 stl
+    if (isupper(*pl)) *pl = (char) ((*(pl+1) != (char) '\0') ? '_' : '\0');		/* C_UPPER udskiftet med isupper 20120529 stl*/
     /* Group and number */
     for (pml = mlab, outgr = -1; pml->trgr != -1; pml++)
       if (!strcmp(pml->s_lab, outcs)) {
@@ -311,9 +309,9 @@ FILE                *tr_error
       }
 
     if (outgr == 0 && outnr == 6) {
-      return((tr_error==NULL) ? TRF_PROGR_ :
-              t_status(tr_error, usertxt,
-              "dk_trans(illegal crt_ed50)", TRF_PROGR_));
+        lord_error(TRF_PROGR_,LORD( "dk_trans(illegal crt_ed50)"));
+        return TRF_PROGR_;
+      
     }
 
     /* Datum actions */
@@ -326,10 +324,10 @@ pml = mlab +8;
 lord_debug(0,LORD("OUT  grp = %4d    nr = %4d   navn = %s, call = %s"),
 outgr, outnr, pml->s_lab, outcs);
 #endif
-      } else
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, usertxt,
-                "dk_trans(unknown o-label)", TRF_ILLEG_));
+      } else{
+       lord_error(TRF_ILLEG_,LORD("dk_trans(unknown o-label)"));
+        return TRF_ILLEG_;
+	}
       }
 
     /* In-system */
@@ -338,7 +336,7 @@ outgr, outnr, pml->s_lab, outcs);
     (void) strcpy(in_cs, in_lab->mlb);
     pl = in_cs + in_lab->sepix;
     if (in_lab->h_ix) *(in_cs + in_lab->h_ix -1) = '\0';
-    if (isupper(*pl)) *pl = (char) ((*(pl+1) != (char) '\0') ? '_' : '\0');		// C_UPPER udskiftet med isupper 20120529 stl
+    if (isupper(*pl)) *pl = (char) ((*(pl+1) != (char) '\0') ? '_' : '\0');		/* C_UPPER udskiftet med isupper 20120529 stl*/
     /* Group and number */
     for (pml = mlab, in_gr = -1; pml->trgr != -1; pml++)
       if (!strcmp(pml->s_lab, in_cs)) {
@@ -352,9 +350,9 @@ pml->trgr, pml->trnr, pml->s_lab, in_cs);
       }
 
     if (in_gr == 0 && in_nr == 6) {
-      return((tr_error==NULL) ? TRF_ILLEG_ :
-              t_status(tr_error, usertxt,
-              "dk_trans(illegal crt_ed50)", TRF_ILLEG_));
+	 lord_error(TRF_ILLEG_,LORD("dk_trans(illegal crt_ed50)"));
+         return TRF_ILLEG_;
+             
     }
 
     /* Datum actions */
@@ -367,10 +365,11 @@ pml = mlab +8;
 lord_debug(0,LORD("IN   grp = %4d    nr = %4d   navn = %s, call = %s"),
 outgr, outnr, pml->s_lab, in_cs);
 #endif
-      } else
-      return((tr_error!=NULL) ? TRF_ILLEG_ :
-              t_status(tr_error, usertxt,
-              "dk_trans(unknown i-label)", TRF_ILLEG_));
+      } else{
+	       lord_error(TRF_ILLEG_,LORD( "dk_trans(unknown i-label)"));
+		return TRF_ILLEG_;
+	  
+	}
     }
 
     /* Save check-sums */
@@ -449,32 +448,32 @@ ACTION[act], nst, level);
 
       /* REGULAR TRANSFORMATIONS */
       case U32G: /* utm32 -> geo */
-        res = ptg(&TC_u32, +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_u32, +1, N, E, &N, &E, "", NULL);
         break;
       case GU32: /* geo -> utm32 */
-        res = ptg(&TC_u32, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_u32, -1, N, E, &N, &E, "", NULL);
         break;
       case ZTZD: /* utm33 -> utm32 */
-        res = ptg(&TC_u33, +2, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_u33, +2, N, E, &N, &E, "", NULL);
         if (res < result) result = res;
-        res = ptg(&TC_u32, -2, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_u32, -2, N, E, &N, &E, "", NULL);
         break;
       case ZTZU: /* utm32 -> utm33 */
-        res = ptg(&TC_u32, +2, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_u32, +2, N, E, &N, &E, "", NULL);
         if (res < result) result = res;
-        res = ptg(&TC_u33, -2, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_u33, -2, N, E, &N, &E, "", NULL);
         break;
       case P_TG: /* proj -> geo */
-        res = ptg(in_lab, +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(in_lab, +1, N, E, &N, &E, "", NULL);
         break;
       case G_TP: /* geo -> proj */
-        res = ptg(outlab, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(outlab, -1, N, E, &N, &E, "", NULL);
         break;
       case P_TP: /* proj -> proj (or IDNT) */
         if (proj_proj) {
-          res = ptg(in_lab, +1, N, E, &N, &E, usertxt, tr_error);
+          res = ptg(in_lab, +1, N, E, &N, &E, "", NULL);
           if (res < result) result = res;
-          res = ptg(outlab, -1, N, E, &N, &E, usertxt, tr_error);
+          res = ptg(outlab, -1, N, E, &N, &E, "", NULL);
         }
         act   = IDNT; /* stop */
         *Nout = N;
@@ -483,126 +482,122 @@ ACTION[act], nst, level);
       case TGTP: /* tcgeo_ed50 -> tc32_ed50 */
       case GTTP: /* geo_ed50 -> utm32_ed50 */
         if (fabs(M_PI*0.06667 - E) < M_PI*0.03333)
-        res = ptg(&TC_u32, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_u32, -1, N, E, &N, &E, "", NULL);
         else nst = (act == TGTP) ? 1 : 5;
         /* when totally outside DK, where utm32_ed50 == tc32_ed50 */
         break;
 
       case PTGS: /* gs -> geo */
-        res = ptg(&TC__gs, +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC__gs, +1, N, E, &N, &E, "", NULL);
         break;
       case GSTP: /* geo -> gs */
-        res = ptg(&TC__gs, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC__gs, -1, N, E, &N, &E, "", NULL);
         break;
       case PTBS: /* gsb -> geo */
-        res = ptg(&TC_gsb, +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_gsb, +1, N, E, &N, &E, "", NULL);
         break;
       case BSTP: /* geo -> gsb */
-        res = ptg(&TC_gsb, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_gsb, -1, N, E, &N, &E, "", NULL);
         break;
 
         /* UTM ED50 */
       case T32U: /* tc32 -> utm32 */
-        res = tcts_u(N, E, &N, &E, 'u',  1, usertxt, tr_error);
+        res = tcts_u(N, E, &N, &E, 'u',  1, "", NULL);
         break;
       case U32T: /* utm32 -> tc32 */
-        res = tcts_u(N, E, &N, &E, 'u', -1, usertxt, tr_error);
+        res = tcts_u(N, E, &N, &E, 'u', -1, "", NULL);
         break;
 
         /* DK */
       case T32J: /* tc32 -> s34j */
-        res = tcts_u(N, E, &N, &E, 'j',  1, usertxt, tr_error);
+        res = tcts_u(N, E, &N, &E, 'j',  1, "", NULL);
         break;
       case JT32: /* s34j -> tc32 */
-        res = tcts_u(N, E, &N, &E, 'j', -1, usertxt, tr_error);
+        res = tcts_u(N, E, &N, &E, 'j', -1, "", NULL);
         break;
       case T32S: /* tc32 -> s34s */
-        res = tcts_u(N, E, &N, &E, 's',  1, usertxt, tr_error);
+        res = tcts_u(N, E, &N, &E, 's',  1, "", NULL);
         break;
       case ST32: /* s34s -> tc32 */
-        res = tcts_u(N, E, &N, &E, 's', -1, usertxt, tr_error);
+        res = tcts_u(N, E, &N, &E, 's', -1, "", NULL);
         break;
       case T32L: /* tc32 -> s34  */
         if (N > 6033467.0) {
           if (E < +775000.0) { /* Jylland + Sjælland */
             while (N < *(N32 + ijs)) ijs ++;
             res = (E < *(E32 + ijs))
-                ? tcts_u(N, E, &N, &E, 'j',  1, usertxt, tr_error)
-                : tcts_u(N, E, &N, &E, 's',  1, usertxt, tr_error);
+                ? tcts_u(N, E, &N, &E, 'j',  1, "", NULL)
+                : tcts_u(N, E, &N, &E, 's',  1, "", NULL);
           } else /* BORNHOLM */
-            res = tcts_u(N, E, &N, &E, 'b',  1, usertxt, tr_error);
+            res = tcts_u(N, E, &N, &E, 'b',  1, "", NULL);
         } else
-        if (tr_error!=NULL)
-           (void) t_status(tr_error, usertxt, "dk_trans", TRF_AREA_,
-                           "m ", "", N, E, 0.0, 0.0);
+		lord_debug(0,"dk_trans: %.4f %.4f", N, E); /*simlk->ke: should be error?*/
         break;
       case LT32: /* s34  -> tc32 */
         if (N > 0.0) {
           if (N > 75000.0 || E > +65000.0) { /* Jylland + Sjælland */
             while (N < *(Njs + ijs)) ijs ++;
             res = (E < *(Ejs + ijs))
-                ? tcts_u(N, E, &N, &E, 's', -1, usertxt, tr_error)
-                : tcts_u(N, E, &N, &E, 'j', -1, usertxt, tr_error);
+                ? tcts_u(N, E, &N, &E, 's', -1, "", NULL)
+                : tcts_u(N, E, &N, &E, 'j', -1, "", NULL);
           } else /* BORNHOLM */
-            res = tcts_u(N, E, &N, &E, 'b', -1, usertxt, tr_error);
+            res = tcts_u(N, E, &N, &E, 'b', -1, "", NULL);
         } else
-        if (tr_error!=NULL)
-           (void) t_status(tr_error, usertxt, "dk_trans", TRF_AREA_,
-                        "m ", "", N, E, 0.0, 0.0);
+             lord_debug(0,"dk_trans: %.4f %.4f", N, E); /*simlk->ke: should be error?*/
         break;
 
       case U_GS: /* utm32 -> gs  */
-        res = utgs(N, E, &N, &E, 'd', +1, usertxt, tr_error);
+        res = utgs(N, E, &N, &E, 'd', +1, "", NULL);
         break;
       case GS_U: /* gs -> utm32  */
-        res = utgs(N, E, &N, &E, 'd', -1, usertxt, tr_error);
+        res = utgs(N, E, &N, &E, 'd', -1, "", NULL);
         break;
 
       /* KK and OS - sic transit gloria mundi */
       case J_OS: /* s34j -> os */
-        res = s34jtos(N, E, &N, &E, +1, usertxt, tr_error);
+        res = s34jtos(N, E, &N, &E, +1, "", NULL);
         break;
       case OS_J: /* os -> s34j */
-        res = s34jtos(N, E, &N, &E, -1, usertxt, tr_error);
+        res = s34jtos(N, E, &N, &E, -1, "", NULL);
         break;
       case S_KK: /* s34s -> kk */
-        res = s34stkk(N, E, &N, &E, +1, usertxt, tr_error);
+        res = s34stkk(N, E, &N, &E, +1, "", NULL);
         break;
       case KK_S: /* kk -> s34s */
-        res = s34stkk(N, E, &N, &E, -1, usertxt, tr_error);
+        res = s34stkk(N, E, &N, &E, -1, "", NULL);
         break;
 
       /* STOREBÆLT */
       case U_SB: /* u32 -> sb */
-        res = utsb(N, E, &N, &E, +1, usertxt, tr_error);
+        res = utsb(N, E, &N, &E, +1, "", NULL);
         break;
       case SB_U: /* sb -> u32 */
-        res = utsb(N, E, &N, &E, -1, usertxt, tr_error);
+        res = utsb(N, E, &N, &E, -1, "", NULL);
         break;
 
       /* DKS */
       case SDKS: /* s34s -> dks */
         res = dks_tr("s34s", outcs, N, E, Nout, Eout,
-            usertxt, tr_error);
+            "", NULL);
         act   = 0;
         break;
       case DKSS: /* dks -> s34s */
         res = dks_tr(in_cs, "s34s", N, E, &N, &E,
-            usertxt, tr_error);
+            "", NULL);
         break;
 
       /* BORNHOLM */
       case T32B: /* tc32 -> s45b */
-        res = tcts_u(N, E, &N, &E, 'b',  1, usertxt, tr_error);
+        res = tcts_u(N, E, &N, &E, 'b',  1, "", NULL);
         break;
       case BT32: /* s45b -> tc32 */
-        res = tcts_u(N, E, &N, &E, 'b', -1, usertxt, tr_error);
+        res = tcts_u(N, E, &N, &E, 'b', -1, "", NULL);
         break;
       case UGSB: /* utm33 -> gsb */
-        res = utgs(N, E, &N, &E, 'b',  1, usertxt, tr_error);
+        res = utgs(N, E, &N, &E, 'b',  1, "", NULL);
         break;
       case GSBU: /* gsb -> utm33 */
-        res = utgs(N, E, &N, &E, 'b', -1, usertxt, tr_error);
+        res = utgs(N, E, &N, &E, 'b', -1, "", NULL);
         break;
 
       case IDNT: /* ident and terminating transf */
@@ -612,20 +607,20 @@ ACTION[act], nst, level);
 
       case XIDT: /* ident and terminating transf for dks */
         res = dks_tr(in_cs, outcs, N, E, &N, &E,
-            usertxt, tr_error);
+            "", NULL);
         *Nout = N;
         *Eout = E;
         act   = 0;
         break;
 
       case ILLG: /* illegal transformation */
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, usertxt,
-                "dk_trans(illegal)", TRF_ILLEG_));
+	       lord_error(TRF_ILLEG_,LORD("dk_trans(illegal)"));
+	       return TRF_ILLEG_;
+     
       default: /* programme error */
-        return((tr_error==NULL) ? TRF_PROGR_ :
-                t_status(tr_error, usertxt,
-                "dk_trans(prog error)", TRF_PROGR_));
+	       lord_error(TRF_PROGR_,LORD("dk_trans(prog error)"));
+	       return TRF_PROGR_;
+     
       }
 #ifdef  DEBUGDKTRANS
 	  lord_debug(0,LORD(", res = %d"), res);

@@ -22,6 +22,7 @@
 /* Modified, KE JAN 2010                                       */
 /* Does not use def_lab anymore - instead use preparsed data stored in extern def_data *DEF_DATA */
 /* simlk, june 2012 */
+/* And now, its not a global structure anymore - rather a state object passed around!*/
 
 #include    <stdio.h>
 #include    <stdlib.h>
@@ -42,11 +43,12 @@ char               *p_nm,
 char               *e_nm,
 char               *rgn_nm,
 short              *mask,
-struct dsh_str     *trp
+struct dsh_str     *trp,
+def_data          *DEF_DATA
 )
 
 {
-extern def_data *DEF_DATA;
+
 
 #define  MAS  (RHO*1000.0)
 

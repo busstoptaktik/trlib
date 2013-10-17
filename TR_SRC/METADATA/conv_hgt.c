@@ -42,6 +42,7 @@ int                      conv_hgt(
 char                    *lab_info,
 struct lab_def_str      *p_lb_ex,
 struct hgt_lab          *h_lab,
+def_data                  *DEF_DATA,
 ...
 )
 {
@@ -148,7 +149,7 @@ struct hgt_lab          *h_lab,
 
     /* Set datum */
     h_lab->datum = (short) set_dtm_1(-1, p_dtm, &par_dtm, p_name,
-                   e_name, rgn_pref.prfx, &mask, &(h_lab->dsh_con));
+                   e_name, rgn_pref.prfx, &mask, &(h_lab->dsh_con),DEF_DATA);
     if (h_lab->datum > 0)
       h_lab->ellipsoid = (short) set_grs(-1, e_name, ell_p);
     else {
@@ -218,7 +219,7 @@ struct hgt_lab          *h_lab,
 
       if (h_lab->datum > 0) {
         if (set_dtm_1(h_lab->datum, p_dtm, &par_dtm, p_name,
-          e_name, rgn_pref.prfx, &mask, &d_sh) > 0) {
+          e_name, rgn_pref.prfx, &mask, &d_sh,DEF_DATA) > 0) {
           (void) fprintf(iofile, "\nDatum:     %9s%s", " ", p_dtm);
         }
       }
@@ -283,11 +284,11 @@ struct hgt_lab          *h_lab,
     /* get the datum name */
     if (h_lab->datum > 0) {
       if (set_dtm_1(h_lab->datum, p_dtm, &par_dtm,
-          p_name, e_name, rgn_pref.prfx, &mask, &d_sh) > 0) {
+          p_name, e_name, rgn_pref.prfx, &mask, &d_sh,DEF_DATA) > 0) {
         (void) fprintf(iofile, "%9s%s", " ", p_dtm);
         /* get the parent datum name */
         if (set_dtm_1(h_lab->p_dtm, p_dtm, &par_dtm,
-            p_name, e_name, rgn_pref.prfx, &mask, &d_sh) > 0) {
+            p_name, e_name, rgn_pref.prfx, &mask, &d_sh,DEF_DATA) > 0) {
           (void) fprintf(iofile, "\npar. dtm  = %15d", h_lab->p_dtm);
           (void) fprintf(iofile, "%9s%s", " ", p_dtm);
         }

@@ -36,7 +36,7 @@
 #include "parse_xml.h"
 
 #define MAX_TABLE_LEN (32)
- #define MAX_DSCR_LEN (128)
+#define MAX_DSCR_LEN (128)
  
 struct def_grs {
 	char mlb[MLBLNG];
@@ -134,6 +134,7 @@ typedef struct{
 } tab_dir;
 
 tab_dir *tab_dir_open(char *path);
+void tab_dir_close(tab_dir *self);
 
 
 typedef struct {
@@ -144,6 +145,19 @@ typedef struct {
  int type;
 }
 table_adm_str;
+
+typedef int( *TRANSF_FCT)(
+struct coord_lab      *in_lab,
+struct coord_lab      *outlab,
+double              N,
+double              E,
+double              H,
+double             *Nout,
+double             *Eout,
+double             *Hout,
+tab_dir              *tdir
+); 
+
 
 struct gd_state{
 	struct coord_lab    *i_lab, *o_lab; 
@@ -160,6 +174,7 @@ struct gd_state{
 	struct coord_lab    t_lab;   /* non-reg gateway */
 	struct coord_lab    g_lab;   /* geo_* PRE/ANT   */
         char   geoid_name[MLBLNG]; /* should  be used to something */
+	tab_dir            *TAB_DIR;
         table_adm_str   *grid_tab;
 	table_adm_str   *h_grid_tab;
 	struct htr_c_str    htr_const;
@@ -171,14 +186,8 @@ struct gd_state{
 	char                i_sep, nonp_i[3];
 	char                o_sep, nonp_o[3];
 	/*handle to non-standard transformations*/
-	int      (*dfb_trf)(
-		struct coord_lab      *i_lab,
-		struct coord_lab      *o_lab,
-		double              N,    double   E,    double   H,
-		double             *Nout, double  *Eout, double  *Hout,
-		char               *usertxt,
-		FILE               *tr_error
-	);
+	TRANSF_FCT dfb_trf;
+		
   };
 
 typedef struct gd_state gd_state;
@@ -202,10 +211,10 @@ table_adm_str *gd_global_stdgeoids(int open_g);
 table_adm_str *gd_global_fehmarngeoid(int open_g);
 table_adm_str *gd_global_fbeltgeoid(int open_g);*/
 
-int conv_w_crd(char *mlb, struct coord_lab *c_lab);
-int conv_w_tab(char *mlb, struct gde_lab *t_lab);
-int conv_w_plm(char *mlb, struct plm_lab *p_lab);
-int srch_def(int srch_type, char *p_sys, struct lab_def_str *p_lb);
+int conv_w_crd(char *mlb, struct coord_lab *c_lab, def_data *data);
+/*int conv_w_tab(char *mlb, struct gde_lab *t_lab);
+int conv_w_plm(char *mlb, struct plm_lab *p_lab);*/
+int srch_def(int srch_type, char *p_sys, struct lab_def_str *p_lb, def_data *data);
 
 
 

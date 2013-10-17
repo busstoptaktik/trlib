@@ -30,8 +30,9 @@
 
 #if !defined     (H_EE_TRANS)
 #define           H_EE_TRANS
+#include       "metadata.h"
 
-extern int         ee_trans(
+ int         ee_trans(
 /*________________________*/
 struct coord_lab      *in_lab_a,
 struct coord_lab      *outlab_a,
@@ -41,8 +42,7 @@ double              H_in,
 double             *Nout,
 double             *Eout,
 double             *Hout,
-char               *usertxt,
-FILE               *tr_error
+tab_dir              *tdir
 );
 
 /* ee_trans   : prediction function for Estonian coord-systems*/

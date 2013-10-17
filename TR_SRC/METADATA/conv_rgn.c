@@ -25,14 +25,14 @@ short            conv_rgn(
 /*______________________*/
 short            rgn_nr,
 char            *rgn_prfx,
-char            *rgn_name
+char            *rgn_name,
+def_data *DEF_DATA
 )
 {
 
 
 /* Use preparsed regions. simlk, june 2012 */
 	union rgn_un     f_rgn, r_rgn;
-	extern def_data *DEF_DATA;
 	int n_rgn=0;
 	def_rgn *this_rgn;
 	(void) strcpy(rgn_name, "Undefined");

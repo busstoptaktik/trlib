@@ -40,6 +40,11 @@ static char *attach_pom_extension(char *dir,char *in){
 		
 
 void tab_dir_close(tab_dir *self){
+	if (!self)
+		return;
+	if (self->def_lab)
+		close_def_data(self->def_lab);
+	/*TODO: close all GRIM objects*/
 	free(self);
 }
 

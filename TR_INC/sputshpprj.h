@@ -43,8 +43,9 @@
 #define      H_SPUTSHPRJ
  
 #include "geo_lab.h"
+#include "metadata.h"
  
- int sputshpprj(char *wkt_out, struct coord_lab *g_lab);
+ int sputshpprj(char *wkt_out, struct coord_lab *g_lab, def_data *data);
 
 #endif
 

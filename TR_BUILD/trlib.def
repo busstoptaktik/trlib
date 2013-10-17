@@ -38,15 +38,11 @@ EXPORTS
 	bshlm2
 	bshlm2g
 	c_gps_c
-	c_tabdir_file
-	ch_tabdir_par
 	cic
 	clenshaw
 	conv_crd
 	conv_hgt
-	conv_plm
 	conv_rgn
-	conv_tab
 	ctc
 	cwfJD
 	cwtJD
@@ -59,9 +55,7 @@ EXPORTS
 	ee_trans
 	eetmtu_g
 	erad
-	etrs89_trans
 	export_to_epsg
-	f_nxt
 	fe_trans
 	fgetdt
 	fgetg
@@ -80,7 +74,6 @@ EXPORTS
 	get_mlb
 	get_tpd
 	get_zone
-	get_def_numbers
 	getsinexlin
 	getsinexver
 	gettabdir
@@ -90,13 +83,10 @@ EXPORTS
 	gtc
 	hlm_tr
 	htr_init
-	i_tabdir_file
 	inpoly
-	itrf_trans
 	labchsum
 	mlb_to_proj4
 	ng_trans
-	prn_cho
 	proj4_to_mlb
 	ptg
 	ptg_d
@@ -111,7 +101,6 @@ EXPORTS
 	set_dtm
 	set_dtm_1
 	set_grs
-	set_itrf_c
 	set_tpd
 	set_trc
 	settabdir
@@ -123,14 +112,8 @@ EXPORTS
 	sputcw
 	sputg
 	sputshpprj
-	srch_plate
-	srch_tab_typ
 	t_status
-	tab3d_c
-	tab3d_i
-	tab3d_val
 	tcts_u
-	tpd_doc_f
 	utgs
 	utsb
 	v_red

@@ -26,8 +26,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <fcntl.h>
-#include <stdarg.h>
 #include "metadata.h"
+#include "lord.h"
 
 #ifndef    M_PI
 #include   "kms_math.h"
@@ -39,8 +39,7 @@ int          set_grs(
 int          ell_nmb,
 char        *ellname,
 double      *e,
-...
-)
+def_data *DEF_DATA)
 
 {
 
@@ -59,7 +58,7 @@ double      *e,
   double   GMg;       /* GM or geq         -"-             */
   double   omg;       /* rotation velocity                 */
   /* use the global parsed data : simlk, june 2012 */
-  extern def_data *DEF_DATA;
+ 
   def_grs *grs_def;
   int n_grs=0;
 
@@ -291,8 +290,7 @@ if (empty) {
     geq = GM/a/b*(1. - m*(1. + qdp/qd));
     break;
   default:
-    (void) fprintf(stderr,
-          "\n** set_grs: mode %d is illegal\n", mode);
+   lord_error(1,LORD("set_grs: mode %d is illegal\n"), mode);
     *e = 0.0;
     return(-1);
   }

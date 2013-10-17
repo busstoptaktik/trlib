@@ -161,8 +161,8 @@ double                   *ogh
   /* In prg is iEh replacing H_in (CRT causes troubles)    */
  
   if (tr_state == NULL) {
-    (void) ng_trans(NULL, NULL, 0.0, 0.0, 0.0, &N, &E, &H, "", NULL);
-     return(0);
+     lord_error(TRF_ILLEG_,LORD("state object is NULL"));
+     return TRF_ILLEG_;
   }
 
 
@@ -227,7 +227,7 @@ double                   *ogh
 	(void) lord_debug(0, LORD("   %s -> %s;"), tr_state->(i_Nlab).mlb, (i_wlab).mlb);
 	(void) lord_debug(0, LORD(" %7.2f  %7.2f   %7.2f;"), N, E, H);
 #endif
-        ies = (tr_state->dfb_trf)(tr_state->i_Nlab, i_wlab,N, E, H, &N, &E, &HH,"", NULL);
+        ies = (tr_state->dfb_trf)(tr_state->i_Nlab, i_wlab,N, E, H, &N, &E, &HH,tr_state->TAB_DIR);
         if (lev == 3 && (tr_state->dfb_trf == ng_trans)) {
           req_th = -1;
           th     = HH - H;
@@ -274,8 +274,7 @@ double                   *ogh
           iEh  = HH;
           iEhr = 0;
         }
-        ies = ctc(tr_state->i_Rlab, o_wlab, N, E, H, &N, &E, &H,
-                  "", NULL);
+        ies = ctc(tr_state->i_Rlab, o_wlab, N, E, H, &N, &E, &H,tr_state->TAB_DIR);
         break;
    
       case  CTG: /* CRT -> GEO */
@@ -308,7 +307,7 @@ double                   *ogh
   N, E, N*180.0/M_PI, E*180.0/M_PI, H);
 #endif
         ies = (tr_state->dfb_trf)(tr_state->i_Nlab, i_wlab,
-                         N, E, H, &N, &E, &HH, "", NULL);
+                         N, E, H, &N, &E, &HH, tr_state->TAB_DIR);
         if (lev == 3 && ((tr_state->dfb_trf) == ng_trans)) {
           req_th = -1;
           th     = HH - H;

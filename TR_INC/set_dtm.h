@@ -32,6 +32,7 @@
 #define       _SET_DTM_FNC_
 
 #include    "geo_lab.h"
+#include    "metadata.h"
 
 extern int      set_dtm(
 /*____________________*/
@@ -40,7 +41,8 @@ char            *d_nm,
 short           *p_no,
 char            *p_nm,
 char            *e_nm,
-struct dsh_str  *trp
+struct dsh_str  *trp,
+def_data      *data
 );
 
 /*

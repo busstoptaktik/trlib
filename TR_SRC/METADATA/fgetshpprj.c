@@ -17,13 +17,13 @@
  */
  
  #include "sgetshpprj.h"
-
- int fgetshpprj(FILE *fh_in, struct coord_lab *g_lab){
+#include "metadata.h"
+ int fgetshpprj(FILE *fh_in, struct coord_lab *g_lab, def_data *data){
 	char wkt[4096];
 	size_t n_read=fread(wkt,1,4096,fh_in);
 	if (n_read==4096) /*overflow??*/
 		return -1;
-	return sgetshpprj(wkt,g_lab,NULL);
+	return sgetshpprj(wkt,g_lab,NULL,data);
 
 }
  

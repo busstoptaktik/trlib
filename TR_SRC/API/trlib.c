@@ -40,9 +40,9 @@
 #define TRLIB_VERSION ( "dev v1.1 (rev: " TRLIB_REV_STRING  ", " __DATE__ ", " __TIME__ ")" )
 
 #define TR_TABDIR_ENV  "TR_TABDIR" /* some env var, that can be set by the user to point to relevant library. Should perhaps be in trlib_intern.h */
-#define TR_DEF_FILE      "def_lab.txt"
+#define TR_DEF_FILE      "def_trlib.xml"
 #define TR_EPSG_FILE    "def_epsg.txt"
-#define TR_MAN_TAB_FILE   "def_table.xml"
+
 
 /* R2D equals the geo_lab define DOUT = (180.0/M_PI) */
 
@@ -61,9 +61,9 @@ static int *MAIN_THREAD_ID=0; /* same as above - also signals whether the librar
 
 FILE *ERR_LOG=0;
 
-def_data *DEF_DATA=0;
-tab_dir    *TAB_DIR=0;
 
+tab_dir    *TAB_DIR=0;
+def_data *DEF_DATA=0;  /*really a member of TAB_DIR - but useful for error checking to include pointer here...*/
 
 /* only used in InitLibrary at the moment- but could be useful */
 int TR_IsMainThread(void){
@@ -120,9 +120,9 @@ int TR_InitLibrary(char *path) {
 	    return TR_ERROR;
     }
     #ifdef _ROUT
-    if (DEF_DATA && ERR_LOG){
+    if (TAB_DIR && ERR_LOG){
 	    fprintf(ERR_LOG,"\nContents of %s:\n",TR_DEF_FILE);
-	    present_data(ERR_LOG,DEF_DATA);
+	    present_data(ERR_LOG,TAB_DIR->def_lab);
 	    fflush(ERR_LOG);
     }
     #endif
@@ -190,13 +190,12 @@ int TR_InitLibrary(char *path) {
 
 int TR_SetGeoidDir(char *path){
 	FILE *fp;
-	int rc;
-	char buf[TR_MAX_FILENAME],fname[TR_MAX_FILENAME],*init_path=0;
-	if (path && strlen(path)>0) 
+	char buf[TR_MAX_FILENAME],fname[TR_MAX_FILENAME],*init_path=NULL;
+	if (path && *path) 
 		init_path=path;
 	else
 		init_path=getenv(TR_TABDIR_ENV);
-	if (0==init_path){ 
+	if (NULL==init_path){ 
 		sprintf(buf,"./");
 		init_path=buf;
 	}
@@ -205,24 +204,11 @@ int TR_SetGeoidDir(char *path){
 		strcat(buf,"/");
 		init_path=buf;
 	}
-		    
-	strcpy(fname,init_path);
-	strcat(fname,TR_DEF_FILE);
-	#ifdef _ROUT
-	lord_debug(0,"tabdir: %s  def_lab: %s",init_path,fname); /*just debugging */
-	#endif
-	fp=fopen(fname,"r");
-	if (0==fp)
-		return TR_ERROR;
+	
 	/* close previously parsed definitions */
-	if (DEF_DATA) 
-		close_def_data(DEF_DATA);
+	tab_dir_close(TAB_DIR);
 	/* close previously opened tab-dir files */
-	/*TODO close previous TAB_DIR */
-
-	c_tabdir_file(0,NULL);
-	DEF_DATA=open_def_data(fp,&rc);
-	fclose(fp);
+	/*Should soon be unneeded!!!*/
 	/*init epsg table*/
 	strcpy(fname,init_path);
 	strcat(fname,TR_EPSG_FILE);
@@ -234,13 +220,15 @@ int TR_SetGeoidDir(char *path){
 		lord_debug(0,"Parsed epsg_def_file with %d entries.",n);
 		fclose(fp);
 	}
-	lord_debug(0,"Parsed def_lab , errs: %d",rc);
 	/*init tab_dir var*/
 	strcpy(fname,init_path);
-	strcat(fname,TR_MAN_TAB_FILE);
+	strcat(fname,TR_DEF_FILE);
+	#ifdef _ROUT
+	lord_debug(0,"tabdir: %s  def_lab: %s",init_path,fname); /*just debugging */
+	#endif
 	TAB_DIR=tab_dir_open(fname);
-	settabdir(init_path);
-	return (DEF_DATA && TAB_DIR )? TR_OK: TR_ERROR;
+	DEF_DATA=TAB_DIR->def_lab;  /*just a useful pointer which could be NULL */
+	return (TAB_DIR )? TR_OK: TR_ERROR;
 }
 	
 /* Mock up - not fully implemented! */
@@ -278,13 +266,17 @@ void TR_GetVersion(char *buffer,int BufSize) {
 PR *TR_OpenProjection(char *mlb){
 	int label_check;
 	struct coord_lab *plab=NULL;
-	PR *proj= malloc(sizeof(PR));
-	
+	PR *proj;
+	if (!TAB_DIR || !TAB_DIR->def_lab){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Library not initialised!"));
+		return NULL;
+	}
+	proj= malloc(sizeof(PR));
 	if (!proj){
 		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
 		return 0;
 	}
-	label_check = conv_w_crd(mlb,proj);
+	label_check = conv_w_crd(mlb,proj,TAB_DIR->def_lab);
 	if (label_check!=CRD_LAB) {
 		free(proj);
 		lord_error(TR_LABEL_ERROR,"Failed to open projection %s.",mlb);
@@ -569,7 +561,9 @@ int TR_itrf(
         if(n_vel==n){
             i_vel[0]=velx_in[i]; i_vel[1]=vely_in[i]; i_vel[2]=velz_in[i];
         }
-        err = itrf_trans(plab_in, plab_out, stn_vel, i_crd, i_vel, i_JD, o_crd, o_vel, plate_info, tr_par, "", err_str);
+        /*err = itrf_trans(plab_in, plab_out, stn_vel, i_crd, i_vel, i_JD, o_crd, o_vel, plate_info, tr_par, "", err_str);*/
+	/*TODO: rewrite itrf_trans as for gd_trans*/
+	err=TRF_ILLEG_;
         x_out[i]=o_crd[0]; y_out[i]=o_crd[1]; z_out[i]=o_crd[2];
         if(n_vel==n){
             velx_out[i]=o_vel[0]; vely_out[i]=o_vel[1]; velz_out[i]=o_vel[2];
@@ -579,7 +573,7 @@ int TR_itrf(
            ERR = err;
    }
    if (ERR)
-	   lord_error(ERR,"Error in itrf transformation.");
+	   lord_error(ERR,LORD("Error in itrf transformation."));
 
    return ERR? TR_ERROR: TR_OK;
 
@@ -642,15 +636,13 @@ int TR_Stream(TR *trf, FILE *f_in, FILE *f_out, int n) {
 
 /* We need to close file pointers! Other ressources *should* be freed automatically! */
 void TR_TerminateLibrary(void) {
-	TR_TerminateThread(); /*terminate the 'main' thread - assuming this haven't been done already (perhaps check for this??) */
-	if (DEF_DATA)
-		close_def_data(DEF_DATA);
+	tab_dir_close(TAB_DIR);
 	release_epsg_table();
 }
 
+/*not needed*/
 void TR_TerminateThread(void){
-	gd_trans(NULL,0,0,0,NULL,NULL,NULL,NULL);
-	c_tabdir_file(0,NULL);
+	return;
 }
 
 /* Translates mlb to ESRI wkt*/
@@ -659,7 +651,7 @@ int TR_GetEsriText(char *mlb, char *wkt_out){
     PR *TC=TR_OpenProjection(mlb);
     if (!TC)
 	return TR_LABEL_ERROR;
-    err=sputshpprj(wkt_out,TC); /* See fputshpprj.h for details on return value */
+    err=sputshpprj(wkt_out,TC,DEF_DATA); /* See fputshpprj.h for details on return value */
     TR_CloseProjection(TC);
     return (err==0)?(TR_OK):(TR_LABEL_ERROR);
 }
@@ -701,7 +693,7 @@ int TR_ImportLabel(char *text, char *mlb_out, int buf_len){
 	/*We go for autodetection of format - could also implement explicit identifiers like in EPSG:xxxxx*/
 	/*case proj4*/
 	if (strstr(text,"+proj"))
-		ok=proj4_to_mlb(text,buf);
+		ok=proj4_to_mlb(text,buf,DEF_DATA);
 	/*case epsg*/
 	else if (strstr(text,"EPSG")){
 		char *pos=strchr(text,':');
@@ -720,7 +712,7 @@ int TR_ImportLabel(char *text, char *mlb_out, int buf_len){
 	}
 	/*case wkt*/
 	else if (strchr(text,'[') && strchr(text,']')){
-		ok=sgetshpprj(text,NULL,buf);
+		ok=sgetshpprj(text,NULL,buf,DEF_DATA);
 		ok=(ok==0)?(TR_OK):(TR_LABEL_ERROR);
 	}
 	else
@@ -753,7 +745,7 @@ int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len){
 			}
 			break;
 		case TR_FRMT_PROJ4: /*TODO*/
-			ok=mlb_to_proj4(mlb,buf,4096);
+			ok=mlb_to_proj4(mlb,buf,4096,DEF_DATA);
 			break;
 		case TR_FRMT_ESRI_WKT:
 			ok=TR_GetEsriText(mlb,buf);

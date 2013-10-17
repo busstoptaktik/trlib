@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "metadata.h"
 #include "geo_lab.h"
-#include "geoid_d.h"
+
 
 /*Utility macros implemented in order the hide the detailed composition of a PR-object (which may change) */
 #define IS_CARTESIC(pr)           (pr->cstm==1)

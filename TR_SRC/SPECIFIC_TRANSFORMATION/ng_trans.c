@@ -36,6 +36,9 @@
 #define  PTG    3
 #define  GTP    4
 
+
+/*TODO: see if we can get rid of THREAD_SAFE and most init actions...*/
+
 int                    ng_trans(
 /*___________________________*/
 struct coord_lab     *in_lab,
@@ -46,19 +49,18 @@ double               H_in,
 double              *Nout,
 double              *Eout,
 double              *Hout,
-char                *usertxt,
-FILE                *tr_error
+tab_dir               *tdir
 )
 {
 
   static THREAD_SAFE  int                 in_chsum = 0L;
   static THREAD_SAFE  int                 outchsum = 0L;
   static  int                 init = 0;
-  static struct mtab3d_str   nadg_gr96_tab;
+  static GRIM   *nadg_gr96_tab=NULL;
   static struct coord_lab     w_lab;
 
   char                     in_cs[MLBLNG], outcs[MLBLNG];
-  char                    *p_str, err_str[512];
+  char                    *p_str;
 
   int                      in_gr, outgr, outnr = 0, ng_z;
   int                      nst, gst, act;
@@ -113,25 +115,24 @@ FILE                *tr_error
   };
 
   if (in_lab == NULL) {
-    if (init) (void) fclose(nadg_gr96_tab.table_u.fd);
-    init               = 0;
-    nadg_gr96_tab.init = 0;
-    return(0);
+    lord_error(TRF_ILLEG_,LORD("Input label is NULL - table close down is handled elsewhere."));
+    return TRF_ILLEG_;
   }
   /* Test io-labels */
   if (in_lab->lab_type == CRD_LAB && outlab->lab_type == CRD_LAB) {
 
-    if (init == 0) {
-      char   err_str[128];
-      res  = tab3d_i("nadggr96.06", T3D_LAB, &nadg_gr96_tab, err_str);
+    if (nadg_gr96_tab == NULL) {
+      nadg_gr96_tab=get_specific_table("nadggr96.06", T3D_LAB, tdir);
+     /* res  = tab3d_i("nadggr96.06", T3D_LAB, &nadg_gr96_tab, err_str);*/
       /* State/action table size and width */
       ng_z = sizeof(ngtab)/sizeof(struct act_nst);
       ng_w = (int) sqrt(1.0000001*ng_z);
-      (void) conv_w_crd("geo_nad83g", &w_lab);
-      init = (res > 0) && (ng_z == ng_w*ng_w);
-      if (!init)
-        return(t_status(
-               tr_error, usertxt, "ng_trans(table)", res));
+      (void) conv_w_crd("geo_nad83g", &w_lab, tdir->def_lab);
+      init =  (nadg_gr96_tab!=NULL && ng_z == ng_w*ng_w);
+      if (!init){
+	      lord_error(res,LORD( "ng_trans(table)"));
+	      return res;
+      }
     }
 
     /* Check i/o labels, init of actual transf. systems */
@@ -215,8 +216,9 @@ pml->trgr, pml->trnr, pml->s_lab);
 #endif
 
       if (outnr == -1 || in_nr == -1) {
-        return(t_status(
-               tr_error, usertxt, "ng_trans(table)", TRF_ILLEG_));
+	        lord_error(TRF_ILLEG_,LORD( "ng_trans(table)"));
+	        return TRF_ILLEG_;
+      
       }
 
       ptab = ngtab + ng_w*outnr;  /* output row */
@@ -243,97 +245,91 @@ pml->trgr, pml->trnr, pml->s_lab);
       switch(act) {
 
       case NTG: /* geo_nad83g -> geo_gr96 */
-        ies = tab3d_val(&w_lab, &nadg_gr96_tab,
-                        N_g, E_g, val, err_str);
+        ies = grim_values(*nadg_gr96_tab,N_g, E_g, 0, val);
 #ifdef  DEBUGNGTRANS
 (void) lord_debug(0, LORD("NG_TRANS ACTION  NTG:   %f, %f, res=%d;"), N_g*180.0 / M_PI, E_g*180.0 / M_PI, ies);
 #endif
-        if (ies >= 0) {
-          N  = N_g + *(val   ) * 0.0000001;
-          E  = E_g + *(val +1) * 0.0000001;
+        if (ies == 0) {
+          N  = N_g + *(val   ); 
+          E  = E_g + *(val +1);
           H +=       *(val +2);
         } else
-        if (ies == TRF_AREA_) {
+        /*if (ies == TRF_AREA_) */{
           N   = N_g + 0.0000001424;
           E   = E_g + 0.0000001111;
           ies = 0;
-        } else {
+        } /*else {
           if (ies < res) res = ies;
-          if (tr_error != NULL)
-             (void) t_status(tr_error, usertxt, "\nng_trans", ies,
-                             "sx", "", N_g, E_g, 0.0, 0.0);
-        }
+         
+             lord_debug(0,LORD("ng_trans, ies: %d, N: %.6f, E: %.6f"),ies, N_g, E_g);
+        }*/
 #ifdef  DEBUGNGTRANS
 (void) lord_debug(0, LORD("NG_TRANS ACTION  NTG:   %f, %f, res=%d;"), N*180.0 / M_PI, E*180.0 / M_PI, ies);
 #endif
         break;
 
       case GTN: /* geo_gr96 -> geo_nad83g */
-        ies = tab3d_val(&w_lab, &nadg_gr96_tab,
-                        N_g, E_g, val, err_str);
+        ies = grim_values(*nadg_gr96_tab,N_g, E_g, 0, val);
 #ifdef  DEBUGNGTRANS
 (void) lord_debug(0, LORD("NG_TRANS ACTION  GTN1:   %f, %f, res=%d;"), *val, *(val+1), ies);
 #endif
-        if (ies >= 0) {
-          N = N_g - *(val   ) * 0.0000001;
-          E = E_g - *(val +1) * 0.0000001;
-          ies = tab3d_val(&w_lab, &nadg_gr96_tab, N, E, val, err_str);
+        if (ies == 0) {
+          N = N_g - *(val   );
+          E = E_g - *(val +1);
+           ies = grim_values(*nadg_gr96_tab,N, E, 0, val);
 #ifdef  DEBUGNGTRANS
 (void) lord_debug(0, LORD("NG_TRANS ACTION  GTN2:   %f, %f, res=%d;"), *val, *(val+1), ies);
 #endif
-          if (ies >= 0) {
-            N = N_g - *(val   ) * 0.0000001;
-            E = E_g - *(val +1) * 0.0000001;
-            ies = tab3d_val(&w_lab, &nadg_gr96_tab, N, E, val, err_str);
+          if (ies == 0) {
+            N = N_g - *(val   );
+            E = E_g - *(val +1);
+            ies = grim_values(*nadg_gr96_tab,N, E, 0, val);
 #ifdef  DEBUGNGTRANS
 (void) lord_debug(0, LORD("NG_TRANS ACTION  GTN2:   %f, %f, res=%d;"), *val, *(val+1), ies);
 #endif
-            if (ies >= 0) {
+            if (ies == 0) {
               N  = N_g - *(val   ) * 0.0000001;
               E  = E_g - *(val +1) * 0.0000001;
               H -=       *(val +2);
             } else
-            if (ies == TRF_AREA_) {
+            /*if (ies == TRF_AREA_) */{
               N   = N_g - 0.0000001424;
               E   = E_g - 0.0000001111;
               ies = 0;
-            } else {
+            }/* else {
               if (ies < res) res = ies;
               res = ies;
-              if (tr_error != NULL)
-                 (void) t_status(tr_error, usertxt, "\nng_trans", ies,
-                                 "sx", "", N_g, E_g, 0.0, 0.0);
-            }
+             
+             lord_debug(0,LORD("ng_trans, ies: %d, N: %.6f, E: %.6f"),ies, N_g, E_g);
+            }*/
           } else
-          if (ies == TRF_AREA_) {
+          /*if (ies == TRF_AREA_)*/ {
             N   = N_g - 0.0000001424;
             E   = E_g - 0.0000001111;
             ies = 0;
-          } else {
+          }/* else {
             if (ies < res) res = ies;
             res = ies;
-            if (tr_error != NULL)
-               (void) t_status(tr_error, usertxt, "\nng_trans", ies,
-                               "sx", "", N_g, E_g, 0.0, 0.0);
-          }
+         
+             lord_debug(0,LORD("ng_trans, ies: %d, N: %.6f, E: %.6f"),ies, N_g, E_g);
+          }*/
         } else
-        if (ies == TRF_AREA_) {
+        /*if (ies == TRF_AREA_)*/ {
           N   = N_g - 0.0000001424;
           E   = E_g - 0.0000001111;
           ies = 0;
-        } else {
+        }/* else {
           if (ies < res) res = ies;
           res = ies;
-          if (tr_error != NULL)
-             (void) t_status(tr_error, usertxt, "\nng_trans", ies,
-                             "sx", "", N_g, E_g, 0.0, 0.0);
-        }
+       
+             lord_debug(0,LORD("ng_trans, ies: %d, N: %.6f, E: %.6f"),ies, N_g, E_g);
+        }*/
         break;
 
       case  PTG: /* PRJ -> GEO */
         /*______________________________*/
         ies = ptg(in_lab, +1, N, E, &N, &E,
-                  "\nng_trans error:", tr_error);
+                  "\nng_trans error:", NULL);
         N_g = N;
         E_g = E;
 #ifdef  DEBUGNGTRANS
@@ -345,7 +341,7 @@ pml->trgr, pml->trnr, pml->s_lab);
       case  GTP: /* GEO -> PRJ */
         /*______________________________*/
         ies = ptg(outlab, -1, N, E, &N, &E,
-                  "\nng_trans error:", tr_error);
+                  "\nng_trans error:", NULL);
 #ifdef  DEBUGNGTRANS
 (void) lord_debug(0, LORD("\n*NG_TRANS ACTION  GTP:   %s, res=%d;"), outlab->mlb, ies);
 #endif
@@ -356,16 +352,18 @@ pml->trgr, pml->trnr, pml->s_lab);
         break;
 
       default: /* programme error */
-        return(t_status(
-               tr_error, usertxt, "ng_trans(prog error)", TRF_ILLEG_));
+	      lord_error(TRF_ILLEG_,LORD("ng_trans(prog error)"));
+	      return TRF_ILLEG_;
+      
       } /* end switch(action) */
       if (ies < res) res = ies;
 
     } while (nst != gst && res >= TRF_TOLLE_);
   }
   else {
-    return(t_status(
-           tr_error, usertxt, "ng_trans(i/o labels)", TRF_ILLEG_));
+	lord_error(TRF_ILLEG_,LORD("ng_trans(i/o labels)"));
+	return TRF_ILLEG_;
+  
   }
 
   /* Return coord and result */

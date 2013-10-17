@@ -35,8 +35,7 @@ double                Zi,
 double                *Xo,
 double                *Yo,
 double                *Zo,
-char                  *usertxt,
-FILE                  *tr_error
+tab_dir               *tdir
 )
 {
 
@@ -77,21 +76,20 @@ FILE                  *tr_error
   short mask;
   
   if (i_lab->lab_type != CRD_LAB) {
-          return((tr_error==NULL) ? TRF_ILLEG_ :
-                  t_status(tr_error, usertxt,
-                  "ctc(input label fault)", TRF_ILLEG_));
+	  lord_error(TRF_ILLEG_,LORD("ctc(input label fault)"));
+          return TRF_ILLEG_;
+               
   }
 
   if (o_lab->lab_type != CRD_LAB) {
-    return((tr_error==NULL) ? TRF_ILLEG_ :
-            t_status(tr_error, usertxt,
-            "ctc(output label fault)", TRF_ILLEG_));
+         lord_error(TRF_ILLEG_,LORD("ctc(output label fault)"));
+	return TRF_ILLEG_;
   }
 
   if (!init) {
-    (void) set_dtm_1(-1, "ed50",   &p_no, p_nm, e_nm, rgn,&mask,ew);
-    (void) set_dtm_1(-1, "nwl9d",   &p_no, p_nm, e_nm, rgn,&mask,nw);
-    (void) set_dtm_1(-1, "etrs89", &p_no, p_nm, e_nm, rgn,&mask,iw);
+    (void) set_dtm_1(-1, "ed50",   &p_no, p_nm, e_nm, rgn,&mask,ew,tdir->def_lab);
+    (void) set_dtm_1(-1, "nwl9d",   &p_no, p_nm, e_nm, rgn,&mask,nw,tdir->def_lab);
+    (void) set_dtm_1(-1, "etrs89", &p_no, p_nm, e_nm, rgn,&mask,iw,tdir->def_lab);
     init = 1;
   }
 
@@ -113,7 +111,7 @@ FILE                  *tr_error
 
     /* transformation to central system */
     if ((ci - id) && fc->tp != 0)
-      result = cic(fc, +1, X, Y, Z, &X, &Y, &Z, usertxt, tr_error);
+      result = cic(fc, +1, X, Y, Z, &X, &Y, &Z, "", NULL);
 
     ptab = dtmtab + 5*(co - 1); /* TABLE WIDTH */
     nst  = ci - 1;
@@ -151,7 +149,7 @@ FILE                  *tr_error
       }
       if (act) {
         res = (wc->tp == 0) ? 0
-            : cic(wc, act, X, Y, Z, &X, &Y, &Z, usertxt, tr_error);
+            : cic(wc, act, X, Y, Z, &X, &Y, &Z,"", NULL);
         if (res < result) result = res;
       }
 
@@ -159,15 +157,14 @@ FILE                  *tr_error
 
     /* transformation from central system */
     if ((co - od) && tc->tp != 0) {
-      res = cic(tc, -1, X, Y, Z, &X, &Y, &Z, usertxt, tr_error);
+      res = cic(tc, -1, X, Y, Z, &X, &Y, &Z,  "", NULL);
       if (res < result) result = res;
     }
 
   }
   else {
-      return((tr_error==NULL) ? TRF_ILLEG_ :
-      	      t_status(tr_error, usertxt,
-              "ctc(unknown datum shift)", TRF_ILLEG_));
+	lord_error(TRF_ILLEG_,LORD( "ctc(unknown datum shift)"));
+        return TRF_ILLEG_;
   }
 
   *Xo = X;

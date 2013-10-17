@@ -24,12 +24,13 @@
 
 #include <stdio.h>
 #include "geo_lab.h"
+#include "metadata.h"
 
 
 extern int       fputshpprj(
 /*________________________*/
 FILE            *fh_out,
-struct coord_lab   *g_lab);
+struct coord_lab   *g_lab, def_data *data);
 
 /* fputshpprj writes the .prj file to a shape file
    from the geo_lab.

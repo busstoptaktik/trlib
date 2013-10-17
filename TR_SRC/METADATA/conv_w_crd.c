@@ -5,7 +5,7 @@
 
 
 
-int conv_w_crd(char *mlb, struct coord_lab *c_lab){
+int conv_w_crd(char *mlb, struct coord_lab *c_lab, def_data *DEF_DATA){
 	int lab_lng,res=-1,h_type=-1;
 	short lab_rgn;
 	struct lab_def_str         lb_ln_ex, *p_lb = &lb_ln_ex;
@@ -13,10 +13,10 @@ int conv_w_crd(char *mlb, struct coord_lab *c_lab){
 	char                      *p_sys = p_lb->name;
 	char                      *h_mlb, *h_mlb2;
 	lab_lng = get_mlb(mlb,&lab_rgn, p_sys, &p_lb->sepch, p_dtm, &h_mlb);
-	res = srch_def(CRD_LAB, p_sys, p_lb);
+	res = srch_def(CRD_LAB, p_sys, p_lb,DEF_DATA);
 	if (res!=0)
 		return res;
-	res=conv_crd("",p_lb,c_lab,mlb+lab_lng);
+	res=conv_crd("",p_lb,c_lab,mlb+lab_lng,DEF_DATA);
 	if (res==CRD_LAB){
 		 if (*(c_lab->mlb + c_lab->sepix) == 'H' && h_mlb != NULL){
 			      struct hgt_lab  hh_lab;
@@ -27,15 +27,15 @@ int conv_w_crd(char *mlb, struct coord_lab *c_lab){
 					      &p_lb->sepch, p_dtm, &h_mlb2);
 
 			      /* search the def_lab_file for p_sys (or w_sys) */ 
-			      res_h = srch_def(HGT_LAB, p_sys, p_lb);
+			      res_h = srch_def(HGT_LAB, p_sys, p_lb,DEF_DATA);
 			      if (res_h < 0){
 				      c_lab->lab_type = ILL_LAB;
 				      return(ILL_LAB);
 			      }
 			      if (p_lb->lab_type == HGT_LAB)
-				  h_type = (short) conv_hgt("", p_lb, &hh_lab, h_mlb);
+				  h_type = (short) conv_hgt("", p_lb, &hh_lab,DEF_DATA, h_mlb); /*hmm - check call*/
 			      if (h_type == HGT_LAB) {
-				p_lb->lab_type = CRD_LAB;  // RESET
+				p_lb->lab_type = CRD_LAB;  /* RESET*/
 				if (c_lab->imit == 0) c_lab->imit = hh_lab.imit;
 				if (c_lab->p_rgn == 0) c_lab->p_rgn = hh_lab.p_rgn;
 				if (c_lab->region == 0) c_lab->region = c_lab->p_rgn;

@@ -28,11 +28,12 @@ struct coord_lab        *o_clb,
 struct coord_lab          *htr_lab,
 struct htr_c_str        *htr_const,
 char                    *dh_table_name,
-char                    *dh_tr_info
+char                    *dh_tr_info,
+tab_dir                 *tdir
 )
 {
  
-  //static THREAD_SAFE  short          sh_dtm = 0;
+  def_data              *DEF_DATA;
   struct coord_lab   test_lab;
   char                *p_tp;
   int                   tr_type = HTRF_ILLEG_, l_inv;
@@ -43,7 +44,6 @@ char                    *dh_tr_info
   union rgn_un          DK_rgn, FO_rgn, GR_rgn, DE_rgn;
   char dummy_rgn[3];
   short imit;
-  extern def_data *DEF_DATA;
   def_hth_tr *htr_def;
   int n_hth=0;
 
@@ -54,12 +54,12 @@ char                    *dh_tr_info
   (void) strcpy(FO_rgn.prfx, "FO");
   (void) strcpy(GR_rgn.prfx, "GR");
   (void) strcpy(DE_rgn.prfx, "DE");
+ 
 
 
-
-  if (DEF_DATA==NULL)
+  if (!tdir || !(tdir->def_lab))
 	return -1;
-
+  DEF_DATA=tdir->def_lab;
  
   //sh_dtm = -1;
   /* find datum name from datum number */
@@ -125,15 +125,15 @@ char                    *dh_tr_info
   if (i_hdtm == o_hdtm) tr_type = 0;
   else {
     
-    (void) set_dtm_1(i_hdtm, i_nm, &p_no, p_nm, e_nm, dummy_rgn,&imit,&trp);
-    (void) set_dtm_1(o_hdtm, o_nm, &p_no, p_nm, e_nm, dummy_rgn,&imit, &trp);
+    (void) set_dtm_1(i_hdtm, i_nm, &p_no, p_nm, e_nm, dummy_rgn,&imit,&trp,DEF_DATA);
+    (void) set_dtm_1(o_hdtm, o_nm, &p_no, p_nm, e_nm, dummy_rgn,&imit, &trp,DEF_DATA);
   
 
     do {
       
       htr_def=DEF_DATA->hth_entries+(n_hth++);
 	
-      conv_w_crd(htr_def->from_mlb, &test_lab);
+      conv_w_crd(htr_def->from_mlb, &test_lab, DEF_DATA);
       if (test_lab.lab_type == 1) {
       
         l_inv = test_lab.h_dtm == o_hdtm;

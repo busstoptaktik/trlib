@@ -31,7 +31,8 @@ int get_val_str(char* val_str, double val);
 int              sputshpprj(
 /*________________________*/
 char            *wkt_out,
-struct coord_lab   *c_lab)
+struct coord_lab   *c_lab,
+def_data      *data)
 {
 
 /* sputshpprj writes the .prj Esri wkt
@@ -71,9 +72,11 @@ struct coord_lab   *c_lab)
   double            e[9];
   struct dsh_str    trp;
   union rgn_un      rgn_pref;
-  FILE             *fp;
-  
- /* wkt_start=wkt_out; */ /*will allow us to keep track of the number of chars written *if needed* */
+  strcpy(wkt_out,"TODO");
+  return 0;
+  }
+  /*
+ /* wkt_start=wkt_out; */ /*will allow us to keep track of the number of chars written *if needed* /
   fp = i_tabdir_file(5, "def_shp.txt", &i, prj_txt2);
   if (i) {
     wkt_out+=sprintf(wkt_out, 
@@ -275,7 +278,7 @@ struct coord_lab   *c_lab)
 }
 
 int get_val_str(char* val_str, double val) {
-  double  val1, val2; /*, val3; */
+  double  val1, val2; /*, val3; /
   int     dec = 0;
 
   val1 = val;
@@ -289,4 +292,4 @@ int get_val_str(char* val_str, double val) {
   dec = sprintf(val_str, "%.*f", dec, val);
   return(dec);
 }
-
+*/

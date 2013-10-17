@@ -27,7 +27,9 @@ int              sgetshpprj(
 /*______________________*/
 char            *wkt_in,
 struct coord_lab   *g_lab,
-char            *mlb_out)
+char            *mlb_out,
+def_data       *data
+)
 {
 
 /* sgetshpprj returns::
@@ -55,7 +57,7 @@ char            *mlb_out)
   int    go_on = 1, params = 0, r_params = 0, completed = 0;
   int    state = 0, lab_state = 0, chrs_in = 0, itm = 0, zone, N = 1;
   double val;
-  FILE  *fp;
+  
   if (g_lab!=NULL)
 	  g_lab->g_tpd = *set_tpd("dg", 2, 7);
   k = 0;
@@ -65,6 +67,10 @@ char            *mlb_out)
 	  lord_error(TR_LABEL_ERROR,LORD("Empty input string."));
 	  return -1;
   }
+  strcpy(mlb_out,"TODO");
+  return 0;
+  }
+  /*
   do {
     c = *(wkt_in++);
     if (c != '\n' && c != '_' && c != ' ') {
@@ -80,13 +86,13 @@ char            *mlb_out)
           ++ lab_state;
         } else
         if (c == ']') -- state;
-      } /* else inside text skip: , */
+      } /* else inside text skip: , /
     }
   } while ((state > 0 || lab_state == 0) &&
             chrs_in < 2047 && c != '\0');
   lord_debug(0,LORD("Escaped parsing wkt"));
   *(prj_txt + chrs_in) = '\0';
-    /*moved these assignments for earlier error check - simlk march 2013*/
+    /*moved these assignments for earlier error check - simlk march 2013/
     p_txt1 = strchr(p_txt, '[');
     k    = (int)((ptrdiff_t)p_txt1 - (ptrdiff_t)p_txt);
   
@@ -97,24 +103,24 @@ char            *mlb_out)
 
     (void) strcpy(mlb2, "_h_msl");
     /*p_txt1 = strchr(p_txt, '[');
-    k      = (int)((ptrdiff_t)p_txt1 - (ptrdiff_t)p_txt); - moved above...*/
+    k      = (int)((ptrdiff_t)p_txt1 - (ptrdiff_t)p_txt); - moved above.../
     (void) fgetlhtx(fp, entry);
     for (j = 0; go_on && state == 0; j++) {
       int n_read=fgetln_kms(entry, &i, fp);
-      if (n_read==EOF){ /*add an escape route!*/
+      if (n_read==EOF){ /*add an escape route!/
 	      state=1;
 	      lord_error(TR_LABEL_ERROR,LORD("Reached end of file while scanning!"));
 	      break;  
       }
       if (strncmp(p_txt, entry, k) == 0) {
         switch (j) {
-        case 0:  /*COMPDCS*/
+        case 0:  /*COMPDCS/
           ++ go_on;
           sep   = 'H';
           p_txt = strchr(p_txt, ',') +1;
           break;
-        case 1:  /* GEOGCS*/
-        case 2:  /* GEOCCS*/
+        case 1:  /* GEOGCS/
+        case 2:  /* GEOCCS/
           -- go_on;
           lab_state = 2;
           (void) sprintf(lab_str, "geo%c", sep);
@@ -128,7 +134,7 @@ char            *mlb_out)
           }
           (void) fgetlhtx(fp, entry);
           break;
-        case 3:  /* PROJCS */
+        case 3:  /* PROJCS /
           -- go_on;
           lab_state = 1;
           p_txt1 = strchr(p_txt, '"') +1;
@@ -140,14 +146,14 @@ char            *mlb_out)
             j      = used;
             p_txt3 = strstr(p_txt1, temp);
             if (p_txt3 != 0 && p_txt3 < p_txt2) {
-            p_tmp = entry + used; /*get params:*/
+            p_tmp = entry + used; /*get params:/
             (void) sscanf(p_tmp, "%d%n", &params, &used);
-            p_tmp += used; /*get completed:*/
+            p_tmp += used; /*get completed:/
             (void) sscanf(p_tmp, "%d%n", &completed, &used);
-            p_tmp += used; /* proj_name */
+            p_tmp += used; /* proj_name /
             (void) sscanf(p_tmp, "%s%n", lab_str, &used);
             if (params == 0) {
-              /* known projection (no params) */
+              /* known projection (no params) /
               lab_state       = 3;
               j               = (int) strlen(lab_str);
               *(lab_str +j)   = sep;
@@ -317,4 +323,4 @@ char            *mlb_out)
 	  lord_error(TR_LABEL_ERROR,LORD("Malformed WKT"));
 	  return(-1);
   }
-}
+}*/

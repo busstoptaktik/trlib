@@ -33,7 +33,7 @@
 
 #include <stdio.h>
 #include "geo_lab.h"
-#include "geoid_d.h"
+
 
 extern int                gd_trans(
 /*_______________________________*/

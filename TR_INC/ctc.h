@@ -30,8 +30,9 @@
 
 #if !defined     (H_CTC_FNC_)
 #define           H_CTC_FNC_
+#include    "metadata.h"
 
-extern int            ctc(
+ int            ctc(
 /*______________________*/
 struct coord_lab         *i_lab_u,
 struct coord_lab         *o_lab_u,
@@ -41,8 +42,7 @@ double                Zi,
 double                *Xo,
 double                *Yo,
 double                *Zo,
-char                  *usertxt,
-FILE                  *tr_error
+tab_dir                 *tdir
 );
 
 /* ctc:      Cartesic_Transformation_to_Cartesic            */

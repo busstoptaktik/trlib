@@ -46,6 +46,7 @@ int                      conv_crd(
 char                    *lab_info,
 struct lab_def_str      *p_lb,
 struct coord_lab        *c_lab,
+def_data               *DEF_DATA,
 ...
 )
 {
@@ -328,7 +329,7 @@ struct coord_lab        *c_lab,
       if (*p_lb->pr_dtm != '\0') p_dtm = p_lb->pr_dtm;
       (void) strcpy(t_lab, p_dtm);
       c_lab->datum = (short) set_dtm_1(-1, p_dtm, &par_dtm, p_name,
-                     e_name, rgn_pref.prfx, &mask, &(c_lab->dsh_con));
+                     e_name, rgn_pref.prfx, &mask, &(c_lab->dsh_con),DEF_DATA);
 
       if (c_lab->datum > 0) {
         if (c_lab->p_rgn == 0 && dum_pref.r_nr[0] != rgn_pref.r_nr[0])
@@ -633,7 +634,7 @@ struct coord_lab        *c_lab,
 
       if (c_lab->datum > 0
           && set_dtm_1(c_lab->datum, p_dtm, &par_dtm, p_name,
-                     e_name, rgn_pref.prfx, &mask, &d_sh) > 0)
+                     e_name, rgn_pref.prfx, &mask, &d_sh,DEF_DATA) > 0)
          (void) fprintf(iofile, "\nDatum:     %9s%s", " ", p_dtm);
       if (c_lab->p_rgn != 0 &&
           (conv_rgn(c_lab->p_rgn, rgn_pref.prfx, rgn_name) > 0)) {
@@ -660,7 +661,7 @@ struct coord_lab        *c_lab,
       if (*(c_lab->mlb + c_lab->sepix) == 'H') {
         if (c_lab->h_dtm > 0
             && set_dtm_1(c_lab->h_dtm, p_dtm, &par_dtm, p_name,
-                     e_name, rgn_pref.prfx, &mask, &d_sh) > 0)
+                     e_name, rgn_pref.prfx, &mask, &d_sh,DEF_DATA) > 0)
            (void) fprintf(iofile, "\nHeight Datum: %9s%s", " ", p_dtm);
       }
 
@@ -794,7 +795,7 @@ struct coord_lab        *c_lab,
     (void) fprintf(iofile, "\ndatum     = %15d", c_lab->datum);
     if (c_lab->datum > 0) {
       i = set_dtm_1(c_lab->datum, p_dtm, &par_dtm,
-                    p_name, e_name, rgn_pref.prfx, &mask, &d_sh);
+                    p_name, e_name, rgn_pref.prfx, &mask, &d_sh,DEF_DATA);
       if (i > 0) (void) fprintf(iofile, "%9s%s", " ", p_dtm);
       if (c_lab->p_rgn != 0 &&
           (conv_rgn(c_lab->p_rgn, rgn_pref.prfx, rgn_name) > 0)) {
@@ -809,7 +810,7 @@ struct coord_lab        *c_lab,
       if (i > 0) {
         /* get the parent datum name */
         if (set_dtm_1(c_lab->p_dtm, p_dtm, &par_dtm,
-                    p_name, e_name, rgn_pref.prfx, &mask, &d_sh) > 0) {
+                    p_name, e_name, rgn_pref.prfx, &mask, &d_sh,DEF_DATA) > 0) {
           (void) fprintf(iofile, "\npar. dtm  = %15d", c_lab->p_dtm);
           (void) fprintf(iofile, "%9s%s", " ", p_dtm);
           /* p_name from first call could be used */
@@ -825,7 +826,7 @@ struct coord_lab        *c_lab,
     if (sepch == 'H') {
       if (c_lab->h_dtm > 0
           && set_dtm_1(c_lab->h_dtm, p_dtm, &par_dtm, p_name,
-                   e_name, rgn_pref.prfx, &mask, &d_sh) > 0) {
+                   e_name, rgn_pref.prfx, &mask, &d_sh,DEF_DATA) > 0) {
         (void) fprintf(iofile, "\nHeight Dtm= %15d", c_lab->h_dtm);
         (void) fprintf(iofile, "%9s%s", " ", p_dtm);
         (void) fprintf(iofile, "\nHeight ix = %15d", c_lab->h_ix);

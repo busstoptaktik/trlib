@@ -30,8 +30,9 @@
 
 #if !defined     (H_FH_TRANS)
 #define           H_FH_TRANS
+#include  "metadata.h"
 
-extern int          fh_trans(
+ int          fh_trans(
 /*___________________________*/
 struct coord_lab       *in_lab_u,
 struct coord_lab       *outlab_u,
@@ -41,8 +42,7 @@ double              H,
 double              *Nout,
 double              *Eout,
 double              *Hout,
-char                *usertxt,
-FILE                *tr_error
+tab_dir              *tdir
 );
 
 /* Fehmarn Bridge Projection test of AREA */

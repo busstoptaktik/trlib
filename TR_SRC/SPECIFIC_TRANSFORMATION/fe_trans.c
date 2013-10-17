@@ -63,8 +63,7 @@ double              H,
 double              *Nout,
 double              *Eout,
 double              *Hout,
-char                *usertxt,
-FILE                *tr_error
+tab_dir               *tdir
 )
 
 {
@@ -247,17 +246,19 @@ FILE                *tr_error
 
     if (init == 0) {
       /* Internal wrk-labels */
-      init = (conv_w_crd("utm29_etrs89", &TC_u29) == CRD_LAB
-          &&  conv_w_crd("fke",          &TC_fke) == CRD_LAB
-          &&  conv_w_crd("fu50",         &TC_u50) == CRD_LAB
-          &&  conv_w_crd("fk54",         &TC_f54) == CRD_LAB);
+      init = (conv_w_crd("utm29_etrs89", &TC_u29, tdir->def_lab) == CRD_LAB
+          &&  conv_w_crd("fke",          &TC_fke, tdir->def_lab) == CRD_LAB
+          &&  conv_w_crd("fu50",         &TC_u50, tdir->def_lab) == CRD_LAB
+          &&  conv_w_crd("fk54",         &TC_f54, tdir->def_lab) == CRD_LAB);
       /* State/action table size and width */
       fe_z = sizeof(fetab)/sizeof(struct act_nst);
       fe_w = (int) sqrt(1.0000001*fe_z);
       init = init && (fe_z == fe_w*fe_w);
-      if (!init)
-        return(t_status(
-               tr_error, "", "fe_trans(internal labels)", TRF_ILLEG_));
+      if (!init){
+	      lord_error(TRF_ILLEG_,LORD("fe_trans(internal labels)"));
+	      return TRF_ILLEG_;
+      }
+       
     }
 
     /* Check i/o labels, init of actual transf. systems */
@@ -322,9 +323,10 @@ FILE                *tr_error
 (void) lord_error(0,LORD("OUT  grp = %4d    nr = %4d;"), pml->trgr, pml->trnr);
 #endif
 
-      if (res == TRF_ILLEG_)
-        return(t_status(
-               tr_error, "", "fe_trans(outsys - lab)", TRF_ILLEG_));
+      if (res == TRF_ILLEG_){
+	       lord_error(TRF_ILLEG_,LORD("fe_trans(outsys - lab)"));
+	      return TRF_ILLEG_;
+      }
 
       /* In-system */
       /*___________*/
@@ -387,9 +389,11 @@ FILE                *tr_error
 #endif
 
 
-      if (res == TRF_ILLEG_)
-        return(t_status(
-               tr_error, "", "fe_trans(in_sys)", TRF_ILLEG_));
+      if (res == TRF_ILLEG_){
+	       lord_error(TRF_ILLEG_,LORD("fe_trans(in_sys)"));
+	      return TRF_ILLEG_;
+      }
+      
 
       /* Save check-sums */
       in_chsum = in_lab->ch_sum;
@@ -421,80 +425,81 @@ FILE                *tr_error
       switch(act) {
 
       case GTU: /* geo_etrs89 -> utm29_etrs89 */
-        ies = ptg(&TC_u29, -1, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_u29, -1, N, E, &N, &E, "", NULL);
         break;
       case UTG: /* utm29_etrs89 -> geo_etrs89 */
-        ies = ptg(&TC_u29, +1, N, E, &N, &E,  usertxt, tr_error);
+        ies = ptg(&TC_u29, +1, N, E, &N, &E,  "", NULL);
         break;
 
       case FTU: /* FO national system -> utm29_etrs89 */
-        ies = ptg(&TC_fke, +2, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_fke, +2, N, E, &N, &E, "", NULL);
         if (ies < res) res = ies;
-        ies = ptg(&TC_u29, -2, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_u29, -2, N, E, &N, &E, "", NULL);
         break;
 
       case UTF: /* utm29_etrs89 -> FO national system */
-        ies = ptg(&TC_u29, +2, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_u29, +2, N, E, &N, &E, "", NULL);
         if (ies < res) res = ies;
-        ies = ptg(&TC_fke, -2, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_fke, -2, N, E, &N, &E, "", NULL);
         break;
 
       case UU0: /* utm29_etrs89 -> utm29_ed50 */
-        ies = fo_g_tr(3, +1, N, E, &N, &E, usertxt, tr_error);
+        ies = fo_g_tr(3, +1, N, E, &N, &E, "", NULL);
         break;
 
       case U0U: /* utm29_ed50 -> utm29_etrs89 */
-        ies = fo_g_tr(3, -1, N, E, &N, &E, usertxt, tr_error);
+        ies = fo_g_tr(3, -1, N, E, &N, &E, "", NULL);
         break;
 
       case G4K: /* fgeo(_fd54) -> fk(_fd54) */
-        ies = ptg(&TC_f54, -1, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_f54, -1, N, E, &N, &E, "", NULL);
         break;
 
       case KG4: /* fk(_fd54) -> fgeo(_fd54) */
-        ies = ptg(&TC_f54, +1, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_f54, +1, N, E, &N, &E, "", NULL);
         break;
 
       case U0G: /* utm29_ed50 -> geo_ed50 */
-        ies = ptg(&TC_u50, +1, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_u50, +1, N, E, &N, &E, "", NULL);
         break;
 
       case GU0: /* geo_ed50 -> utm29_ed50 */
-        ies = ptg(&TC_u50, -1, N, E, &N, &E, usertxt, tr_error);
+        ies = ptg(&TC_u50, -1, N, E, &N, &E, "", NULL);
         break;
 
       case UTK: /* utm29_etrs89 -> fk54 */
-        ies = fo_g_tr(5, +1, N, E, &N, &E, usertxt, tr_error);
+        ies = fo_g_tr(5, +1, N, E, &N, &E, "", NULL);
         break;
 
       case KTU: /* fk54 -> utm29_etrs89 */
-        ies = fo_g_tr(5, -1, N, E, &N, &E, usertxt, tr_error);
+        ies = fo_g_tr(5, -1, N, E, &N, &E, "", NULL);
         break;
 
       case U9K: /* utm29_etrs89 -> fk89 */
-        ies = fo_g_tr(7, +1, N, E, &N, &E, usertxt, tr_error);
+        ies = fo_g_tr(7, +1, N, E, &N, &E, "", NULL);
         break;
 
       case K9U: /* fk89 -> utm29_etrs89 */
-        ies = fo_g_tr(7, -1, N, E, &N, &E, usertxt, tr_error);
+        ies = fo_g_tr(7, -1, N, E, &N, &E, "", NULL);
         break;
 
       case IDT: /* ident, no action */
         break;
 
       default: /* programme error */
-        return(t_status(
-               tr_error, "", "fe_trans(prog error)", TRF_ILLEG_));
+	        lord_error(TRF_ILLEG_,LORD("fe_trans(prog error)"));
+	       return TRF_ILLEG_;
+      
       } /* end switch(action) */
       if (ies < res) res = ies;
 
     } while (nst != gst && res >= TRF_TOLLE_);
   }
   else {
-
-    return(t_status(
-           tr_error, "", "fe_trans(i/o labels)", TRF_ILLEG_));
-  }
+ 
+	lord_error(TRF_ILLEG_,LORD("fe_trans(i/o labels)"));
+	return TRF_ILLEG_;
+ }
 
   /* Return coord and result */
   *Nout = N;

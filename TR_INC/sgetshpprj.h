@@ -20,10 +20,12 @@
 #define           H_SGETSHPPRJ
  
  #include "geo_lab.h"
+ #include  "metadata.h"
  int              sgetshpprj(
 /*______________________*/
 char            *wkt_in,
 struct coord_lab   *g_lab,
-char            *mlb_out);
+char            *mlb_out,
+def_data       *data);
 
 #endif

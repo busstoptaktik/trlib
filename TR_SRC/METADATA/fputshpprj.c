@@ -46,11 +46,11 @@
 int              fputshpprj(
 /*______________________*/
 FILE            *fh_out,
-struct coord_lab   *g_lab)
+struct coord_lab   *g_lab, def_data *data)
 {
 	int ret_val;
 	char esri_wkt[MAX_WKT_LEN]; 
-	ret_val=sputshpprj(esri_wkt,g_lab);
+	ret_val=sputshpprj(esri_wkt,g_lab,data);
 	fputs(esri_wkt,fh_out);
 	return ret_val;
 }

@@ -33,6 +33,7 @@
 #define           H_FE_TRANS
 
 #include "geo_lab.h"
+#include          "metadata.h"
 
 extern int          fe_trans(
 /*___________________________*/
@@ -44,8 +45,8 @@ double              H,
 double             *Nout,
 double             *Eout,
 double             *Hout,
-char               *usertxt,
-FILE               *tr_error
+tab_dir              *tdir
+
 );
 
 /* 2. dim. transformation function for area FE */

@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "geo_lab.h"
-#include "geoid_d.h"
+#include "metadata.h"
 
 
 
@@ -34,7 +34,7 @@
 extern int       fgetshpprj(
 /*________________________*/
 FILE            *fh_in,
-struct coord_lab   *g_lab);
+struct coord_lab   *g_lab, def_data *data);
 
 /* fgetshpprj reads the .prj file to a shape file
    and sets the geo_lab accordingly.

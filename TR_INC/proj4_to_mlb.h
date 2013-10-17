@@ -18,7 +18,7 @@
 
 #if !defined(H_PROJ4_TO_MLB)
 #define      H_PROJ4_TO_MLB
-
+#include    "metadata.h"
 
  struct proj4_entry{
         char proj[64];
@@ -49,11 +49,11 @@
  /*Remember to free the returned pointer*/
  proj4_entry *parse_proj4(char *proj4_text);
  
- int proj4_to_mlb(char *proj4_text, char *mlb);
+ int proj4_to_mlb(char *proj4_text, char *mlb, def_data *data);
  
  /* setter function for flag to allow kms-datum extensions */
  void set_kms_datums_allowed(int is_allowed);
- int mlb_to_proj4(char *mlb, char *out, int buf_len);
+ int mlb_to_proj4(char *mlb, char *out, int buf_len, def_data *data);
  
  /*normalise datum (use specific etrs89 alias)*/
  void normalise_datum(char *datum);

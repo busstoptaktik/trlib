@@ -58,6 +58,8 @@ static char          *ACTION[] = {
 
 #endif
 
+/*TODO: See if we can get rid of THREAD_SAFE and most of the initialisation...*/
+
 int                    ee_trans(
 /*___________________________*/
 struct coord_lab      *in_lab,
@@ -68,8 +70,7 @@ double               H,
 double              *Nout,
 double              *Eout,
 double              *Hout,
-char                *usertxt,
-FILE                *tr_error
+tab_dir               *tdir
 )
 {
 
@@ -188,10 +189,10 @@ FILE                *tr_error
 
   if (init == 0) {
     /* Internal wrk-labels */
-    act = (conv_w_crd("eetm27",        &TC_eetm) == CRD_LAB
-       &&  conv_w_crd("tm27_eeold42",  &TC_eold) == CRD_LAB
-       &&  conv_w_crd("eelmne",        &TC_elmn) == CRD_LAB
-       &&  conv_w_crd("utm35_euref89", &TC_u35) == CRD_LAB);
+    act = (conv_w_crd("eetm27",        &TC_eetm, tdir->def_lab) == CRD_LAB
+       &&  conv_w_crd("tm27_eeold42",  &TC_eold, tdir->def_lab) == CRD_LAB
+       &&  conv_w_crd("eelmne",        &TC_elmn, tdir->def_lab) == CRD_LAB
+       &&  conv_w_crd("utm35_euref89", &TC_u35, tdir->def_lab) == CRD_LAB);
 
     /* State/action table size and width */
     ee_z = sizeof(gr_tab)/sizeof(struct act_nst);
@@ -207,20 +208,20 @@ FILE                *tr_error
     pv_w = (int) sqrt(1.0000001*ee_z);
     init = act && (ee_z == pv_w*pv_w);
 
-    if (!init) return((tr_error==NULL) ? TRF_ILLEG_ :
-                       t_status(tr_error, usertxt,
-                       "ee_trans(init lab error)", TRF_ILLEG_));
+    if (!init){
+	    lord_error(TRF_ILLEG_,LORD("ee_trans(init lab error)"));
+	    return TRF_ILLEG_;
+    }
   }
 
   /* Check i/o labels, init of actual transf. systems */
   if (in_chsum != in_lab->ch_sum || outchsum != outlab->ch_sum) {
 
     /* Coord labels */
-    if   ( in_lab->lab_type != CRD_LAB
-        || outlab->lab_type != CRD_LAB) {
-      return((tr_error==NULL) ? TRF_ILLEG_ :
-              t_status(tr_error, usertxt,
-              "ee_trans(i/o labels error)", TRF_ILLEG_));
+    if   ( in_lab->lab_type != CRD_LAB || outlab->lab_type != CRD_LAB) {
+	lord_error(TRF_ILLEG_,LORD( "ee_trans(i/o labels error)"));
+	return TRF_ILLEG_;
+   
     }
 
     /* Out-system */
@@ -248,10 +249,10 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
     /* Label and region check */
     switch (outgr) {
     case 0: /* Label */
-      if (!strcmp(p_dtm, "eeref89"))
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, usertxt,
-                "ee_trans(missing : EE_ or ill_lab)", TRF_ILLEG_));
+      if (!strcmp(p_dtm, "eeref89")){
+	     lord_error(TRF_ILLEG_,LORD("ee_trans(missing : EE_ or ill_lab)"));
+	     return TRF_ILLEG_;
+      }
       break;
     case 1:
       break;
@@ -268,9 +269,9 @@ pml->trgr, pml->trnr, pml->s_lab, outcs);
       break;
 
     default: /* Unknown label */
-      return((tr_error==NULL) ? TRF_ILLEG_ :
-              t_status(tr_error, usertxt,
-              "ee_trans(unknown o-label)", TRF_ILLEG_));
+	      lord_error(TRF_ILLEG_,LORD( "ee_trans(unknown o-label)"));
+	     return TRF_ILLEG_;
+    
     } /* end out-label check */
 
     /* In-system */
@@ -298,10 +299,10 @@ pml->trgr, pml->trnr, pml->s_lab);
     /* Label and region check */
     switch (in_gr) {
     case 0: /* Label */
-      if (!strcmp(p_dtm, "eeref89"))
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, usertxt,
-                "ee_trans(missing : EE_ or ill_lab)", TRF_ILLEG_));
+      if (!strcmp(p_dtm, "eeref89")){
+	  lord_error(TRF_ILLEG_,LORD("ee_trans(missing : EE_ or ill_lab)"));
+	  return TRF_ILLEG_;
+      }
       break;
     case 1:
       break;
@@ -318,16 +319,15 @@ pml->trgr, pml->trnr, pml->s_lab);
       break;
 
     default: /* Unknown label */
-      return((tr_error==NULL) ? TRF_ILLEG_ :
-              t_status(tr_error, usertxt,
-              "ee_trans(unknown i-label)", TRF_ILLEG_));
+        lord_error(TRF_ILLEG_,LORD( "ee_trans(unknown i-label)"));
+	return TRF_ILLEG_;
 
     } /* end in-label check */
 
-    if (in_nr == 3 || outnr == 3)
-      return((tr_error==NULL) ? TRF_ILLEG_ :
-              t_status(tr_error, usertxt,
-              "ee_trans(crt_) ILLEGAL", TRF_ILLEG_));
+    if (in_nr == 3 || outnr == 3){
+	      lord_error(TRF_ILLEG_,LORD("ee_trans(crt_) ILLEGAL"));
+	     return TRF_ILLEG_;
+    }
 
     /* Save check-sums */
     in_chsum = in_lab->ch_sum;
@@ -376,8 +376,7 @@ in_nr, outnr);
   } /* End of init actions */
 
 
-
-/* ee_trans   version 2.0           # page 7   10 Sep 1998 11 36 */
+
 
 
   /* transformation module */
@@ -400,56 +399,56 @@ ACTION[act], gst, nst, level);
       switch(act) {
 
       case ETG: /* eetm27 -> eegeo */
-        res = ptg(&TC_eetm, +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_eetm, +1, N, E, &N, &E, "", NULL);
         break;
       case GTE: /* eegeo -> eetm27 */
-        res = ptg(&TC_eetm, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_eetm, -1, N, E, &N, &E, "", NULL);
         break;
       case OTG: /* tm27_eeold42 -> geo_eeold42 */
-        res = ptg(&TC_eold, +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_eold, +1, N, E, &N, &E, "", NULL);
         break;
       case GTO: /* geo_eeold42 -> tm27_eeold42 */
-        res = ptg(&TC_eold, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_eold, -1, N, E, &N, &E, "", NULL);
         break;
       case VTG: /* eelmne -> geo_eepv37 */
-        res = ptg(&TC_elmn, +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_elmn, +1, N, E, &N, &E, "", NULL);
         break;
       case GTV: /* geo_eepv37 -> eelmne */
-        res = ptg(&TC_elmn, -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(&TC_elmn, -1, N, E, &N, &E, "", NULL);
         break;
       case TTG: /* eetm -> eegeo */
-        res = ptg(in_lab,  +1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(in_lab,  +1, N, E, &N, &E, "", NULL);
         break;
       case GTT: /* eegeo -> eetm */
-        res = ptg(outlab,  -1, N, E, &N, &E, usertxt, tr_error);
+        res = ptg(outlab,  -1, N, E, &N, &E, "", NULL);
         break;
 
       case UPE: /* utm35_euref89 -> eetm27 */
-        res = eetmtu_g(-1, N, E, &N, &E, usertxt, tr_error);
+        res = eetmtu_g(-1, N, E, &N, &E, "", NULL);
         break;
       case PEU: /* eetm27 -> utm35_euref89 */
-        res = eetmtu_g(+1, N, E, &N, &E, usertxt, tr_error);
+        res = eetmtu_g(+1, N, E, &N, &E, "", NULL);
         break;
       case PEO: /* eetm27 -> tm27_eeold42 */
-        res = eetmtu_g(-2, N, E, &N, &E, usertxt, tr_error);
+        res = eetmtu_g(-2, N, E, &N, &E, "", NULL);
         break;
       case OPE: /* tm27_eeold42 -> eetm27 */
-        res = eetmtu_g(+2, N, E, &N, &E, usertxt, tr_error);
+        res = eetmtu_g(+2, N, E, &N, &E, "", NULL);
         break;
       case UPV: /* utm35_euref89 -> eelmne */
-        res = eetmtu_g(-3, N, E, &N, &E, usertxt, tr_error);
+        res = eetmtu_g(-3, N, E, &N, &E, "", NULL);
         break;
       case PVU: /* eelmne -> utm35_euref89 */
-        res = eetmtu_g(+3, N, E, &N, &E, usertxt, tr_error);
+        res = eetmtu_g(+3, N, E, &N, &E, "", NULL);
         break;
 
       case IDT: /* ident, no action */
         break;
 
 	  default: /* programme error */
-        return((tr_error==NULL) ? TRF_ILLEG_ :
-                t_status(tr_error, usertxt,
-                "ee_trans(prog error)", TRF_PROGR_));
+		   lord_error(TRF_PROGR_,LORD( "ee_trans(prog error)"));
+		   return TRF_ILLEG_;
+	
       }
       if (res < result) result = res;
 

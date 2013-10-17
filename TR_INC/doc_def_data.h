@@ -20,12 +20,12 @@
 
 #if !defined(H_DOC_DEF_DATA)
 #define      H_DOC_DEF_DATA
-
-int doc_rgn(char *rgn_name, char *descr, int detail);
-int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail);
-int doc_dtm(char *dtm_name, char *descr, int detail);
-int get_def_numbers(int *n_prj, int *n_dtm, int *n_grs, int *n_rgn);
-int doc_grs(char *ell_name, FILE *out, int detail);
+#include "metadata.h"
+int doc_rgn(char *rgn_name, char *descr, int detail, def_data *data);
+int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail, def_data *data);
+int doc_dtm(char *dtm_name, char *descr, int detail, def_data *data);
+int get_def_numbers(int *n_prj, int *n_dtm, int *n_grs, int *n_rgn, def_data *data);
+int doc_grs(char *ell_name, FILE *out, int detail, def_data *data);
 void present_data(FILE *fp,def_data *data);
 
 #endif

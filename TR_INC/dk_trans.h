@@ -32,9 +32,8 @@
 
 #if !defined     (H_DK_TRANS)
 #define           H_DK_TRANS
-
-extern int          dk_trans(
-/*___________________________*/
+#include          "metadata.h"
+typedef int( *TRANSF)(
 struct coord_lab      *in_lab,
 struct coord_lab      *outlab,
 double              N,
@@ -43,9 +42,23 @@ double              H,
 double             *Nout,
 double             *Eout,
 double             *Hout,
-char               *usertxt,
-FILE               *tr_error
+tab_dir              *tdir
 );
+
+TRANSF dk_trans;
+/*
+int          dk_trans(
+
+struct coord_lab      *in_lab,
+struct coord_lab      *outlab,
+double              N,
+double              E,
+double              H,
+double             *Nout,
+double             *Eout,
+double             *Hout,
+tab_dir              *tdir
+);*/
 
 /* 2. dim. transformation function for area DK */
 

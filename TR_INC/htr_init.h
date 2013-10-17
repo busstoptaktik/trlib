@@ -32,6 +32,7 @@
 #define           H_HTR_INIT
 
 #include    "geo_lab.h"
+#include    "metadata.h"
 
 extern int               htr_init(
 /*                              */
@@ -40,7 +41,8 @@ struct  coord_lab       *oh_dtm,
 struct coord_lab        *htr_lab,
 struct htr_c_str        *htr_const,
 char                    *dh_table_name,
-char                    *dh_tr_info
+char                    *dh_tr_info,
+tab_dir                 *tdir
 );
 
 /*

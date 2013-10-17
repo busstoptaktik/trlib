@@ -40,7 +40,8 @@ char               *d_nm,
 short              *p_no,
 char               *p_nm,
 char               *e_nm,
-struct dsh_str     *trp
+struct dsh_str     *trp,
+def_data           *data
 )
 
 {
@@ -48,7 +49,7 @@ char    rgn_nm[MLBLNG];
 short   mask;
 
 return(
-  set_dtm_1(d_no, d_nm, p_no, p_nm, e_nm, rgn_nm, &mask, trp));
+  set_dtm_1(d_no, d_nm, p_no, p_nm, e_nm, rgn_nm, &mask, trp, data));
 
 }
 

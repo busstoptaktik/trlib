@@ -35,11 +35,11 @@
 
 
 
-extern def_data *DEF_DATA;  /* due to design, mimicking 'old style', this is global rather than a parameter to functions. */
+
 
 /* will simply output  "rgn" or "rgn country" depending on detail level requested */
 /* use conv_rgn for other types of call */
-int doc_rgn(char *rgn_name, char *descr, int detail){
+int doc_rgn(char *rgn_name, char *descr, int detail, def_data *DEF_DATA){
 	int i;
 	def_rgn *rgn=NULL;
 	int mode=0;
@@ -77,7 +77,7 @@ int doc_rgn(char *rgn_name, char *descr, int detail){
 /* type can be used to separate proj labels from other types of labels */
 /* impl_datum is useful when describing prj labels like e.g. dktm1 or webmrc where the datum is implicit */
 
-int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail){
+int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail, def_data *DEF_DATA){
 	def_projection *prj=NULL;
 	int i,mode=0;
 	static int n_prj=0;
@@ -155,7 +155,7 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 
 /* search for dtm_name. If dtm_name is "" or NULL, 'next' prj is requested */
 /* if detail<0 only the ellipsoid name is copied to descr - usefull when looking only for ellipsoid data */
-int doc_dtm( char *dtm_name, char *descr, int detail){
+int doc_dtm( char *dtm_name, char *descr, int detail, def_data *DEF_DATA){
 	def_datum *dtm=NULL;
 	int i,s_mode,mode;
 	static int n_dtm=0;
@@ -213,8 +213,8 @@ int doc_dtm( char *dtm_name, char *descr, int detail){
 			
 /* output number of predefined labels */	
 	
-	
-int get_def_numbers(int *n_prj, int *n_dtm, int *n_grs, int *n_rgn){
+/*	
+int get_def_numbers(int *n_prj, int *n_dtm, int *n_grs, int *n_rgn, def_data *DEF_DATA){
 	if (DEF_DATA==NULL)
 		return TR_ERROR;
 	*n_prj=DEF_DATA->n_prj;
@@ -223,11 +223,11 @@ int get_def_numbers(int *n_prj, int *n_dtm, int *n_grs, int *n_rgn){
 	*n_grs=DEF_DATA->n_ellip;
 	return TR_OK;
 }
-
+*/
 
 /* Copied from previous set_grs - out could be changed to a string */
 
-int doc_grs(char *ell_name, FILE *out, int detail){
+int doc_grs(char *ell_name, FILE *out, int detail, def_data *DEF_DATA){
 	int rc,i,internal_no,p=0,mode;
 	static int n_grs=0;
 	def_grs *grs=NULL;

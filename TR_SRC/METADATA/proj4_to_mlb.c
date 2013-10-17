@@ -269,8 +269,8 @@ void set_kms_datums_allowed(int is_allowed){
 * Thus there is no bullet proof method of setting a KMS datum from a proj4 string, unless the datum is explicitly given with the +datum token.
 *  E.g. there is no way of distinguishing etrs89 and gr96 in proj4 currently. (towgs both zeroes...)
 */
-static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
-        extern def_data *DEF_DATA; /*pointer to the preparsed def_data structure*/
+static int guess_proj4_datum(proj4_entry *proj_entry, char *datum, def_data *DEF_DATA){
+       
         /*if no datum - look for towgs84 params or guesssssss*/
         datum[0]='\0';
         if (DEF_DATA==NULL){
@@ -387,8 +387,7 @@ static int guess_proj4_datum(proj4_entry *proj_entry, char *datum){
 }
 /*the actual conversion of proj4 text to mlb */
 /*TODO: streamline recognition of mlbs with implicit datum to work more generally.... */
-int proj4_to_mlb(char *proj4_text, char *mlb){
-        extern def_data *DEF_DATA;
+int proj4_to_mlb(char *proj4_text, char *mlb, def_data *DEF_DATA){
         int is_transverse_mercator=0,is_mercator=0,found_exact_alias=0,rc;
         char proj[32],datum[32],vdatum[32],sep_char='_';
         char param_string[128]; /*string to print extra parameters to */
@@ -438,7 +437,7 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
                 return TR_LABEL_ERROR;
         }
         /*set datum*/
-        rc=guess_proj4_datum(proj_entry,datum);
+        rc=guess_proj4_datum(proj_entry,datum,DEF_DATA);
         
         if (strlen(datum)==0){
                 lord_error(TR_LABEL_ERROR,"Proj4: Unable to recognize datum...");
@@ -536,13 +535,12 @@ int proj4_to_mlb(char *proj4_text, char *mlb){
 }
 
 /*A sketchy implementation of this translation - todo: improve.... easier than the other way!*/
-int mlb_to_proj4(char *mlb, char *out, int buf_len){
+int mlb_to_proj4(char *mlb, char *out, int buf_len, def_data *DEF_DATA){
         int n_chars,is_geo=0,set_datum=1;
         char internal_buf[512], *tmp;
         char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
         short sepch,region;
         PR *srs=NULL;
-        extern def_data *DEF_DATA; /*pointer to the preparsed def_data structure*/
         if (DEF_DATA==NULL){
                 lord_error(TR_ALLOCATION_ERROR,LORD("def-data not initialised!"));
                 return TR_ALLOCATION_ERROR;
