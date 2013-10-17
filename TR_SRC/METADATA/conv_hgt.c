@@ -151,9 +151,9 @@ def_data                  *DEF_DATA,
     h_lab->datum = (short) set_dtm_1(-1, p_dtm, &par_dtm, p_name,
                    e_name, rgn_pref.prfx, &mask, &(h_lab->dsh_con),DEF_DATA);
     if (h_lab->datum > 0)
-      h_lab->ellipsoid = (short) set_grs(-1, e_name, ell_p);
+      h_lab->ellipsoid = (short) set_grs(-1, e_name, ell_p, DEF_DATA);
     else {
-      h_lab->ellipsoid = (short) set_grs(-1, t_lab, ell_p);
+      h_lab->ellipsoid = (short) set_grs(-1, t_lab, ell_p, DEF_DATA);
       h_lab->datum     = -2;
     }
 
@@ -206,7 +206,7 @@ def_data                  *DEF_DATA,
                        " ", rgn_pref.prfx, rgn_name);
       }
       /* Ellipsoid, datum, and parent datum */
-      if (set_grs(h_lab->ellipsoid, e_name, ell_p) > 0) {
+      if (set_grs(h_lab->ellipsoid, e_name, ell_p, DEF_DATA) > 0) {
         (void) fprintf(iofile, "\nEllipsoid: %9s%s", " ", e_name);
         (void) fprintf(iofile,
                     "\n  a       =        %14.4f m", h_lab->a);
@@ -278,7 +278,7 @@ def_data                  *DEF_DATA,
     }
     /* Ellipsoid, datum, and parent datum */
     (void) fprintf(iofile, "\nellipsoid = %15d", h_lab->ellipsoid);
-    if (set_grs(h_lab->ellipsoid, e_name, ell_p) > 0)
+    if (set_grs(h_lab->ellipsoid, e_name, ell_p, DEF_DATA) > 0)
         (void) fprintf(iofile, "%9s%s", " ", e_name);
     (void) fprintf(iofile, "\ndatum     = %15d", h_lab->datum);
     /* get the datum name */

@@ -254,7 +254,7 @@ int doc_grs(char *ell_name, FILE *out, int detail, def_data *DEF_DATA){
 		return TR_LABEL_ERROR;
 	internal_no=grs->no;
 	mode=grs->mode;
-	rc=set_grs(internal_no,dummy_name,e);
+	rc=set_grs(internal_no,dummy_name,e,DEF_DATA);
 	if (rc<0)
 		return TR_LABEL_ERROR;
 	if (out==NULL)
@@ -362,8 +362,8 @@ void present_data(FILE *fp,def_data *data){
 		fprintf(fp,"n_par: %d\n",projections[i].q_par);
 		fprintf(fp,"native_proj: %s\n",projections[i].native_proj);
 		if (projections[i].q_par>0 && projections[i].param_tokens[0]=='\"'){
-			for(j=0;j<projections[i].q_par;j++) fprintf(fp," %f",projections[i].native_params[j]);
-			fprintf(fp,"\n");
+			fprintf(fp,"params: %s\n",projections[i].param_text);
+			
 		}
 		fprintf(fp,"%s\n\n",projections[i].descr);
 	
@@ -382,8 +382,10 @@ void present_data(FILE *fp,def_data *data){
 		fprintf(fp,"dtm : %s, no: %d\n",datums[i].mlb,datums[i].no);
 		fprintf(fp,"parent: %s, ellipsoid: %s\n",datums[i].p_datum,datums[i].ellipsoid);
 		fprintf(fp,"imit: %d, type: %d, rgn: %s\n",datums[i].imit,datums[i].type,datums[i].rgn);
-		fprintf(fp,"TO-WGS84:\n%f %f %f\n%f ppm %f dg %f dg %f dg\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2],datums[i].scale*1e6,
-		datums[i].rotation[0]*R2D,datums[i].rotation[1]*R2D,datums[i].rotation[2]*R2D);
+		if (datums[i].type!=0 && datums[i].type!=1)
+		    fprintf(fp,"TO-WGS84:\n%f %f %f\n",datums[i].translation[0],datums[i].translation[1],datums[i].translation[2]);
+		if (datums[i].type==7 || datums[i].type==-7)
+		    fprintf(fp,"%f ppm %f dg %f dg %f dg\n",datums[i].scale*1e6,datums[i].rotation[0]*R2D,datums[i].rotation[1]*R2D,datums[i].rotation[2]*R2D);
 		fprintf(fp,"%s\n\n",datums[i].descr);
 	}
 	fprintf(fp,"*****************\n\n");

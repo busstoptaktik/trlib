@@ -274,6 +274,7 @@ tab_dir              *tdir
     TC_init = act && ed_z == bs_w*bs_w;
 
     if (!TC_init){
+	lord_debug(0,LORD("act: %d"),act);
 	lord_error(TRF_PROGR_,LORD("dk_trans(init labels)"));
 	return TRF_PROGR_;
     }  

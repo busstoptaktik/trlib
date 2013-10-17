@@ -12,11 +12,17 @@ int conv_w_crd(char *mlb, struct coord_lab *c_lab, def_data *DEF_DATA){
 	char                      *p_dtm = p_lb->mlb2;
 	char                      *p_sys = p_lb->name;
 	char                      *h_mlb, *h_mlb2;
+	lord_debug(0,LORD("mlb in con_w_crd: %s"),mlb);
 	lab_lng = get_mlb(mlb,&lab_rgn, p_sys, &p_lb->sepch, p_dtm, &h_mlb);
+	lord_debug(0,LORD("p_sys is now: %s, p_dtm"),p_sys, p_dtm);
 	res = srch_def(CRD_LAB, p_sys, p_lb,DEF_DATA);
-	if (res!=0)
+	if (res!=0){
+		lord_debug(0,LORD("mlb: %s, not found!"),mlb);
 		return res;
-	res=conv_crd("",p_lb,c_lab,mlb+lab_lng,DEF_DATA);
+	}
+	lord_debug(0,LORD("So far so good! mlb: %s, p_sys: %s"),mlb,p_sys);
+	res=conv_crd("",p_lb,c_lab,DEF_DATA,mlb+lab_lng);
+	lord_debug(0,LORD("So far so good! - res is %d, CRD_LAB: %d"),res,CRD_LAB);
 	if (res==CRD_LAB){
 		 if (*(c_lab->mlb + c_lab->sepix) == 'H' && h_mlb != NULL){
 			      struct hgt_lab  hh_lab;
@@ -34,6 +40,7 @@ int conv_w_crd(char *mlb, struct coord_lab *c_lab, def_data *DEF_DATA){
 			      }
 			      if (p_lb->lab_type == HGT_LAB)
 				  h_type = (short) conv_hgt("", p_lb, &hh_lab,DEF_DATA, h_mlb); /*hmm - check call*/
+			          lord_debug(0,LORD("So far so good! - htyp is %d"),h_type);
 			      if (h_type == HGT_LAB) {
 				p_lb->lab_type = CRD_LAB;  /* RESET*/
 				if (c_lab->imit == 0) c_lab->imit = hh_lab.imit;

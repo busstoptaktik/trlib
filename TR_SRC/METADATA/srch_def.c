@@ -24,13 +24,13 @@ int srch_def(
 	return -2;
  
   (void) strcpy(dum_rgn.prfx, "ZZ");
-  
+   lord_debug(0,LORD("srch-def called with: %s"),p_sys);
    /* Replace digits by ?'s in w_sys (i.e. UTM32 -> UTM?? etc.), for easier search */
    for (qr = 0; *(p_sys+qr); qr++)
 	*(w_sys+qr) = (isdigit(*(p_sys+qr))) ? '?' : *(p_sys+qr);
    *(w_sys+qr) = '\0';
    
-
+  lord_debug(0,LORD("w_sys: %s"),w_sys);
   do {
 	prj=DEF_DATA->projections+(n_prj++);
 	strcpy(p_name,prj->mlb);
@@ -77,6 +77,8 @@ int srch_def(
 
 		strcpy(p_lb->text,prj->descr); 
 		res =0;
+		lord_debug(0,LORD("FOUND match: %s"),prj->mlb);
+		lord_debug(0,LORD("type: %d, cstm: %d, mask: %d, region: %s"), prj->type,prj->cstm, prj->mask,prj->rgn);
 	   }
     
   } while (res<0  && n_prj<DEF_DATA->n_prj);

@@ -130,7 +130,7 @@ int TR_InitLibrary(char *path) {
      * Allow unsafe projections ONLY in initialisation!
     */
     ALLOW_UNSAFE=1;
-    
+    lord_debug(0,LORD("Init of data successfull! - trying to transform, def_lab not null: %d"),(TAB_DIR->def_lab!=NULL));
     trf=TR_Open("utm32_ed50","utm32_wgs84","");
     if (!trf){
 	    lord_error(TR_LABEL_ERROR,"TR_InitLibrary: Failed to open first transformation!");
@@ -228,7 +228,7 @@ int TR_SetGeoidDir(char *path){
 	#endif
 	TAB_DIR=tab_dir_open(fname);
 	DEF_DATA=TAB_DIR->def_lab;  /*just a useful pointer which could be NULL */
-	return (TAB_DIR )? TR_OK: TR_ERROR;
+	return (TAB_DIR && DEF_DATA)? TR_OK: TR_ERROR;
 }
 	
 /* Mock up - not fully implemented! */
@@ -267,7 +267,7 @@ PR *TR_OpenProjection(char *mlb){
 	int label_check;
 	struct coord_lab *plab=NULL;
 	PR *proj;
-	if (!TAB_DIR || !TAB_DIR->def_lab){
+	if (!TAB_DIR || !DEF_DATA){
 		lord_error(TR_ALLOCATION_ERROR,LORD("Library not initialised!"));
 		return NULL;
 	}
@@ -276,12 +276,13 @@ PR *TR_OpenProjection(char *mlb){
 		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space."));
 		return 0;
 	}
-	label_check = conv_w_crd(mlb,proj,TAB_DIR->def_lab);
+	label_check = conv_w_crd(mlb,proj,DEF_DATA);
 	if (label_check!=CRD_LAB) {
 		free(proj);
 		lord_error(TR_LABEL_ERROR,"Failed to open projection %s.",mlb);
 		return 0;
 	}
+	lord_debug(0,LORD("So far so good!"));
 	if (!TR_IsThreadSafe(proj) && !ALLOW_UNSAFE){
 		lord_error(TR_LABEL_ERROR,"%s not allowed in multithreaded mode!",mlb);
 		free(proj);

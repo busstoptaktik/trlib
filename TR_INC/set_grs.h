@@ -30,13 +30,15 @@
 
 #ifndef      _SET_GRS_H
 #define      _SET_GRS_H
+#include     "metadata.h"
 
-extern int          set_grs(
+
+int          set_grs(
 /*________________________*/
 int          ell_nmb,
 char         *ellname,
 double       *e,
-...
+def_data   *data
 );
 
 /* 

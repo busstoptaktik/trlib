@@ -128,7 +128,7 @@ static int set_projection(struct tag *prj_tag,  def_projection *proj){
 	if (!get_value_as_string(get_named_child(prj_tag,"native"),proj->native_proj,MLBLNG))
 		strcpy(proj->native_proj,proj->mlb);
 	if (!get_value_as_string(get_named_child(prj_tag,"region"),proj->rgn,3))
-		strcpy(proj->native_proj,"ZZ");
+		strcpy(proj->rgn,"ZZ");
 	if (!get_value_as_string(get_named_child(prj_tag,"parameters"),proj->param_text,128))
 		*proj->param_text='\0';
 	if (!get_value_as_string(get_named_child(prj_tag,"parent_datum"),proj->p_datum,16))
@@ -161,7 +161,7 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 		strcpy(dtm->rgn,"ZZ");
 	if (1!=get_value(get_named_child(dtm_tag,"type"),&dtm->type,1,int_converter,NULL))
 		return 0;
-	if (dtm->type!=0){
+	if (dtm->type!=0 && dtm->type!=1){
 		if (1!=get_value(get_named_child(dtm_tag,"t_x"),dtm->translation,1,double_converter,NULL))
 			return 0;
 		if (1!=get_value(get_named_child(dtm_tag,"t_y"),dtm->translation+1,1,double_converter,NULL))
