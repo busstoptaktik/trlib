@@ -38,12 +38,14 @@
 #define       _CONV_CRD_FNC_
 
 #include "geo_lab.h"
+#include "metadata.h"
 
 extern int            conv_crd(
 /*___________________________*/
 char                 *lab_name,
 struct lab_def_str   *p_lb,
 struct coord_lab     *c_lab,
+def_data             *data,
 ...
 );
 

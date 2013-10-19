@@ -74,8 +74,8 @@ tab_dir *tab_dir_open(char *path){
 	strncpy(self->dir,dir,128);
 	xml=mem_friendly_reader(fp);
 	fclose(fp);
-	root=get_root_tag(xml);
-	if(!root.valid){
+	 root=get_root_tag(xml);
+	 if(!root.valid){
 		lord_error(TAB_N_MAN_,LORD("Invalid xml - root tag not found."));
 		goto CLEANUP;
 	}
@@ -89,6 +89,7 @@ tab_dir *tab_dir_open(char *path){
 		lord_error(TAB_N_MAN_,LORD("def_lab tag not found - invalid trlib definition file."));
 		goto CLEANUP;
 	}
+	
 	self->def_lab=open_def_data(&def_lab_tag,&n_err);
 	if (!(self->def_lab)){
 		lord_error(TAB_N_MAN_,LORD("Failed to parse def_lab - invalid trlib definition file."));
@@ -127,8 +128,7 @@ static int parse_table_manager(struct tag *root, tab_dir *self){
 	tag_l2=get_next_child(&tag_l1,NULL);
 	
 	for (i=0; tag_l2.valid; i++){
-		get_value_as_string(tag_l2,name,len);
-		lord_debug(1,LORD("name is %s"),name);
+		get_value_as_string(&tag_l2,name,len);
 		g=grim_open(attach_pom_extension(self->dir,name));
 		if (!g){
 			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to memory map %s."),name);
@@ -146,7 +146,7 @@ static int parse_table_manager(struct tag *root, tab_dir *self){
 	}
 	tag_l2=get_next_child(&tag_l1,NULL);
 	for (i=0; tag_l2.valid; i++){
-		get_value_as_string(tag_l2,name,len);
+		get_value_as_string(&tag_l2,name,len);
 		g=grim_open(attach_pom_extension(self->dir,name));
 		if (!g){
 			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to memory map %s."),name);
@@ -164,7 +164,7 @@ static int parse_table_manager(struct tag *root, tab_dir *self){
 	}
 	tag_l2=get_next_child(&tag_l1,NULL);
 	for (i=0; tag_l2.valid; i++){
-		get_value_as_string(tag_l2,name,len);
+		get_value_as_string(&tag_l2,name,len);
 		g=grim_open(attach_pom_extension(self->dir,name));
 		if (!g){
 			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to memory map %s."),name);
@@ -182,7 +182,7 @@ static int parse_table_manager(struct tag *root, tab_dir *self){
 	}
 	tag_l2=get_next_child(&tag_l1,NULL);
 	for (j=0; tag_l2.valid && j<10; j++){
-		get_value_as_string(tag_l2,name,len);
+		get_value_as_string(&tag_l2,name,len);
 		self->geoid_seq_std[j]=NULL;
 		for(i=0; i<self->n_geoids && self->geoid_seq_std[j]==NULL; i++){
 			if (!strcmp(name,grim_filename(self->geoids[i])))

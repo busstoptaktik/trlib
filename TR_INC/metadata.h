@@ -40,8 +40,8 @@
  
 struct def_grs {
 	char mlb[MLBLNG];
-	short no;
-	short mode;
+	int no;
+	int mode;
 	double axis;
 	double flattening;
 	double km;

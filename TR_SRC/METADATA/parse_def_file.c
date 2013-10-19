@@ -19,8 +19,12 @@
 #include    <stdlib.h>
 #include    <string.h>
 #include    <ctype.h>
-#include    "KmsFncs.h"
+#include    "geo_lab.h"
+#include    "sgetg.h"
+#include    "lord.h"
 #include    "parse_xml.h"
+#include    "metadata.h"
+
 
 /*Values  below copy-pasted from def_lab.txt */
 #define KM_HERE       (3986005.e8)
@@ -31,75 +35,86 @@
 #define KMMOON       KM_HERE*0.0122298 /* Moon parameter relative to Earth - fix of '*' char in def_lab which was interpreted as a */
 #define SKIP_SPACE(pos) while(isspace(*pos)) pos++
 
-static int set_ellipsoid(struct tag *grs_tag,  def_grs *ellip);
-static int int_converter(char *in, int *out, size_t buf_size, void *extra);
-static int double_converter(char *in, double *out, size_t buf_size, void *extra);
+static int set_ellips(struct tag *grs_tag,  def_grs *ellip);
+static int int_converter(char *in, void *out, size_t buf_size, void *extra);
+static int double_converter(char *in, void *out, size_t buf_size, void *extra);
 static int set_projection(struct tag *prj_tag,  def_projection *proj);
 static int set_datum(struct tag *dtm_tag, def_datum *dtm);
 static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr);
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn);
-
+//static char BUF[256];
 
 /* 'single' int converter. A 'sep-char' could be input to extra, if more values were to be extracted from a string...*/
-static int int_converter(char *in, int *out, size_t buf_size, void *extra){
+static int int_converter(char *in, void *out, size_t buf_size, void *extra){
 	char *end;
+	int *pos= (int*) out;
 	SKIP_SPACE(in);
-	*out=(int) strtol(in,&end,0);
+	*pos=(int) strtol(in,&end,0);
 	return (end>in)? 1:0;
 }
 
-static int double_converter(char *in, double *out, size_t buf_size, void *extra){
+static int double_converter(char *in, void *out, size_t buf_size, void *extra){
 	char *end;
+	double *pos= (double*) out;
 	struct typ_dec type_in;
 	int used;
 	SKIP_SPACE(in);
 	if (extra==NULL){
-		*out=strtod(in, &end);
+		*pos=strtod(in, &end);
 		return (end>in)?1:0;
 	}
-	*out=sgetg(in,&type_in,&used,(char*) extra);
+	*pos=sgetg(in,&type_in,&used,(char*) extra);
 	return (type_in.gf>0)? 1: 0;
 }
 
 
 
-static int set_ellipsoid(struct tag *grs_tag,  def_grs *ellip){
-	char buf[128];
-	if (!get_value_as_string(get_named_child(grs_tag,"mlb"),ellip->mlb,MLBLNG))
+static int set_ellips(struct tag *grs_tag,  def_grs *ellip){
+	struct tag t;
+	static char BUF[256]; /*crashes in optimized mode for MSVC whenever we have local vars defined on the stack!!!*/
+	t=get_named_child(grs_tag,"mlb");
+	if (!get_value_as_string(&t,ellip->mlb,MLBLNG))
 		return 0;
-	if (1!=get_value(get_named_child(grs_tag,"id"),&ellip->no,1,int_converter,NULL))
+	t=get_named_child(grs_tag,"id");
+	if (1!=get_value(&t,&ellip->no,1,int_converter,NULL))
 		return 0;
-	if (1!=get_value(get_named_child(grs_tag,"mode"),&ellip->mode,1,int_converter,NULL))
+	t=get_named_child(grs_tag,"mode");
+	if (1!=get_value(&t,&ellip->mode,1,int_converter,NULL))
 		return 0;
-	if (1!=get_value(get_named_child(grs_tag,"semi_major_axis"),&ellip->axis,1,double_converter,NULL))
+	t=get_named_child(grs_tag,"semi_major_axis");
+	if (1!=get_value(&t,&ellip->axis,1,double_converter,NULL))
 		return 0;
-	if (1!=get_value(get_named_child(grs_tag,"flattening"),&ellip->flattening,1,double_converter,NULL))
+	t=get_named_child(grs_tag,"flattening");
+	if (1!=get_value(&t,&ellip->flattening,1,double_converter,NULL))
 		return 0;
-	if (!get_value_as_string(get_named_child(grs_tag,"gravity"),buf,128))
+	
+	t=get_named_child(grs_tag,"gravity");
+	if (!get_value_as_string(&t,BUF,128))
 		return 0;
-	if (!isalpha(buf[0])){
-		if (1!=double_converter(buf,&ellip->km,1,NULL))
+	if (!isalpha(BUF[0])){
+		if (1!=double_converter(BUF,&ellip->km,1,NULL))
 			return 0;
 	}
-	else if (!strcmp(buf,"KM"))
+	else if (!strcmp(BUF,"KM"))
 		ellip->km=KM_HERE;
-	else if (!strcmp(buf,"KMMOON"))
+	else if (!strcmp(BUF,"KMMOON"))
 		ellip->km=KMMOON;
-	else if (!strcmp(buf,"GEQ"))
+	else if (!strcmp(BUF,"GEQ"))
 		ellip->km=GEQ_HERE;
-	else if (!strcmp(buf,"KMW84"))
+	else if (!strcmp(BUF,"KMW84"))
 		ellip->km=KMW84_HERE;
-	else if (!strcmp(buf,"GEQ84"))
+	else if (!strcmp(BUF,"GEQ84"))
 		ellip->km=GEQ84_HERE;
 	else
 		return 0;
-	if (!get_value_as_string(get_named_child(grs_tag,"rotation"),buf,128))
+	t=get_named_child(grs_tag,"rotation");
+	if (!get_value_as_string(&t,BUF,128))
 		return 0;
-	if (!isalpha(buf[0])){
-		if (1!=double_converter(buf,&ellip->omega,1,NULL))
+	if (!isalpha(BUF[0])){
+		if (1!=double_converter(BUF,&ellip->omega,1,NULL))
 			return 0;
 	}
-	else if (!strcmp(buf,"OMEGA"))
+	else if (!strcmp(BUF,"OMEGA"))
 		ellip->omega=OMEGA_HERE;
 	else
 		return 0;
@@ -109,73 +124,104 @@ static int set_ellipsoid(struct tag *grs_tag,  def_grs *ellip){
 
 
 static int set_projection(struct tag *prj_tag,  def_projection *proj){
-	if (!get_value_as_string(get_named_child(prj_tag,"description"),proj->descr,MAX_DSCR_LEN))
+	struct tag t;
+	t=get_named_child(prj_tag,"description");
+	if (!get_value_as_string(&t,proj->descr,MAX_DSCR_LEN))
 		*(proj->descr)='\0';
-	if (!get_value_as_string(get_named_child(prj_tag,"mlb"),proj->mlb,MLBLNG))
+	t=get_named_child(prj_tag,"mlb");
+	if (!get_value_as_string(&t,proj->mlb,MLBLNG))
 		return 0;
-	if (1!=get_value(get_named_child(prj_tag,"cha_str"),&proj->cha_str,1,int_converter,NULL))
+	t=get_named_child(prj_tag,"cha_str");
+	if (1!=get_value(&t,&proj->cha_str,1,int_converter,NULL))
 		return 0;
-	if (1!=get_value(get_named_child(prj_tag,"type"),&proj->type,1,int_converter,NULL))
+	t=get_named_child(prj_tag,"type");
+	if (1!=get_value(&t,&proj->type,1,int_converter,NULL))
 		return 0;
-	if (1!=get_value(get_named_child(prj_tag,"cstm"),&proj->cstm,1,int_converter,NULL))
+	t=get_named_child(prj_tag,"cstm");
+	if (1!=get_value(&t,&proj->cstm,1,int_converter,NULL))
 		return 0;
-	if (1!=get_value(get_named_child(prj_tag,"mode"),&proj->mode,1,int_converter,NULL))
+	t=get_named_child(prj_tag,"mode");
+	if (1!=get_value(&t,&proj->mode,1,int_converter,NULL))
 		return 0;
-	if (1!=get_value(get_named_child(prj_tag,"mask"),&proj->mask,1,int_converter,NULL))
+	t=get_named_child(prj_tag,"mask");
+	if (1!=get_value(&t,&proj->mask,1,int_converter,NULL))
 		return 0;
-	if (!get_value_as_string(get_named_child(prj_tag,"kms_seq"),proj->seq,4))
+	t=get_named_child(prj_tag,"kms_seq");
+	if (!get_value_as_string(&t,proj->seq,4))
 		strcpy(proj->seq,"ZZ");
-	if (!get_value_as_string(get_named_child(prj_tag,"native"),proj->native_proj,MLBLNG))
+	t=get_named_child(prj_tag,"native");
+	if (!get_value_as_string(&t,proj->native_proj,MLBLNG))
 		strcpy(proj->native_proj,proj->mlb);
-	if (!get_value_as_string(get_named_child(prj_tag,"region"),proj->rgn,3))
+	t=get_named_child(prj_tag,"region");
+	if (!get_value_as_string(&t,proj->rgn,3))
 		strcpy(proj->rgn,"ZZ");
-	if (!get_value_as_string(get_named_child(prj_tag,"parameters"),proj->param_text,128))
+	t=get_named_child(prj_tag,"parameters");
+	if (!get_value_as_string(&t,proj->param_text,128))
 		*proj->param_text='\0';
-	if (!get_value_as_string(get_named_child(prj_tag,"parent_datum"),proj->p_datum,16))
+	t=get_named_child(prj_tag,"parent_datum");
+	if (!get_value_as_string(&t,proj->p_datum,16))
 		strcpy(proj->p_datum,"\"");
-	if (1!=get_value(get_named_child(prj_tag,"n_parameters"),&proj->q_par,1,int_converter,NULL))
+	t=get_named_child(prj_tag,"n_parameters");
+	if (1!=get_value(&t,&proj->q_par,1,int_converter,NULL))
 		return 0;
 	strcpy(proj->param_tokens,"\"");
 	if ((proj->q_par)>0 && strlen(proj->param_text)==0){
-		if (!get_value_as_string(get_named_child(prj_tag,"parameter_tokens"),proj->param_tokens,32))
+		t=get_named_child(prj_tag,"parameter_tokens");
+		if (!get_value_as_string(&t,proj->param_tokens,32))
 			return 0;
 	}
 	return 1;
 }
 	
 static int set_datum(struct tag *dtm_tag, def_datum *dtm){
-	if (!get_value_as_string(get_named_child(dtm_tag,"mlb"),dtm->mlb,MLBLNG))
+	struct tag t;
+	t=get_named_child(dtm_tag,"mlb");
+	if (!get_value_as_string(&t,dtm->mlb,MLBLNG))
 		return 0;
-	if (!get_value_as_string(get_named_child(dtm_tag,"description"),dtm->descr,MAX_DSCR_LEN))
+	t=get_named_child(dtm_tag,"description");
+	if (!get_value_as_string(&t,dtm->descr,MAX_DSCR_LEN))
 		*dtm->descr='\0';
-	if (1!=get_value(get_named_child(dtm_tag,"id"),&dtm->no,1,int_converter,NULL))
+	t=get_named_child(dtm_tag,"id");
+	if (1!=get_value(&t,&dtm->no,1,int_converter,NULL))
 		return 0;
 	dtm->p_no=-1;
-	if (!get_value_as_string(get_named_child(dtm_tag,"parent"),dtm->p_datum,MLBLNG))
+	t=get_named_child(dtm_tag,"parent");
+	if (!get_value_as_string(&t,dtm->p_datum,MLBLNG))
 		return 0;
-	if (!get_value_as_string(get_named_child(dtm_tag,"ellipsoid"),dtm->ellipsoid,MLBLNG))
+	t=get_named_child(dtm_tag,"ellipsoid");
+	if (!get_value_as_string(&t,dtm->ellipsoid,MLBLNG))
 		return 0;
-	if (1!=get_value(get_named_child(dtm_tag,"imit"),&dtm->imit,1,int_converter,NULL))
+	t=get_named_child(dtm_tag,"imit");
+	if (1!=get_value(&t,&dtm->imit,1,int_converter,NULL))
 		return 0;
-	if (!get_value_as_string(get_named_child(dtm_tag,"region"),dtm->rgn,3))
+	t=get_named_child(dtm_tag,"region");
+	if (!get_value_as_string(&t,dtm->rgn,3))
 		strcpy(dtm->rgn,"ZZ");
-	if (1!=get_value(get_named_child(dtm_tag,"type"),&dtm->type,1,int_converter,NULL))
+	t=get_named_child(dtm_tag,"type");
+	if (1!=get_value(&t,&dtm->type,1,int_converter,NULL))
 		return 0;
 	if (dtm->type!=0 && dtm->type!=1){
-		if (1!=get_value(get_named_child(dtm_tag,"t_x"),dtm->translation,1,double_converter,NULL))
+		t=get_named_child(dtm_tag,"t_x");
+		if (1!=get_value(&t,dtm->translation,1,double_converter,NULL))
 			return 0;
-		if (1!=get_value(get_named_child(dtm_tag,"t_y"),dtm->translation+1,1,double_converter,NULL))
+		t=get_named_child(dtm_tag,"t_y");
+		if (1!=get_value(&t,dtm->translation+1,1,double_converter,NULL))
 			return 0;
-		if (1!=get_value(get_named_child(dtm_tag,"t_z"),dtm->translation+2,1,double_converter,NULL))
+		t=get_named_child(dtm_tag,"t_z");
+		if (1!=get_value(&t,dtm->translation+2,1,double_converter,NULL))
 			return 0;
 		if (dtm->type!=3){
-			if (1!=get_value(get_named_child(dtm_tag,"rot_x"),dtm->rotation,1,double_converter,"sx"))
+			t=get_named_child(dtm_tag,"rot_x");
+			if (1!=get_value(&t,dtm->rotation,1,double_converter,"sx"))
 				return 0;
-			if (1!=get_value(get_named_child(dtm_tag,"rot_y"),dtm->rotation+1,1,double_converter,"sx"))
+			t=get_named_child(dtm_tag,"rot_y");
+			if (1!=get_value(&t,dtm->rotation+1,1,double_converter,"sx"))
 				return 0;
-			if (1!=get_value(get_named_child(dtm_tag,"rot_z"),dtm->rotation+2,1,double_converter,"sx"))
+			t=get_named_child(dtm_tag,"rot_z");
+			if (1!=get_value(&t,dtm->rotation+2,1,double_converter,"sx"))
 				return 0;
-			if (1!=get_value(get_named_child(dtm_tag,"scale"),&dtm->scale,1,double_converter,"ppm"))
+			t=get_named_child(dtm_tag,"scale");
+			if (1!=get_value(&t,&dtm->scale,1,double_converter,"ppm"))
 				return 0;
 		} /*end should have 7 parameters */
 	} /*end should have datum shift parameters */
@@ -183,37 +229,51 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 }
 
 static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr){
-	if (!get_value_as_string(get_named_child(hth_tag,"from"),hth_tr->from_mlb,MLBLNG))
+	struct tag t;
+	t=get_named_child(hth_tag,"from");
+	if (!get_value_as_string(&t,hth_tr->from_mlb,MLBLNG))
 		return 0;
-	if (!get_value_as_string(get_named_child(hth_tag,"description"),hth_tr->descr,MAX_DSCR_LEN))
+	t=get_named_child(hth_tag,"description");
+	if (!get_value_as_string(&t,hth_tr->descr,MAX_DSCR_LEN))
 		*(hth_tr->descr)='\0';
-	if (!get_value_as_string(get_named_child(hth_tag,"to"),hth_tr->to_dtm,MLBLNG))
+	t=get_named_child(hth_tag,"to");
+	if (!get_value_as_string(&t,hth_tr->to_dtm,MLBLNG))
 		return 0;
-	if (1!=get_value(get_named_child(hth_tag,"type"),&hth_tr->type,1,int_converter,NULL))
+	t=get_named_child(hth_tag,"type");
+	if (1!=get_value(&t,&hth_tr->type,1,int_converter,NULL))
 		return 0;
-	if (1!=get_value(get_named_child(hth_tag,"lat_0"),&hth_tr->B0,1,double_converter,"nt"))
+	t=get_named_child(hth_tag,"lat_0");
+	if (1!=get_value(&t,&hth_tr->B0,1,double_converter,"nt"))
 		return 0;
-	if (1!=get_value(get_named_child(hth_tag,"lon_0"),&hth_tr->L0,1,double_converter,"nt"))
+	t=get_named_child(hth_tag,"lon_0");
+	if (1!=get_value(&t,&hth_tr->L0,1,double_converter,"nt"))
 		return 0;
 	switch (hth_tr->type){
 		case 1:
-			if (!get_value_as_string(get_named_child(hth_tag,"table"),hth_tr->table,MAX_TABLE_LEN))
+			t=get_named_child(hth_tag,"table");
+			if (!get_value_as_string(&t,hth_tr->table,MAX_TABLE_LEN))
 				return 0;
 			break;
 		case 2:
-			if (1!=get_value(get_named_child(hth_tag,"k0"),hth_tr->constants,1,double_converter,NULL))
+			t=get_named_child(hth_tag,"k0");
+			if (1!=get_value(&t,hth_tr->constants,1,double_converter,NULL))
 				return 0;
 			break;
 		case 3:
-			if (1!=get_value(get_named_child(hth_tag,"M0"),hth_tr->constants,1,double_converter,NULL))
+			t=get_named_child(hth_tag,"M0");
+			if (1!=get_value(&t,hth_tr->constants,1,double_converter,NULL))
 				return 0;
-			if (1!=get_value(get_named_child(hth_tag,"N0"),hth_tr->constants+1,1,double_converter,NULL))
+			t=get_named_child(hth_tag,"N0");
+			if (1!=get_value(&t,hth_tr->constants+1,1,double_converter,NULL))
 				return 0;
-			if (1!=get_value(get_named_child(hth_tag,"k0"),hth_tr->constants+2,1,double_converter,NULL))
+			t=get_named_child(hth_tag,"k0");
+			if (1!=get_value(&t,hth_tr->constants+2,1,double_converter,NULL))
 				return 0;
-			if (1!=get_value(get_named_child(hth_tag,"kN"),hth_tr->constants+3,1,double_converter,"sx"))
+			t=get_named_child(hth_tag,"kN");
+			if (1!=get_value(&t,hth_tr->constants+3,1,double_converter,"sx"))
 				return 0;
-			if (1!=get_value(get_named_child(hth_tag,"kE"),hth_tr->constants+4,1,double_converter,"sx"))
+			t=get_named_child(hth_tag,"kE");
+			if (1!=get_value(&t,hth_tr->constants+4,1,double_converter,"sx"))
 				return 0;
 			break;
 		default:
@@ -223,20 +283,21 @@ static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr){
 }
 
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn){
-	if (!get_value_as_string(get_named_child(rgn_tag,"new"),rgn->rgn_new,3))
+	struct tag t;
+	t=get_named_child(rgn_tag,"new");
+	if (!get_value_as_string(&t,rgn->rgn_new,3))
 		return 0;
-	if (!get_value_as_string(get_named_child(rgn_tag,"old"),rgn->rgn_old,3))
+	t=get_named_child(rgn_tag,"old");
+	if (!get_value_as_string(&t,rgn->rgn_old,3))
 		return 0;
-	if (!get_value_as_string(get_named_child(rgn_tag,"country"),rgn->country,64))
+	t=get_named_child(rgn_tag,"country");
+	if (!get_value_as_string(&t,rgn->country,64))
 		return 0;
 	return 1;
 }
 
 /* 
-Function that parses def_lab file. All is well as long as we can determine via a min_tokens attribute if 'entries' spanning more than one line
- are completed after reading at least two lines! And 'entries' SHOULD span at least two lines! 
-If formatting in the file is changed, this logic should be reconsidered :-)
-Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus regions could be considered as one 'entry' spanning an unpredictable number of lines. 
+Function that parses def_lab file. Now in XML :-)
 */
 
  def_data *open_def_data(struct tag *root, int *n_err){
@@ -244,15 +305,15 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	struct tag def_tag,item_tag;
 	def_data *data=NULL;
 	int n_set[5]={0,0,0,0,0},mode,i;
-	enum modes {mode_prj=0,mode_grs=1,mode_rgn=2,mode_dtm=3,mode_hth=4};
+	enum modes {mode_prj=0,mode_rgn=1,mode_dtm=2,mode_hth=3,mode_grs=4};
 	void *entries[5]={NULL,NULL,NULL,NULL,NULL};
-	char *mode_names[5]={"def_prj","def_grs","def_rgn","def_dtm","def_hth"};
-	char *item_names[5]={"prj","grs","rgn","dtm","hth"};
+	char *mode_names[5]={"def_prj","def_rgn","def_dtm","def_hth","def_grs"};
+	char *item_names[5]={"prj","rgn","dtm","hth","grs"};
 	/* specifications for how much to preallocate */
 	int n_prealloc[5]={256,128,128,128,64};
 	int n_alloc[5]={256,128,128,128,64};
-	int mode_sizes[5]={sizeof( def_projection),sizeof( def_grs),sizeof(def_rgn),sizeof( def_datum), sizeof( def_hth_tr)};
-	
+	size_t mode_sizes[5]={sizeof( def_projection),sizeof(def_rgn),sizeof( def_datum), sizeof( def_hth_tr),sizeof( def_grs)};
+	/*printf("def_grs: %d\n",sizeof(def_grs));*/
 	*n_err=0; /* set no errors - yet! */
 	/* allocate memory for objects */
 	for(mode=0;mode<5;mode++){
@@ -270,6 +331,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	}
 	/*iterate over modes*/
 	for(mode=0; mode<5; mode++){
+		lord_debug(0,LORD("Hello - mode is : %d"),mode);
 		def_tag=get_named_child(root,mode_names[mode]);
 		if (!def_tag.valid){
 			lord_error(XML_ROOT_NOT_FOUND,LORD("Failed to find tag %s."),mode_names[mode]);
@@ -282,23 +344,24 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 				*n_err++;
 			}
 			else{
-				int ok;
+				int ok=0;
 				void *entry=entries[mode];
+				lord_debug(0,LORD("mode: %d, n_set: %d"),mode,n_set[mode]);
 				switch(mode){
 					case 0:
 						ok=set_projection(&item_tag,(def_projection*) entry+n_set[mode]);
 						break;
 					case 1:
-						ok=set_ellipsoid(&item_tag,(def_grs*) entry+n_set[mode]);
-						break;
-					case 2:
 						ok=set_rgn(&item_tag, (def_rgn*) entry+n_set[mode]);
 						break;
-					case 3:
+					case 2:
 						ok=set_datum(&item_tag, (def_datum*) entry+n_set[mode]);
 						break;
-					case 4:
+					case 3:
 						ok=set_hth(&item_tag, (def_hth_tr*) entry+n_set[mode]);
+						break;
+					case 4:
+						ok=set_ellips(&item_tag,(def_grs*) entry+n_set[mode]);
 						break;
 					default:
 						lord_error(TR_LABEL_ERROR,LORD("Invalid mode."));
@@ -309,23 +372,30 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 					lord_error(TR_LABEL_ERROR,LORD("Invalid xml format of entry in mode %d"),mode);
 					goto error;
 				}
-			}
-			n_set[mode]++;
-			/* allocate more space if needed*/
-			if (n_set[mode]==n_alloc[mode]){
-				void *more_space;
-				more_space=realloc(entries[mode],mode_sizes[mode]*(n_alloc[mode]+n_prealloc[mode]));
-				if (more_space!=NULL){
-					n_alloc[mode]+=n_prealloc[mode];
-					entries[mode]=more_space;
-				}
 				else{
-					lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space"));
-					goto error;
+					n_set[mode]++;
+					/* allocate more space if needed*/
+					if (n_set[mode]==n_alloc[mode]){
+						void *more_space;
+						more_space=realloc(entries[mode],mode_sizes[mode]*(n_alloc[mode]+n_prealloc[mode]));
+						if (more_space!=NULL){
+							n_alloc[mode]+=n_prealloc[mode];
+							entries[mode]=more_space;
+						}
+						else{
+							lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate space"));
+							goto error;
+						}
+					}
 				}
+			
 			}
 			item_tag=get_next_child(&def_tag,&item_tag);
 		} /* end iteration over items */ 
+		if (n_set[mode]==0){
+			lord_error(TR_LABEL_ERROR,LORD("No items defined in mode %s"),mode_names[mode]);
+			goto error;
+		}
 	}/*end mode iteration*/
 	/*reallocate sizes of objects */
 	for(i=0;i<5;i++)
@@ -362,6 +432,7 @@ Mode def_rgn is special since new 'entries' are not prefixed by '#'. Thus region
 	data->regions=entries[mode_rgn];
 	data->hth_entries=entries[mode_hth];
 	/* perhaps sort entries after number?? */
+	//present_data(stdout,data);
 	return data;
 	error:
 	    (*n_err)++;

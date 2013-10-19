@@ -103,16 +103,16 @@ def_data               *DEF_DATA,
   (void) strcpy(rgn_EE.prfx, "EE");
   /* save lab_info */
   (void) strcpy(t_lab, lab_info);
-  conv_mode=0;
- /* conv_mode = (!strcmp(t_lab,  "input")) ? 1 :
+ 
+ conv_mode = (!strcmp(t_lab,  "input")) ? 1 :
               (!strcmp(t_lab, "output")) ? 3 :
               (!strcmp(t_lab, "OUTPUT")) ? 4 :
-              (!strcmp(t_lab, "SURVEY")) ? 5 : 0;*/
-  /*
+              (!strcmp(t_lab, "SURVEY")) ? 5 : 0;
+  
   va_start(o_p, DEF_DATA);
   if (conv_mode) iofile = va_arg(o_p, FILE *);
   else           io_str = va_arg(o_p, char *);
-  va_end(o_p);*/
+  va_end(o_p);
 
   if (p_lb->lab_type != CRD_LAB) {
     lord_error(0,LORD("conv_crd called with wrong lab_type %d"), p_lb->lab_type);
@@ -145,7 +145,7 @@ def_data               *DEF_DATA,
     c_lab->ncoord   = (short) strlen(p_lb->a_seq);
     c_lab->scale    = 1.0;        /* default */
     c_lab->imit     = p_lb->mask;
-    lord_debug(0,LORD("System is now: %d, lab_type: %d"),c_lab->cstm,c_lab->lab_type);
+    /*lord_debug(0,LORD("System is now: %d, lab_type: %d"),c_lab->cstm,c_lab->lab_type);*/
     if (c_lab->cstm == 1 && sepch != '_') sepch = '_';
     if (sepch == 'N' || sepch == 'E' || sepch == 'H') ++ c_lab->ncoord;
 
@@ -219,7 +219,7 @@ def_data               *DEF_DATA,
       break; /* end cs: 2, geo coord */
 
     case  3: /* utm, itm, dks, asb, sb */
-      lord_debug(0,LORD("Mode is now: %d, type is: %d"),c_lab->mode,c_lab->lab_type);
+     
       switch (c_lab->mode) {
       case    0: /* utm**   (N, E) */
       case    1: /* utm**n  (N, E) */
@@ -239,7 +239,7 @@ def_data               *DEF_DATA,
           }
           else c_lab->lab_type = ILL_LAB;
         }
-	lord_debug(0,LORD("Mode is now: %d, type is: %d"),c_lab->mode,c_lab->lab_type);
+	
         break;
 
       case 8: /* tm**  */
@@ -294,7 +294,7 @@ def_data               *DEF_DATA,
       break;
 
     default: /* unintelligible system */
-      lord_debug(0,LORD("Mode is now: %d, type is: %d"),c_lab->mode,c_lab->lab_type);
+    
       c_lab->lab_type = ILL_LAB;
       break;
     }
@@ -314,9 +314,9 @@ def_data               *DEF_DATA,
       (void) sprintf(c_lab->mlb, "%s%c", p_sys, sepch);
       p_dtm = p_lb->pr_dtm;
     }
-    lord_debug(0,LORD("So far so good!"));
+    
     if (dtm_req) {
-	lord_debug(0,LORD("So far so good! - dtm_req"));
+	
       /* prepare generated c_label */
       /*___________________________*/
 
@@ -335,7 +335,7 @@ def_data               *DEF_DATA,
       (void) strcpy(t_lab, p_dtm);
       c_lab->datum = (short) set_dtm_1(-1, p_dtm, &par_dtm, p_name,
                      e_name, rgn_pref.prfx, &mask, &(c_lab->dsh_con),DEF_DATA);
-       lord_debug(0,LORD("Mode is now: %d, type is: %d, datum: %d"),c_lab->mode,c_lab->lab_type,c_lab->datum);
+       /*lord_debug(0,LORD("Mode is now: %d, type is: %d, datum: %d"),c_lab->mode,c_lab->lab_type,c_lab->datum);*/
       if (c_lab->datum > 0) {
         if (c_lab->p_rgn == 0 && dum_pref.r_nr[0] != rgn_pref.r_nr[0])
             c_lab->p_rgn = rgn_pref.r_nr[0];
@@ -360,7 +360,7 @@ def_data               *DEF_DATA,
       c_lab->datum     = 0;
       c_lab->ellipsoid = 0;
     }
-       lord_debug(0,LORD("Mode is now: %d, type is: %d, datum: %d"),c_lab->mode,c_lab->lab_type,c_lab->datum);
+      
     if (conv_mode == 1) {  /* iofile */
       if ((p_lb->q_par && *p_lb->add_p != '\0') || 
           (6 <= c_lab->datum && c_lab->datum <= 8)) {
@@ -496,7 +496,7 @@ def_data               *DEF_DATA,
 
     /* set trf. constants for completed systems */
     (void) set_trc(c_lab);
-       lord_debug(0,LORD("Mode is now: %d, type is: %d, datum: %d"),c_lab->mode,c_lab->lab_type,c_lab->datum);
+      /* lord_debug(0,LORD("Mode is now: %d, type is: %d, datum: %d"),c_lab->mode,c_lab->lab_type,c_lab->datum);*/
      /* INPUT OF DATE at datums: ITRF, IGS, ETRF */
     if (6 <= c_lab->datum && c_lab->datum <= 8) {
       if (conv_mode == 0 || conv_mode == 1) {
@@ -517,7 +517,7 @@ def_data               *DEF_DATA,
     /* checksum for identification of the label */
     if (*(c_lab->mlb + c_lab->sepix) != 'H')
       c_lab->ch_sum = labchsum((union geo_lab *) c_lab, &c_lab->ch_sum);
-    lord_debug(0,LORD("And we're done, type is: %d"),c_lab->lab_type);
+   
     break; /* end conv_mode 0 & 1 */
 
   case 3:  /* output of minilabel, simple */

@@ -98,7 +98,6 @@ int TR_InitLibrary(char *path) {
     int ok=-1,rc,unsafe_allowed=ALLOW_UNSAFE;
     double x,y,z;
     TR* trf;
-    
     if (!TR_IsMainThread()) /*Only one thread can succesfully initialise the library*/
 	    return TR_ERROR;
     /*only initialise if not already done*/
@@ -111,18 +110,15 @@ int TR_InitLibrary(char *path) {
     set_lord_modes(1,1,1,1,1);
     set_lord_verbosity_levels(3,3,3,3,3);
     #endif
-    
-  
     ok=TR_SetGeoidDir(path);
-    
     if (ok!=TR_OK){
 	    lord_error(TR_ERROR,"Failed to parse def-file!");
 	    return TR_ERROR;
     }
     #ifdef _ROUT
-    if (TAB_DIR && ERR_LOG){
+    if (DEF_DATA && ERR_LOG){
 	    fprintf(ERR_LOG,"\nContents of %s:\n",TR_DEF_FILE);
-	    present_data(ERR_LOG,TAB_DIR->def_lab);
+	    present_data(ERR_LOG,DEF_DATA);
 	    fflush(ERR_LOG);
     }
     #endif
@@ -144,7 +140,6 @@ int TR_InitLibrary(char *path) {
 	    ok=TR_TransformPoint(trf,512200.1,6143200.1,0,&x,&y,&z);
 	    TR_Close(trf);
     }
-    
     trf=TR_Open("utm32_wgs84","fotm","");
     
     if (0!=trf){
@@ -207,6 +202,7 @@ int TR_SetGeoidDir(char *path){
 	
 	/* close previously parsed definitions */
 	tab_dir_close(TAB_DIR);
+	
 	/* close previously opened tab-dir files */
 	/*Should soon be unneeded!!!*/
 	/*init epsg table*/
@@ -226,8 +222,10 @@ int TR_SetGeoidDir(char *path){
 	#ifdef _ROUT
 	lord_debug(0,"tabdir: %s  def_lab: %s",init_path,fname); /*just debugging */
 	#endif
+	DEF_DATA=NULL;
 	TAB_DIR=tab_dir_open(fname);
-	DEF_DATA=TAB_DIR->def_lab;  /*just a useful pointer which could be NULL */
+	if (TAB_DIR)
+		DEF_DATA=TAB_DIR->def_lab;  /*just a useful pointer which could be NULL */
 	return (TAB_DIR && DEF_DATA)? TR_OK: TR_ERROR;
 }
 	

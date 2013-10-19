@@ -4,7 +4,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include "friendly_reader.h"
-#include "parse_xml.h" 
+#include "parse_xml.h"
+#include "lord.h"
 #define SKIP_SPACE(a) while( isspace(*a) ) a++
 
 static ptrdiff_t item_len(struct tag *t);
@@ -16,24 +17,25 @@ static xml_error preparse_xml(char *in, char **end);
 static char *next_word(char *start, char **stop);
 static struct tag new_tag(int level);
 static xml_error go_deeper(struct tag *t);
+static int copy_string(char *in, void *out, size_t len, void *nothing);
 
 /*get value */
-int get_value(struct tag t, void *out, size_t size, item_converter conv, void *conv_data){
+int get_value(struct tag *t, void *out, size_t size, item_converter conv, void *conv_data){
 	int res=0;
-	char *pos=t.pos[1]+1;
-	ptrdiff_t len=item_len(&t);
-	if (len==0 || t.is_simple){
-		/*t->err_no=XML_EMPTY_ITEM;*/
+	char *pos=t->pos[1]+1;
+	ptrdiff_t len=item_len(t);
+	if (len==0 || t->is_simple){
+		t->err_no=XML_EMPTY_ITEM;
 		return 0;
 	}
-	if (!t.valid || (get_next_child(&t,NULL)).valid){
-		/*t.err_no=XML_BAD_HIERARCHY;*/
+	if (!t->valid || (get_next_child(t,NULL)).valid){
+		t->err_no=XML_BAD_HIERARCHY;
 		return 0;
 	}
 	SKIP_SPACE(pos);
-	*(t.pos[2])='\0'; /*insert break*/
+	*(t->pos[2])='\0'; /*insert break*/
 	res=conv(pos,out,size,conv_data); /*number of items converted*/
-	*(t.pos[2])='<';
+	*(t->pos[2])='<';
 	return res;
 }
 
@@ -66,12 +68,14 @@ static char *next_word(char *start, char **stop){
 }
 
 static int copy_string(char *in, void *out, size_t len, void *nothing){
-	strncpy(out,in,len);
+	char *pos=(char*) out;
+	strncpy(pos,in,len);
+	pos[len-1]='\0';
 	return 1;
 }
 
 /* copy the content of a tag */
-char *get_value_as_string( struct tag t, char *out, size_t buf_len){
+char *get_value_as_string( struct tag *t, char *out, size_t buf_len){
 	if (get_value(t,(void*)out,buf_len,copy_string,NULL))
 		return out;
 	return NULL;
@@ -111,8 +115,6 @@ struct tag get_next_child(struct tag *o_tag, struct tag *last_tag){
 	char *start,*stop;
 	rtag=new_tag(o_tag->level+1);
 	if (o_tag->is_simple){/*tadd special signal that we have reached innermost level */
-		char buf[512];
-		printf("Yipee we have a simple tag: %s\n",get_tag(o_tag,buf,512));
 		rtag.err_no=XML_ROOT_NOT_FOUND;
 		return rtag;
 	}
@@ -127,7 +129,7 @@ struct tag get_next_child(struct tag *o_tag, struct tag *last_tag){
 	else
 		 (start=o_tag->pos[1]+1);
 	rtag=s_read_tag(start,stop);
-	rtag.level=o_tag->level+1;
+	rtag.level=(o_tag->level)+1;
 	return rtag;
 }
 
