@@ -155,15 +155,29 @@ static int set_projection(struct tag *prj_tag,  def_projection *proj){
 	t=get_named_child(prj_tag,"region");
 	if (!get_value_as_string(&t,proj->rgn,3))
 		strcpy(proj->rgn,"ZZ");
-	t=get_named_child(prj_tag,"parameters");
-	if (!get_value_as_string(&t,proj->param_text,128))
-		*proj->param_text='\0';
-	t=get_named_child(prj_tag,"parent_datum");
-	if (!get_value_as_string(&t,proj->p_datum,16))
-		strcpy(proj->p_datum,"\"");
 	t=get_named_child(prj_tag,"n_parameters");
 	if (1!=get_value(&t,&proj->q_par,1,int_converter,NULL))
 		return 0;
+	t=get_named_child(prj_tag,"parameters");
+	if (!get_value_as_string(&t,proj->param_text,128))
+		*proj->param_text='\0';
+	else{ /*parse the parameters*/
+		int i,used;
+		char *pos=proj->param_text;
+		struct typ_dec type;
+		for(i=0; i<proj->q_par; i++){
+			proj->native_params[i]=sgetg(pos,&type,&used,"m"); /*TODO: fix this hack (reading scale as m)*/
+			if (type.gf==0){
+				lord_error(TR_LABEL_ERROR,LORD("Failed to parse parameter."));
+				return 0;
+			}
+			pos+=used;
+		}
+	}
+	t=get_named_child(prj_tag,"parent_datum");
+	if (!get_value_as_string(&t,proj->p_datum,16))
+		strcpy(proj->p_datum,"\"");
+	
 	strcpy(proj->param_tokens,"\"");
 	if ((proj->q_par)>0 && strlen(proj->param_text)==0){
 		t=get_named_child(prj_tag,"parameter_tokens");
@@ -346,7 +360,7 @@ Function that parses def_lab file. Now in XML :-)
 			else{
 				int ok=0;
 				void *entry=entries[mode];
-				lord_debug(0,LORD("mode: %d, n_set: %d"),mode,n_set[mode]);
+				/*lord_debug(0,LORD("mode: %d, n_set: %d"),mode,n_set[mode]);*/
 				switch(mode){
 					case 0:
 						ok=set_projection(&item_tag,(def_projection*) entry+n_set[mode]);

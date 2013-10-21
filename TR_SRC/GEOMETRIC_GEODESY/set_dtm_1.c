@@ -221,7 +221,7 @@ def_data          *DEF_DATA
 	else
 		break;
 	}
-	lord_debug(0,LORD("So far so good! w_name: %s"),w_name);
+
       if (dtm==NULL)
 	      return -1;
       
