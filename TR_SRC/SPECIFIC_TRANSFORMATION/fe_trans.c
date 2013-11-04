@@ -295,7 +295,7 @@ tab_dir               *tdir
             outnr = 4;
             break;
           case 146: /* fk89 */
-            outnr = 4;
+            outnr = 7;
             break;
           default:
             res = TRF_ILLEG_;
@@ -360,7 +360,7 @@ tab_dir               *tdir
             in_nr = 4;
             break;
           case 146: /* fk89 */
-            in_nr = 4;
+            in_nr = 7;
             break;
           default:
             res = TRF_ILLEG_;
