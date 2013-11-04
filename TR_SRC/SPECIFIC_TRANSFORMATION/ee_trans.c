@@ -74,8 +74,6 @@ tab_dir               *tdir
 )
 {
 
-  static THREAD_SAFE  int  in_chsum = 0;
-  static THREAD_SAFE  int  outchsum = 0;
   static  int  init = 0;
 
   char                     in_cs[32], outcs[32];
@@ -133,8 +131,8 @@ tab_dir               *tdir
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE  struct act_nst *ptab, *pt[3];
-  static THREAD_SAFE  int             in_nr, stlev, levst, in[3];
+  struct act_nst *ptab, *pt[3];
+  int             in_nr, stlev, levst, in[3];
   static int                          ee_w, ol_w, pv_w, gr_w;
 
   /* Action/state table :: inter group */
@@ -213,9 +211,6 @@ tab_dir               *tdir
 	    return TRF_ILLEG_;
     }
   }
-
-  /* Check i/o labels, init of actual transf. systems */
-  if (in_chsum != in_lab->ch_sum || outchsum != outlab->ch_sum) {
 
     /* Coord labels */
     if   ( in_lab->lab_type != CRD_LAB || outlab->lab_type != CRD_LAB) {
@@ -329,10 +324,6 @@ pml->trgr, pml->trnr, pml->s_lab);
 	     return TRF_ILLEG_;
     }
 
-    /* Save check-sums */
-    in_chsum = in_lab->ch_sum;
-    outchsum = outlab->ch_sum;
-
     /* Test identical labels */
     if (in_lab->ch_sum == outlab->ch_sum) {
       in_gr = outgr = 0;
@@ -373,7 +364,7 @@ in_nr, outnr);
     case 3: /*eepv37 */ pt[2] = pv_tab + pv_w * outnr; break;
     }
 
-  } /* End of init actions */
+   /* End of init actions */
 
 
 

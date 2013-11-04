@@ -68,8 +68,6 @@ tab_dir               *tdir
 
 {
 
-  static THREAD_SAFE int   in_chsum = 0L;
-  static THREAD_SAFE int   outchsum = 0L;
   static int   init = 0;
 
   char                     in_cs[32], outcs[32];
@@ -111,8 +109,8 @@ tab_dir               *tdir
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE struct act_nst  *ptab;
-  static THREAD_SAFE int              in_nr;
+  struct act_nst  *ptab;
+  int              in_nr;
   static int                          fe_w;
 
   /* Action/state table */
@@ -258,11 +256,9 @@ tab_dir               *tdir
 	      lord_error(TRF_ILLEG_,LORD("fe_trans(internal labels)"));
 	      return TRF_ILLEG_;
       }
-       
     }
 
     /* Check i/o labels, init of actual transf. systems */
-    if (in_chsum != in_lab->ch_sum || outchsum != outlab->ch_sum) {
 
       /* Out-system */
       /*____________*/
@@ -393,14 +389,9 @@ tab_dir               *tdir
 	       lord_error(TRF_ILLEG_,LORD("fe_trans(in_sys)"));
 	      return TRF_ILLEG_;
       }
-      
-
-      /* Save check-sums */
-      in_chsum = in_lab->ch_sum;
-      outchsum = outlab->ch_sum;
 
       /* Test identical labels */
-      if (in_chsum == outchsum) in_nr = outnr = 0;
+      if (in_lab->ch_sum == outlab->ch_sum) in_nr = outnr = 0;
 
 #ifdef  DEBUGFETRANS
 (void) lord_debug(0, LORD("\n* in = %s, out = %s;\n"), in_cs, outcs);
@@ -408,7 +399,7 @@ tab_dir               *tdir
 #endif
 
       ptab = fetab + fe_w*outnr;  /* output row */
-    } /* End of init actions */
+     /* End of init actions */
 
     /* transformation module */
     *Hout = H;

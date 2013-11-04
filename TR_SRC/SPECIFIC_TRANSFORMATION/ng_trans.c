@@ -53,8 +53,6 @@ tab_dir               *tdir
 )
 {
 
-  static THREAD_SAFE  int                 in_chsum = 0L;
-  static THREAD_SAFE  int                 outchsum = 0L;
   static  int                 init = 0;
   static GRIM   *nadg_gr96_tab=NULL;
   static struct coord_lab     w_lab;
@@ -90,8 +88,8 @@ tab_dir               *tdir
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE  struct act_nst  *ptab;
-  static THREAD_SAFE  int              in_nr;
+struct act_nst  *ptab;
+  int              in_nr;
   static int                           ng_w;
 
   /* Action/state table */
@@ -136,7 +134,6 @@ tab_dir               *tdir
     }
 
     /* Check i/o labels, init of actual transf. systems */
-    if (in_chsum != in_lab->ch_sum || outchsum != outlab->ch_sum) {
 
       /* Out-system */
       /*____________*/
@@ -203,12 +200,8 @@ pml->trgr, pml->trnr, pml->s_lab);
           }
       }
 
-      /* Save check-sums */
-      in_chsum = in_lab->ch_sum;
-      outchsum = outlab->ch_sum;
-
       /* Test identical labels */
-      if (in_chsum == outchsum) in_nr = outnr = 0;
+      if (in_lab->ch_sum == outlab->ch_sum) in_nr = outnr = 0;
 
 #ifdef  DEBUGNGTRANS
 (void) lord_debug(0, LORD("in = %s, out = %s;\n"), in_cs, outcs);
@@ -222,7 +215,7 @@ pml->trgr, pml->trnr, pml->s_lab);
       }
 
       ptab = ngtab + ng_w*outnr;  /* output row */
-    } /* End of init actions */
+     /* End of init actions */
 
     /* transformation module */
 

@@ -79,8 +79,7 @@ tab_dir              *tdir
 )
 {
 
-  static THREAD_SAFE  int               in_chsum = 0;
-  static THREAD_SAFE  int               outchsum = 0, proj_proj = 0;
+  int          proj_proj = 0;
   static int               TC_init = 0;
 
   char                    *pl;
@@ -95,7 +94,7 @@ tab_dir              *tdir
 
  
 
-  static THREAD_SAFE char  outcs[32], in_cs[32];
+  char  outcs[32], in_cs[32];
   static struct coord_lab      TC_u32, TC_u33, TC_tr2, TC__gs, TC_gsb;
 
 #ifdef   DEBUGDKTRANS
@@ -168,8 +167,8 @@ tab_dir              *tdir
   };
 
   /* Start values: *ptab->row, in_nr->col */
-  static THREAD_SAFE struct act_nst *ptab, *pt[2];
-  static THREAD_SAFE int             in_nr, stlev, levst, in[2];
+  struct act_nst *ptab, *pt[2];
+  int             in_nr, stlev, levst, in[2];
   static int                         ed_w, js_w, bo_w, gs_w, bs_w;
 
   static struct act_nst edtab[] = {
@@ -281,8 +280,7 @@ tab_dir              *tdir
  }
 
   /* Check i/o labels, init of actual transf. systems */
-  if (in_chsum != in_lab->ch_sum || outchsum != outlab->ch_sum) {
-
+  
     /* Coord labels */
     if   ( in_lab->lab_type != CRD_LAB
         || outlab->lab_type != CRD_LAB) {
@@ -373,12 +371,9 @@ outgr, outnr, pml->s_lab, in_cs);
 	}
     }
 
-    /* Save check-sums */
-    in_chsum = in_lab->ch_sum;
-    outchsum = outlab->ch_sum;
 
     /* Test identical labels */
-    if (in_chsum == outchsum) {
+    if (in_lab->ch_sum == outlab->ch_sum) {
       in_gr = outgr = 0;
       in_nr = outnr = 0;
     } else
@@ -429,7 +424,7 @@ outcs, outgr, outnr, proj_proj);
     case 4: pt[1] = bstab + bs_w * outnr; break;
     }
 
-  } /* end of init after input def */
+   /* end of init actions after input def */
 
   /* transformation module */
   *Hout = H;
@@ -532,7 +527,7 @@ ACTION[act], nst, level);
           } else /* BORNHOLM */
             res = tcts_u(N, E, &N, &E, 'b',  1, "", NULL);
         } else
-		lord_debug(0,"dk_trans: %.4f %.4f", N, E); /*simlk->ke: should be error?*/
+		lord_error(TRF_AREA_,LORD("N: %.4f, E: %.4f"), N, E);
         break;
       case LT32: /* s34  -> tc32 */
         if (N > 0.0) {
@@ -544,7 +539,7 @@ ACTION[act], nst, level);
           } else /* BORNHOLM */
             res = tcts_u(N, E, &N, &E, 'b', -1, "", NULL);
         } else
-             lord_debug(0,"dk_trans: %.4f %.4f", N, E); /*simlk->ke: should be error?*/
+		lord_error(TRF_AREA_,LORD("N: %.4f, E: %.4f"), N, E);
         break;
 
       case U_GS: /* utm32 -> gs  */
