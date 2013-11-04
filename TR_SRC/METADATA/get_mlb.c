@@ -36,8 +36,7 @@ char               **h_mlb
   char                tx[4*MLBLNG], *ptx = tx;
   int                 tx_lng, i, res;
   char               *p_sep, *p_mlb;
-  short               lab_rgn;
-  char                rgn_pref[8];
+  union rgn_un        lab_rgn;
   char                rgn_name[32];
 
 
@@ -60,17 +59,17 @@ char               **h_mlb
     /* The third char must be an underscore                    */
     if (isupper(*(tx +0)) && isupper(*(tx +1))
         &&     (*(tx +2) == '_')) {
-      (void) strncpy(rgn_pref, tx, 2);
-      rgn_pref[2] = '\0';
+      (void) strncpy(rgn_pref.prfx, tx, 2);
+      rgn_pref.r_nr[1] = 0;
 
-      if ((lab_rgn = conv_rgn(-1, rgn_pref, rgn_name)) > 0) { 
+      if ((conv_rgn(-1, lab_rgn.prfx, rgn_name)) > 0) { 
         ptx    += 3;
         tx_lng -= 3;
-      } else lab_rgn = 0;
+      } else lab_rgn.r_nr[0] = 0;
 
-    } else lab_rgn = 0; /* no prefix letters found */
+    } else lab_rgn.r_nr[0] = 0; /* no prefix letters found */
 
-    *region = lab_rgn;
+    *region = lab_rgn.r_nr[0];
 
     /* SYSTEM PART */
     /* Extract the system part and the contingent separator  */
