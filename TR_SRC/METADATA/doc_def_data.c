@@ -19,11 +19,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#include "set_grs.h"
+#include "geo_lab.h"
 #include "trlib_api.h"
 #include "metadata.h"
-#include "geo_lab.h"
 #include "doc_def_data.h"
+#include "set_grs.h"
 
 /* Purpose: move all documentation of labels - also stuff implemented in conv_lab - here for a cleaner 'aspect' oriented structure */
 /* Mainly thought of as usable for external apps, which operate on minilabels/strings *not* via the internal system numbers */
@@ -66,7 +66,7 @@ int doc_rgn(char *rgn_name, char *descr, int detail, def_data *DEF_DATA){
 		return TR_LABEL_ERROR;
 	/*decide what to print to descr*/
 	if (detail>0 || mode==0)
-		descr+=sprintf(descr,"%s ",rgn->rgn_new);
+		descr+=sprintf(descr,"%-6s ",rgn->rgn_new);
 	if (detail>0 || mode==1)
 		sprintf(descr,"%s",rgn->country);
 	
@@ -120,7 +120,6 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 	}
 	/*printf("Look for: %s n_prj is %d, found? %d\n", prj_name,n_prj,(prj==NULL));*/
 	if (prj==NULL){
-		
 		return TR_LABEL_ERROR;
 	}
 	
@@ -133,10 +132,12 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 	*type=prj->type;
 	/*decide what to print to descr*/
 	if (detail>1 || mode==0) /*iteration mode */
-		descr+=sprintf(descr,"%s ",prj->mlb);
+		descr+=sprintf(descr,"%-11s ",prj->mlb);
 	if (detail>1)
 	/*todo: add whatever relevant here */
-		descr+=sprintf(descr,"mode: %d, cstm: %d ",prj->mode,prj->cstm);
+    descr+= (mode) ?
+            sprintf(descr,"mode: %2d, cstm: %d ",prj->mode,prj->cstm)
+            : sprintf(descr," %2d,   %d ",prj->mode,prj->cstm);
 	if (detail>0 || mode==1){
 		char *loop_over_descr=prj->descr, *loop_over_replaced=replaced;
 		/*replace ?? by the stored digits*/
@@ -198,7 +199,7 @@ int doc_dtm( char *dtm_name, char *descr, int detail, def_data *DEF_DATA){
 			descr+=sprintf(descr,"%s ",dtm->mlb);
 		if (detail>1)
 			/*todo: put more stuff here */
-			descr+=sprintf(descr,"%s %d %s ",dtm->ellipsoid,dtm->type,dtm->p_datum);
+			descr+=sprintf(descr,"%-10s %4d %-10s ",dtm->ellipsoid,dtm->type,dtm->p_datum);
 		if (detail>0 || mode==1)
 			sprintf(descr,"%s",dtm->descr);
 	}
