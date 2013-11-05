@@ -1,0 +1,3140 @@
+<!--
+n_prj: 152
+n_rgn: 28
+n_dtm: 87
+n_grs: 20
+n_hth: 9
+-->
+<def_trlib>
+<def_lab>
+  <def_prj>
+    <prj>
+      <mlb>gg</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>1</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>gg</native>
+      <description>
+       Geometric Geodesy
+      </description>
+    </prj>
+    <prj>
+      <mlb>rg</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>2</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>rg</native>
+      <description>
+       Red. geom. Geodesy (to geoid)
+      </description>
+    </prj>
+    <prj>
+      <mlb>lg</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>7</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>lg</native>
+      <description>
+      
+      </description>
+    </prj>
+    <prj>
+      <mlb>ni</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>3</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>ni</native>
+      <description>
+       Levelling observ.
+      </description>
+    </prj>
+    <prj>
+      <mlb>cb</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>4</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>cb</native>
+      <description>
+       Coordinate Block (anblock)
+      </description>
+    </prj>
+    <prj>
+      <mlb>ph</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>4</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>ph</native>
+      <description>
+       Photogrammetry
+      </description>
+    </prj>
+    <prj>
+      <mlb>mono</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>5</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>mono</native>
+      <description>
+       Monocomparator
+      </description>
+    </prj>
+    <prj>
+      <mlb>gr</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>6</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>gr</native>
+      <description>
+       Gravimetr. observ.
+      </description>
+    </prj>
+    <prj>
+      <mlb>mean</mlb>
+      <cha_str>0</cha_str> <type>9</type> <cstm>55</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>mean</native>
+      <description>
+       Monocomparator
+      </description>
+    </prj>
+    <prj>
+      <mlb>cond</mlb>
+      <cha_str>0</cha_str> <type>16</type> <cstm>1</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>cond</native>
+      <description>
+       Condition
+      </description>
+    </prj>
+    <prj>
+      <mlb>crt</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>1</cstm>
+      <mode>3</mode> <mask>0</mask>
+      <kms_seq>XYZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>crt</native>
+      <description>
+       Cartesian 3-d coord
+      </description>
+    </prj>
+    <prj>
+      <mlb>ts</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>1</cstm>
+      <mode>9</mode> <mask>0</mask>
+      <kms_seq>XYZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>ts</native>
+      <description>
+       Cartesian 3-d coord in DB Time Serie
+      </description>
+    </prj>
+    <prj>
+      <mlb>geo</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>2</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>geo</native>
+      <description>
+       Geographical coord (Lat  Lon)
+      </description>
+    </prj>
+    <prj>
+      <mlb>geoi</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>2</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>geo</native>
+      <description>
+       Geographical coord (Lon  Lat)
+      </description>
+    </prj>
+    <prj>
+      <mlb>utm??</mlb>
+      <cha_str>3</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>utm??</native>
+      <description>
+       UTM zone ?? (?? = 2 digits) (N  E)
+      </description>
+    </prj>
+    <prj>
+      <mlb>utmi??</mlb>
+      <cha_str>4</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>utm??</native>
+      <description>
+       UTM zone ?? (?? = 2 digits) (E  N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>utm??n</mlb>
+      <cha_str>3</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>utm??n</native>
+      <description>
+       UTM zone ??  North. LAT (N  E)
+      </description>
+    </prj>
+    <prj>
+      <mlb>utmi??n</mlb>
+      <cha_str>4</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>utm??n</native>
+      <description>
+       UTM zone ??  North. LAT (E  N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>utm??s</mlb>
+      <cha_str>3</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>SE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>utm??s</native>
+      <description>
+       UTM zone ??  South. LAT (N  E)
+      </description>
+    </prj>
+    <prj>
+      <mlb>utmi??s</mlb>
+      <cha_str>4</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>ES</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>utmi??s</native>
+      <description>
+       UTM zone ??  South. LAT (E  S)
+      </description>
+    </prj>
+    <prj>
+      <mlb>tsu??</mlb>
+      <cha_str>3</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>9</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>tsu??</native>
+      <description>
+       UTM zone ?? in DB Time Serie
+      </description>
+    </prj>
+    <prj>
+      <mlb>kp2000j</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>10</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 930nt 200km 0.999950</parameters>
+      <description>
+       KortProjektion 2000 Jylland etrs89
+      </description>
+    </prj>
+    <prj>
+      <mlb>kp2000s</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>11</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 12dg 500km 0.999950</parameters>
+      <description>
+       KortProjektion 2000 Sjaelland etrs89
+      </description>
+    </prj>
+    <prj>
+      <mlb>kp2000b</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>12</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 15dg 900km 1.0</parameters>
+      <description>
+       KortProjektion 2000 Bornholm etrs89
+      </description>
+    </prj>
+    <prj>
+      <mlb>kfmr</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>14</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg -6092030m 1234nt 40km 1.0</parameters>
+      <description>
+       System CR
+      </description>
+    </prj>
+    <prj>
+      <mlb>dktm1</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>15</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itmi</native>
+      <parameters>0dg -5000km 9dg 200km 0.999980</parameters>
+      <description>
+       DKTM1 etrs89 (E  N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>dktm2</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>16</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itmi</native>
+      <parameters>0dg -5000km 10dg 400km 0.999980</parameters>
+      <description>
+       DKTM2 etrs89 (E  N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>dktm3</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>17</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itmi</native>
+      <parameters>0dg -5000km 11.75dg 600km 0.999980</parameters>
+      <description>
+       DKTM3 etrs89 (E  N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>dktm4</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>18</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itmi</native>
+      <parameters>0dg -5000km 15dg 800km 1.0</parameters>
+      <description>
+       DKTM4 etrs89 (E  N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>fotm</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>19</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <region>FO</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itmi</native>
+      <parameters>0dg -6000km -7dg 200km 0.999997</parameters>
+      <description>
+       Faroe TM etrs89 (E  N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>ssbkp</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>20</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <region>DK</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itmi</native>
+      <parameters>0dg -6013km 1152nt 40km 1.000000</parameters>
+      <description>
+       Storstroems Broens Kortprojektion
+      </description>
+    </prj>
+    <prj>
+      <mlb>itm</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>B0 N0 Lc Ec Scale</parameter_tokens>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <description>
+       ITM  GAUSS-KR (N  E)
+      </description>
+    </prj>
+    <prj>
+      <mlb>itmi</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <parameter_tokens>B0 N0 Lc Ec Scale</parameter_tokens>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <description>
+       ITMI  GAUSS-KR (E  N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>fcs</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>3</mode> <mask>7</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>feh10</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 1120nt 1000km 1.000000</parameters>
+      <description>
+       Fehmarn Coord. Sys.
+      </description>
+    </prj>
+    <prj>
+      <mlb>asb</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>3</mode> <mask>1</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>asb</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 1248nt 500km 0.999999</parameters>
+      <description>
+       OEresund bridge proj.
+      </description>
+    </prj>
+    <prj>
+      <mlb>eetm21</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>5</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eesti42</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 21dg 4500km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr 21 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>eetm24</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>5</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eesti42</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 24dg 500km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr 24 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>eetm27</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>5</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eesti42</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 27dg 5500km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr 27 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>eetm0</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>6</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eesti42</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>6nt 0m 2157nt 250km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr  21 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>eetm1</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>6</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eesti42</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>6nt 0m 2457nt 1250km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr  24 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>eetm2</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>6</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eesti42</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>6nt 0m 2757nt 2250km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr  27 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>eebm</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>7</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eeref89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 24dg 500km 0.9996</parameters>
+      <description>
+       Estonian Base Map
+      </description>
+    </prj>
+    <prj>
+      <mlb>tm21</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>-8</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 21dg 4500km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr 21 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>tm24</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>-8</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 24dg 500km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr 24 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>tm27</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>-8</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 27dg 5500km 1.0</parameters>
+      <description>
+       Estonian Gauss-Kr 27 dg
+      </description>
+    </prj>
+    <prj>
+      <mlb>tm??</mlb>
+      <cha_str>2</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>8</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>4</n_parameters>
+      <native>tm??</native>
+      <parameters>0dg 0m 0dg 500km</parameters>
+      <description>
+       Gauss-Kr ?? dg  3dg z  scale 1.0
+      </description>
+    </prj>
+    <prj>
+      <mlb>mrc</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>4</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>B0 N0 Lc Ec</parameter_tokens>
+      <n_parameters>4</n_parameters>
+      <native>mrc</native>
+      <description>
+       Mercator projection
+      </description>
+    </prj>
+    <prj>
+      <mlb>dmrc</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>4</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <n_parameters>4</n_parameters>
+      <native>mrc</native>
+      <parameters>56dg 500km 9dg 500km</parameters>
+      <description>
+       Dansk Merkator
+      </description>
+    </prj>
+    <prj>
+      <mlb>dm</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>4</cstm>
+      <mode>1</mode> <mask>1</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>ed50</parent_datum>
+      <n_parameters>4</n_parameters>
+      <native>mrc</native>
+      <parameters>56dg 500km 9dg 500km</parameters>
+      <description>
+       Dansk Merkator
+      </description>
+    </prj>
+    <prj>
+      <mlb>mrc0</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>4</cstm>
+      <mode>9</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>4</n_parameters>
+      <native>mrc</native>
+      <parameters>0dg 0m 0dg 0m</parameters>
+      <description>
+       Mercator projection zero
+      </description>
+    </prj>
+    <prj>
+      <mlb>webmrc</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>4</cstm>
+      <mode>3</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parent_datum>wgs84</parent_datum>
+      <n_parameters>4</n_parameters>
+      <native>mrc</native>
+      <parameters>0dg 0m 0dg 0m</parameters>
+      <description>
+       WEB Mercator projection zero
+      </description>
+    </prj>
+    <prj>
+      <mlb>lmb</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>B0 N0 Lc Ec Bc</parameter_tokens>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <description>
+       Lambert conf. con.
+      </description>
+    </prj>
+    <prj>
+      <mlb>dlmb</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>B0 N0 Lc Ec B1 B2</parameter_tokens>
+      <n_parameters>6</n_parameters>
+      <native>dlmb</native>
+      <description>
+       Lambert 2 par. c. con.
+      </description>
+    </prj>
+    <prj>
+      <mlb>elmb</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>3</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>B0 N0 Lc Ec B1 B2</parameter_tokens>
+      <n_parameters>6</n_parameters>
+      <native>elmb</native>
+      <description>
+       Lambert eql. c. con.
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk1w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>81dg 0m -40dg 0m 82.5dg</parameters>
+      <description>
+       GI conf. con  W-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk2w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>78dg 0m -64dg 0m 79.5dg</parameters>
+      <description>
+       GI conf. con  W-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk3w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>75dg 0m -64dg 0m 76.5dg</parameters>
+      <description>
+       GI conf. con  W-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk4w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>72dg 0m -52dg 0m 73.5dg</parameters>
+      <description>
+       GI conf. con  W-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk5w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>69dg 0m -52dg 0m 70.5dg</parameters>
+      <description>
+       GI conf. con  W-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk6w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>66dg 0m -52dg 0m 67.5dg</parameters>
+      <description>
+       GI conf. con  W-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk7w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>63dg 0m -52dg 0m 64.5dg</parameters>
+      <description>
+       GI conf. con  W-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk8w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>60dg 0m -48dg 0m 61.5dg</parameters>
+      <description>
+       GI conf. con  W-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk1e</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>81dg 0m -40dg 0m 82.5dg</parameters>
+      <description>
+       GI conf. con  E-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk2e</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>78dg 0m -24dg 0m 79.5dg</parameters>
+      <description>
+       GI conf. con  E-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk3e</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>75dg 0m -20dg 0m 76.5dg</parameters>
+      <description>
+       GI conf. con  E-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk4e</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>72dg 0m -24dg 0m 73.5dg</parameters>
+      <description>
+       GI conf. con  E-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk5e</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>scosd</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>69dg 0m -24dg 0m 70.5dg</parameters>
+      <description>
+       GI conf. con  E-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk6e</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>scosd</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>66dg 0m -32dg 0m 67.5dg</parameters>
+      <description>
+       GI conf. con  E-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk7e</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>ammlk</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>63dg 0m -40dg 0m 64.5dg</parameters>
+      <description>
+       GI conf. con  E-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>gk8e</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>GL</region>
+      <parent_datum>qornoq</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>60dg 0m -48dg 0m 61.5dg</parameters>
+      <description>
+       GI conf. con  E-Groenland
+      </description>
+    </prj>
+    <prj>
+      <mlb>eel2p</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eeref89</parent_datum>
+      <n_parameters>6</n_parameters>
+      <native>dlmb</native>
+      <parameters>573103.19415sx 6375km 24dg 500km 58dg 5920nt</parameters>
+      <description>
+       Estonian Lambert  2 std par.
+      </description>
+    </prj>
+    <prj>
+      <mlb>eelmne</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>2</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eepv37</parent_datum>
+      <n_parameters>6</n_parameters>
+      <native>dlmb</native>
+      <parameters>5906nt 0m 25dg 0m 5842nt 5930nt</parameters>
+      <description>
+       Estonian Lambert  EPV37  2 std par.
+      </description>
+    </prj>
+    <prj>
+      <mlb>eelmse</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>2</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eepv37</parent_datum>
+      <n_parameters>6</n_parameters>
+      <native>dlmb</native>
+      <parameters>5806nt 0m 25dg 0m 5742nt 5830nt</parameters>
+      <description>
+       Estonian Lambert  EPV37  2 std par.
+      </description>
+    </prj>
+    <prj>
+      <mlb>npstg</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>6</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>stg</native>
+      <description>
+       North polar stereogr. proj.
+      </description>
+    </prj>
+    <prj>
+      <mlb>spstg</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>6</cstm>
+      <mode>-1</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>stg</native>
+      <description>
+       South polar stereogr. proj.
+      </description>
+    </prj>
+    <prj>
+      <mlb>upsn</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>6</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>3</n_parameters>
+      <native>stg</native>
+      <parameters>2000km 2000km 0.994</parameters>
+      <description>
+       Universal polar stereogr N
+      </description>
+    </prj>
+    <prj>
+      <mlb>upss</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>6</cstm>
+      <mode>-2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>3</n_parameters>
+      <native>stg</native>
+      <parameters>2000km 2000km 0.994</parameters>
+      <description>
+       Universal polar stereogr S
+      </description>
+    </prj>
+    <prj>
+      <mlb>stg</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>6</cstm>
+      <mode>3</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>Bc Nc Lc Ec scale</parameter_tokens>
+      <n_parameters>5</n_parameters>
+      <native>stg</native>
+      <description>
+       Stereogr. projection
+      </description>
+    </prj>
+    <prj>
+      <mlb>estg</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>6</cstm>
+      <mode>4</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>Bc Nc Lc Ec B1 B2</parameter_tokens>
+      <n_parameters>6</n_parameters>
+      <native>stg</native>
+      <description>
+       Eql. Stereogr. projection
+      </description>
+    </prj>
+    <prj>
+      <mlb>bnpstg</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>6</cstm>
+      <mode>5</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>B1 Scale</parameter_tokens>
+      <n_parameters>2</n_parameters>
+      <native>stg</native>
+      <description>
+       NP Stereogr. projection with scale at lat
+      </description>
+    </prj>
+    <prj>
+      <mlb>bspstg</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>6</cstm>
+      <mode>-5</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>B1 Scale</parameter_tokens>
+      <n_parameters>2</n_parameters>
+      <native>stg</native>
+      <description>
+       SP Stereogr. projection with scale at lat
+      </description>
+    </prj>
+    <prj>
+      <mlb>safle</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>safle</native>
+      <description>
+       Sansom-Flamsteed eq.pr.  ell.
+      </description>
+    </prj>
+    <prj>
+      <mlb>safl</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>safl</native>
+      <description>
+       Sansom-Flamsteed equiv. proj.
+      </description>
+    </prj>
+    <prj>
+      <mlb>lmbac</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>3</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>lmbac</native>
+      <description>
+       Lambert equiv. cyl. proj.
+      </description>
+    </prj>
+    <prj>
+      <mlb>lmbap</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>4</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>lmbap</native>
+      <description>
+       Lambert equiv. pol. proj. (N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>lmbaps</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>5</mode> <mask>0</mask>
+      <kms_seq>SE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>lmbap</native>
+      <description>
+      Lambert equiv. pol. proj. (N)
+      </description>
+    </prj>
+    <prj>
+      <mlb>lmblap</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>8</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parameter_tokens>Lc</parameter_tokens>
+      <n_parameters>1</n_parameters>
+      <native>lmbap</native>
+      <description>
+      Lambert equiv. pol. proj. (S)
+      </description>
+    </prj>
+    <prj>
+      <mlb>lmblaps</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>9</mode> <mask>0</mask>
+      <kms_seq>SE</kms_seq>
+      <parameter_tokens>Lc</parameter_tokens>
+      <n_parameters>1</n_parameters>
+      <native>lmbap</native>
+      <description>
+      Lambert equiv. pol. proj. (S)
+      </description>
+    </prj>
+    <prj>
+      <mlb>auth</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>6</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>auth</native>
+      <description>
+       Authalic geographic
+      </description>
+    </prj>
+    <prj>
+      <mlb>tcgeo</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>2</cstm>
+      <mode>132</mode> <mask>3</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <n_parameters>0</n_parameters>
+      <native>geo</native>
+      <description>
+       TR technical geogr.  ed50
+      </description>
+    </prj>
+    <prj>
+      <mlb>gsgeo</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>2</cstm>
+      <mode>2</mode> <mask>1</mask>
+      <kms_seq>NW</kms_seq>
+      <region>DK</region>
+      <parent_datum>gs</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>geo</native>
+      <description>
+       geographic  gs
+      </description>
+    </prj>
+    <prj>
+      <mlb>gsbgeo</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>2</cstm>
+      <mode>3</mode> <mask>1</mask>
+      <kms_seq>NW</kms_seq>
+      <region>DK</region>
+      <parent_datum>gsb</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>geo</native>
+      <description>
+       geographic gs Bornholm
+      </description>
+    </prj>
+    <prj>
+      <mlb>fg50</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>2</cstm>
+      <mode>5</mode> <mask>5</mask>
+      <kms_seq>NE</kms_seq>
+      <region>FO</region>
+      <parent_datum>fg50</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>geo</native>
+      <description>
+       FO geographic  ed50
+      </description>
+    </prj>
+    <prj>
+      <mlb>fu50</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>0</mode> <mask>5</mask>
+      <kms_seq>NE</kms_seq>
+      <region>FO</region>
+      <parent_datum>fu50</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m -9dg 500km 0.9996</parameters>
+      <description>
+       FO utm zone 29  top_ed50
+      </description>
+    </prj>
+    <prj>
+      <mlb>fg54</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>2</cstm>
+      <mode>4</mode> <mask>5</mask>
+      <kms_seq>NE</kms_seq>
+      <region>FO</region>
+      <parent_datum>fg54</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>geo</native>
+      <description>
+       FO geographic  fd54
+      </description>
+    </prj>
+    <prj>
+      <mlb>etrs-tm??</mlb>
+      <cha_str>7</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>itm</native>
+      <description>
+       etrs89 zone ?? (?? = 2 digits)
+      </description>
+    </prj>
+    <prj>
+      <mlb>ETRS-TM??</mlb>
+      <cha_str>7</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>itm</native>
+      <description>
+       etrs89 zone ?? (?? = 2 digits)
+      </description>
+    </prj>
+    <prj>
+      <mlb>fk54</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>5</mask>
+      <kms_seq>NW</kms_seq>
+      <region>FO</region>
+      <parent_datum>fk54</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>62dg 500km -9dg 500km 62dg</parameters>
+      <description>
+       Conf. con. Faeroe  fd 54
+      </description>
+    </prj>
+    <prj>
+      <mlb>fke</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>FO</region>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>62dg 500km -9dg 500km 62dg</parameters>
+      <description>
+       Conf. con. Faeroe  etrs89
+      </description>
+    </prj>
+    <prj>
+      <mlb>fk89</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>5</mask>
+      <kms_seq>NW</kms_seq>
+      <region>FO</region>
+      <parent_datum>fk89</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>62dg 700km -9dg 700km 62dg</parameters>
+      <description>
+       Conf. con. Faeroe  fd 54a
+      </description>
+    </prj>
+    <prj>
+      <mlb>etrs-lcc</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>6</n_parameters>
+      <native>dlmb</native>
+      <parameters>52dg 2800km 10dg 4000km 35dg 65dg</parameters>
+      <description>
+       etrs89 Lambert Conformal Conical
+      </description>
+    </prj>
+    <prj>
+      <mlb>ETRS-LCC</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>6</n_parameters>
+      <native>dlmb</native>
+      <parameters>52dg 2800km 10dg 4000km 35dg 65dg</parameters>
+      <description>
+       etrs89 Lambert Conformal Conical
+      </description>
+    </prj>
+    <prj>
+      <mlb>lmbhjo</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <region>IS</region>
+      <parent_datum>hjoersey</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>65dg 500km -18dg 500km 65dg</parameters>
+      <description>
+       Lambert Conf. Con. Hjoersey ISLAND
+      </description>
+    </prj>
+    <prj>
+      <mlb>islmb</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>IS</region>
+      <parent_datum>isn93</parent_datum>
+      <n_parameters>6</n_parameters>
+      <native>dlmb</native>
+      <parameters>65dg 500km -19dg 500km 6415nt 6545nt</parameters>
+      <description>
+       Lambert Conf. Con. WGS84 ISLAND
+      </description>
+    </prj>
+    <prj>
+      <mlb>etrs-laea</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>7</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>4</n_parameters>
+      <native>lmbap</native>
+      <parameters>52dg 3210km 10dg 4321km</parameters>
+      <description>
+       etrs89 Lambert Azimuthal Equal Area
+      </description>
+    </prj>
+    <prj>
+      <mlb>ETRS-LAEA</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
+      <mode>7</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <parent_datum>etrs89</parent_datum>
+      <n_parameters>4</n_parameters>
+      <native>lmbap</native>
+      <parameters>52dg 3210km 10dg 4321km</parameters>
+      <description>
+       etrs89 Lambert Azimuthal Equal Area
+      </description>
+    </prj>
+    <prj>
+      <mlb>eegeo</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>2</cstm>
+      <mode>10</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eesti42</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>geo</native>
+      <description>
+       geogr. crd  Pulkovo 1942
+      </description>
+    </prj>
+    <prj>
+      <mlb>eecrt</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>1</cstm>
+      <mode>10</mode> <mask>6</mask>
+      <kms_seq>NE</kms_seq>
+      <region>EE</region>
+      <parent_datum>eesti42</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>crt</native>
+      <description>
+       Cartesic crd  Pulkovo 1942
+      </description>
+    </prj>
+    <prj>
+      <mlb>tc32</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>132</mode> <mask>3</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 9dg 500km 0.9996</parameters>
+      <description>
+       TR technical utm zone 32  ed50
+      </description>
+    </prj>
+    <prj>
+      <mlb>s34j</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>8</cstm>
+      <mode>1</mode> <mask>1</mask>
+      <kms_seq>NW</kms_seq>
+      <region>DK</region>
+      <parent_datum>s34j</parent_datum>
+      <n_parameters>3</n_parameters>
+      <native>s34j</native>
+      <parameters>5608nt 265km 0.999950</parameters>
+      <description>
+       System 1934 Jylland
+      </description>
+    </prj>
+    <prj>
+      <mlb>s34s</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>8</cstm>
+      <mode>2</mode> <mask>1</mask>
+      <kms_seq>NW</kms_seq>
+      <region>DK</region>
+      <parent_datum>s34s</parent_datum>
+      <n_parameters>3</n_parameters>
+      <native>s34s</native>
+      <parameters>5520nt 119km 0.999978</parameters>
+      <description>
+       System 1934 Sjaelland
+      </description>
+    </prj>
+    <prj>
+      <mlb>s45b</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>8</cstm>
+      <mode>3</mode> <mask>1</mask>
+      <kms_seq>NW</kms_seq>
+      <region>DK</region>
+      <parent_datum>s45b</parent_datum>
+      <n_parameters>3</n_parameters>
+      <native>s45b</native>
+      <parameters>5508nt 50km 1.0</parameters>
+      <description>
+       System 1945 Bornholm
+      </description>
+    </prj>
+    <prj>
+      <mlb>s34b</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>8</cstm>
+      <mode>3</mode> <mask>1</mask>
+      <kms_seq>NW</kms_seq>
+      <region>DK</region>
+      <parent_datum>s45b</parent_datum>
+      <n_parameters>3</n_parameters>
+      <native>s45b</native>
+      <parameters>5508nt 50km 1.0</parameters>
+      <description>
+       System 1945 Bornholm
+      </description>
+    </prj>
+    <prj>
+      <mlb>gs</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>9</cstm>
+      <mode>1</mode> <mask>1</mask>
+      <kms_seq>NV</kms_seq>
+      <region>DK</region>
+      <parent_datum>gs</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>55dg 0m 212nt 0m 56dg</parameters>
+      <description>
+       GS conf. con. DK
+      </description>
+    </prj>
+    <prj>
+      <mlb>gsb</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>9</cstm>
+      <mode>3</mode> <mask>1</mask>
+      <kms_seq>NV</kms_seq>
+      <region>DK</region>
+      <parent_datum>gsb</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>lmb</native>
+      <parameters>55dg 5614.621m -221nt 18831.460m 56dg</parameters>
+      <description>
+       GS conf. con. Bornholm
+      </description>
+    </prj>
+    <prj>
+      <mlb>kk</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>10</cstm>
+      <mode>0</mode> <mask>1</mask>
+      <kms_seq>NV</kms_seq>
+      <region>DK</region>
+      <parent_datum>kk</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>kk</native>
+      <description>
+       Kbh. komm. system
+      </description>
+    </prj>
+    <prj>
+      <mlb>os</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>10</cstm>
+      <mode>1</mode> <mask>1</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>os</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>os</native>
+      <description>
+       Ostenfeldt system
+      </description>
+    </prj>
+    <prj>
+      <mlb>crt2u</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>11</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>crt2</native>
+      <description>
+       Loc. 2-dim crdsys undef. orient.
+      </description>
+    </prj>
+    <prj>
+      <mlb>crt2cl</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>11</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>crt2</native>
+      <description>
+       Loc. 2-dim crdsys clockwize
+      </description>
+    </prj>
+    <prj>
+      <mlb>crt2acl</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>11</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>EN</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>crt2</native>
+      <description>
+       Loc. 2-dim crdsys anti-clw.
+      </description>
+    </prj>
+    <prj>
+      <mlb>crt2w</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>11</cstm>
+      <mode>3</mode> <mask>0</mask>
+      <kms_seq>NW</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>crt2</native>
+      <description>
+       Loc. 2-dim crdsys west pos.
+      </description>
+    </prj>
+    <prj>
+      <mlb>dks</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>3</mode> <mask>1</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>dks</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg -5895km 1248nt 119km 0.999999</parameters>
+      <description>
+       OEresund bridge proj  sp
+      </description>
+    </prj>
+    <prj>
+      <mlb>sb</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>4</mode> <mask>1</mask>
+      <kms_seq>NE</kms_seq>
+      <region>DK</region>
+      <parent_datum>sb</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 1058nt 500km 0.999999</parameters>
+      <description>
+       SB bridge proj.
+      </description>
+    </prj>
+    <prj>
+      <mlb>sbf</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>4</mode> <mask>1</mask>
+      <kms_seq>EN</kms_seq>
+      <region>DK</region>
+      <parent_datum>sb</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 1058nt 500km 0.999999</parameters>
+      <description>
+       SB bridge proj.  inverted
+      </description>
+    </prj>
+    <prj>
+      <mlb>rt38g</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>38</mode> <mask>1</mask>
+      <kms_seq>NE</kms_seq>
+      <region>SE</region>
+      <parent_datum>rt38g</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 154829.8sx 1500km 1.0</parameters>
+      <description>
+       RT38g  2.5 gon vest
+      </description>
+    </prj>
+    <prj>
+      <mlb>rt90g</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>90</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>SE</region>
+      <parent_datum>rt90g</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 154829.8sx 1500km 1.0</parameters>
+      <description>
+       RT90g  2.5 gon vest
+      </description>
+    </prj>
+    <prj>
+      <mlb>qng24</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>39</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>QA</region>
+      <parent_datum>qng24</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>2427nt 300km 5113nt 200km 0.99999</parameters>
+      <description>
+       Qatar National Grid System 1924
+      </description>
+    </prj>
+    <prj>
+      <mlb>qbc2001</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>40</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>QA</region>
+      <parent_datum>qbc2001</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>25dg 500km 5049nt 400km 0.999996</parameters>
+      <description>
+       Qatar Bahrain Causeway 2001
+      </description>
+    </prj>
+    <prj>
+      <mlb>qng</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>3</cstm>
+      <mode>41</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <region>QA</region>
+      <parent_datum>qng24</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>2427nt 300km 5113nt 200km 0.99999</parameters>
+      <description>
+       Qatar National Grid
+      </description>
+    </prj>
+    <prj>
+      <mlb>rt90v</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>12</cstm>
+      <mode>1</mode> <mask>1</mask>
+      <kms_seq>NE</kms_seq>
+      <region>SE</region>
+      <parent_datum>rt90v</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 133329.8sx 0m 1.0</parameters>
+      <description>
+       RT90v  spec. for dks
+      </description>
+    </prj>
+    <prj>
+      <mlb>rt38v</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>12</cstm>
+      <mode>2</mode> <mask>1</mask>
+      <kms_seq>NE</kms_seq>
+      <region>SE</region>
+      <parent_datum>rt38v</parent_datum>
+      <n_parameters>5</n_parameters>
+      <native>itm</native>
+      <parameters>0dg 0m 133329.8sx 0m 1.0</parameters>
+      <description>
+       RT38v  spec. for dks
+      </description>
+    </prj>
+    <prj>
+      <mlb>geoid</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>16</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>geoid</native>
+      <description>
+       Geoid heights
+      </description>
+    </prj>
+    <prj>
+      <mlb>defl</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>16</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>NE</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>defl</native>
+      <description>
+       Deflections of the vertical
+      </description>
+    </prj>
+    <prj>
+      <mlb>ellh</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>17</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>ellh</native>
+      <description>
+       Ellipsoidal heights
+      </description>
+    </prj>
+    <prj>
+      <mlb>gravi</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>18</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>gravi</native>
+      <description>
+       Gravity
+      </description>
+    </prj>
+    <prj>
+      <mlb>gfree</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>18</cstm>
+      <mode>1</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>gravi</native>
+      <description>
+       Free Air Gravity
+      </description>
+    </prj>
+    <prj>
+      <mlb>gboug</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>18</cstm>
+      <mode>2</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>gravi</native>
+      <description>
+       Bouguer Gravity
+      </description>
+    </prj>
+    <prj>
+      <mlb>gnorm</mlb>
+      <cha_str>0</cha_str> <type>1</type> <cstm>18</cstm>
+      <mode>3</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>gravi</native>
+      <description>
+       Normal Gravity
+      </description>
+    </prj>
+    <prj>
+      <mlb>h</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>33</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>h</native>
+      <description>
+       Metric Heights
+      </description>
+    </prj>
+    <prj>
+      <mlb>ch</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>33</cstm>
+      <mode>8</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>ch</native>
+      <description>
+       Metric Heights with conditions in Groups
+      </description>
+    </prj>
+    <prj>
+      <mlb>hts</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>33</cstm>
+      <mode>9</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>hts</native>
+      <description>
+       Metric Height in DB Time Serie
+      </description>
+    </prj>
+    <prj>
+      <mlb>hort</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>34</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>hort</native>
+      <description>
+       Orthometric Heights
+      </description>
+    </prj>
+    <prj>
+      <mlb>hnorm</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>35</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>hnorm</native>
+      <description>
+       Normal Heights
+      </description>
+    </prj>
+    <prj>
+      <mlb>hpot</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>36</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>pot</native>
+      <description>
+       Geopotential Heights
+      </description>
+    </prj>
+    <prj>
+      <mlb>chpot</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>36</cstm>
+      <mode>8</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>chpot</native>
+      <description>
+       Geopotential Heights with conditions in Groups
+      </description>
+    </prj>
+    <prj>
+      <mlb>hdyn</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>37</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>hdyn</native>
+      <description>
+       Dynamic Heights
+      </description>
+    </prj>
+    <prj>
+      <mlb>hsec</mlb>
+      <cha_str>0</cha_str> <type>2</type> <cstm>38</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>H</kms_seq>
+      <parent_datum>msl</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>hsec</native>
+      <description>
+       uplift rates mm/year
+      </description>
+    </prj>
+    <prj>
+      <mlb>nnr</mlb>
+      <cha_str>0</cha_str> <type>12</type> <cstm>0</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <parent_datum>geo_wgs84</parent_datum>
+      <n_parameters>0</n_parameters>
+      <native>nnr</native>
+      <description>
+       Plate_motion-label
+      </description>
+    </prj>
+    <prj>
+      <mlb>wor</mlb>
+      <cha_str>0</cha_str> <type>4</type> <cstm>0</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>wor</native>
+      <description>
+       Adj_res-label
+      </description>
+    </prj>
+    <prj>
+      <mlb>idt</mlb>
+      <cha_str>0</cha_str> <type>33</type> <cstm>0</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>idt</native>
+      <description>
+       Ident-label
+      </description>
+    </prj>
+    <prj>
+      <mlb>jdf</mlb>
+      <cha_str>0</cha_str> <type>34</type> <cstm>0</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>jdf</native>
+      <description>
+       Jobdef-label
+      </description>
+    </prj>
+    <prj>
+      <mlb>phoc</mlb>
+      <cha_str>0</cha_str> <type>5</type> <cstm>0</cstm>
+      <mode>0</mode> <mask>0</mask>
+      <kms_seq>ZZ</kms_seq>
+      <n_parameters>0</n_parameters>
+      <native>phoc</native>
+      <description>
+       Photo_oc-label
+      </description>
+    </prj>
+  </def_prj>
+  
+  <def_rgn>
+    <rgn>
+      <new>DK</new> <old>DK</old> <country>Denmark</country>
+    </rgn>
+    <rgn>
+      <new>FO</new> <old>FO</old> <country>FaroeIslands</country>
+    </rgn>
+    <rgn>
+      <new>FE</new> <old>FO</old> <country>FaroeIslands</country>
+    </rgn>
+    <rgn>
+      <new>GL</new> <old>GL</old> <country>Greenland</country>
+    </rgn>
+    <rgn>
+      <new>GR</new> <old>GL</old> <country>Greenland</country>
+    </rgn>
+    <rgn>
+      <new>SJ</new> <old>SJ</old> <country>Soenderjylland</country>
+    </rgn>
+    <rgn>
+      <new>NO</new> <old>NO</old> <country>Norway</country>
+    </rgn>
+    <rgn>
+      <new>FI</new> <old>FI</old> <country>Finland</country>
+    </rgn>
+    <rgn>
+      <new>SF</new> <old>FI</old> <country>Finland</country>
+    </rgn>
+    <rgn>
+      <new>SE</new> <old>SE</old> <country>Sweeden</country>
+    </rgn>
+    <rgn>
+      <new>SV</new> <old>SE</old> <country>Sweeden</country>
+    </rgn>
+    <rgn>
+      <new>IS</new> <old>IS</old> <country>Iceland</country>
+    </rgn>
+    <rgn>
+      <new>EU</new> <old>EU</old> <country>EUREF</country>
+    </rgn>
+    <rgn>
+      <new>DE</new> <old>DE</old> <country>Germany</country>
+    </rgn>
+    <rgn>
+      <new>EE</new> <old>EE</old> <country>Estonia</country>
+    </rgn>
+    <rgn>
+      <new>LV</new> <old>LV</old> <country>Latvia</country>
+    </rgn>
+    <rgn>
+      <new>LE</new> <old>LV</old> <country>Latvia</country>
+    </rgn>
+    <rgn>
+      <new>LT</new> <old>LT</old> <country>Lithuania</country>
+    </rgn>
+    <rgn>
+      <new>LI</new> <old>LT</old> <country>Lithuania</country>
+    </rgn>
+    <rgn>
+      <new>NL</new> <old>NL</old> <country>TheNetherlands</country>
+    </rgn>
+    <rgn>
+      <new>PL</new> <old>PL</old> <country>Poland</country>
+    </rgn>
+    <rgn>
+      <new>BE</new> <old>BE</old> <country>Belgium</country>
+    </rgn>
+    <rgn>
+      <new>RE</new> <old>RE</old> <country>RETrig</country>
+    </rgn>
+    <rgn>
+      <new>FR</new> <old>FR</old> <country>France</country>
+    </rgn>
+    <rgn>
+      <new>CA</new> <old>CA</old> <country>Canada</country>
+    </rgn>
+    <rgn>
+      <new>QA</new> <old>QA</old> <country>Qatar</country>
+    </rgn>
+    <rgn>
+      <new>UK</new> <old>UK</old> <country>England</country>
+    </rgn>
+    <rgn>
+      <new>US</new> <old>US</old> <country>USA</country>
+    </rgn>
+  </def_rgn>
+  <def_dtm>
+
+    <dtm>
+      <mlb>wgs84</mlb>
+      <id>1</id>
+      <parent>wgs84</parent> <ellipsoid>WGS84</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      World Geodetic System 1984 (G730)
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>ed50</mlb>
+      <id>2</id>
+      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>3</imit> <type>7</type> <region>DK</region>
+      <t_x>-81.0703 m</t_x> <t_y>-89.3603 m</t_y> <t_z>-115.7526 m</t_z>
+      <rot_x>-0.4849 sx</rot_x> <rot_y>-0.0244 sx</rot_y> <rot_z>-0.4132 sx</rot_z>
+      <scale>-0.540645 ppm</scale>
+      <description>
+      European Datum 1950
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>nwl9d</mlb>
+      <id>3</id>
+      <parent>wgs84</parent> <ellipsoid>NWL9D</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>ZZ</region>
+      <t_x>0 m</t_x> <t_y>0 m</t_y> <t_z>4.5 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>-0.8140 sx</rot_z>
+      <scale>-0.6 ppm</scale>
+      <description>
+      Naval Weapons Laboratory
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>etrf89</mlb>
+      <id>4</id>
+      <parent>wgs84</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      European Terrestrial Ref System 1989
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>etrs89</mlb>
+      <id>4</id>
+      <parent>wgs84</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      European Terrestrial Ref System 1989
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>euref89</mlb>
+      <id>4</id>
+      <parent>wgs84</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      European Terrestrial Ref System 1989
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>gr96</mlb>
+      <id>5</id>
+      <parent>wgs84</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>GL</region>
+      <description>
+      Greenland Reference Frame 1996
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>igsyy</mlb>
+      <id>6</id>
+      <parent>igsyy</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      IGSyy
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>itrfyy</mlb>
+      <id>7</id>
+      <parent>itrfyy</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      Int. Terr Ref Frame 19yy or 20yy
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>etrfyy</mlb>
+      <id>8</id>
+      <parent>etrfyy</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>EU</region>
+      <description>
+      European Terr Ref Frame 19yy or 20yy
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>topex</mlb>
+      <id>9</id>
+      <parent>etrs89</parent> <ellipsoid>TOPEX</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      TOPEX
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>eeref89</mlb>
+      <id>51</id>
+      <parent>wgs84</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>EE</region>
+      <t_x>0.055 m</t_x> <t_y>-0.541 m</t_y> <t_z>-0.185 m</t_z>
+      <rot_x>-0.0183 sx</rot_x> <rot_y>0.0003 sx</rot_y> <rot_z>0.0070 sx</rot_z>
+      <scale>-0.014 ppm</scale>
+      <description>
+      Estonian ETRS 1989
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>ed87</mlb>
+      <id>10</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      European Datum 1987
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>wgs72</mlb>
+      <id>11</id>
+      <parent>nwl9d</parent> <ellipsoid>WGS72</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>ZZ</region>
+      <t_x>0 m</t_x> <t_y>0 m</t_y> <t_z>0 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.2600 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      World Geodetic system 1972
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>fd54</mlb>
+      <id>13</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>5</imit> <type>7</type> <region>FO</region>
+      <t_x>-153.33 m</t_x> <t_y>-169.41 m</t_y> <t_z>86.39 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      Faeroe Datum 1954
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>qornoq</mlb>
+      <id>14</id>
+      <parent>gr96</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>GL</region>
+      <t_x>197.8579 m</t_x> <t_y>146.5947 m</t_y> <t_z>-108.8501 m</t_z>
+      <rot_x>-0.8573 sx</rot_x> <rot_y>0.3608 sx</rot_y> <rot_z>0.3863 sx</rot_z>
+      <scale>-8.356137 ppm</scale>
+      <description>
+      Qornok Datum 1927
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>nad83</mlb>
+      <id>15</id>
+      <parent>wgs84</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>-7</type> <region>ZZ</region>
+      <t_x>0.991 m</t_x> <t_y>-1.9072 m</t_y> <t_z>-0.5129 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>-0.0258 sx</rot_y> <rot_z>-0.0097 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      North American Datum 1983
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>nad27</mlb>
+      <id>16</id>
+      <parent>wgs84</parent> <ellipsoid>Clarke66</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>ZZ</region>
+      <t_x>-8 m</t_x> <t_y>160 m</t_y> <t_z>176 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      North American D.1927 Conus
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>nad27c</mlb>
+      <id>17</id>
+      <parent>wgs84</parent> <ellipsoid>Clarke66</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>ZZ</region>
+      <t_x>-10 m</t_x> <t_y>158 m</t_y> <t_z>187 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      North American D.1927 Canada
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>pu42</mlb>
+      <id>18</id>
+      <parent>wgs84</parent> <ellipsoid>Krassovsky</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>ZZ</region>
+      <t_x>11.58 m</t_x> <t_y>-130.31 m</t_y> <t_z>-103.43 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      Pulkowo 1942 temporary
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>island</mlb>
+      <id>20</id>
+      <parent>wgs84</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>IS</region>
+      <t_x>-73 m</t_x> <t_y>46 m</t_y> <t_z>-86 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      Hjoersey datum Island 1955
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>scosd</mlb>
+      <id>22</id>
+      <parent>gr96</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>GL</region>
+      <t_x>218.233 m</t_x> <t_y>270.6151 m</t_y> <t_z>253.1391 m</t_z>
+      <rot_x>0.2634 sx</rot_x> <rot_y>-0.1573 sx</rot_y> <rot_z>-1.1986 sx</rot_z>
+      <scale>-59.923872 ppm</scale>
+      <description>
+      Scoresbysund datum
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>ammlk</mlb>
+      <id>23</id>
+      <parent>gr96</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>GL</region>
+      <t_x>308.9415 m</t_x> <t_y>136.202 m</t_y> <t_z>986.3661 m</t_z>
+      <rot_x>-3.8742 sx</rot_x> <rot_y>3.7783 sx</rot_y> <rot_z>-7.6134 sx</rot_z>
+      <scale>-171.67315 ppm</scale>
+      <description>
+      Ammassalik datum
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>srt90g</mlb>
+      <id>25</id>
+      <parent>wgs84</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>0</imit> <type>-7</type> <region>SE</region>
+      <t_x>-424.3 m</t_x> <t_y>80.5 m</t_y> <t_z>-613.1 m</t_z>
+      <rot_x>-4.3965 sx</rot_x> <rot_y>1.9866 sx</rot_y> <rot_z>-5.1846 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      Sweedish Riks Triangulation 1990 Sweeden
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>rt90g</mlb>
+      <id>24</id>
+      <parent>wgs84</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>0</imit> <type>-7</type> <region>SE</region>
+      <t_x>-419.375 m</t_x> <t_y>-99.352 m</t_y> <t_z>-591.349 m</t_z>
+      <rot_x>0.8505 sx</rot_x> <rot_y>1.8172 sx</rot_y> <rot_z>-7.8622 sx</rot_z>
+      <scale>0.99496 ppm</scale>
+      <description>
+      Riks Triangulation 1990 Sweeden
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>ed79</mlb>
+      <id>12</id>
+      <parent>wgs84</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>ZZ</region>
+      <t_x>-86 m</t_x> <t_y>-98 m</t_y> <t_z>-119 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      European Datum 1979 (from WGS84)
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>mrsk50</mlb>
+      <id>31</id>
+      <parent>wgs84</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>DK</region>
+      <t_x>-89.5 m</t_x> <t_y>-93.8 m</t_y> <t_z>-123.1 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.1560 sx</rot_z>
+      <scale>1.2 ppm</scale>
+      <description>
+      MAERSK European Datum 1950 (old)
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>dhdn</mlb>
+      <id>41</id>
+      <parent>etrs89</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>DE</region>
+      <t_x>598.1 m</t_x> <t_y>73.7 m</t_y> <t_z>418.2 m</t_z>
+      <rot_x>-0.2020 sx</rot_x> <rot_y>-0.0450 sx</rot_y> <rot_z>2.4450 sx</rot_z>
+      <scale>6.7 ppm</scale>
+      <description>
+      Deutsches Hauptdrnetz 2001 (Total)
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>dhdnd</mlb>
+      <id>46</id>
+      <parent>etrs89</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>DE</region>
+      <t_x>582 m</t_x> <t_y>105 m</t_y> <t_z>414 m</t_z>
+      <rot_x>-1.0400 sx</rot_x> <rot_y>-0.3500 sx</rot_y> <rot_z>3.0800 sx</rot_z>
+      <scale>8.3 ppm</scale>
+      <description>
+      Deutsches Hauptdreiecksnetz 1995 (Total)
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>dhdn1</mlb>
+      <id>42</id>
+      <parent>etrs89</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>DE</region>
+      <t_x>590.5 m</t_x> <t_y>69.5 m</t_y> <t_z>411.6 m</t_z>
+      <rot_x>0.7960 sx</rot_x> <rot_y>0.0520 sx</rot_y> <rot_z>3.6010 sx</rot_z>
+      <scale>8.3 ppm</scale>
+      <description>
+      Deutsches Hauptdrnetz (Nordtyskland)
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>nad83g</mlb>
+      <id>62</id>
+      <parent>gr96</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>4</imit> <type>7</type> <region>GL</region>
+      <t_x>0 m</t_x> <t_y>0 m</t_y> <t_z>0 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.8000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      North American D.1983 Greenland
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>feh10</mlb>
+      <id>32</id>
+      <parent>etrs89</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>7</imit> <type>7</type> <region>DK</region>
+      <t_x>0.6002 m</t_x> <t_y>-0.0022 m</t_y> <t_z>-0.6009 m</t_z>
+      <rot_x>-0.0050 sx</rot_x> <rot_y>0.0132 sx</rot_y> <rot_z>0.0103 sx</rot_z>
+      <scale>0.02113875 ppm</scale>
+      <description>
+      Fehmarn Datum 2010
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>detrs89</mlb>
+      <id>33</id>
+      <parent>etrs89</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>DE</region>
+      <t_x>-2.2023 m</t_x> <t_y>-10.5537 m</t_y> <t_z>-3.5459 m</t_z>
+      <rot_x>0.2231 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>-0.2461 sx</rot_z>
+      <scale>0.84036959 ppm</scale>
+      <description>
+      Germany ETRS89
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>detrf89</mlb>
+      <id>33</id>
+      <parent>etrs89</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>DE</region>
+      <t_x>-2.2023 m</t_x> <t_y>-10.5537 m</t_y> <t_z>-3.5459 m</t_z>
+      <rot_x>0.2231 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>-0.2461 sx</rot_z>
+      <scale>0.84036959 ppm</scale>
+      <description>
+      Germany ETRS89
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>deuref89</mlb>
+      <id>33</id>
+      <parent>etrs89</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>DE</region>
+      <t_x>-2.2023 m</t_x> <t_y>-10.5537 m</t_y> <t_z>-3.5459 m</t_z>
+      <rot_x>0.2231 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>-0.2461 sx</rot_z>
+      <scale>0.84036959 ppm</scale>
+      <description>
+      Germany ETRS89
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>googrs80</mlb>
+      <id>128</id>
+      <parent>wgs84</parent> <ellipsoid>SpGRS80</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>ZZ</region>
+      <t_x>0 m</t_x> <t_y>0 m</t_y> <t_z>0 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      Google Spheric Mercator Datum
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>s34j</mlb>
+      <id>129</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ System 1934 Jylland
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>s34s</mlb>
+      <id>130</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ System 1934 Sjaelland
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>s45b</mlb>
+      <id>131</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ System 1945 Bornholm
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>gs</mlb>
+      <id>132</id>
+      <parent>ed50</parent> <ellipsoid>GS</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Generalst. Sys. Jyl. + Sjl
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>gsb</mlb>
+      <id>133</id>
+      <parent>ed50</parent> <ellipsoid>GS</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Generalst. System Bornholm
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>os</mlb>
+      <id>134</id>
+      <parent>ed50</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Ostenfeldt System
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>kk</mlb>
+      <id>135</id>
+      <parent>ed50</parent> <ellipsoid>Dansk</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Koebenhavns Komm. System
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>sb</mlb>
+      <id>136</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Storebaelts System
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>sbf</mlb>
+      <id>136</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Storebaelts S. inv.
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>dks</mlb>
+      <id>140</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ DKS
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>asb</mlb>
+      <id>149</id>
+      <parent>ed50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>1</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ A/S Belt
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>fg54</mlb>
+      <id>142</id>
+      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>5</imit> <type>0</type> <region>FO</region>
+      <description>
+      @ Geogr. Faroe Island 1954
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>fg50</mlb>
+      <id>143</id>
+      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>5</imit> <type>0</type> <region>FO</region>
+      <description>
+      @ Geogr. Faroe ED 1950
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>fk54</mlb>
+      <id>144</id>
+      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>5</imit> <type>0</type> <region>FO</region>
+      <description>
+      @ Konf. con. Faroe 1954
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>fu50</mlb>
+      <id>145</id>
+      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>5</imit> <type>0</type> <region>FO</region>
+      <description>
+      @ UTM 29 Topogr. grid ED 50
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>fk89</mlb>
+      <id>146</id>
+      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>5</imit> <type>0</type> <region>FO</region>
+      <description>
+      @ Konf. con. Faroe 1989
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>rt90v</mlb>
+      <id>137</id>
+      <parent>ed50</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>SE</region>
+      <description>
+      @ Riks Triang 1990 Sweeden 2.5 gon west
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>rt38v</mlb>
+      <id>138</id>
+      <parent>ed50</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>SE</region>
+      <description>
+      @ Riks Triang 1938 Sweeden 2.5 gon west
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>rt38g</mlb>
+      <id>139</id>
+      <parent>ed50</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>SE</region>
+      <description>
+      @ Riks Triang 1938 Sweeden
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>eesti42</mlb>
+      <id>141</id>
+      <parent>eeref89</parent> <ellipsoid>Krassovsky</ellipsoid>
+      <imit>6</imit> <type>7</type> <region>EE</region>
+      <t_x>11.58 m</t_x> <t_y>-130.31 m</t_y> <t_z>-103.43 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      @ Estonian 1942
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>eeold42</mlb>
+      <id>147</id>
+      <parent>eeref89</parent> <ellipsoid>Krassovsky</ellipsoid>
+      <imit>6</imit> <type>0</type> <region>EE</region>
+      <description>
+      @ OLD Estonian 1942
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>eepv37</mlb>
+      <id>148</id>
+      <parent>eeref89</parent> <ellipsoid>Bessel</ellipsoid>
+      <imit>6</imit> <type>0</type> <region>EE</region>
+      <description>
+      @ Estonian PV 1942
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>ain1970</mlb>
+      <id>154</id>
+      <parent>wgs84</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>7</type> <region>QA</region>
+      <t_x>-66.102 m</t_x> <t_y>-348.245 m</t_y> <t_z>-40.619 m</t_z>
+      <rot_x>0.3662 sx</rot_x> <rot_y>1.8426 sx</rot_y> <rot_z>-3.7904 sx</rot_z>
+      <scale>6.207 ppm</scale>
+      <description>
+      @ Ain El Abd 1970
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>nahrwan</mlb>
+      <id>150</id>
+      <parent>wgs84</parent> <ellipsoid>Clarke80</ellipsoid>
+      <imit>0</imit> <type>-7</type> <region>QA</region>
+      <t_x>250.2 m</t_x> <t_y>153.09 m</t_y> <t_z>-391.7 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      @ Nahrwan 1967
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>qng24</mlb>
+      <id>151</id>
+      <parent>wgs84</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>-7</type> <region>QA</region>
+      <t_x>128.16 m</t_x> <t_y>282.42 m</t_y> <t_z>-21.93 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      @ Qatar National Grid System 1924
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>qbc2001</mlb>
+      <id>152</id>
+      <parent>wgs84</parent> <ellipsoid>WGS84</ellipsoid>
+      <imit>0</imit> <type>-7</type> <region>QA</region>
+      <t_x>0 m</t_x> <t_y>0 m</t_y> <t_z>0 m</t_z>
+      <rot_x>0.0000 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>0.0000 sx</rot_z>
+      <scale>0 ppm</scale>
+      <description>
+      @ Qatar Bahrain Causeway (COWI DEF)
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>qnd1995</mlb>
+      <id>153</id>
+      <parent>wgs84</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>-7</type> <region>QA</region>
+      <t_x>119.4248 m</t_x> <t_y>303.65872 m</t_y> <t_z>11.00061 m</t_z>
+      <rot_x>1.1643 sx</rot_x> <rot_y>0.1745 sx</rot_y> <rot_z>1.0963 sx</rot_z>
+      <scale>-3.657065 ppm</scale>
+      <description>
+      @ Qatar National Datum 1995
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>lrl</mlb>
+      <id>201</id>
+      <parent>lrl</parent> <ellipsoid>WGS84</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      @ Local Reference Level
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>msl</mlb>
+      <id>202</id>
+      <parent>msl</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      @ Mean Sea Level Frame
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>gm91</mlb>
+      <id>203</id>
+      <parent>gm91</parent> <ellipsoid>GS</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Gradmaalingen 1891 kote
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>gi44</mlb>
+      <id>204</id>
+      <parent>gi44</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ G.I. 1944 kotesystem
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>kn44</mlb>
+      <id>205</id>
+      <parent>kn44</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Kbh. Nul 1944 kotesys.
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>gi50</mlb>
+      <id>206</id>
+      <parent>gi50</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ G.I. 1950 kote
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>dvr90</mlb>
+      <id>208</id>
+      <parent>dvr90</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Danish Vertical Ref Frame 1990
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>fvr09</mlb>
+      <id>211</id>
+      <parent>fvr09</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>FO</region>
+      <description>
+      @ Faroe Islands Vertical Ref Frame 2009
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>foldmsl</mlb>
+      <id>216</id>
+      <parent>foldmsl</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>FO</region>
+      <description>
+      @ Faroe Islands Mean Sea Level before 2009
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>evrf2000</mlb>
+      <id>210</id>
+      <parent>evrf2000</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>EU</region>
+      <description>
+      @ Eropean Vertical Ref Frame 2000
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>evrf2007</mlb>
+      <id>212</id>
+      <parent>evrf2007</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>EU</region>
+      <description>
+      @ Eropean Vertical Ref Frame 2000
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>nkgvrf03</mlb>
+      <id>214</id>
+      <parent>nkgvrf03</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      @ NKG Vertical Ref Frame 2003
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>dnn</mlb>
+      <id>209</id>
+      <parent>dnn</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ DNN: gm91/gi44/h_msl
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>dhhn92</mlb>
+      <id>215</id>
+      <parent>dhhn92</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DE</region>
+      <description>
+      @ German height system in Fehmarn area
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>fcsvr10</mlb>
+      <id>213</id>
+      <parent>fcsvr10</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ Fehmarn Vertical Reference Frame 2010
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>kms90</mlb>
+      <id>207</id>
+      <parent>dvr90</parent> <ellipsoid>GRS80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>DK</region>
+      <description>
+      @ KMS 1990 midlertidigt regneniveau
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>qnhd</mlb>
+      <id>290</id>
+      <parent>qnhd</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>QA</region>
+      <description>
+      @ Qatar National Height Datum
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>ee1940</mlb>
+      <id>291</id>
+      <parent>ee1940</parent> <ellipsoid>Krassovsky</ellipsoid>
+      <imit>6</imit> <type>0</type> <region>EE</region>
+      <description>
+      @ ESTONIA 1940 Vertical Frame
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>ee1948</mlb>
+      <id>292</id>
+      <parent>ee1948</parent> <ellipsoid>Krassovsky</ellipsoid>
+      <imit>6</imit> <type>0</type> <region>EE</region>
+      <description>
+      @ ESTONIA 1948 Vertical Frame
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>ee1977</mlb>
+      <id>293</id>
+      <parent>ee1977</parent> <ellipsoid>Krassovsky</ellipsoid>
+      <imit>6</imit> <type>0</type> <region>EE</region>
+      <description>
+      @ ESTONIA 1977 Vertical Frame
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>igsn</mlb>
+      <id>301</id>
+      <parent>igsn</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      @ IGSN gravity system
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>abso</mlb>
+      <id>302</id>
+      <parent>abso</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      @ IGSN Absolute gravity system
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>potsd</mlb>
+      <id>303</id>
+      <parent>potsd</parent> <ellipsoid>Hayford</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      @ Potsdam gravity system
+      </description>
+    </dtm>
+    <dtm>
+      <mlb>clarke80</mlb>
+      <id>63</id>
+      <parent>wgs84</parent> <ellipsoid>Clarke80</ellipsoid>
+      <imit>0</imit> <type>0</type> <region>ZZ</region>
+      <description>
+      Clarke80 NO TRF
+      </description>
+    </dtm>
+  </def_dtm>
+
+  <def_hth>
+    <hth>
+      <from>DK_geoHetrs89_h_dvr90</from> <to>evrf2000</to>
+      <type>3</type>
+      <lat_0>5602.00 nt</lat_0> <lon_0>914.00 nt</lon_0>
+      <M0>6370860.167</M0> <N0>6390001.436</N0> <k0>0.011 m</k0> <kN>0.0030 sx</kN> <kE>0.0110 sx</kE>
+      <description>http://www.crs-geo.eu/   National CRS,  DK</description>
+    </hth>
+    <hth>
+      <from>DK_geoHetrs89_h_dvr90</from> <to>evrf2007</to>
+      <type>3</type>
+      <lat_0>5602.00 nt</lat_0> <lon_0>914.00 nt</lon_0>
+      <M0>6370860.167</M0> <N0>6390001.436</N0> <k0>-0.004 m</k0> <kN>0.0070 sx</kN> <kE>0.0230 sx</kE>
+      <description>http://www.crs-geo.eu/   National CRS,  DK</description>
+    </hth>
+    <hth>
+      <from>DK_geoHetrs89_h_dnn</from> <to>dvr90</to>
+      <type>1</type>
+      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
+      <table>dhdnndvr.02</table>
+      <description>DNN to DVR90</description>
+    </hth>
+    <hth>
+      <from>DK_s34jH_h_gm91</from> <to>dvr90</to>
+      <type>1</type>
+      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
+      <table>dhgmdvr.01</table>
+      <description>GM 1891 to DVR90</description>
+    </hth>
+    <hth>
+      <from>DK_s34jH_h_dnn</from> <to>gi50</to>
+      <type>1</type>
+      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
+      <table>dhdnn50.01</table>
+      <description>DNN OLD to DNN 1950 (NEW)</description>
+    </hth>
+    <hth>
+      <from>FO_geoHetrs89_h_fvr09</from> <to>foldmsl</to>
+      <type>1</type>
+      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
+      <table>dhfvr09oldmsl.12</table>
+      <description>FVR09 to MSL (old FO Height System)</description>
+    </hth>
+    <hth>
+      <from>DK_geoHfeh10_h_dvr90</from> <to>fcsvr10</to>
+      <type>2</type>
+      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
+      <k0>-0.034 m</k0>
+      <description>DVR90 to Fehmarn Bridge Project Height</description>
+    </hth>
+    <hth>
+      <from>DE_geoHfeh10_h_dhhn92</from> <to>fcsvr10</to>
+      <type>1</type>
+      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
+      <table>dhdhhn92fcsvr.10</table>
+      <description>Fehmarn Bridge Project Height to DHDHHN92</description>
+    </hth>
+    <hth>
+      <from>DK_geoHetrs89_h_dvr90</from> <to>kn44</to>
+      <type>2</type>
+      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
+      <k0>-0.038 m</k0>
+      <description>DVR90 to Koebenhavns Nul 1944</description>
+    </hth>
+  </def_hth>
+ <def_grs>
+   
+    <grs>
+      <mlb>GRS80</mlb>
+      <id>1</id> <mode>1</mode>
+      <semi_major_axis>6378137</semi_major_axis>
+      <flattening>0.00108263</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      
+    </grs>
+    <grs>
+      <mlb>Hayford</mlb>
+      <id>2</id> <mode>2</mode>
+      <semi_major_axis>6378388</semi_major_axis>
+      <flattening>297</flattening>
+      <gravity>9.78049</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>GRS67</mlb>
+      <id>3</id> <mode>1</mode>
+      <semi_major_axis>6378160</semi_major_axis>
+      <flattening>0.0010827</flattening>
+      <gravity>3.98603e+014</gravity>  <rotation>7.292115147e-005</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>WGS84</mlb>
+      <id>4</id> <mode>1</mode>
+      <semi_major_axis>6378137</semi_major_axis>
+      <flattening>-0.00048416685</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>WGS72</mlb>
+      <id>5</id> <mode>3</mode>
+      <semi_major_axis>6378135</semi_major_axis>
+      <flattening>298.26</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>NWL9D</mlb>
+      <id>6</id> <mode>3</mode>
+      <semi_major_axis>6378145</semi_major_axis>
+      <flattening>298.25</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>TOPEX</mlb>
+      <id>16</id> <mode>2</mode>
+      <semi_major_axis>6378136.3</semi_major_axis>
+      <flattening>298.257</flattening>
+      <gravity>9.78049</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>GS</mlb>
+      <id>7</id> <mode>4</mode>
+      <semi_major_axis>57010</semi_major_axis>
+      <flattening>300</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Dansk</mlb>
+      <id>8</id> <mode>4</mode>
+      <semi_major_axis>57010</semi_major_axis>
+      <flattening>300</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Bessel</mlb>
+      <id>9</id> <mode>3</mode>
+      <semi_major_axis>6377397.155</semi_major_axis>
+      <flattening>299.1528128</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Krassovsky</mlb>
+      <id>10</id> <mode>3</mode>
+      <semi_major_axis>6378245</semi_major_axis>
+      <flattening>298.3</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Clarke66</mlb>
+      <id>11</id> <mode>3</mode>
+      <semi_major_axis>6378206.4</semi_major_axis>
+      <flattening>294.9786982</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Clarke80</mlb>
+      <id>12</id> <mode>3</mode>
+      <semi_major_axis>6378249.145</semi_major_axis>
+      <flattening>293.465</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Everest</mlb>
+      <id>13</id> <mode>3</mode>
+      <semi_major_axis>6377276.345</semi_major_axis>
+      <flattening>300.8017</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Airy</mlb>
+      <id>14</id> <mode>3</mode>
+      <semi_major_axis>6377563.396</semi_major_axis>
+      <flattening>299.3249646</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>SPBessel</mlb>
+      <id>15</id> <mode>4</mode>
+      <semi_major_axis>57013.109</semi_major_axis>
+      <flattening>0.001674184805</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>SpGRS80</mlb>
+      <id>89</id> <mode>3</mode>
+      <semi_major_axis>6378137</semi_major_axis>
+      <flattening>0</flattening>
+      <gravity>KM</gravity>  <rotation>OMEGA</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Spheric</mlb>
+      <id>90</id> <mode>2</mode>
+      <semi_major_axis>1</semi_major_axis>
+      <flattening>0</flattening>
+      <gravity>1</gravity>  <rotation>0</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Moon</mlb>
+      <id>99</id> <mode>1</mode>
+      <semi_major_axis>1737400</semi_major_axis>
+      <flattening>0.000256</flattening>
+      <gravity>KMMOON</gravity>  <rotation>2.6617e-006</rotation>
+      <description />
+    </grs>
+    <grs>
+      <mlb>Mars</mlb>
+      <id>104</id> <mode>1</mode>
+      <semi_major_axis>3397200</semi_major_axis>
+      <flattening>0.001964</flattening>
+      <gravity>4.28079e+013</gravity>  <rotation>7.088218e-005</rotation>
+      <description />
+    </grs>
+  </def_grs>
+
+</def_lab>
+<!-- bytes used: 101092 -->
+<!-- manager tab -->
+	<def_tab_manager>
+	   <geoids>
+	      <geoid> dvr90g2013.02</geoid>
+	   </geoids>
+	   <dhtables>
+		 <dhtable> dhdnndvr.02</dhtable>
+	   </dhtables>
+	   <t3dtables>
+	   </t3dtables>
+	   <geoid_sequence>
+		<geoid> dvr90g2013.02</geoid>
+	   </geoid_sequence>
+	</def_tab_manager>
+
+</def_trlib>
