@@ -42,6 +42,7 @@ static int set_projection(struct tag *prj_tag,  def_projection *proj);
 static int set_datum(struct tag *dtm_tag, def_datum *dtm);
 static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr);
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn);
+static int set_alias(struct tag *alias_tag, def_alias *alias);
 //static char BUF[256];
 
 /* 'single' int converter. A 'sep-char' could be input to extra, if more values were to be extracted from a string...*/
@@ -256,12 +257,7 @@ static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr){
 	t=get_named_child(hth_tag,"type");
 	if (1!=get_value(&t,&hth_tr->type,1,int_converter,NULL))
 		return 0;
-	t=get_named_child(hth_tag,"lat_0");
-	if (1!=get_value(&t,&hth_tr->B0,1,double_converter,"nt"))
-		return 0;
-	t=get_named_child(hth_tag,"lon_0");
-	if (1!=get_value(&t,&hth_tr->L0,1,double_converter,"nt"))
-		return 0;
+	
 	switch (hth_tr->type){
 		case 1:
 			t=get_named_child(hth_tag,"table");
@@ -274,6 +270,12 @@ static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr){
 				return 0;
 			break;
 		case 3:
+			t=get_named_child(hth_tag,"lat_0");
+			if (1!=get_value(&t,&hth_tr->B0,1,double_converter,"nt"))
+				return 0;
+			t=get_named_child(hth_tag,"lon_0");
+			if (1!=get_value(&t,&hth_tr->L0,1,double_converter,"nt"))
+				return 0;
 			t=get_named_child(hth_tag,"M0");
 			if (1!=get_value(&t,hth_tr->constants,1,double_converter,NULL))
 				return 0;
@@ -296,6 +298,17 @@ static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr){
 	return 1;
 }
 
+static int set_alias(struct tag *alias_tag, def_alias *alias){
+	struct tag t;
+	t=get_named_child(alias_tag,"key");
+	if (!get_value_as_string(&t,alias->key,MLBLNG))
+		return 0;
+	t=get_named_child(alias_tag,"value");
+	if (!get_value_as_string(&t,alias->value,MLBLNG))
+		return 0;
+	return 1;
+}
+
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn){
 	struct tag t;
 	t=get_named_child(rgn_tag,"new");
@@ -313,24 +326,24 @@ static int set_rgn(struct tag *rgn_tag, def_rgn *rgn){
 /* 
 Function that parses def_lab file. Now in XML :-)
 */
-
+#define N_MODES  (6)
  def_data *open_def_data(struct tag *root, int *n_err){
 	/*stuff that match the formatting and 'modes' of the def_lab file */
 	struct tag def_tag,item_tag;
 	def_data *data=NULL;
-	int n_set[5]={0,0,0,0,0},mode,i;
-	enum modes {mode_prj=0,mode_rgn=1,mode_dtm=2,mode_hth=3,mode_grs=4};
-	void *entries[5]={NULL,NULL,NULL,NULL,NULL};
-	char *mode_names[5]={"def_prj","def_rgn","def_dtm","def_hth","def_grs"};
-	char *item_names[5]={"prj","rgn","dtm","hth","grs"};
+	int n_set[N_MODES]={0,0,0,0,0,0},mode,i;
+	enum modes {mode_prj=0,mode_rgn=1,mode_dtm=2,mode_alias=3,mode_hth=4,mode_grs=5};
+	void *entries[N_MODES]={NULL,NULL,NULL,NULL,NULL,NULL};
+	char *mode_names[N_MODES]={"def_prj","def_rgn","def_dtm","def_alias","def_hth","def_grs"};
+	char *item_names[N_MODES]={"prj","rgn","dtm","alias","hth","grs"};
 	/* specifications for how much to preallocate */
-	int n_prealloc[5]={256,128,128,128,64};
-	int n_alloc[5]={256,128,128,128,64};
-	size_t mode_sizes[5]={sizeof( def_projection),sizeof(def_rgn),sizeof( def_datum), sizeof( def_hth_tr),sizeof( def_grs)};
+	int n_prealloc[N_MODES]={256,128,128,20,128,64};
+	int n_alloc[N_MODES]={256,128,128,20,128,64};
+	size_t mode_sizes[N_MODES]={sizeof( def_projection),sizeof(def_rgn),sizeof( def_datum), sizeof(def_alias), sizeof( def_hth_tr),sizeof( def_grs)};
 	/*printf("def_grs: %d\n",sizeof(def_grs));*/
 	*n_err=0; /* set no errors - yet! */
 	/* allocate memory for objects */
-	for(mode=0;mode<5;mode++){
+	for(mode=0;mode<N_MODES;mode++){
 		entries[mode]=malloc(n_prealloc[mode]*mode_sizes[mode]);
 		if (entries[mode]==NULL)
 			goto error;
@@ -344,7 +357,7 @@ Function that parses def_lab file. Now in XML :-)
 		goto error;
 	}
 	/*iterate over modes*/
-	for(mode=0; mode<5; mode++){
+	for(mode=0; mode<N_MODES; mode++){
 		lord_debug(0,LORD("Hello - mode is : %d"),mode);
 		def_tag=get_named_child(root,mode_names[mode]);
 		if (!def_tag.valid){
@@ -362,19 +375,22 @@ Function that parses def_lab file. Now in XML :-)
 				void *entry=entries[mode];
 				/*lord_debug(0,LORD("mode: %d, n_set: %d"),mode,n_set[mode]);*/
 				switch(mode){
-					case 0:
+					case mode_prj:
 						ok=set_projection(&item_tag,(def_projection*) entry+n_set[mode]);
 						break;
-					case 1:
+					case mode_rgn:
 						ok=set_rgn(&item_tag, (def_rgn*) entry+n_set[mode]);
 						break;
-					case 2:
+					case mode_dtm:
 						ok=set_datum(&item_tag, (def_datum*) entry+n_set[mode]);
 						break;
-					case 3:
+					case mode_alias:
+						ok=set_alias(&item_tag, (def_alias*) entry+n_set[mode]);
+						break;
+					case mode_hth:
 						ok=set_hth(&item_tag, (def_hth_tr*) entry+n_set[mode]);
 						break;
-					case 4:
+					case mode_grs:
 						ok=set_ellips(&item_tag,(def_grs*) entry+n_set[mode]);
 						break;
 					default:
@@ -412,7 +428,7 @@ Function that parses def_lab file. Now in XML :-)
 		}
 	}/*end mode iteration*/
 	/*reallocate sizes of objects */
-	for(i=0;i<5;i++)
+	for(i=0;i<N_MODES;i++)
 		entries[i]=realloc(entries[i],mode_sizes[i]*n_set[i]);
 	/*set parent no of datums*/
 	
@@ -440,11 +456,13 @@ Function that parses def_lab file. Now in XML :-)
 	data->n_ellip=n_set[mode_grs];
 	data->n_dtm=n_set[mode_dtm];
 	data->n_hth=n_set[mode_hth];
+	data->n_alias=n_set[mode_alias];
 	data->projections=entries[mode_prj];
 	data->datums=entries[mode_dtm];
 	data->ellipsoids=entries[mode_grs];
 	data->regions=entries[mode_rgn];
 	data->hth_entries=entries[mode_hth];
+	data->alias_table=entries[mode_alias];
 	/* perhaps sort entries after number?? */
 	//present_data(stdout,data);
 	return data;
@@ -464,6 +482,7 @@ void close_def_data( def_data *data){
 	free(data->ellipsoids);
 	free(data->regions);
 	free(data->hth_entries);
+	free(data->alias_table);
 	free(data);
 	return;
 }

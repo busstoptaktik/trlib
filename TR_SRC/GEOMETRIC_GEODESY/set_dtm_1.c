@@ -201,10 +201,15 @@ def_data          *DEF_DATA
     if (!isalpha(*d_nm) || strlen(d_nm) < 2)
 	    goto report;
     
+    /* search alias*/
+    for(i=0; i<DEF_DATA->n_alias ; i++){
+	    if(!strcmp(DEF_DATA->alias_table[i].key,w_name)) {
+		    strcpy(w_name, DEF_DATA->alias_table[i].value);
+		    break;
+	    }
+    }    
+    
     /* get datum info from datum name */
-    
-    
-    
     for(mode=0; mode<2; mode++){
 	    /* do the actual search */
 	    for(i=0; i<DEF_DATA->n_dtm && dtm==NULL; i++){

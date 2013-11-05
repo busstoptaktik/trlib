@@ -2052,24 +2052,8 @@ n_hth: 9
       European Terrestrial Ref System 1989
       </description>
     </dtm>
-    <dtm>
-      <mlb>etrs89</mlb>
-      <id>4</id>
-      <parent>wgs84</parent> <ellipsoid>GRS80</ellipsoid>
-      <imit>0</imit> <type>0</type> <region>ZZ</region>
-      <description>
-      European Terrestrial Ref System 1989
-      </description>
-    </dtm>
-    <dtm>
-      <mlb>euref89</mlb>
-      <id>4</id>
-      <parent>wgs84</parent> <ellipsoid>GRS80</ellipsoid>
-      <imit>0</imit> <type>0</type> <region>ZZ</region>
-      <description>
-      European Terrestrial Ref System 1989
-      </description>
-    </dtm>
+   
+    
     <dtm>
       <mlb>gr96</mlb>
       <id>5</id>
@@ -2784,7 +2768,7 @@ n_hth: 9
     <dtm>
       <mlb>dnn</mlb>
       <id>209</id>
-      <parent>dnn</parent> <ellipsoid>Hayford</ellipsoid>
+      <parent>dvr90</parent> <ellipsoid>Hayford</ellipsoid>
       <imit>0</imit> <type>0</type> <region>DK</region>
       <description>
       @ DNN: gm91/gi44/h_msl
@@ -2890,29 +2874,62 @@ n_hth: 9
       </description>
     </dtm>
   </def_dtm>
+  
+  <!-- Alias table for datum aliases  -->
+  <def_alias>
+     <alias>
+         <key> euref89 </key>
+        <value> etrf89 </value>
+      </alias>
+      <alias>
+         <key> etrs89 </key>
+         <value> etrf89 </value>
+      </alias>
+</def_alias>
+  
 
   <def_hth>
+  <!-- 
+  def_hth constants:
+  from_dtm   to_dtm  type   constants
+  reference
+
+constants depend of type::
+type == 1::  (defined via dh-table in table tag)
+  h_[to_dtm] = h_from + [dhtable](B, L)
+  
+type> == 2:: (defined by an addition constant in k0 tag)
+  h_[to_dtm] = h_from + k0
+  
+type == 3:: (defined by transformtion formula below, constants provided in tags) 
+  h_[to_dtm] = h_from + k0 + kN*(lat -lat_0)*M0  + kE*(lon -lon_0)*N0
+  
+  -->
     <hth>
-      <from>DK_geoHetrs89_h_dvr90</from> <to>evrf2000</to>
+      <from>dvr90</from> <to>evrf2000</to>
       <type>3</type>
+      <mlb>DK_geoHetrs89</mlb> 
       <lat_0>5602.00 nt</lat_0> <lon_0>914.00 nt</lon_0>
       <M0>6370860.167</M0> <N0>6390001.436</N0> <k0>0.011 m</k0> <kN>0.0030 sx</kN> <kE>0.0110 sx</kE>
       <description>http://www.crs-geo.eu/   National CRS,  DK</description>
     </hth>
+    
     <hth>
-      <from>DK_geoHetrs89_h_dvr90</from> <to>evrf2007</to>
+      <from>dvr90</from> <to>evrf2007</to>
       <type>3</type>
+      <mlb>DK_geoHetrs89</mlb> 
       <lat_0>5602.00 nt</lat_0> <lon_0>914.00 nt</lon_0>
       <M0>6370860.167</M0> <N0>6390001.436</N0> <k0>-0.004 m</k0> <kN>0.0070 sx</kN> <kE>0.0230 sx</kE>
       <description>http://www.crs-geo.eu/   National CRS,  DK</description>
     </hth>
+    
     <hth>
-      <from>DK_geoHetrs89_h_dnn</from> <to>dvr90</to>
+      <from>dnn</from> <to>dvr90</to>
       <type>1</type>
-      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
       <table>dhdnndvr.02</table>
       <description>DNN to DVR90</description>
     </hth>
+    
     <hth>
       <from>DK_s34jH_h_gm91</from> <to>dvr90</to>
       <type>1</type>
@@ -2920,41 +2937,42 @@ n_hth: 9
       <table>dhgmdvr.01</table>
       <description>GM 1891 to DVR90</description>
     </hth>
+    
     <hth>
-      <from>DK_s34jH_h_dnn</from> <to>gi50</to>
+      <from>dnn</from> <to>gi50</to>
       <type>1</type>
-      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
       <table>dhdnn50.01</table>
       <description>DNN OLD to DNN 1950 (NEW)</description>
     </hth>
+    
     <hth>
-      <from>FO_geoHetrs89_h_fvr09</from> <to>foldmsl</to>
+      <from>fvr09</from> <to>foldmsl</to>
       <type>1</type>
-      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
       <table>dhfvr09oldmsl.12</table>
       <description>FVR09 to MSL (old FO Height System)</description>
     </hth>
+    
     <hth>
-      <from>DK_geoHfeh10_h_dvr90</from> <to>fcsvr10</to>
+      <from>dvr90</from> <to>fcsvr10</to>
       <type>2</type>
-      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
       <k0>-0.034 m</k0>
       <description>DVR90 to Fehmarn Bridge Project Height</description>
     </hth>
+    
     <hth>
-      <from>DE_geoHfeh10_h_dhhn92</from> <to>fcsvr10</to>
+      <from>dhhn92</from> <to>fcsvr10</to>
       <type>1</type>
-      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
       <table>dhdhhn92fcsvr.10</table>
       <description>Fehmarn Bridge Project Height to DHDHHN92</description>
     </hth>
+    
     <hth>
-      <from>DK_geoHetrs89_h_dvr90</from> <to>kn44</to>
+      <from>dvr90</from> <to>kn44</to>
       <type>2</type>
-      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
       <k0>-0.038 m</k0>
       <description>DVR90 to Koebenhavns Nul 1944</description>
     </hth>
+    
   </def_hth>
  <def_grs>
    

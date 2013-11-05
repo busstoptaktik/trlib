@@ -37,7 +37,17 @@
 
 #define MAX_TABLE_LEN (32)
 #define MAX_DSCR_LEN (128)
- 
+
+struct def_alias {
+	char key[MLBLNG];
+	char value[MLBLNG];
+};
+
+
+
+
+
+
 struct def_grs {
 	char mlb[MLBLNG];
 	int no;
@@ -104,6 +114,7 @@ typedef struct def_grs def_grs;
 typedef struct def_datum def_datum;
 typedef struct def_projection def_projection;
 typedef struct def_rgn def_rgn;
+typedef struct def_alias def_alias;
 
 struct def_data{
 	def_projection *projections;
@@ -111,11 +122,13 @@ struct def_data{
 	def_grs    *ellipsoids;
 	def_hth_tr *hth_entries;
 	def_rgn     *regions;
+	def_alias *alias_table;
 	int n_prj;
 	int n_dtm;
 	int n_ellip;
 	int n_rgn;
 	int n_hth;
+	int n_alias;
 };
 
 typedef struct def_data def_data;

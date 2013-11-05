@@ -350,11 +350,13 @@ void present_data(FILE *fp,def_data *data){
 	int n_dtm=data->n_dtm;
 	int n_prj=data->n_prj;
 	int n_hth=data->n_hth;
+	int n_alias=data->n_alias;
 	fprintf(fp,"n_prj: %d\n",n_prj);
 	fprintf(fp,"n_rgn: %d\n",n_rgn);
 	fprintf(fp,"n_dtm: %d\n",n_dtm);
 	fprintf(fp,"n_grs: %d\n",n_grs);
-	fprintf(fp,"n_hth: %d\n\n",n_hth);
+	fprintf(fp,"n_hth: %d\n",n_hth);
+	fprintf(fp,"n_alias: %d\n\n",n_alias);
 	for (i=0; i<data->n_prj; i++){
 		fprintf(fp,"prj: %s\n",projections[i].mlb);
 		fprintf(fp,"cha_str: %d type: %d cstm: %d mode: %d mask: %d\n",projections[i].cha_str,projections[i].type,projections[i].cstm,projections[i].mode,projections[i].mask);
@@ -392,7 +394,6 @@ void present_data(FILE *fp,def_data *data){
 		
 	for(i=0;i<n_hth;i++){
 		fprintf(fp,"hth: %s to %s\n", data->hth_entries[i].from_mlb,data->hth_entries[i].to_dtm);
-		fprintf(fp,"Bo: %f, L0: %f\n",data->hth_entries[i].B0,data->hth_entries[i].L0);
 		switch( (data->hth_entries[i]).type)
 		{
 			case 1:
@@ -403,6 +404,7 @@ void present_data(FILE *fp,def_data *data){
 				break;
 			case 3:
 				fprintf(fp,"Constants: ");
+				fprintf(fp,"Bo: %f, L0: %f\n",data->hth_entries[i].B0,data->hth_entries[i].L0);
 				for(j=0;j<5;j++)
 					fprintf(fp," %e",data->hth_entries[i].constants[j]);
 				fprintf(fp,"\n");
@@ -415,9 +417,15 @@ void present_data(FILE *fp,def_data *data){
 		
 	}
 	fprintf(fp,"*****************\n\n");
+	
+	for(i=0; i<n_alias;i++){
+		fprintf(fp,"alias: key: %s, value: %s\n",data->alias_table[i].key,data->alias_table[i].value);
+	}
+	fprintf(fp,"*****************\n\n");
 	{
 	int n_bytes=0;
 	n_bytes=sizeof( def_projection)*n_prj+sizeof( def_datum)*n_dtm+sizeof( def_grs)*n_grs+n_rgn*3+sizeof( def_hth_tr)*n_hth;
+	n_bytes+=sizeof(def_alias)*n_alias;
 	fprintf(fp,"bytes used: %d\n",n_bytes);
 	}
 	
