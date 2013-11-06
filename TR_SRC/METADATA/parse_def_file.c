@@ -249,11 +249,11 @@ static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr, char *dir_name){
 	GRIM g;
 	
 	t=get_named_child(hth_tag,"from");
-	if (!get_value_as_string(&t,hth_tr->from_mlb,MLBLNG))
+	if (!get_value_as_string(&t,hth_tr->from,MLBLNG))
 		return 0;
 	
 	t=get_named_child(hth_tag,"to");
-	if (!get_value_as_string(&t,hth_tr->to_dtm,MLBLNG))
+	if (!get_value_as_string(&t,hth_tr->to,MLBLNG))
 		return 0;
 	
 	t=get_named_child(hth_tag,"file");
@@ -263,7 +263,7 @@ static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr, char *dir_name){
 	g=grim_open(attach_pom_extension(dir_name,file_name));
 	
 	if (g==NULL)
-		return 0;
+		return 0; /*TODO: check for POM proj_mlb field name is set*/
 	
 	return 1;
 }

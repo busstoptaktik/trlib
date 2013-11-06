@@ -3146,24 +3146,39 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
 <!-- bytes used: 101092 -->
 <!-- manager tab -->
 	<def_tab_manager>
-	   <height_datums>
-	       <height_datum>
+	   <geoid_height_datums>
+	       <geoid_height_datum>
 	       <mlb>dvr90</mlb>
 	       <geoids>
 		<geoid>
 		<file>dvr90g2013.02</file>
 		<variance> 1</variance>
 		</geoid>
+	     </geoids>
+	    </geoid_height_datum>
+	       <geoid_height_datum>
+	       <mlb>egm96</mlb>
+	       <geoids>
+		<geoid>
+		<file>egm_file</file>
+		<variance> 999 </variance>
+		</geoid>
+	     </geoids>
+	  </geoid_height_datum>
+          </geoid_height_datums>
+
+         <geoid_unused_s>
+	       <geoid_height_datum>
+	       <mlb>dvr90</mlb>
+	       <geoids>
 		<geoid>
 		<file>dvr90g2002.01</file>
 		<variance> 999 </variance>
 		</geoid>
 	     </geoids>
-	
-	   
-	   <dhtables>
-		 <dhtable> dhdnndvr.02</dhtable>
-	   </dhtables>
+	    </geoid_height_datum>
+         </geoid_unused_s>
+
 	   <t3dtables>
 	   </t3dtables>
 	   <geoid_sequence>

@@ -26,9 +26,7 @@ int                      htr_init(
 struct coord_lab        *i_clb,
 struct coord_lab        *o_clb,
 struct coord_lab        *htr_lab,
-struct htr_c_str        *htr_const,
-char                    *dh_table_name,
-char                    *dh_tr_info,
+struct htr_route        *htr_const,
 tab_dir                 *tdir
 )  
 {
@@ -45,7 +43,8 @@ tab_dir                 *tdir
   short imit;
   def_hth_tr *htr_def;
   int n_hth=0;
-
+  htr_const->n_steps=0;
+	
   if (i_clb->h_dtm < 200 || 299 < i_clb->h_dtm ||
       o_clb->h_dtm < 200 || 299 < o_clb->h_dtm) return(HTRF_ILLEG_);
 
@@ -128,40 +127,27 @@ tab_dir                 *tdir
       
       htr_def=DEF_DATA->hth_entries+(n_hth++);
 	
-      if ((!strcmp(i_nm, htr_def->from_mlb) &&
-          (!strcmp(o_nm, htr_def->to_dtm)    ) {
-         tr_type = htr_def->type;
+      if ((!strcmp(i_nm, htr_def->from) &&
+          (!strcmp(o_nm, htr_def->to)    ) {
+         tr_type = 1;
          l_inv   = 0;
       } else
-      if ((!strcmp(o_nm, htr_def->from_mlb) &&
-          (!strcmp(i_nm, htr_def->to_dtm)    ) {
-         tr_type = htr_def->type;
-         l_inv   = 0;
+      if ((!strcmp(o_nm, htr_def->from) &&
+          (!strcmp(i_nm, htr_def->to)    ) {
+         tr_type = 1;
+         l_inv   = 1;
       }
-      if (tr_type > -1) { /* FOUND */
-        htr_const->inv   = l_inv;
-        /* params :: */
-        switch (tr_type) {
-        case 1: // dh_table
-          strncpy(dh_table_name,htr_def->table,MAX_TABLE_LEN); 
-          *htr_lab = GET_CO_LAB_FROM_TABLE.POM;
-            break;
-        case 2: // Constant
-          htr_const->a1 =htr_def->constants[0]; 
-          break;
-        case 3: // Linear
-          *htr_lab = htr_def->crt;
-          htr_const->LAT0 = htr_def->B0; 
-          htr_const->LON0 = htr_def->L0; 
-          htr_const->M0   = htr_def->constants[0];
-          htr_const->N0   = htr_def->constants[1]; 
-          htr_const->a1   = htr_def->constants[2]; 
-          htr_const->a2   = htr_def->constants[3]; 
-          htr_const->a3   = htr_def->constants[4]; 
-          o_hdtm          = (htr_const->inv) ? i_hdtm : o_hdtm;
-        }
-      }
-    } while (tr_type <= 0 && n_hth<DEF_DATA->n_hth);
+      if (tr_type> -1) { /* FOUND */
+        htr_const->inv[n_steps]  = l_inv;
+        htr_const->g[n_steps]= htr_def->g;
+	if(htr_const->n_steps==0)
+		res =  conv_w_crd(grim_field_name(htr_def->g, "proj_mlb"), htr_lab, DEF_DATA);
+
+	htr_const->n_steps++;
+        break;
+	}
+      
+    } while (n_hth<DEF_DATA->n_hth); /*Prepared for more steps, only one now (20131107)*/
   }
 
   if (tr_type < 0) {
@@ -172,69 +158,3 @@ tab_dir                 *tdir
 }
 
 
-/* CUT OUT
-
-  /* TODO: put in alias table */
-  /* idt for DK h_dtms */
-  if (i_hdtm == 203 || i_hdtm == 204 || i_hdtm == 206) i_hdtm = 209;
-  if (o_hdtm == 203 || o_hdtm == 204 || o_hdtm == 206) o_hdtm = 209;
-
-      conv_w_crd(htr_def->from_mlb, &test_lab, DEF_DATA);
-      if (test_lab.lab_type == 1) {
-      
-        l_inv = test_lab.h_dtm == o_hdtm;
-        if (test_lab.h_dtm == i_hdtm || l_inv) {
-        
-            if (!strcmp((l_inv) ? i_nm : o_nm, htr_def->to_dtm)) { // FOUND
-              // The grid_val accepts NO height label part::
-              p_tp = test_lab.mlb+test_lab.sepix;
-              if (test_lab.sepix+2 == test_lab.h_ix)
-                *(test_lab.mlb+test_lab.sepix)   = '\0';
-              else {
-                *(test_lab.mlb+test_lab.sepix)   = '_';
-                *(test_lab.mlb+test_lab.h_ix -1) = '\0';
-              }
-              htr_const->inv   = l_inv;
-              *htr_lab         = test_lab;
-              //sh_dtm           = o_hdtm;
-            
-	      tr_type=htr_def->type;
-            
-              htr_const->LAT0  = htr_def->B0; 
-            
-              htr_const->LON0  = htr_def->L0; 
-              // params ::
-           
-              
-                switch (tr_type) {
-                case 1: // dh_table
-                  strncpy(dh_table_name,htr_def->table,MAX_TABLE_LEN); 
-                break;
-                case 2: // Constant
-                  htr_const->a1 =htr_def->constants[0]; 
-                break;
-                case 3: // Linear
-                  htr_const->M0  = htr_def->constants[0];
-                
-                  htr_const->N0  = htr_def->constants[1]; 
-                 
-                  htr_const->a1  = htr_def->constants[2]; 
-                  
-                  htr_const->a2  = htr_def->constants[3]; 
-               
-                  htr_const->a3  = htr_def->constants[4]; 
-                  o_hdtm         = (htr_const->inv) ? i_hdtm : o_hdtm;
-                }
-              
-            } 
-            
-            if (tr_type > 0) // reference
-		    strncpy(dh_tr_info, "Not available.",127); / *TODO: preparse and add this * /
-         
-          
-        } else {
-         
-           strncpy(dh_tr_info, "Not available.",127); 
-        }
-      } else test_lab.lab_type = STP_LAB;
-*/

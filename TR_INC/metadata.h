@@ -103,6 +103,12 @@ struct  def_hth_tr{
 	GRIM g;
 };
 
+struct htr_route{
+	int n_steps;
+	int inv[2];
+	GRIM g[2];
+};
+
 typedef struct def_hth_tr def_hth_tr;
 typedef struct def_grs def_grs;
 typedef struct def_datum def_datum;
@@ -132,10 +138,9 @@ void close_def_data(def_data *data);
 
 typedef struct{
 	GRIM geoids[128];
-	GRIM dhtabs[30];
 	GRIM t3dtabs[30];
 	GRIM  geoid_seq_std[10];
-	int n_geoids,n_dhtabs,n_3dtabs,n_geoid_seq_std;
+	int n_geoids,n_3dtabs,n_geoid_seq_std;
 	def_data   *def_lab;
 	char dir[128];
 } tab_dir;
@@ -184,7 +189,7 @@ struct gd_state{
 	tab_dir            *TAB_DIR;
         table_adm_str   *grid_tab;
 	table_adm_str   *h_grid_tab;
-	struct htr_c_str    htr_const;
+	struct htr_route    htr_const;
 	int                 b_lev, s_lev;
 	short               iEh_req, oEh_req;
 	short               s_req_dh;

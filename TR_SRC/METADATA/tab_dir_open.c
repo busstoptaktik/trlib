@@ -115,19 +115,47 @@ tab_dir *tab_dir_open(char *path){
 	
 	
 static int parse_table_manager(struct tag *root, tab_dir *self){
-	struct tag tag_l1, tag_l2;
+	struct tag tag_l1, tag_l2, tag_l3;
 	int i, j;
 	int len = 128;
 	char name[256];
 	GRIM g;
-	tag_l1=get_named_child(root,"geoids");
+	
+	tag_l1=get_named_child(root,"height_datums");
 	if (!tag_l1.valid){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 'geoids' not found."));
+		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 'height_datums' not found."));
 		return 0;
 	}
+
 	tag_l2=get_next_child(&tag_l1,NULL);
-	
 	for (i=0; tag_l2.valid; i++){
+		tag_l3=get_named_child(&tag_l2,"mlb");
+		/* Do something with mlb*/
+		
+
+		
+		
+	<def_tab_manager>
+	   <height_datums>
+	       <height_datum>
+	       <mlb>dvr90</mlb>
+	       <geoids>
+		<geoid>
+		<file>dvr90g2013.02</file>
+		<variance> 1</variance>
+		</geoid>
+		<geoid>
+		<file>dvr90g2002.01</file>
+		<variance> 999 </variance>
+		</geoid>
+	     </geoids>
+
+		
+		
+		
+		
+		
+		
 		get_value_as_string(&tag_l2,name,len);
 		g=grim_open(attach_pom_extension(self->dir,name));
 		if (!g){
@@ -139,24 +167,7 @@ static int parse_table_manager(struct tag *root, tab_dir *self){
 		tag_l2=get_next_child(&tag_l1,&tag_l2);
 	}
 	self->n_geoids = i;
-	tag_l1=get_named_child(root,"dhtables");
-	if (!tag_l1.valid){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 'dhtables' not found."));
-		return 0;
-	}
-	tag_l2=get_next_child(&tag_l1,NULL);
-	for (i=0; tag_l2.valid; i++){
-		get_value_as_string(&tag_l2,name,len);
-		g=grim_open(attach_pom_extension(self->dir,name));
-		if (!g){
-			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to memory map %s."),name);
-			return 0;
-		}
-		self->dhtabs[i]=g;
-		
-		tag_l2=get_next_child(&tag_l1,&tag_l2);
-	}
-	self->n_dhtabs = i;
+
 	tag_l1=get_named_child(root,"t3dtables");
 	if (!tag_l1.valid){
 		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 't3dtabs' not found."));
