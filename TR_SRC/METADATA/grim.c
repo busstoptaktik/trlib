@@ -121,6 +121,7 @@ endif
 
 
 struct GRIM {
+    int type; /* 0 : grid, otherwise polynomial..... 	
     long           /* size_t here will get us into trouble for signed/unsigned comparisons */
         ncols,
         nrows;
@@ -136,7 +137,10 @@ struct GRIM {
         nodata;
     double         /* parameters for affine transformations between
                       world coordinates (m) and grid coordinates (px) */
-        affine[6];
+        affine[6],
+	coefficients[6];
+	
+     
 
 
     float         /* the memory map herself */
@@ -287,21 +291,22 @@ double grim_column (const GRIM g, double northing, double easting) {
 
 
 GRIM grim_close (GRIM g) {
-    if (g->file)
-        fclose (g->file);
+	if(g->type==0){
+		if (g->file)
+			fclose (g->file);
 
-#ifdef USE_MMAP
-    assert (0==munmap (g->data, g->data_size));
-#elif defined _WIN32
-    if (g->data)     UnmapViewOfFile (g->data);
-    if (g->hfilemap) CloseHandle (g->hfilemap);
-    if (g->hfile)    CloseHandle (g->hfile);
-#else
-/* TODO
-   if (g->data)
-        free (g->data);  */
-#endif
-
+		#ifdef USE_MMAP
+		    assert (0==munmap (g->data, g->data_size));
+		#elif defined _WIN32
+		    if (g->data)     UnmapViewOfFile (g->data);
+		    if (g->hfilemap) CloseHandle (g->hfilemap);
+		    if (g->hfile)    CloseHandle (g->hfile);
+		#else
+		/* TODO
+		   if (g->data)
+			free (g->data);  */
+		#endif
+	}
 	free (g);
 	return 0;
 }
@@ -347,6 +352,7 @@ GRIM grim_open (char *pomfilename) {
     GRIM g;
 	POM *p;
     int res;
+    g->file = NULL;
     if (0==pomfilename)
         return 0;
 
@@ -360,34 +366,46 @@ GRIM grim_open (char *pomfilename) {
     if (0==g)
 		return (GRIM) pom_free (p);
     g->pom = p;
-
+    if (!strcmp(pomval(p,"type"),"table");
+	g->type=0;
+    else
+	g->type=1;
     /* Extract the grid header information from the pom */
-    g->ncols     = pomtod (p, "ncols");
-    g->nrows     = pomtod (p, "nrows");
-    g->xllcenter = pomtod (p, "xllcenter");
-    g->yllcenter = pomtod (p, "yllcenter");
-    g->xcellsize = pomtod (p, "xcellsize");
-    g->ycellsize = pomtod (p, "ycellsize");
-    g->nodata    = pomtod (p, "nodata");
-    g->filename  = pomval (p, "filename");
-
-    g->offset    = pomtod (p, "offset");
-    g->stride    = pomtod (p, "stride");
-    g->channels  = pomtod (p, "channels");
-
-    g->affine[0] = g->xcellsize;
-    g->affine[1] = 0;
-    g->affine[2] = g->xllcenter;
-
-    g->affine[3] = 0;
-    g->affine[4] = - g->ycellsize;
-    g->affine[5] = g->yllcenter + (g->nrows - 1) * g->ycellsize;
-
-    if (0!=(res=memory_map_file (g, pomfilename))){
-	lord_error(res,LORD("Memory mapping failed..."));
-        return grim_close (g);
+    if (g->type==0){
+	g->ncols     = pomtod (p, "ncols");
+	g->nrows     = pomtod (p, "nrows");
+	g->xcellsize = pomtod (p, "xcellsize");
+	g->ycellsize = pomtod (p, "ycellsize");
+	g->nodata    = pomtod (p, "nodata");
+	g->filename  = pomval (p, "filename");
+	g->offset    = pomtod (p, "offset");
+	g->stride    = pomtod (p, "stride");
+	g->affine[0] = g->xcellsize;
+	g->affine[1] = 0;
+	g->affine[2] = g->xllcenter;
+	g->affine[3] = 0;
+	g->affine[4] = - g->ycellsize;
+	g->affine[5] = g->yllcenter + (g->nrows - 1) * g->ycellsize;
+    }
+     else if (g->type==1){
+	g->coefficients[0]=pomtod(p,"k0");
+	g->coefficients[1]=pomtod(p,"kN")*pomtod(p,"M0");
+	g->coefficients[2]=pomtod(p,"kE")*pomtod(p,"N0");
     }
 
+    else
+	return NULL;
+    
+    g->xllcenter = pomtod (p, "xllcenter");
+    g->yllcenter = pomtod (p, "yllcenter");
+    g->channels  = pomtod (p, "channels");
+   
+    if (g->type==0){
+	    if (0!=(res=memory_map_file (g, pomfilename))){
+		lord_error(res,LORD("Memory mapping failed..."));
+		return grim_close (g);
+		}
+	}
     return g;
 }
 
@@ -485,16 +503,28 @@ static int grim_values_workhorse (const GRIM g, double northing, double easting,
 }
 
 
-
+int grim_polynomial_workhorse(const GRIM g, double northing, double easting, *double record, int channels){
+	if (channels>1){ /*only 1d for now*/
+		return 1;
+	}
+	*record=g->coefficients[0]+(northing-g->yllcenter)*g->coefficients[1]+(easting-g->xllcenter)*g->coefficients[2]; /*todo: more terms*/
+	return 0;
+}
 
 
 /* grim_values: interpolate in a multichannel grid. */
 int grim_values (const GRIM g, double northing, double easting, size_t extrapolation_method, double *record) {
-    return grim_values_workhorse (g, northing, easting, extrapolation_method, record, 0, g->channels);
+    if (g->type==1)
+	    return grim_polynomial_workhorse(g,northing,easting, record, g->channels);
+    else
+	    return grim_values_workhorse (g, northing, easting, extrapolation_method, record, 0, g->channels);
 }
 double grim_value (const GRIM g, double northing, double easting, size_t channel, size_t extrapolation_method) {
     double v;
-    grim_values_workhorse (g, northing, easting, extrapolation_method, &v, channel, 1);
+    if (g->type==1)
+	    grim_polynomial_workhorse(g, northing, easting, &v, channel, 1);
+    else
+	   grim_values_workhorse (g, northing, easting, extrapolation_method, &v, channel, 1);
     return v;
 }
 
@@ -519,20 +549,16 @@ char *grim_filename(const GRIM g){
 	return g->filename;
 }
 
-char *grim_proj(const GRIM g){
-	return pomval(g->pom, "proj_mlb");
-}
-
-char *grim_h_mlb(const GRIM g){
-	return pomval(g->pom, "h_mlb");
-}
-
 double grim_rows(const GRIM g){
 	return g->nrows;
 }
 
 double grim_columns(const GRIM g){
 	return g->ncols;
+}
+
+const char *grim_field_name(const GRIM g, const char *field_name){
+	return pomval(g->pom, field_name);
 }
 
 #ifdef TEST_GRIM

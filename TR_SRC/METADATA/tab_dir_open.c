@@ -90,7 +90,7 @@ tab_dir *tab_dir_open(char *path){
 		goto CLEANUP;
 	}
 	
-	self->def_lab=open_def_data(&def_lab_tag,&n_err);
+	self->def_lab=open_def_data(&def_lab_tag,self->dir,&n_err);
 	if (!(self->def_lab)){
 		lord_error(TAB_N_MAN_,LORD("Failed to parse def_lab - invalid trlib definition file."));
 		goto CLEANUP;

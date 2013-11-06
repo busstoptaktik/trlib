@@ -96,18 +96,12 @@ struct def_projection{
 };
 
 struct  def_hth_tr{
-	char from_mlb[MLBLNG];
-	char to_dtm[MLBLNG];
+	char from[MLBLNG];
+	char to[MLBLNG];
 	int ih_dtm;
 	int oh_dtm;
-	int type;
-	double B0;
-	double L0;
-	double constants[5];
-	char table[MAX_TABLE_LEN];
-	char descr[MAX_DSCR_LEN];
+	GRIM g;
 };
-	
 
 typedef struct def_hth_tr def_hth_tr;
 typedef struct def_grs def_grs;

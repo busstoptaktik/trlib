@@ -2885,6 +2885,18 @@ n_hth: 9
          <key> etrs89 </key>
          <value> etrf89 </value>
       </alias>
+      <alias>
+         <key>gm91</key>
+         <value>dnn</value>
+      </alias>
+      <alias>
+         <key>gi44</key>
+         <value>dnn</value>
+      </alias>
+      <alias>
+         <key>gi50</key>
+         <value>dnn</value>
+      </alias>
 </def_alias>
   
 
@@ -2916,30 +2928,16 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
     
     <hth>
       <from>dvr90</from> <to>evrf2007</to>
-      <type>3</type>
-      <mlb>DK_geoHetrs89</mlb> 
-      <lat_0>5602.00 nt</lat_0> <lon_0>914.00 nt</lon_0>
-      <M0>6370860.167</M0> <N0>6390001.436</N0> <k0>-0.004 m</k0> <kN>0.0070 sx</kN> <kE>0.0230 sx</kE>
-      <description>http://www.crs-geo.eu/   National CRS,  DK</description>
+      <file>dhdvr90evrf2007</file>
     </hth>
     
     <hth>
       <from>dnn</from> <to>dvr90</to>
-      <type>1</type>
-      <table>dhdnndvr.02</table>
-      <description>DNN to DVR90</description>
+      <file>dhdnndvr.02</file>
     </hth>
     
     <hth>
-      <from>DK_s34jH_h_gm91</from> <to>dvr90</to>
-      <type>1</type>
-      <lat_0>5430.00 nt</lat_0> <lon_0>1120.00 nt</lon_0>
-      <table>dhgmdvr.01</table>
-      <description>GM 1891 to DVR90</description>
-    </hth>
-    
-    <hth>
-      <from>dnn</from> <to>gi50</to>
+      <from>dnn1945</from> <to>dnn</to>
       <type>1</type>
       <table>dhdnn50.01</table>
       <description>DNN OLD to DNN 1950 (NEW)</description>
@@ -2971,6 +2969,12 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
       <type>2</type>
       <k0>-0.038 m</k0>
       <description>DVR90 to Koebenhavns Nul 1944</description>
+    </hth>
+    
+    <hth>
+       <from>dvr90</from> <to>dhhn92</to>
+       <type>6</type>
+       <step>fcsvr10</step>
     </hth>
     
   </def_hth>
@@ -3142,9 +3146,21 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
 <!-- bytes used: 101092 -->
 <!-- manager tab -->
 	<def_tab_manager>
-	   <geoids>
-	      <geoid> dvr90g2013.02</geoid>
-	   </geoids>
+	   <height_datums>
+	       <height_datum>
+	       <mlb>dvr90</mlb>
+	       <geoids>
+		<geoid>
+		<file>dvr90g2013.02</file>
+		<variance> 1</variance>
+		</geoid>
+		<geoid>
+		<file>dvr90g2002.01</file>
+		<variance> 999 </variance>
+		</geoid>
+	     </geoids>
+	
+	   
 	   <dhtables>
 		 <dhtable> dhdnndvr.02</dhtable>
 	   </dhtables>
