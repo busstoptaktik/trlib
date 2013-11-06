@@ -243,58 +243,28 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 	return 1;
 }
 
-static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr){
+static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr, char *dir_name){
 	struct tag t;
+	char file_name[512];
+	GRIM g;
+	
 	t=get_named_child(hth_tag,"from");
 	if (!get_value_as_string(&t,hth_tr->from_mlb,MLBLNG))
 		return 0;
-	t=get_named_child(hth_tag,"description");
-	if (!get_value_as_string(&t,hth_tr->descr,MAX_DSCR_LEN))
-		*(hth_tr->descr)='\0';
+	
 	t=get_named_child(hth_tag,"to");
 	if (!get_value_as_string(&t,hth_tr->to_dtm,MLBLNG))
 		return 0;
-	t=get_named_child(hth_tag,"type");
-	if (1!=get_value(&t,&hth_tr->type,1,int_converter,NULL))
+	
+	t=get_named_child(hth_tag,"file");
+	if (!get_value_as_string(&t,file_name,128))
 		return 0;
 	
-	switch (hth_tr->type){
-		case 1:
-			t=get_named_child(hth_tag,"table");
-			if (!get_value_as_string(&t,hth_tr->table,MAX_TABLE_LEN))
-				return 0;
-			break;
-		case 2:
-			t=get_named_child(hth_tag,"k0");
-			if (1!=get_value(&t,hth_tr->constants,1,double_converter,NULL))
-				return 0;
-			break;
-		case 3:
-			t=get_named_child(hth_tag,"lat_0");
-			if (1!=get_value(&t,&hth_tr->B0,1,double_converter,"nt"))
-				return 0;
-			t=get_named_child(hth_tag,"lon_0");
-			if (1!=get_value(&t,&hth_tr->L0,1,double_converter,"nt"))
-				return 0;
-			t=get_named_child(hth_tag,"M0");
-			if (1!=get_value(&t,hth_tr->constants,1,double_converter,NULL))
-				return 0;
-			t=get_named_child(hth_tag,"N0");
-			if (1!=get_value(&t,hth_tr->constants+1,1,double_converter,NULL))
-				return 0;
-			t=get_named_child(hth_tag,"k0");
-			if (1!=get_value(&t,hth_tr->constants+2,1,double_converter,NULL))
-				return 0;
-			t=get_named_child(hth_tag,"kN");
-			if (1!=get_value(&t,hth_tr->constants+3,1,double_converter,"sx"))
-				return 0;
-			t=get_named_child(hth_tag,"kE");
-			if (1!=get_value(&t,hth_tr->constants+4,1,double_converter,"sx"))
-				return 0;
-			break;
-		default:
-			return 0;
-	}
+	g=grim_open(attach_pom_extension(dir_name,file_name));
+	
+	if (g==NULL)
+		return 0;
+	
 	return 1;
 }
 
@@ -327,7 +297,7 @@ static int set_rgn(struct tag *rgn_tag, def_rgn *rgn){
 Function that parses def_lab file. Now in XML :-)
 */
 #define N_MODES  (6)
- def_data *open_def_data(struct tag *root, int *n_err){
+ def_data *open_def_data(struct tag *root, char *dir_name, int *n_err){
 	/*stuff that match the formatting and 'modes' of the def_lab file */
 	struct tag def_tag,item_tag;
 	def_data *data=NULL;
@@ -388,7 +358,7 @@ Function that parses def_lab file. Now in XML :-)
 						ok=set_alias(&item_tag, (def_alias*) entry+n_set[mode]);
 						break;
 					case mode_hth:
-						ok=set_hth(&item_tag, (def_hth_tr*) entry+n_set[mode]);
+						ok=set_hth(&item_tag, (def_hth_tr*) entry+n_set[mode], dir_name);
 						break;
 					case mode_grs:
 						ok=set_ellips(&item_tag,(def_grs*) entry+n_set[mode]);
@@ -475,12 +445,15 @@ Function that parses def_lab file. Now in XML :-)
 }
 
 void close_def_data( def_data *data){
+	int i;
 	if (!data)
 		return;
 	free(data->projections);
 	free(data->datums);
 	free(data->ellipsoids);
 	free(data->regions);
+	for (i=0; i<data->n_hth;i++)
+		grim_close(data->hth_entries[i].g);
 	free(data->hth_entries);
 	free(data->alias_table);
 	free(data);
