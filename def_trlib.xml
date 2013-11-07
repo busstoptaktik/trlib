@@ -2900,8 +2900,16 @@ n_hth: 9
 </def_alias>
   
 
-  <def_hth>
-  <!-- 
+  <def_dtm_shifts>
+    <dtm_shift>
+        <from> nad83 </from> <to>gr96</to>
+    </dtm_shift>
+    <dtm_shift>
+         <from>s34</from> <to> ed50 </to>
+	 <file> s34ed50poly</file>
+    </dtm_shift>
+
+<!-- 
   def_hth constants:
   from_dtm   to_dtm  type   constants
   reference
@@ -2917,19 +2925,22 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
   h_[to_dtm] = h_from + k0 + kN*(lat -lat_0)*M0  + kE*(lon -lon_0)*N0
   
   -->
-    <hth>
+    <dtm_shift>
       <from>dvr90</from> <to>evrf2000</to>
-      <type>3</type>
       <mlb>DK_geoHetrs89</mlb> 
-      <lat_0>5602.00 nt</lat_0> <lon_0>914.00 nt</lon_0>
-      <M0>6370860.167</M0> <N0>6390001.436</N0> <k0>0.011 m</k0> <kN>0.0030 sx</kN> <kE>0.0110 sx</kE>
       <description>http://www.crs-geo.eu/   National CRS,  DK</description>
-    </hth>
+      <htr_constants>
+         <lat_0>5602.00 nt</lat_0> <lon_0>914.00 nt</lon_0>
+         <M0>6370860.167</M0> <N0>6390001.436</N0> <k0>0.011 m</k0> <kN>0.0030 sx</kN> <kE>0.0110 sx</kE>
+    </htr_constants>
+    </dtm_shift>
     
-    <hth>
+    
+    
+    <dtm_shift>
       <from>dvr90</from> <to>evrf2007</to>
       <file>dhdvr90evrf2007</file>
-    </hth>
+    </dtm_shift>
     
     <hth>
       <from>dnn</from> <to>dvr90</to>
@@ -3146,44 +3157,8 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
 <!-- bytes used: 101092 -->
 <!-- manager tab -->
 	<def_tab_manager>
-	   <geoid_height_datums>
-	       <geoid_height_datum>
-	       <mlb>dvr90</mlb>
-	       <geoids>
-		<geoid>
-		<file>dvr90g2013.02</file>
-		<variance> 1</variance>
-		</geoid>
-	     </geoids>
-	    </geoid_height_datum>
-	       <geoid_height_datum>
-	       <mlb>egm96</mlb>
-	       <geoids>
-		<geoid>
-		<file>egm_file</file>
-		<variance> 999 </variance>
-		</geoid>
-	     </geoids>
-	  </geoid_height_datum>
-          </geoid_height_datums>
-
-         <geoid_unused_s>
-	       <geoid_height_datum>
-	       <mlb>dvr90</mlb>
-	       <geoids>
-		<geoid>
-		<file>dvr90g2002.01</file>
-		<variance> 999 </variance>
-		</geoid>
-	     </geoids>
-	    </geoid_height_datum>
-         </geoid_unused_s>
-
-	   <t3dtables>
-	   </t3dtables>
-	   <geoid_sequence>
-		<geoid> dvr90g2013.02</geoid>
-	   </geoid_sequence>
+	   <tables>
+	      <table> dvr90g2002.01 </table>
+	   </tables>
 	</def_tab_manager>
-
 </def_trlib>

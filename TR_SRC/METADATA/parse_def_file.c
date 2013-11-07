@@ -40,7 +40,7 @@ static int int_converter(char *in, void *out, size_t buf_size, void *extra);
 static int double_converter(char *in, void *out, size_t buf_size, void *extra);
 static int set_projection(struct tag *prj_tag,  def_projection *proj);
 static int set_datum(struct tag *dtm_tag, def_datum *dtm);
-static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr);
+static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, char *dir_name);
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn);
 static int set_alias(struct tag *alias_tag, def_alias *alias);
 //static char BUF[256];
@@ -243,28 +243,83 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 	return 1;
 }
 
-static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr, char *dir_name){
+static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, char *dir_name){
 	struct tag t;
 	char file_name[512];
 	GRIM g;
 	
-	t=get_named_child(hth_tag,"from");
-	if (!get_value_as_string(&t,hth_tr->from,MLBLNG))
+	t=get_named_child(dtm_shift_tag,"from");
+	if (!get_value_as_string(&t,dtm_shift->from,MLBLNG))
 		return 0;
 	
-	t=get_named_child(hth_tag,"to");
-	if (!get_value_as_string(&t,hth_tr->to,MLBLNG))
+	t=get_named_child(dtm_shift_tag,"to");
+	if (!get_value_as_string(&t,dtm_shift->to,MLBLNG))
 		return 0;
 	
-	t=get_named_child(hth_tag,"file");
-	if (!get_value_as_string(&t,file_name,128))
-		return 0;
-	
-	g=grim_open(attach_pom_extension(dir_name,file_name));
-	
-	if (g==NULL)
-		return 0; /*TODO: check for POM proj_mlb field name is set*/
-	
+	t=get_named_child(dtm_shift_tag,"file");
+	if (t.is_valid){
+		(if !get_value_as_string(&t,file_name,128))
+			return 0;
+		g=grim_open(attach_pom_extension(dir_name,file_name));
+		if (g==NULL)
+			return 0; /*TODO: check for POM proj_mlb field name is set*/
+	}
+	else{
+		int degree;
+		double coefficients[4];
+		double lon_0=0.0,lat_0=0.0;
+		char mlb[MLBLNG];
+		mlb[0]='\0';
+		
+		t=get_named_child(dtm_shift_tag,"mlb");
+		if (!get_value_as_string(&t,mlb,MLBLNG);
+			return 0;
+
+		t=get_named_child(dtm_shift_tag,"htr_constant");
+		if (t.is_valid) {
+			if (1!=get_value(&t,coefficients,1,double_converter,NULL))
+				return 0;
+			coefficients[1]=0;
+			coefficients[2]=0;
+			coefficients[3]=0;
+			degree = 0;
+		}
+		else {
+			struct tag s;
+			t=get_named_child(dtm_shift_tag,"htr_constants");
+			if (t.is_valid) {
+				s=get_named_child(&t,"lat_0");
+				if (1!=get_value(&s,&lat_0,1,double_converter,"nt"))
+					return 0;
+				s=get_named_child(&t,"lon_0");
+				if (1!=get_value(&s,&lon_0,1,double_converter,"nt"))
+					return 0;
+				s=get_named_child(&t,"k0");
+				if (1!=get_value(&s,coefficients,1,double_converter,NULL))
+					return 0;
+				s=get_named_child(&t,"M0");
+				if (1!=get_value(&s,coefficients+1,1,double_converter,NULL))
+					return 0;
+				s=get_named_child(&t,"kN");
+				if (1!=get_value(&s,coefficients+2,1,double_converter,"sx"))
+					return 0;
+				coefficients[1]*=coeffecients[2];
+				s=get_named_child(&t,"N0");
+				if (1!=get_value(&s,coefficients+2,1,double_converter,NULL))
+					return 0;
+				s=get_named_child(&t,"kE");
+				if (1!	=get_value(&s,coefficients+3,1,double_converter,"sx"))
+					return 0;
+				coefficients[2]*=coeffecients[3];
+				coefficients[3]=0;
+				degree=1;
+			}
+			else
+			return 0;
+		}
+		g=grim_polynomial(lat_0,lon_0,coefficients, 3, 1, degree, mlb);
+	}
+	dtm_shift->g=g
 	return 1;
 }
 
@@ -302,14 +357,14 @@ Function that parses def_lab file. Now in XML :-)
 	struct tag def_tag,item_tag;
 	def_data *data=NULL;
 	int n_set[N_MODES]={0,0,0,0,0,0},mode,i;
-	enum modes {mode_prj=0,mode_rgn=1,mode_dtm=2,mode_alias=3,mode_hth=4,mode_grs=5};
+	enum modes {mode_prj=0,mode_rgn=1,mode_dtm=2,mode_alias=3,mode_dtm_shift=4,mode_grs=5};
 	void *entries[N_MODES]={NULL,NULL,NULL,NULL,NULL,NULL};
-	char *mode_names[N_MODES]={"def_prj","def_rgn","def_dtm","def_alias","def_hth","def_grs"};
-	char *item_names[N_MODES]={"prj","rgn","dtm","alias","hth","grs"};
+	char *mode_names[N_MODES]={"def_prj","def_rgn","def_dtm","def_alias","def_dtm_shift","def_grs"};
+	char *item_names[N_MODES]={"prj","rgn","dtm","alias","dtm_shift","grs"};
 	/* specifications for how much to preallocate */
 	int n_prealloc[N_MODES]={256,128,128,20,128,64};
 	int n_alloc[N_MODES]={256,128,128,20,128,64};
-	size_t mode_sizes[N_MODES]={sizeof( def_projection),sizeof(def_rgn),sizeof( def_datum), sizeof(def_alias), sizeof( def_hth_tr),sizeof( def_grs)};
+	size_t mode_sizes[N_MODES]={sizeof( def_projection),sizeof(def_rgn),sizeof( def_datum), sizeof(def_alias), sizeof( def_dtm_shift),sizeof( def_grs)};
 	/*printf("def_grs: %d\n",sizeof(def_grs));*/
 	*n_err=0; /* set no errors - yet! */
 	/* allocate memory for objects */
@@ -358,7 +413,7 @@ Function that parses def_lab file. Now in XML :-)
 						ok=set_alias(&item_tag, (def_alias*) entry+n_set[mode]);
 						break;
 					case mode_hth:
-						ok=set_hth(&item_tag, (def_hth_tr*) entry+n_set[mode], dir_name);
+						ok=set_dtm_shift(&item_tag, (def_dtm_shift*) entry+n_set[mode], dir_name);
 						break;
 					case mode_grs:
 						ok=set_ellips(&item_tag,(def_grs*) entry+n_set[mode]);
@@ -425,13 +480,13 @@ Function that parses def_lab file. Now in XML :-)
 	data->n_rgn=n_set[mode_rgn];
 	data->n_ellip=n_set[mode_grs];
 	data->n_dtm=n_set[mode_dtm];
-	data->n_hth=n_set[mode_hth];
+	data->n_dtm_shifts=n_set[mode_dtm_shift];
 	data->n_alias=n_set[mode_alias];
 	data->projections=entries[mode_prj];
 	data->datums=entries[mode_dtm];
 	data->ellipsoids=entries[mode_grs];
 	data->regions=entries[mode_rgn];
-	data->hth_entries=entries[mode_hth];
+	data->dtm_shifts=entries[mode_dtm_shift];
 	data->alias_table=entries[mode_alias];
 	/* perhaps sort entries after number?? */
 	//present_data(stdout,data);
@@ -452,9 +507,9 @@ void close_def_data( def_data *data){
 	free(data->datums);
 	free(data->ellipsoids);
 	free(data->regions);
-	for (i=0; i<data->n_hth;i++)
-		grim_close(data->hth_entries[i].g);
-	free(data->hth_entries);
+	for (i=0; i<data->n_dtm_shifts;i++)
+		grim_close(data->dtm_shifts[i].g);
+	free(data->dtm_shifts);
 	free(data->alias_table);
 	free(data);
 	return;

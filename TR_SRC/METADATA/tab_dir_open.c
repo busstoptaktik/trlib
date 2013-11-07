@@ -40,11 +40,15 @@ static char *attach_pom_extension(char *dir,char *in){
 		
 
 void tab_dir_close(tab_dir *self){
+	int i;
 	if (!self)
 		return;
 	if (self->def_lab)
 		close_def_data(self->def_lab);
-	/*TODO: close all GRIM objects*/
+	/*close all additional open tables*/
+	for (i=0; i<self->n_additional; i++)
+		grim_close(self->additional_tables[i]);
+	free(self->additional_tables);
 	free(self);
 }
 
@@ -115,77 +119,44 @@ tab_dir *tab_dir_open(char *path){
 	
 	
 static int parse_table_manager(struct tag *root, tab_dir *self){
-	struct tag tag_l1, tag_l2, tag_l3;
-	int i, j;
+	struct tag tag_l1, tag_l2;
+	int i, j, n_allocated;
 	int len = 128;
-	char name[256];
+	char name[512];
 	GRIM g;
-	
-	tag_l1=get_named_child(root,"height_datums");
+	GRIM *tables=NULL;
+	tables=calloc(sizeof(GRIM),30);
+	if (tables==NULL){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Failed to allocate memory for tables."));
+		return TR_ALLOCATION_ERROR;
+	}
+	n_allocated=30;
+	tag_l1=get_named_child(root,"tables");
 	if (!tag_l1.valid){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 'height_datums' not found."));
-		return 0;
+		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 'tables' not found."));
+		return TR_ERROR;
 	}
 
-	tag_l2=get_next_child(&tag_l1,NULL);
-	for (i=0; tag_l2.valid; i++){
-		tag_l3=get_named_child(&tag_l2,"mlb");
-		/* Do something with mlb*/
-		
-
-		
-		
-	<def_tab_manager>
-	   <height_datums>
-	       <height_datum>
-	       <mlb>dvr90</mlb>
-	       <geoids>
-		<geoid>
-		<file>dvr90g2013.02</file>
-		<variance> 1</variance>
-		</geoid>
-		<geoid>
-		<file>dvr90g2002.01</file>
-		<variance> 999 </variance>
-		</geoid>
-	     </geoids>
-
-		
-		
-		
-		
-		
-		
-		get_value_as_string(&tag_l2,name,len);
-		g=grim_open(attach_pom_extension(self->dir,name));
-		if (!g){
-			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to memory map %s."),name);
-			return 0;
-		}
-		self->geoids[i]=g;
-		/*TODO: err check*/
-		tag_l2=get_next_child(&tag_l1,&tag_l2);
-	}
-	self->n_geoids = i;
-
-	tag_l1=get_named_child(root,"t3dtables");
-	if (!tag_l1.valid){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 't3dtabs' not found."));
-		return 0;
-	}
 	tag_l2=get_next_child(&tag_l1,NULL);
 	for (i=0; tag_l2.valid; i++){
 		get_value_as_string(&tag_l2,name,len);
 		g=grim_open(attach_pom_extension(self->dir,name));
 		if (!g){
-			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to memory map %s."),name);
-			return 0;
+			lord_error(TR_ALLOCATION_ERROR,LORD("Failed to create grim object from %s."),name);
+			return TR_ERROR;
 		}
-		self->t3dtabs[i]=g;
+		tables[i]=g;
+		if (i>n_allocated-1){
+			tables=realloc(tables,n_allocated+30);
+			n_allocated+=30;
+		}
 		/*TODO: err check*/
 		tag_l2=get_next_child(&tag_l1,&tag_l2);
 	}
-	self->n_3dtabs = i;
+	self->n_additional = i;
+	self->additional_tables=realloc(tables,i);
+
+	/*
 	tag_l1=get_named_child(root,"geoid_sequence");
 	if (!tag_l1.valid){
 		lord_error(TR_ALLOCATION_ERROR,LORD("Tag: 'geoid_sequence' not found."));
@@ -204,12 +175,12 @@ static int parse_table_manager(struct tag *root, tab_dir *self){
 			return 0;
 		}
 			
-		/*TODO: err check*/
+		
 		tag_l2=get_next_child(&tag_l1,&tag_l2);
 	}
-	self->n_geoid_seq_std = j;
-	lord_debug(0,LORD("Geoids: %d, dhtabs: %d, 3d_tabs: %d"),self->n_geoids,self->n_dhtabs,self->n_3dtabs);
-	return 1;
+	self->n_geoid_seq_std = j;*/
+	lord_debug(0,LORD("Additional tables: %d"),self->n_additional);
+	return TR_OK;
 }
 	
 	

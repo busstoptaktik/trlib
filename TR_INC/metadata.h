@@ -64,6 +64,8 @@ struct def_rgn {
 	char country[64];
 };
 
+
+
 struct def_datum {
 	char mlb[MLBLNG];
 	int no;
@@ -95,7 +97,16 @@ struct def_projection{
 	
 };
 
-struct  def_hth_tr{
+/*datumskift hoerer til et datum - alle grids, polynomier, grim objekter bruges som datum skift - saa hvorfor ikke samle dem eller putte dem ind under datummerne????*/
+struct grim_dtm_shift{
+	char from[MLBLNG];
+	char to[MLBLNG];
+	int no_in;
+	int no_out;
+	
+}
+
+struct  def_dtm_shift{
 	char from[MLBLNG];
 	char to[MLBLNG];
 	int ih_dtm;
@@ -104,12 +115,12 @@ struct  def_hth_tr{
 };
 
 struct htr_route{
-	int n_steps;
+	int n_steps_in, n_steps_dh, n_steps_out;
 	int inv[2];
-	GRIM g[2];
+	GRIM geoid_in[10], dh[2], geoid_out[10];
 };
 
-typedef struct def_hth_tr def_hth_tr;
+typedef struct def_dtm_shift def_dtm_shift;
 typedef struct def_grs def_grs;
 typedef struct def_datum def_datum;
 typedef struct def_projection def_projection;
@@ -120,27 +131,26 @@ struct def_data{
 	def_projection *projections;
 	def_datum      *datums;
 	def_grs    *ellipsoids;
-	def_hth_tr *hth_entries;
+	def_dtm_shift *dtm_shifts;
 	def_rgn     *regions;
 	def_alias *alias_table;
 	int n_prj;
 	int n_dtm;
 	int n_ellip;
 	int n_rgn;
-	int n_hth;
+	int n_dtm_shifts;
 	int n_alias;
 };
 
 typedef struct def_data def_data;
 
-def_data *open_def_data(struct tag *root, int *n_err);
+def_data *open_def_data(struct tag *root, char *dir, int *n_err);
 void close_def_data(def_data *data); 
 
 typedef struct{
-	GRIM geoids[128];
-	GRIM t3dtabs[30];
-	GRIM  geoid_seq_std[10];
-	int n_geoids,n_3dtabs,n_geoid_seq_std;
+	/*GRIM  geoid_seq_std[10];*/
+	GRIM *additional_tables;
+	int n_additional;
 	def_data   *def_lab;
 	char dir[128];
 } tab_dir;
@@ -187,8 +197,8 @@ struct gd_state{
 	struct coord_lab    g_lab;   /* geo_* PRE/ANT   */
         char   geoid_name[MLBLNG]; /* should  be used to something */
 	tab_dir            *TAB_DIR;
-        table_adm_str   *grid_tab;
-	table_adm_str   *h_grid_tab;
+        /*table_adm_str   *grid_tab;
+	table_adm_str   *h_grid_tab;*/
 	struct htr_route    htr_const;
 	int                 b_lev, s_lev;
 	short               iEh_req, oEh_req;

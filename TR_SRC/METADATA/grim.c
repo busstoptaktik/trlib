@@ -121,7 +121,8 @@ endif
 
 
 struct GRIM {
-    int type; /* 0 : grid, otherwise polynomial..... 	
+    int type; /* 0 : grid, otherwise polynomial..... */
+    int degree;
     long           /* size_t here will get us into trouble for signed/unsigned comparisons */
         ncols,
         nrows;
@@ -152,6 +153,7 @@ struct GRIM {
         *file;
     char
         *filename;
+	crs[32];
     size_t            /* TODO: is size_t large enough for 64 bit file systems? */
         data_size;
 #ifdef USE_MMAP
@@ -307,7 +309,7 @@ GRIM grim_close (GRIM g) {
 			free (g->data);  */
 		#endif
 	}
-	free (g);
+	free (g); /*@thokn: free pom???*/
 	return 0;
 }
 
@@ -389,9 +391,13 @@ GRIM grim_open (char *pomfilename) {
     }
      else if (g->type==1){
 	g->coefficients[0]=pomtod(p,"k0");
-	g->coefficients[1]=pomtod(p,"kN")*pomtod(p,"M0");
-	g->coefficients[2]=pomtod(p,"kE")*pomtod(p,"N0");
-    }
+	g->coefficients[1]=pomtod(p,"k1");
+	g->coefficients[2]=pomtod(p,"k2");
+	g->coefficients[3]=pomtod(p,"k3");
+	g->coefficients[4]=pomtod(p,"k4");
+	g->coefficients[5]=pomtod(p,"k5");
+	
+	}
 
     else
 	return NULL;
@@ -399,7 +405,7 @@ GRIM grim_open (char *pomfilename) {
     g->xllcenter = pomtod (p, "xllcenter");
     g->yllcenter = pomtod (p, "yllcenter");
     g->channels  = pomtod (p, "channels");
-   
+
     if (g->type==0){
 	    if (0!=(res=memory_map_file (g, pomfilename))){
 		lord_error(res,LORD("Memory mapping failed..."));
@@ -409,7 +415,39 @@ GRIM grim_open (char *pomfilename) {
     return g;
 }
 
+GRIM grim_polynomial(double lat_0, double lon_0, double *coefficients, int n_coeff, int channels, int degree, char *mlb){
+        GRIM g;
+	int i;
+	
+	if (n_coeff>6)
+		return 0;
+	
+	g = calloc (1, sizeof(struct GRIM));
+	if (0==g)
+		return 0;
+	
+	g->file = NULL;
 
+	if (mlb!=NULL)
+		strncpy(g->crs,mlb,32);
+	
+	if (degree==0)
+		g->crs[0]='\0';
+
+	
+	for (i=0; i<n_coeff; i++)
+		g->coefficients[i]=coefficients[i];
+
+	g->pom=NULL;
+	g->degree=degree;
+	g->channels=channels;
+	g->type=1;
+	g->xllcenter=lon_0;
+	g->yllcenter=lat_0;
+	
+	
+	return g;
+}
 
 
 /* offset from start of file */
@@ -504,10 +542,25 @@ static int grim_values_workhorse (const GRIM g, double northing, double easting,
 
 
 int grim_polynomial_workhorse(const GRIM g, double northing, double easting, *double record, int channels){
+	double N, E, *p, H;
 	if (channels>1){ /*only 1d for now*/
 		return 1;
 	}
-	*record=g->coefficients[0]+(northing-g->yllcenter)*g->coefficients[1]+(easting-g->xllcenter)*g->coefficients[2]; /*todo: more terms*/
+	
+	E=easting - g->xllcenter;
+	N=northing - g->yllcenter;
+
+	/*Ready for an extra loop with shannels*/
+	p=g->coefficients+ channels*(1+degree*2) ;
+		
+	for (H=0.0;p>g->coefficients;)
+		H+=E**(--p) + N**(--p);
+	H+= *p;
+	
+	*record=H;
+	/*end ready*/
+	
+	
 	return 0;
 }
 
@@ -545,9 +598,14 @@ size_t grim_channels (const GRIM g) {
     return g->channels;
 }
 
-char *grim_filename(const GRIM g){
+const char *grim_filename(const GRIM g){
 	return g->filename;
 }
+
+const char *grim_crs(const GRIM g){
+	return g->crs;
+}
+
 
 double grim_rows(const GRIM g){
 	return g->nrows;
@@ -558,6 +616,9 @@ double grim_columns(const GRIM g){
 }
 
 const char *grim_field_name(const GRIM g, const char *field_name){
+	if (g == NULL || g->pom == NULL)
+		return NULL;
+	
 	return pomval(g->pom, field_name);
 }
 

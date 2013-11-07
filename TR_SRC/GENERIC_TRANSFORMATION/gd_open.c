@@ -48,102 +48,6 @@
 #define REG_NON   2 /* Regular->Non-reg */
 #define NON_NON   3 /* Non-reg->Non-reg */
 
-#define FEHMARN_NAME "fehmarngeoid10.bin"
-#define FBELT_NAME "fbeltgeoid.bin"
-
-table_adm_str *table_adm_open(char *name, tab_dir *tdir){
-	table_adm_str *self=NULL;
-	int found = -1, i;
-	GRIM *table=NULL;	
-	if (!tdir){
-		lord_error(TAB_N_MAN_,LORD("Tabdir is null."));
-		return NULL;
-	}
-	self=calloc(sizeof(table_adm_str),1);
-	if (!self){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
-		return NULL;
-	}
-	if (!name || !*name || !strcmp("STD",name)){ /*STD*/
-		self->type=GDE_LAB;
-		self->n_tables=tdir->n_geoid_seq_std;
-		self->table_sequence=tdir->geoid_seq_std;
-		self->free_sequence=0;
-		
-		return self;
-	}
-	/* find the name and type */
-	table=get_specific_table(name,GDE_LAB,tdir);
-	if(table!=NULL){ /* Special geoid */
-		self->table_sequence=calloc(tdir->n_geoid_seq_std+1,sizeof(GRIM));
-		if (!self->table_sequence){
-			lord_error(TR_ALLOCATION_ERROR,LORD("Geoids: Failed to allocate space."));
-			free(self);
-			return NULL;
-		}
-		self->type=GDE_LAB;
-		self->n_tables=tdir->n_geoid_seq_std+1;
-		self->table_sequence=table;
-		for (i=0; i< tdir->n_geoid_seq_std; i++){
-			self->table_sequence[i+1]=tdir->geoid_seq_std[i];
-			self->free_sequence=1;
-		}
-		return self;
-	}
-	/* Why are these 1 member list objects needed instead of just a GRIM object??*/
-	table=get_specific_table(name,DHH_LAB,tdir);
-	if(table!=NULL){
-		self->type=DHH_LAB;
-		self->n_tables=1;
-		self->table_sequence=table;
-		self->free_sequence=0;
-		return self;
-	}
-	table=get_specific_table(name,T3D_LAB,tdir);
-	if (table!=NULL){
-		self->type=T3D_LAB;
-		self->n_tables=1;
-		self->table_sequence=table;
-		self->free_sequence=0;
-		return self;
-	}
-	lord_error(TAB_N_NAM_,LORD("Table not found: %s"),name);
-	free(self);
-	return NULL;
-}
-
-GRIM *get_specific_table(char *name, int type, tab_dir *tdir){
-	GRIM *tables, *found=NULL;
-	int i,n_tables;
-	if (!name || !(*name) || !tdir)
-		return NULL;
-	switch(type){
-		case GDE_LAB:
-			tables=tdir->geoids;
-			n_tables=tdir->n_geoids;
-			break;
-		case DHH_LAB:
-			tables=tdir->dhtabs;
-			n_tables=tdir->n_dhtabs;
-			break;
-		case T3D_LAB:
-			tables=tdir->t3dtabs;
-			n_tables=tdir->n_3dtabs;
-			break;
-		default:
-			lord_error(TR_LABEL_ERROR,LORD("Table type %d not supported."),type);
-			return NULL;
-	}
-	for(i=0; i<n_tables && !found; i++){
-		if(!strcmp(name, grim_filename(tables[i])))
-			found=tables+i;
-	}
-	return found;
-}
-
-
-
-
 void gd_close(gd_state *self){
 	if (!self)
 		return;
@@ -289,45 +193,13 @@ tab_dir                         *tdir
   o_rgn      = o_lab->p_rgn;
   ies        = (i_rgn == rgn_EE.r_nr[0]) || (o_rgn == rgn_EE.r_nr[0]);
   self->geoid_name[0]='\0';
-  use_geoids=(HAS_HEIGHTS(i_lab) || HAS_HEIGHTS(o_lab)) && (GET_HDTM(i_lab)!=GET_HDTM(o_lab)) 
+  use_htr=(HAS_HEIGHTS(i_lab) || HAS_HEIGHTS(o_lab)) && (GET_HDTM(i_lab)!=GET_HDTM(o_lab)) 
   && (GET_DTM(i_lab)!=GET_DTM(o_lab));
-  if (use_geoids){
-	  if (i_lab->imit == FHMASK || o_lab->imit == FHMASK) {
-              /* USE: fehmarngeoid10.bin */
-              /* because: dvr90g.01 is out by 1cm */
-		  self->grid_tab=table_adm_open(FEHMARN_NAME, tdir);
-	  }
-	  else  if  (i_rgn == rgn_DE.r_nr[0] || o_rgn == rgn_DE.r_nr[0]){
-		  self->grid_tab=table_adm_open(FBELT_NAME, tdir);
-	  }
-	  else
-		self->grid_tab=table_adm_open(special_table, tdir);
+  if (use_htr){
+	res = htr_init(i_lab, o_lab, &self->H2_lab, &self->htr_const,tdir);
 
-	  if (0 == self->grid_tab) {
-		    free(self);
-		    return NULL;
-	    }
 
-	    if (i_lab->imit == FHMASK || o_lab->imit == FHMASK)
-                     (void) strncpy(dstr, grim_proj(self->grid_tab->table_sequence[0]),MLBLNG);
-	    else
-	    if (i_rgn == rgn_GR.r_nr[0] || o_rgn == rgn_GR.r_nr[0])
-                    (void) strcpy(dstr, "geoEgr96");
-            else if (ies) 
-		    (void) strcpy(dstr, "geoEeetrf89");
-	    else if (i_rgn != 0) {
-              char     rgn_p[8], rgn_name[24];
-              if (conv_rgn(i_rgn, rgn_p, rgn_name) > 0)
-                 (void) sprintf(dstr, "%-2s_%s",
-                                rgn_p, "geoEetrf89");
-            } else
-                  (void) strcpy(dstr, "geoEetrf89");
-            (void) conv_w_crd(dstr, &self->H0_lab,tdir->def_lab);
-  }
-  else
-	  self->grid_tab=NULL;
-  
-    self->b_lev      = use_geoids ? 0 : 1;
+    self->b_lev      = use_htr ? 0 : 1;
     self->s_lev      =   2;
     self->i_sep      = (i_lab->cstm != 1)
                ? *(i_lab->mlb+i_lab->sepix) : (char) 'E';
@@ -392,7 +264,7 @@ tab_dir                         *tdir
         if (i_lab->h_dtm == 0) self->s_req_dh = -7;
         else {
           self->s_req_dh = htr_init(i_lab, o_lab, &self->H2_lab,
-                              &self->htr_const, self->H3_lab.mlb, dstr,tdir);
+                              &self->htr_const,tdir);
           if (self->s_req_dh < 0) { /* ILLEGAL */
             lord_error(HTRF_ILLEG_ , "gd_trans(ill. height TRF)");
 	    gd_close(self);
