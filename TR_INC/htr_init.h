@@ -39,9 +39,7 @@ extern int               htr_init(
 struct  coord_lab       *ih_dtm,
 struct  coord_lab       *oh_dtm,
 struct coord_lab        *htr_lab,
-struct htr_c_str        *htr_const,
-char                    *dh_table_name,
-char                    *dh_tr_info,
+struct htr_route        *htr_const,
 tab_dir                 *tdir
 );
 

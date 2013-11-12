@@ -389,11 +389,15 @@ of northing and easting values.
 %-----------------------------------------------------
 #endif
 
-char *grim_filename(const GRIM g);
-char *grim_proj(const GRIM g);
-char *grim_h_mlb(const GRIM g);
+const char *grim_filename(const GRIM g);
+const char *grim_crs(const GRIM g);
+const char *grim_field_name(const GRIM g, const char *name);
+GRIM grim_polynomial(double lat_0, double lon_0, double *coefficients, int n_coeff, int channels, int degree, char *mlb);
+int grim_polynomial_workhorse(const GRIM g, double northing, double easting, double *record, int channels);
 double grim_rows(const GRIM g);
 double grim_columns(const GRIM g);
+
+
 
 #if !0xD0C
 .FILE pre.tex \renewcommand{\reportnumber}{GRIM}

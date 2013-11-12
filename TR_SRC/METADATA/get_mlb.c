@@ -59,8 +59,8 @@ char               **h_mlb
     /* The third char must be an underscore                    */
     if (isupper(*(tx +0)) && isupper(*(tx +1))
         &&     (*(tx +2) == '_')) {
-      (void) strncpy(rgn_pref.prfx, tx, 2);
-      rgn_pref.r_nr[1] = 0;
+      (void) strncpy(lab_rgn.prfx, tx, 2);
+      lab_rgn.r_nr[1] = 0;
 
       if ((conv_rgn(-1, lab_rgn.prfx, rgn_name)) > 0) { 
         ptx    += 3;

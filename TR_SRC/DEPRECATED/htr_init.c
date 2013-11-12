@@ -21,21 +21,55 @@
 #include    <math.h>
 #include    "KmsFncs.h"
 
+int find_geoid_seq(int i_hdtm, int o_hdtm, int MAX, GRIM *seq, int *n_steps, int *inv){
+    do {
+      
+      dtm_shift=DEF_DATA->dtm_shifts+(n_dtm_shifts++);
+
+      if ((i_hdtm==dtm_shift->ih_dtm) && (o_hdtm==dtm_shift->oh_dtm)){
+         tr_type = 1;
+         l_inv   = 0;
+      } else
+      if ((i_hdtm==dtm_shift->oh_dtm) && (o_hdtm==dtm_shift->ih_dtm)){
+         tr_type = 1;
+         l_inv   = 1;
+      }
+      
+      else if ((i_hdtm == 202 && o_hdtm==200) || (o_hdtm == 202 && i_hdtm==200)){
+      /*todo: def_data shall have a geoid seq standard, which is the same as something that is already standard */
+	      
+	      } /* msl */
+
+      
+      
+      
+      if (tr_type> -1) { /* FOUND */
+        htr_const->inv[n_steps_dh]  = l_inv;
+        htr_const->dh[n_steps_dh]= dtm_shift->g;
+	if(htr_const->n_steps_dh==0)
+		res =  conv_w_crd(grim_crs(dtm_shift->g, "proj_mlb"), htr_lab, DEF_DATA);
+
+	htr_const->n_steps_dh++;
+        break;
+	}
+      
+    } while (n_dtm_shifts<DEF_DATA->n_dtm_shifts); /*Prepared for more steps, only one now (20131107)*/
+  }
+  
+  
+  
 int                      htr_init(
 /*______________________________*/
 struct coord_lab        *i_clb,
 struct coord_lab        *o_clb,
-struct coord_lab          *htr_lab,
-struct htr_c_str        *htr_const,
-char                    *dh_table_name,
-char                    *dh_tr_info,
+struct coord_lab        *htr_lab,
+struct htr_route        *htr_const,
 tab_dir                 *tdir
-)
+)  
 {
  
-  def_data              *DEF_DATA;
-  struct coord_lab   test_lab;
-  char                *p_tp;
+  def_data             *DEF_DATA;
+  char                 *p_tp;
   int                   tr_type = HTRF_ILLEG_, l_inv;
   short                 p_no, i_hdtm, o_hdtm, rgn;
   char                  i_nm[MLBLNG], p_nm[MLBLNG], e_nm[MLBLNG];
@@ -44,8 +78,11 @@ tab_dir                 *tdir
   union rgn_un          DK_rgn, FO_rgn, GR_rgn, DE_rgn;
   char dummy_rgn[3];
   short imit;
-  def_hth_tr *htr_def;
-  int n_hth=0;
+  def_dtm_shift *dtm_shift;
+  int n_dtm_shifts=0;
+  htr_const->n_steps_in=0;
+  htr_const->n_steps_dh=0;
+  htr_const->n_steps_out=0;
 
   if (i_clb->h_dtm < 200 || 299 < i_clb->h_dtm ||
       o_clb->h_dtm < 200 || 299 < o_clb->h_dtm) return(HTRF_ILLEG_);
@@ -118,86 +155,21 @@ tab_dir                 *tdir
     else
     if (i_hdtm == 211 || rgn == FO_rgn.r_nr[0]) o_hdtm = 211;
   }
-  /* idt for DK h_dtms */
-  if (i_hdtm == 203 || i_hdtm == 204 || i_hdtm == 206) i_hdtm = 209;
-  if (o_hdtm == 203 || o_hdtm == 204 || o_hdtm == 206) o_hdtm = 209;
 
   if (i_hdtm == o_hdtm) tr_type = 0;
-  else {
-    
-    (void) set_dtm_1(i_hdtm, i_nm, &p_no, p_nm, e_nm, dummy_rgn,&imit,&trp,DEF_DATA);
-    (void) set_dtm_1(o_hdtm, o_nm, &p_no, p_nm, e_nm, dummy_rgn,&imit, &trp,DEF_DATA);
+  else
+
+  tr_type=find_geoid_seq(i_hdtm, o_hdtm, htr_const->geoid_in, 1, &htr_const->n_steps_in, htr_const->inv);
   
-
-    do {
-      
-      htr_def=DEF_DATA->hth_entries+(n_hth++);
-	
-      conv_w_crd(htr_def->from_mlb, &test_lab, DEF_DATA);
-      if (test_lab.lab_type == 1) {
-      
-        l_inv = test_lab.h_dtm == o_hdtm;
-        if (test_lab.h_dtm == i_hdtm || l_inv) {
-        
-            if (!strcmp((l_inv) ? i_nm : o_nm, htr_def->to_dtm)) { // FOUND
-              // The grid_val accepts NO height label part::
-              p_tp = test_lab.mlb+test_lab.sepix;
-              if (test_lab.sepix+2 == test_lab.h_ix)
-                *(test_lab.mlb+test_lab.sepix)   = '\0';
-              else {
-                *(test_lab.mlb+test_lab.sepix)   = '_';
-                *(test_lab.mlb+test_lab.h_ix -1) = '\0';
-              }
-              htr_const->inv   = l_inv;
-              *htr_lab         = test_lab;
-              //sh_dtm           = o_hdtm;
-            
-	      tr_type=htr_def->type;
-            
-              htr_const->LAT0  = htr_def->B0; 
-            
-              htr_const->LON0  = htr_def->L0; 
-              // params ::
-           
-              
-                switch (tr_type) {
-                case 1: // dh_table
-                  strncpy(dh_table_name,htr_def->table,MAX_TABLE_LEN); 
-                break;
-                case 2: // Constant
-                  htr_const->a1 =htr_def->constants[0]; 
-                break;
-                case 3: // Linear
-                  htr_const->M0  = htr_def->constants[0];
-                
-                  htr_const->N0  = htr_def->constants[1]; 
-                 
-                  htr_const->a1  = htr_def->constants[2]; 
-                  
-                  htr_const->a2  = htr_def->constants[3]; 
-               
-                  htr_const->a3  = htr_def->constants[4]; 
-                  o_hdtm         = (htr_const->inv) ? i_hdtm : o_hdtm;
-                }
-              
-            } 
-            
-            if (tr_type > 0) // reference
-		    strncpy(dh_tr_info, "Not available.",127); /*TODO: preparse and add this */
-         
-          
-        } else {
-         
-           strncpy(dh_tr_info, "Not available.",127); 
-        }
-      } else test_lab.lab_type = STP_LAB;
-    } while (test_lab.lab_type != STP_LAB && tr_type <= 0 && n_hth<DEF_DATA->n_hth);
-  }
-
   if (tr_type < 0) {
-    htr_lab->h_dtm    = 0;
     htr_lab->lab_type = ILL_LAB;
   }
 
-  return(tr_type);
+  find_geoid_seq(i_hdtm, 200, htr_const->geoid_in, 10, &htr_const->n_steps_in, &htr_const->inv_in);
+  find_geoid_seq(200, o_hdtm, htr_const->geoid_out, 10, &htr_const->n_steps_out, &htr_const->inv_out);
+  
+  
+  return tr_type;
 }
+
+

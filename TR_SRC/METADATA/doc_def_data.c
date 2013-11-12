@@ -19,11 +19,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#include "set_grs.h"
+#include "geo_lab.h"
 #include "trlib_api.h"
 #include "metadata.h"
-#include "geo_lab.h"
 #include "doc_def_data.h"
+#include "set_grs.h"
 
 /* Purpose: move all documentation of labels - also stuff implemented in conv_lab - here for a cleaner 'aspect' oriented structure */
 /* Mainly thought of as usable for external apps, which operate on minilabels/strings *not* via the internal system numbers */
@@ -66,7 +66,7 @@ int doc_rgn(char *rgn_name, char *descr, int detail, def_data *DEF_DATA){
 		return TR_LABEL_ERROR;
 	/*decide what to print to descr*/
 	if (detail>0 || mode==0)
-		descr+=sprintf(descr,"%s ",rgn->rgn_new);
+		descr+=sprintf(descr,"%-6s ",rgn->rgn_new);
 	if (detail>0 || mode==1)
 		sprintf(descr,"%s",rgn->country);
 	
@@ -120,7 +120,6 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 	}
 	/*printf("Look for: %s n_prj is %d, found? %d\n", prj_name,n_prj,(prj==NULL));*/
 	if (prj==NULL){
-		
 		return TR_LABEL_ERROR;
 	}
 	
@@ -133,10 +132,12 @@ int doc_prj(char *prj_name, char *descr, char *impl_datum, int *type, int detail
 	*type=prj->type;
 	/*decide what to print to descr*/
 	if (detail>1 || mode==0) /*iteration mode */
-		descr+=sprintf(descr,"%s ",prj->mlb);
+		descr+=sprintf(descr,"%-11s ",prj->mlb);
 	if (detail>1)
 	/*todo: add whatever relevant here */
-		descr+=sprintf(descr,"mode: %d, cstm: %d ",prj->mode,prj->cstm);
+    descr+= (mode) ?
+            sprintf(descr,"mode: %2d, cstm: %d ",prj->mode,prj->cstm)
+            : sprintf(descr," %2d,   %d ",prj->mode,prj->cstm);
 	if (detail>0 || mode==1){
 		char *loop_over_descr=prj->descr, *loop_over_replaced=replaced;
 		/*replace ?? by the stored digits*/
@@ -198,7 +199,7 @@ int doc_dtm( char *dtm_name, char *descr, int detail, def_data *DEF_DATA){
 			descr+=sprintf(descr,"%s ",dtm->mlb);
 		if (detail>1)
 			/*todo: put more stuff here */
-			descr+=sprintf(descr,"%s %d %s ",dtm->ellipsoid,dtm->type,dtm->p_datum);
+			descr+=sprintf(descr,"%-10s %4d %-10s ",dtm->ellipsoid,dtm->type,dtm->p_datum);
 		if (detail>0 || mode==1)
 			sprintf(descr,"%s",dtm->descr);
 	}
@@ -349,12 +350,14 @@ void present_data(FILE *fp,def_data *data){
 	int n_grs=data->n_ellip;
 	int n_dtm=data->n_dtm;
 	int n_prj=data->n_prj;
-	int n_hth=data->n_hth;
+	int n_dtm_shifts=data->n_dtm_shifts;
+	int n_alias=data->n_alias;
 	fprintf(fp,"n_prj: %d\n",n_prj);
 	fprintf(fp,"n_rgn: %d\n",n_rgn);
 	fprintf(fp,"n_dtm: %d\n",n_dtm);
 	fprintf(fp,"n_grs: %d\n",n_grs);
-	fprintf(fp,"n_hth: %d\n\n",n_hth);
+	fprintf(fp,"n_hth: %d\n",n_dtm_shifts);
+	fprintf(fp,"n_alias: %d\n\n",n_alias);
 	for (i=0; i<data->n_prj; i++){
 		fprintf(fp,"prj: %s\n",projections[i].mlb);
 		fprintf(fp,"cha_str: %d type: %d cstm: %d mode: %d mask: %d\n",projections[i].cha_str,projections[i].type,projections[i].cstm,projections[i].mode,projections[i].mask);
@@ -389,10 +392,9 @@ void present_data(FILE *fp,def_data *data){
 		fprintf(fp,"%s\n\n",datums[i].descr);
 	}
 	fprintf(fp,"*****************\n\n");
-		
-	for(i=0;i<n_hth;i++){
+	/*	TODO
+	for(i=0;i<n_dtm_shifts;i++){
 		fprintf(fp,"hth: %s to %s\n", data->hth_entries[i].from_mlb,data->hth_entries[i].to_dtm);
-		fprintf(fp,"Bo: %f, L0: %f\n",data->hth_entries[i].B0,data->hth_entries[i].L0);
 		switch( (data->hth_entries[i]).type)
 		{
 			case 1:
@@ -403,6 +405,7 @@ void present_data(FILE *fp,def_data *data){
 				break;
 			case 3:
 				fprintf(fp,"Constants: ");
+				fprintf(fp,"Bo: %f, L0: %f\n",data->hth_entries[i].B0,data->hth_entries[i].L0);
 				for(j=0;j<5;j++)
 					fprintf(fp," %e",data->hth_entries[i].constants[j]);
 				fprintf(fp,"\n");
@@ -413,11 +416,17 @@ void present_data(FILE *fp,def_data *data){
 		}
 		fprintf(fp,"%s\n\n",data->hth_entries[i].descr);
 		
+	}*/
+	fprintf(fp,"*****************\n\n");
+	
+	for(i=0; i<n_alias;i++){
+		fprintf(fp,"alias: key: %s, value: %s\n",data->alias_table[i].key,data->alias_table[i].value);
 	}
 	fprintf(fp,"*****************\n\n");
 	{
 	int n_bytes=0;
-	n_bytes=sizeof( def_projection)*n_prj+sizeof( def_datum)*n_dtm+sizeof( def_grs)*n_grs+n_rgn*3+sizeof( def_hth_tr)*n_hth;
+	n_bytes=sizeof( def_projection)*n_prj+sizeof( def_datum)*n_dtm+sizeof( def_grs)*n_grs+n_rgn*3+sizeof( def_dtm_shift)*n_dtm_shifts;
+	n_bytes+=sizeof(def_alias)*n_alias;
 	fprintf(fp,"bytes used: %d\n",n_bytes);
 	}
 	

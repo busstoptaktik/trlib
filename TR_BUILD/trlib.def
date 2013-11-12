@@ -79,10 +79,8 @@ EXPORTS
 	gettabdir
 	gmb1
 	gmb2
-	grid_val2
 	gtc
 	hlm_tr
-	htr_init
 	inpoly
 	labchsum
 	mlb_to_proj4
@@ -92,6 +90,7 @@ EXPORTS
 	ptg_d
 	putsinexval
 	putsinexver
+	present_data
 	s34jtos
 	s34stkk
 	s_status
@@ -123,6 +122,7 @@ EXPORTS
 	lord_warning
 	lord_error
 	lord_critical
+	lord_get_last_error
 	set_lord_debug_mode
 	set_lord_info_mode
 	set_lord_warning_mode
@@ -134,7 +134,7 @@ EXPORTS
 	set_lord_verbosity_levels
 	set_lord_file
 	reset_lord
-	lord_get_last_error
 	set_lord_callback
+	tab_dir_open
 	
 	

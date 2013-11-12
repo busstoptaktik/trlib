@@ -117,10 +117,6 @@ FILE                    *tr_error
   };
 
   
-
-/* fo_g_tr   ver2012.03         # page 4   30 Jan 2012 12 58 */
-
-
   /* Y&X-generelt pol. resultater
   fu50 -> utm29_etrs89
   grad:  8 pass: 5

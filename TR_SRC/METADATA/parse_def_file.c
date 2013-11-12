@@ -40,8 +40,9 @@ static int int_converter(char *in, void *out, size_t buf_size, void *extra);
 static int double_converter(char *in, void *out, size_t buf_size, void *extra);
 static int set_projection(struct tag *prj_tag,  def_projection *proj);
 static int set_datum(struct tag *dtm_tag, def_datum *dtm);
-static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr);
+static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift,def_datum *datums, int n_datums, char *dir_name);
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn);
+static int set_alias(struct tag *alias_tag, def_alias *alias);
 //static char BUF[256];
 
 /* 'single' int converter. A 'sep-char' could be input to extra, if more values were to be extracted from a string...*/
@@ -242,57 +243,118 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 	return 1;
 }
 
-static int set_hth(struct tag *hth_tag, def_hth_tr *hth_tr){
+static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift,def_datum *datums, int n_datums, char *dir_name){
 	struct tag t;
-	t=get_named_child(hth_tag,"from");
-	if (!get_value_as_string(&t,hth_tr->from_mlb,MLBLNG))
+	int i,n_ok;
+	char file_name[512],mlb1[MLBLNG],mlb2[MLBLNG];
+	GRIM g;
+	
+	t=get_named_child(dtm_shift_tag,"from");
+	if (!get_value_as_string(&t,mlb1,MLBLNG))
 		return 0;
-	t=get_named_child(hth_tag,"description");
-	if (!get_value_as_string(&t,hth_tr->descr,MAX_DSCR_LEN))
-		*(hth_tr->descr)='\0';
-	t=get_named_child(hth_tag,"to");
-	if (!get_value_as_string(&t,hth_tr->to_dtm,MLBLNG))
+	
+	t=get_named_child(dtm_shift_tag,"to");
+	if (!get_value_as_string(&t,mlb2,MLBLNG))
 		return 0;
-	t=get_named_child(hth_tag,"type");
-	if (1!=get_value(&t,&hth_tr->type,1,int_converter,NULL))
-		return 0;
-	t=get_named_child(hth_tag,"lat_0");
-	if (1!=get_value(&t,&hth_tr->B0,1,double_converter,"nt"))
-		return 0;
-	t=get_named_child(hth_tag,"lon_0");
-	if (1!=get_value(&t,&hth_tr->L0,1,double_converter,"nt"))
-		return 0;
-	switch (hth_tr->type){
-		case 1:
-			t=get_named_child(hth_tag,"table");
-			if (!get_value_as_string(&t,hth_tr->table,MAX_TABLE_LEN))
-				return 0;
+	n_ok=0;
+	for(i=0; i<n_datums; i++){
+		if (!strcmp(datums[i].mlb,mlb1)){
+			dtm_shift->dno1=datums[i].no;
+			dtm_shift->mlb1=datums[i].mlb;
+			n_ok+=1;
+		}
+		else if (!strcmp(datums[i].mlb,mlb2)){
+			dtm_shift->dno2=datums[i].no;
+			dtm_shift->mlb2=datums[i].mlb;
+			n_ok+=1;
+		}
+		if (n_ok==2)
 			break;
-		case 2:
-			t=get_named_child(hth_tag,"k0");
-			if (1!=get_value(&t,hth_tr->constants,1,double_converter,NULL))
-				return 0;
-			break;
-		case 3:
-			t=get_named_child(hth_tag,"M0");
-			if (1!=get_value(&t,hth_tr->constants,1,double_converter,NULL))
-				return 0;
-			t=get_named_child(hth_tag,"N0");
-			if (1!=get_value(&t,hth_tr->constants+1,1,double_converter,NULL))
-				return 0;
-			t=get_named_child(hth_tag,"k0");
-			if (1!=get_value(&t,hth_tr->constants+2,1,double_converter,NULL))
-				return 0;
-			t=get_named_child(hth_tag,"kN");
-			if (1!=get_value(&t,hth_tr->constants+3,1,double_converter,"sx"))
-				return 0;
-			t=get_named_child(hth_tag,"kE");
-			if (1!=get_value(&t,hth_tr->constants+4,1,double_converter,"sx"))
-				return 0;
-			break;
-		default:
-			return 0;
 	}
+	if (n_ok!=2){
+		lord_error(TR_LABEL_ERROR,LORD("Did not find both datums for datum-shift definition!"));
+		return 0;
+	}
+	t=get_named_child(dtm_shift_tag,"file");
+	if (t.valid){
+		if (!get_value_as_string(&t,file_name,128))
+			return 0;
+		g=grim_open(attach_pom_extension(dir_name,file_name));
+		if (g==NULL)
+			return 0; /*TODO: check for POM proj_mlb field name is set*/
+	}
+	else{
+		int degree;
+		double coefficients[4];
+		double lon_0=0.0,lat_0=0.0;
+		char mlb[MLBLNG];
+		mlb[0]='\0';
+		
+		t=get_named_child(dtm_shift_tag,"mlb");
+		if (!get_value_as_string(&t,mlb,MLBLNG))
+			return 0;
+
+		t=get_named_child(dtm_shift_tag,"htr_constant");
+		if (t.valid) {
+			if (1!=get_value(&t,coefficients,1,double_converter,NULL))
+				return 0;
+			coefficients[1]=0;
+			coefficients[2]=0;
+			coefficients[3]=0;
+			degree = 0;
+		}
+		else {
+			struct tag s;
+			t=get_named_child(dtm_shift_tag,"htr_constants");
+			if (t.valid) {
+				s=get_named_child(&t,"lat_0");
+				if (1!=get_value(&s,&lat_0,1,double_converter,"nt"))
+					return 0;
+				s=get_named_child(&t,"lon_0");
+				if (1!=get_value(&s,&lon_0,1,double_converter,"nt"))
+					return 0;
+				s=get_named_child(&t,"k0");
+				if (1!=get_value(&s,coefficients,1,double_converter,NULL))
+					return 0;
+				s=get_named_child(&t,"M0");
+				if (1!=get_value(&s,coefficients+1,1,double_converter,NULL))
+					return 0;
+				s=get_named_child(&t,"kN");
+				if (1!=get_value(&s,coefficients+2,1,double_converter,"sx"))
+					return 0;
+				coefficients[1]*=coefficients[2];
+				s=get_named_child(&t,"N0");
+				if (1!=get_value(&s,coefficients+2,1,double_converter,NULL))
+					return 0;
+				s=get_named_child(&t,"kE");
+				if (1!=get_value(&s,coefficients+3,1,double_converter,"sx"))
+					return 0;
+				coefficients[2]*=coefficients[3];
+				coefficients[3]=0;
+				degree=1;
+			}
+			else
+			return 0;
+		}
+		g=grim_polynomial(lat_0,lon_0,coefficients, 3, 1, degree, mlb);
+	}
+	if (g==NULL)
+		return 0;
+	dtm_shift->g=calloc(sizeof(GRIM),1);
+	dtm_shift->n_tabs=1;
+	dtm_shift->g[0]=g;
+	dtm_shift->len=1; /*TODO*/
+	return 1;
+}
+
+static int set_alias(struct tag *alias_tag, def_alias *alias){
+	struct tag t;
+	t=get_named_child(alias_tag,"key");
+	if (!get_value_as_string(&t,alias->key,MLBLNG))
+		return 0;
+	t=get_named_child(alias_tag,"value");
+	if (!get_value_as_string(&t,alias->value,MLBLNG))
+		return 0;
 	return 1;
 }
 
@@ -313,24 +375,24 @@ static int set_rgn(struct tag *rgn_tag, def_rgn *rgn){
 /* 
 Function that parses def_lab file. Now in XML :-)
 */
-
- def_data *open_def_data(struct tag *root, int *n_err){
+#define N_MODES  (6)
+ def_data *open_def_data(struct tag *root, char *dir_name, int *n_err){
 	/*stuff that match the formatting and 'modes' of the def_lab file */
 	struct tag def_tag,item_tag;
 	def_data *data=NULL;
-	int n_set[5]={0,0,0,0,0},mode,i;
-	enum modes {mode_prj=0,mode_rgn=1,mode_dtm=2,mode_hth=3,mode_grs=4};
-	void *entries[5]={NULL,NULL,NULL,NULL,NULL};
-	char *mode_names[5]={"def_prj","def_rgn","def_dtm","def_hth","def_grs"};
-	char *item_names[5]={"prj","rgn","dtm","hth","grs"};
+	int n_set[N_MODES]={0,0,0,0,0,0},mode,i;
+	enum modes {mode_prj=0,mode_rgn=1,mode_dtm=2,mode_alias=3,mode_dtm_shift=4,mode_grs=5};
+	void *entries[N_MODES]={NULL,NULL,NULL,NULL,NULL,NULL};
+	char *mode_names[N_MODES]={"def_prj","def_rgn","def_dtm","def_alias","def_dtm_shift","def_grs"};
+	char *item_names[N_MODES]={"prj","rgn","dtm","alias","dtm_shift","grs"};
 	/* specifications for how much to preallocate */
-	int n_prealloc[5]={256,128,128,128,64};
-	int n_alloc[5]={256,128,128,128,64};
-	size_t mode_sizes[5]={sizeof( def_projection),sizeof(def_rgn),sizeof( def_datum), sizeof( def_hth_tr),sizeof( def_grs)};
+	int n_prealloc[N_MODES]={256,128,128,20,128,64};
+	int n_alloc[N_MODES]={256,128,128,20,128,64};
+	size_t mode_sizes[N_MODES]={sizeof( def_projection),sizeof(def_rgn),sizeof( def_datum), sizeof(def_alias), sizeof( def_dtm_shift),sizeof( def_grs)};
 	/*printf("def_grs: %d\n",sizeof(def_grs));*/
 	*n_err=0; /* set no errors - yet! */
 	/* allocate memory for objects */
-	for(mode=0;mode<5;mode++){
+	for(mode=0;mode<N_MODES;mode++){
 		entries[mode]=malloc(n_prealloc[mode]*mode_sizes[mode]);
 		if (entries[mode]==NULL)
 			goto error;
@@ -344,7 +406,7 @@ Function that parses def_lab file. Now in XML :-)
 		goto error;
 	}
 	/*iterate over modes*/
-	for(mode=0; mode<5; mode++){
+	for(mode=0; mode<N_MODES; mode++){
 		lord_debug(0,LORD("Hello - mode is : %d"),mode);
 		def_tag=get_named_child(root,mode_names[mode]);
 		if (!def_tag.valid){
@@ -362,19 +424,22 @@ Function that parses def_lab file. Now in XML :-)
 				void *entry=entries[mode];
 				/*lord_debug(0,LORD("mode: %d, n_set: %d"),mode,n_set[mode]);*/
 				switch(mode){
-					case 0:
+					case mode_prj:
 						ok=set_projection(&item_tag,(def_projection*) entry+n_set[mode]);
 						break;
-					case 1:
+					case mode_rgn:
 						ok=set_rgn(&item_tag, (def_rgn*) entry+n_set[mode]);
 						break;
-					case 2:
+					case mode_dtm:
 						ok=set_datum(&item_tag, (def_datum*) entry+n_set[mode]);
 						break;
-					case 3:
-						ok=set_hth(&item_tag, (def_hth_tr*) entry+n_set[mode]);
+					case mode_alias:
+						ok=set_alias(&item_tag, (def_alias*) entry+n_set[mode]);
 						break;
-					case 4:
+					case mode_dtm_shift:
+						ok=set_dtm_shift(&item_tag, (def_dtm_shift*) entry+n_set[mode], (def_datum*) entries[mode_dtm], n_set[mode_dtm],dir_name);
+						break;
+					case mode_grs:
 						ok=set_ellips(&item_tag,(def_grs*) entry+n_set[mode]);
 						break;
 					default:
@@ -412,7 +477,7 @@ Function that parses def_lab file. Now in XML :-)
 		}
 	}/*end mode iteration*/
 	/*reallocate sizes of objects */
-	for(i=0;i<5;i++)
+	for(i=0;i<N_MODES;i++)
 		entries[i]=realloc(entries[i],mode_sizes[i]*n_set[i]);
 	/*set parent no of datums*/
 	
@@ -439,12 +504,14 @@ Function that parses def_lab file. Now in XML :-)
 	data->n_rgn=n_set[mode_rgn];
 	data->n_ellip=n_set[mode_grs];
 	data->n_dtm=n_set[mode_dtm];
-	data->n_hth=n_set[mode_hth];
+	data->n_dtm_shifts=n_set[mode_dtm_shift];
+	data->n_alias=n_set[mode_alias];
 	data->projections=entries[mode_prj];
 	data->datums=entries[mode_dtm];
 	data->ellipsoids=entries[mode_grs];
 	data->regions=entries[mode_rgn];
-	data->hth_entries=entries[mode_hth];
+	data->dtm_shifts=entries[mode_dtm_shift];
+	data->alias_table=entries[mode_alias];
 	/* perhaps sort entries after number?? */
 	//present_data(stdout,data);
 	return data;
@@ -457,13 +524,17 @@ Function that parses def_lab file. Now in XML :-)
 }
 
 void close_def_data( def_data *data){
+	int i;
 	if (!data)
 		return;
 	free(data->projections);
 	free(data->datums);
 	free(data->ellipsoids);
 	free(data->regions);
-	free(data->hth_entries);
+	for (i=0; i<data->n_dtm_shifts;i++)
+		grim_close(data->dtm_shifts[i].g[0]); /*TODO: close all*/
+	free(data->dtm_shifts);
+	free(data->alias_table);
 	free(data);
 	return;
 }

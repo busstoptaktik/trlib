@@ -58,12 +58,9 @@ FILE           *tr_error
 
   double                      N, E;
 
-  static THREAD_SAFE  int                  in_nr, outnr;
-  static THREAD_SAFE  char                 c_outlab[32] = "UMBA # GUF";
-  static THREAD_SAFE  char                 c_in_lab[32] = "UMBA # GUF";
-  static  int                  TC_init, as_w, as_z;
-
-  int                         result = 0, res = 0, nst, act;
+  int                  in_nr, outnr;
+  int                  as_w, as_z;
+  int                  result = 0, res = 0, nst, act;
 
   /* minilabels */
   struct nr_mlb {
@@ -371,46 +368,42 @@ FILE           *tr_error
 /* dks_tr   ver 1999.01           # page 10   12 Jan 1999 13 41 */
 
 
-  if (!TC_init) {
+  
 
     as_z    = sizeof(astab)/sizeof(struct act_nst);
     as_w    = (int) sqrt(1.0*as_z);
-    TC_init = as_z == as_w*as_w;
+     ;
 
-    if (!TC_init) {
+    if (as_z != as_w*as_w) {
       return((tr_error==NULL) ? TRF_PROGR_ :
               t_status(tr_error, usertxt,
               "dks_tr(state/action tabeller ej ok)", TRF_PROGR_));
     }
-  }
+  
 
   /* lookup outlab */
   /*_______________*/
-  if (strcmp(outlab, c_outlab)) {
+  
     /* insert out-system and clear in-system */
     for (pml = mlab, outnr = -1; pml->trnr != -1; pml++) {
       if (!strcmp(pml->s_lab, outlab)) {
-        (void) strcpy(c_outlab, pml->s_lab);
-        outnr = pml->trnr;
-        /* force a lookup of in_lab */
-        (void) strcpy(c_in_lab, "NUL # amigo");
+	outnr = pml->trnr;
         break;
       }
     }
-  }
+  
 
   /* lookup in_lab */
   /*_______________*/
-  if (strcmp(in_lab, c_in_lab)) {
+  
     /* insert in-system */
     for (pml = mlab, in_nr = -1; pml->trnr != -1; pml++) {
       if (!strcmp(pml->s_lab, in_lab)) {
-        (void) strcpy(c_in_lab, pml->s_lab);
         in_nr = pml->trnr;
         break;
       }
     }
-  }
+  
 
 
   /* Preserve input for reverse check */

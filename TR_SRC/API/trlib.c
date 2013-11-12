@@ -248,7 +248,8 @@ int TR_SetGeoidDir(char *path){
 /*Function which copies the last used geoid name to input buffer.*/    
 
 void TR_GetGeoidName(TR *tr,char *name) {
-	strcpy(name,grim_filename(tr->state->grid_tab->table_sequence[tr->state->grid_tab->cur_table]));
+	/*strcpy(name,grim_filename(tr->state->grid_tab->table_sequence[tr->state->grid_tab->cur_table]));*/
+	strcpy(name,"TODO");
 	return;
 }
 	
@@ -365,7 +366,7 @@ int TR_Insert(TR *tr, char *mlb, int is_out){
 	PR *proj=NULL, *to_be_replaced=NULL;
 	/*PR *i_lab, *o_lab;*/
 	char geoid_name[MLBLNG];
-	strncpy(geoid_name,tr->state->geoid_name,MLBLNG);
+	/*strncpy(geoid_name,tr->state->geoid_name,MLBLNG);*/
 	gd_close(tr->state);
 	gd_close(tr->etats);
 	/*only open if given a proper string - otherwise the slot is just NULL'ed which can be useful also*/
@@ -481,8 +482,8 @@ int TR_tr(
 	    return TR_LABEL_ERROR;
     }
     
-    proj_in = T->i_lab;
-    proj_out = T->o_lab;
+    proj_in = T->lab_in;
+    proj_out = T->lab_out;
     
     if (IS_CARTESIC(proj_in)){
         x_in=Y_in;

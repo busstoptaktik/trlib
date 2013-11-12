@@ -564,6 +564,8 @@ union geo_lab {
     char      text[128];      /* name of system                     */
   };
 
+  /*
+  
 struct  htr_c_str {
     int       inv;
     double    LAT0;
@@ -574,7 +576,8 @@ struct  htr_c_str {
     double    a2;
     double    a3;
   };
-
+*/
+  
 union  rgn_un {
     char      prfx[4];
     short     r_nr[2];
