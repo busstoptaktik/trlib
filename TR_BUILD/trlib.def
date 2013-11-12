@@ -79,10 +79,8 @@ EXPORTS
 	gettabdir
 	gmb1
 	gmb2
-	grid_val2
 	gtc
 	hlm_tr
-	htr_init
 	inpoly
 	labchsum
 	mlb_to_proj4

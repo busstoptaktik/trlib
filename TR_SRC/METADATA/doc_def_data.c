@@ -350,13 +350,13 @@ void present_data(FILE *fp,def_data *data){
 	int n_grs=data->n_ellip;
 	int n_dtm=data->n_dtm;
 	int n_prj=data->n_prj;
-	int n_hth=data->n_hth;
+	int n_dtm_shifts=data->n_dtm_shifts;
 	int n_alias=data->n_alias;
 	fprintf(fp,"n_prj: %d\n",n_prj);
 	fprintf(fp,"n_rgn: %d\n",n_rgn);
 	fprintf(fp,"n_dtm: %d\n",n_dtm);
 	fprintf(fp,"n_grs: %d\n",n_grs);
-	fprintf(fp,"n_hth: %d\n",n_hth);
+	fprintf(fp,"n_hth: %d\n",n_dtm_shifts);
 	fprintf(fp,"n_alias: %d\n\n",n_alias);
 	for (i=0; i<data->n_prj; i++){
 		fprintf(fp,"prj: %s\n",projections[i].mlb);
@@ -392,8 +392,8 @@ void present_data(FILE *fp,def_data *data){
 		fprintf(fp,"%s\n\n",datums[i].descr);
 	}
 	fprintf(fp,"*****************\n\n");
-		
-	for(i=0;i<n_hth;i++){
+	/*	TODO
+	for(i=0;i<n_dtm_shifts;i++){
 		fprintf(fp,"hth: %s to %s\n", data->hth_entries[i].from_mlb,data->hth_entries[i].to_dtm);
 		switch( (data->hth_entries[i]).type)
 		{
@@ -416,7 +416,7 @@ void present_data(FILE *fp,def_data *data){
 		}
 		fprintf(fp,"%s\n\n",data->hth_entries[i].descr);
 		
-	}
+	}*/
 	fprintf(fp,"*****************\n\n");
 	
 	for(i=0; i<n_alias;i++){
@@ -425,7 +425,7 @@ void present_data(FILE *fp,def_data *data){
 	fprintf(fp,"*****************\n\n");
 	{
 	int n_bytes=0;
-	n_bytes=sizeof( def_projection)*n_prj+sizeof( def_datum)*n_dtm+sizeof( def_grs)*n_grs+n_rgn*3+sizeof( def_hth_tr)*n_hth;
+	n_bytes=sizeof( def_projection)*n_prj+sizeof( def_datum)*n_dtm+sizeof( def_grs)*n_grs+n_rgn*3+sizeof( def_dtm_shift)*n_dtm_shifts;
 	n_bytes+=sizeof(def_alias)*n_alias;
 	fprintf(fp,"bytes used: %d\n",n_bytes);
 	}

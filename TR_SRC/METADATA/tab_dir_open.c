@@ -25,10 +25,10 @@
 #include "strong.h"
 #include "lord.h"
 
-static char *attach_pom_extension(char *dir, char *in);
+
 static int parse_table_manager(struct tag *root, tab_dir *self);
 
-static char *attach_pom_extension(char *dir,char *in){
+char *attach_pom_extension(char *dir,char *in){
 	char *pos, buf[256];
 	strcpy(buf,dir);
 	strcat(buf,in);

@@ -40,7 +40,7 @@ static int int_converter(char *in, void *out, size_t buf_size, void *extra);
 static int double_converter(char *in, void *out, size_t buf_size, void *extra);
 static int set_projection(struct tag *prj_tag,  def_projection *proj);
 static int set_datum(struct tag *dtm_tag, def_datum *dtm);
-static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, char *dir_name);
+static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift,def_datum *datums, int n_datums, char *dir_name);
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn);
 static int set_alias(struct tag *alias_tag, def_alias *alias);
 //static char BUF[256];
@@ -243,22 +243,41 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 	return 1;
 }
 
-static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, char *dir_name){
+static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift,def_datum *datums, int n_datums, char *dir_name){
 	struct tag t;
-	char file_name[512];
+	int i,n_ok;
+	char file_name[512],mlb1[MLBLNG],mlb2[MLBLNG];
 	GRIM g;
 	
 	t=get_named_child(dtm_shift_tag,"from");
-	if (!get_value_as_string(&t,dtm_shift->from,MLBLNG))
+	if (!get_value_as_string(&t,mlb1,MLBLNG))
 		return 0;
 	
 	t=get_named_child(dtm_shift_tag,"to");
-	if (!get_value_as_string(&t,dtm_shift->to,MLBLNG))
+	if (!get_value_as_string(&t,mlb2,MLBLNG))
 		return 0;
-	
+	n_ok=0;
+	for(i=0; i<n_datums; i++){
+		if (!strcmp(datums[i].mlb,mlb1)){
+			dtm_shift->dno1=datums[i].no;
+			dtm_shift->mlb1=datums[i].mlb;
+			n_ok+=1;
+		}
+		else if (!strcmp(datums[i].mlb,mlb2)){
+			dtm_shift->dno2=datums[i].no;
+			dtm_shift->mlb2=datums[i].mlb;
+			n_ok+=1;
+		}
+		if (n_ok==2)
+			break;
+	}
+	if (n_ok!=2){
+		lord_error(TR_LABEL_ERROR,LORD("Did not find both datums for datum-shift definition!"));
+		return 0;
+	}
 	t=get_named_child(dtm_shift_tag,"file");
-	if (t.is_valid){
-		(if !get_value_as_string(&t,file_name,128))
+	if (t.valid){
+		if (!get_value_as_string(&t,file_name,128))
 			return 0;
 		g=grim_open(attach_pom_extension(dir_name,file_name));
 		if (g==NULL)
@@ -272,11 +291,11 @@ static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, ch
 		mlb[0]='\0';
 		
 		t=get_named_child(dtm_shift_tag,"mlb");
-		if (!get_value_as_string(&t,mlb,MLBLNG);
+		if (!get_value_as_string(&t,mlb,MLBLNG))
 			return 0;
 
 		t=get_named_child(dtm_shift_tag,"htr_constant");
-		if (t.is_valid) {
+		if (t.valid) {
 			if (1!=get_value(&t,coefficients,1,double_converter,NULL))
 				return 0;
 			coefficients[1]=0;
@@ -287,7 +306,7 @@ static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, ch
 		else {
 			struct tag s;
 			t=get_named_child(dtm_shift_tag,"htr_constants");
-			if (t.is_valid) {
+			if (t.valid) {
 				s=get_named_child(&t,"lat_0");
 				if (1!=get_value(&s,&lat_0,1,double_converter,"nt"))
 					return 0;
@@ -303,14 +322,14 @@ static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, ch
 				s=get_named_child(&t,"kN");
 				if (1!=get_value(&s,coefficients+2,1,double_converter,"sx"))
 					return 0;
-				coefficients[1]*=coeffecients[2];
+				coefficients[1]*=coefficients[2];
 				s=get_named_child(&t,"N0");
 				if (1!=get_value(&s,coefficients+2,1,double_converter,NULL))
 					return 0;
 				s=get_named_child(&t,"kE");
-				if (1!	=get_value(&s,coefficients+3,1,double_converter,"sx"))
+				if (1!=get_value(&s,coefficients+3,1,double_converter,"sx"))
 					return 0;
-				coefficients[2]*=coeffecients[3];
+				coefficients[2]*=coefficients[3];
 				coefficients[3]=0;
 				degree=1;
 			}
@@ -319,7 +338,12 @@ static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, ch
 		}
 		g=grim_polynomial(lat_0,lon_0,coefficients, 3, 1, degree, mlb);
 	}
-	dtm_shift->g=g
+	if (g==NULL)
+		return 0;
+	dtm_shift->g=calloc(sizeof(GRIM),1);
+	dtm_shift->n_tabs=1;
+	dtm_shift->g[0]=g;
+	dtm_shift->len=1; /*TODO*/
 	return 1;
 }
 
@@ -412,8 +436,8 @@ Function that parses def_lab file. Now in XML :-)
 					case mode_alias:
 						ok=set_alias(&item_tag, (def_alias*) entry+n_set[mode]);
 						break;
-					case mode_hth:
-						ok=set_dtm_shift(&item_tag, (def_dtm_shift*) entry+n_set[mode], dir_name);
+					case mode_dtm_shift:
+						ok=set_dtm_shift(&item_tag, (def_dtm_shift*) entry+n_set[mode], (def_datum*) entries[mode_dtm], n_set[mode_dtm],dir_name);
 						break;
 					case mode_grs:
 						ok=set_ellips(&item_tag,(def_grs*) entry+n_set[mode]);
@@ -508,7 +532,7 @@ void close_def_data( def_data *data){
 	free(data->ellipsoids);
 	free(data->regions);
 	for (i=0; i<data->n_dtm_shifts;i++)
-		grim_close(data->dtm_shifts[i].g);
+		grim_close(data->dtm_shifts[i].g[0]); /*TODO: close all*/
 	free(data->dtm_shifts);
 	free(data->alias_table);
 	free(data);

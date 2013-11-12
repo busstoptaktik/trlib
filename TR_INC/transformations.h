@@ -11,6 +11,6 @@ int ng_trans(struct coord_lab*,struct coord_lab*,double,double,double,double*,do
 int ee_trans(struct coord_lab*,struct coord_lab*,double,double,double,double*,double*,double*,tab_dir*);  
 
 /*generic transformations*/
-
+int gd_trans(gd_state*, double, double, double, double*,double*,double*,double*);
 
 #endif

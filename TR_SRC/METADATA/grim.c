@@ -152,7 +152,7 @@ struct GRIM {
     FILE
         *file;
     char
-        *filename;
+        *filename,
 	crs[32];
     size_t            /* TODO: is size_t large enough for 64 bit file systems? */
         data_size;
@@ -368,7 +368,7 @@ GRIM grim_open (char *pomfilename) {
     if (0==g)
 		return (GRIM) pom_free (p);
     g->pom = p;
-    if (!strcmp(pomval(p,"type"),"table");
+    if (!strcmp(pomval(p,"type"),"table"))
 	g->type=0;
     else
 	g->type=1;
@@ -541,7 +541,7 @@ static int grim_values_workhorse (const GRIM g, double northing, double easting,
 }
 
 
-int grim_polynomial_workhorse(const GRIM g, double northing, double easting, *double record, int channels){
+int grim_polynomial_workhorse(const GRIM g, double northing, double easting, double *record, int channels){
 	double N, E, *p, H;
 	if (channels>1){ /*only 1d for now*/
 		return 1;
@@ -551,7 +551,7 @@ int grim_polynomial_workhorse(const GRIM g, double northing, double easting, *do
 	N=northing - g->yllcenter;
 
 	/*Ready for an extra loop with shannels*/
-	p=g->coefficients+ channels*(1+degree*2) ;
+	p=g->coefficients+ channels*(1+g->degree*2) ;
 		
 	for (H=0.0;p>g->coefficients;)
 		H+=E**(--p) + N**(--p);
@@ -575,7 +575,7 @@ int grim_values (const GRIM g, double northing, double easting, size_t extrapola
 double grim_value (const GRIM g, double northing, double easting, size_t channel, size_t extrapolation_method) {
     double v;
     if (g->type==1)
-	    grim_polynomial_workhorse(g, northing, easting, &v, channel, 1);
+	    grim_polynomial_workhorse(g, northing, easting, &v, channel);
     else
 	   grim_values_workhorse (g, northing, easting, extrapolation_method, &v, channel, 1);
     return v;

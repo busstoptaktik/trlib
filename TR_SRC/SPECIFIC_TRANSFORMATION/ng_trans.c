@@ -120,7 +120,7 @@ struct act_nst  *ptab;
   if (in_lab->lab_type == CRD_LAB && outlab->lab_type == CRD_LAB) {
 
     if (nadg_gr96_tab == NULL) {
-      nadg_gr96_tab=get_specific_table("nadggr96.06", T3D_LAB, tdir);
+      nadg_gr96_tab=NULL; /* TODO: get_specific_table("nadggr96.06", T3D_LAB, tdir);*/
      /* res  = tab3d_i("nadggr96.06", T3D_LAB, &nadg_gr96_tab, err_str);*/
       /* State/action table size and width */
       ng_z = sizeof(ngtab)/sizeof(struct act_nst);
