@@ -25,7 +25,6 @@
 int                  get_mlb(
 /*_________________________*/
 char                *mlb_str,
-short               *region,
 char                *mlb1,
 short               *sepch,
 char                *mlb2,
@@ -36,11 +35,12 @@ char               **h_mlb
   char                tx[4*MLBLNG], *ptx = tx;
   int                 tx_lng, i, res;
   char               *p_sep, *p_mlb;
-  union rgn_un        lab_rgn;
+  
+ 
   char                rgn_name[32];
 
 
-  *region = 0;
+ 
   *sepch  = 0;
   *mlb1   = (char) '\0';
   *mlb2   = (char) '\0';
@@ -58,19 +58,11 @@ char               **h_mlb
     /* label textstring. Test first and second char for region */
     /* The third char must be an underscore                    */
     if (isupper(*(tx +0)) && isupper(*(tx +1))
-        &&     (*(tx +2) == '_')) {
-      (void) strncpy(lab_rgn.prfx, tx, 2);
-      lab_rgn.r_nr[1] = 0;
-
-      if ((conv_rgn(-1, lab_rgn.prfx, rgn_name)) > 0) { 
+        &&     (*(tx +2) == '_')) { /*hmmm -- removed all region stuff - todo consider if we want it back...*/
+    
         ptx    += 3;
         tx_lng -= 3;
-      } else lab_rgn.r_nr[0] = 0;
-
-    } else lab_rgn.r_nr[0] = 0; /* no prefix letters found */
-
-    *region = lab_rgn.r_nr[0];
-
+ }
     /* SYSTEM PART */
     /* Extract the system part and the contingent separator  */
 

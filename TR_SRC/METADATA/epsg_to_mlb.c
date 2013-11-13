@@ -20,9 +20,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "metadata.h"
 #include "sputshpprj.h"
 #include "geo_lab.h"
-#include "get_mlb.h"
 #include "trlib_intern.h"
 #include "trlib_api.h"
 #include "proj4_to_mlb.h"
@@ -109,7 +109,7 @@ int export_to_epsg(char *mlb, int *h_code, int *v_code){
 	int utm_zone=0;
 	char mlb1[2*MLBLNG], mlb2[2*MLBLNG],mlb_src[2*MLBLNG+1], *h_datum,*utm_scan=0;
 	EPSG_ENTRY *found;
-	short sepch,region;
+	short sepch;
 	*v_code=0;
 	*h_code=0;
 	if (EPSG_TABLE==NULL){
@@ -126,7 +126,7 @@ int export_to_epsg(char *mlb, int *h_code, int *v_code){
 		
 	/*secondly search for 2d-match*/
 		
-	get_mlb(mlb,&region,mlb1,&sepch,mlb2,&h_datum);
+	get_mlb(mlb,mlb1,&sepch,mlb2,&h_datum);
 	
 	/*first see if this is a utm system */
         if ((utm_scan=strstr(mlb1,"utm"))){
@@ -178,7 +178,7 @@ int export_to_epsg(char *mlb, int *h_code, int *v_code){
 int import_from_epsg(int h_code, int v_code, char *mlb){
 	EPSG_ENTRY *found;
 	char mlb1[2*MLBLNG], mlb2[2*MLBLNG],buf[2*MLBLNG],*h_datum,*utm_scan;
-	short sepch,region;
+	short sepch;
 	if (EPSG_TABLE==NULL){
 		lord_error(TR_ALLOCATION_ERROR,"EPSG table not initialised.");
 		return TR_ALLOCATION_ERROR;
@@ -191,11 +191,11 @@ int import_from_epsg(int h_code, int v_code, char *mlb){
 	/*If utm system - append zone number after 'utm'*/
 	if (found->code1<found->code2 && (utm_scan=strstr(found->mlb,"utm"))){
 		sprintf(buf,"utm%02d%s",(found->start_zone+(h_code-found->code1)),utm_scan+3);
-		get_mlb(buf,&region,mlb1,&sepch,mlb2,&h_datum);
+		get_mlb(buf,mlb1,&sepch,mlb2,&h_datum);
 		strcpy(mlb,buf);
 	}
 	else{
-		get_mlb(found->mlb,&region,mlb1,&sepch,mlb2,&h_datum);
+		get_mlb(found->mlb,mlb1,&sepch,mlb2,&h_datum);
 		strcpy(mlb,found->mlb);
 	}
 	if (v_code>0 && (sepch!='_')){

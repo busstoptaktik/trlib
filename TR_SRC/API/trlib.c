@@ -730,8 +730,8 @@ int TR_ExportLabel(char *mlb, char *out, int foreign_format_code, int buf_len){
 	char buf[4096];
 	/*TODO: test for height in mlb and return a warning/special return code if only partially translated
 	char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
-	short sepch,region;
-	ok=get_mlb(mlb,&region,mlb1,&sepch,mlb2,&h_datum);
+	short sepch;
+	ok=get_mlb(mlb,mlb1,&sepch,mlb2,&h_datum);
 	*/
 	*out='\0';
 	switch(foreign_format_code){

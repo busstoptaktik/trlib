@@ -16,7 +16,7 @@ int srch_def(
   int                        qr, res = -1, cha_str;
   int                        n_prj=0; 
   int                        l_cstm, l_mode, l_type;
-  union rgn_un               rgn_pref, dum_rgn;
+  union rgn_un               rgn_pref, dum_rgn; /*hmm - get rid of this hack*/
   def_projection *prj;
   
   

@@ -19,19 +19,18 @@ OPTIONS={"-thread_safe": "Compile a thread safe library.",
 "-pattern":" <pattern>  : Build files matching pattern.",
 "-clean": "Delete objcet files.",
 "-test":"Run tests.",
-"-kmsfncs":"(DEPRECATED) Expose KE's functions (windows).",
 "-gprof":"Include symbols for gprof.",
 "-compiler_version":"Echo compiler selection.",
 "-java":"Build java (jni) bindings.",
 "-java_external":"Build and link a separate library for jni-bindings.",
 "-build_java":"Build java source (not implemented)."}
 OPTIONS.update(COMPILER_SELECTION_OPTS)
+#NEW: TRLIB ROOT is now fetched automatically
+TRLIB=os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
 CWD=os.path.realpath(os.getcwd())
 #THIS IS WHERE YOU WILL GET YOUR OBJECT FILES
 BUILD_DIR=os.path.realpath("./BUILD_PY")
 BUILD_DIR_CROSS=os.path.realpath("./BUILD_PY_W64")
-#IF YOU HAVE TEST PROGRAMS TO COMPILE - PUT THEM HERE
-
 #THIS IS WHERE YOU'LL GET YOUR OUTPUT LIBRARY BY DEFAULT
 LIB_DIR=os.path.realpath("./LIB")
 LIB_DIR_CROSS=os.path.realpath("./LIB64")
@@ -63,7 +62,7 @@ TESTS=[]
 
 
 def Usage():
-	print("To run: %s <path_to_source_dir> options (at least one!)" %os.path.basename(sys.argv[0]))
+	print("To run: %s options (at least one!)" %os.path.basename(sys.argv[0]))
 	print("Available options:")
 	for option in OPTIONS.keys():
 		print("%s : %s" %(option,OPTIONS[option]))
@@ -126,10 +125,10 @@ def GetSource(trlib):
 
 def main(args):
 	global TESTS
-	if len(args)<3:
+	if len(args)<2:
 		Usage()
-	TRLIB=os.path.realpath(args[1])
-	if not os.path.exists(TRLIB) or not TestOptions(args[2:]):
+	if not os.path.exists(TRLIB) or not TestOptions(args[1:]):
+		print TRLIB
 		Usage()
 	log_fp=open(BUILD_LOG,"w")
 	sys.stdout=RedirectStdout(log_fp,True)
@@ -139,6 +138,7 @@ def main(args):
 		lib_dir=LIB_DIR_CROSS
 	else:
 		build_dir=BUILD_DIR
+		lib_dir=LIB_DIR
 	is_msvc=isinstance(compiler,cc.msvc)
 	if "-compiler_version" in args:
 		print GetCompiler(compiler)
@@ -185,11 +185,7 @@ def main(args):
 		if "-thread_safe" in args:
 			defines.append("THREAD_SAFE")
 		if is_msvc:
-			if "-kmsfncs" in args:
-				print("DEPRECATED OPTION....")
-				def_file=os.path.join(TRLIB,DEF_FILE_KMS_FNCS)
-			else:
-				def_file=os.path.join(TRLIB,DEF_FILE_API)
+			def_file=os.path.join(TRLIB,DEF_FILE_API)
 		else:
 			def_file=""
 		ok=Build(compiler,outname,source,inc_dirs,defines,debug,True,compiler.LINK_LIBRARIES,def_file,build_dir)

@@ -40,9 +40,6 @@ EXPORTS
 	c_gps_c
 	cic
 	clenshaw
-	conv_crd
-	conv_hgt
-	conv_rgn
 	ctc
 	cwfJD
 	cwtJD
@@ -73,7 +70,6 @@ EXPORTS
 	get_ha_s
 	get_mlb
 	get_tpd
-	get_zone
 	getsinexlin
 	getsinexver
 	gettabdir

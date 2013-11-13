@@ -78,7 +78,7 @@ COMMON_PROJ4_DEFINITIONS[]={
 */
 
 /* Some KMS aliases for etrs89 - possibly others as well*/
-
+/*TODO: use alias table...*/
 static struct translation_entry KMS_DATUM_ALIAS[]={
 {"etrf89","etrs89"},
 {"euref89","etrs89"},
@@ -539,7 +539,7 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len, def_data *DEF_DATA){
         int n_chars,is_geo=0,set_datum=1;
         char internal_buf[512], *tmp;
         char mlb1[2*MLBLNG], mlb2[2*MLBLNG], *h_datum;
-        short sepch,region;
+        short sepch;
         PR *srs=NULL;
         if (DEF_DATA==NULL){
                 lord_error(TR_ALLOCATION_ERROR,LORD("def-data not initialised!"));
@@ -550,7 +550,7 @@ int mlb_to_proj4(char *mlb, char *out, int buf_len, def_data *DEF_DATA){
         if (srs==NULL){
                 return TR_LABEL_ERROR;
         }
-        n_chars=get_mlb(mlb,&region,mlb1,&sepch,mlb2,&h_datum);
+        n_chars=get_mlb(mlb,mlb1,&sepch,mlb2,&h_datum);
         if (n_chars==0){
                 lord_error(TR_LABEL_ERROR,LORD("Failed to parse mlb"));
                 goto MLB_TO_PROJ4_CLEANUP;

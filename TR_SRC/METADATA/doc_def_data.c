@@ -38,7 +38,7 @@
 
 
 /* will simply output  "rgn" or "rgn country" depending on detail level requested */
-/* use conv_rgn for other types of call */
+
 int doc_rgn(char *rgn_name, char *descr, int detail, def_data *DEF_DATA){
 	int i;
 	def_rgn *rgn=NULL;

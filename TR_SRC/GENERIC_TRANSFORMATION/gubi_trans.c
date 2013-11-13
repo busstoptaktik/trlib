@@ -10,11 +10,11 @@ int apply_datum_shift(def_dtm_shift *shifts[], int *direction, int n_shifts, dou
 	
 /*TODO - fix this up! */
 static void convert2geo(char *mlb_in, char *mlb_out){
-	short rgn,sep;
+	short sep;
 	char dtm[MLBLNG];
 	char prj[MLBLNG];
 	char *p;
-	get_mlb(mlb_in,&rgn,prj,&sep,dtm,&p);
+	get_mlb(mlb_in,prj,&sep,dtm,&p);
 	sprintf(mlb_out,"geoE%s",dtm);
 	lord_debug(0,LORD("in: %s, out: %s"),mlb_in,mlb_out);
 }
@@ -29,8 +29,8 @@ gd_state *gd_open(struct coord_lab *lab_in, struct coord_lab *lab_out, char *ext
 		conv_w_crd("geo_wgs84",&tlab,tdir->def_lab);
 		init=1;
 	}
-	if (!lab_in || !lab_out){
-		lord_error(TR_ALLOCATION_ERROR,LORD("Input crs structures not set!"));
+	if (!lab_in || !lab_out || lab_in->lab_type!=CRD_LAB || lab_out->lab_type!=CRD_LAB){
+		lord_error(TR_ALLOCATION_ERROR,LORD("Input crs structures not initialised."));
 		return NULL;
 	}
 	lord_debug(0,LORD("mlb1: %s, hdtm1: %d, mlb2: %s, hdtm2: %d, dtm2: %d"),GET_MLB(lab_in),GET_HDTM(lab_in),GET_MLB(lab_out),GET_HDTM(lab_out),GET_DTM(lab_out));
@@ -220,7 +220,7 @@ int gd_trans(gd_state *state, double N, double E, double H, double *No, double *
 			/*trick: assume H is ellipsoidal height - the output table cell should be more or less independent of the actual h
 			as long as h is small compared to R and the axes of the table system and the input system are more or less aligned*/
 			lord_debug(0,LORD("*** Taking the scenic gtc route ***"));
-			lord_debug(0,LORD("Input hdtm is: %d, output hdtm is: %d"),state->hdtm_in, state->hdtm_out);
+			lord_debug(0,LORD("Input hdtm is: %d, output hdtm is: %d, H is: %.3f"),state->hdtm_in, state->hdtm_out,H);
 			lord_debug(0,LORD("geo-coords with 'fake' ellipsoidal heights: %.4f %.4f %.4f"),N*DOUT,E*DOUT,H); 
 			gtc(in_step,1,N,E,H,&X,&Y,&Z,"",NULL); /*go up from fake 'geoE' to crt*/
 			ctc(in_step,geoid_route->clab,X,Y,Z,&X,&Y,&Z,tdir); /*change to table dtm*/
@@ -229,7 +229,7 @@ int gd_trans(gd_state *state, double N, double E, double H, double *No, double *
 			if (res!=0)
 				return TAB_C_ARE_;
 			/*add the geoid height to H and we're pretty much in Ellipsodal heights*/
-			H+=Z;
+			H=2*H+Z-tE;
 			lord_debug(0,LORD("geo-coords with 'real' ellipsoidal heights: %.4f %.4f %.4f"),N*DOUT,E*DOUT,H); 
 			gtc(in_step,1,N,E,H,&E,&N,&H,"",NULL); /*now go to the true 3d coords*/
 			lord_debug(0,LORD("crt coords in input dtm: %.2f %.2f %.2f"),E,N,H); 

@@ -129,8 +129,8 @@ int find_htr_route(int dtm1,int dtm2,htr_route *route,def_dtm_shift *shifts, int
 		route->n_shifts=2;
 		route->shifts[0]=shift1;
 		route->shifts[1]=shift2;
-		route->direction[0]=(shift1->dno1!=dtm1)?1:-1;
-		route->direction[1]=(shift2->dno2!=dtm2)?1:-1;
+		route->direction[0]=(shift1->dno1==dtm1)?1:-1;
+		route->direction[1]=(shift2->dno2==dtm2)?1:-1;
 		route->len=shift1->len+shift2->len;
 		return 0;
 	}

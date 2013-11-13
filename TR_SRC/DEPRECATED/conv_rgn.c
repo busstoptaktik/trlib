@@ -25,13 +25,13 @@ short            conv_rgn(
 /*______________________*/
 short            rgn_nr,
 char            *rgn_prfx,
-char            *rgn_name
+char            *rgn_name,
+def_data       *DEF_DATA
 )
 {
 
 
 /* Use preparsed regions. simlk, june 2012 */
-	extern def_data *DEF_DATA; /*TODO; fix this as a parameter*/
 	union rgn_un     f_rgn, r_rgn;
 	int n_rgn=0;
 	def_rgn *this_rgn;

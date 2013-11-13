@@ -197,15 +197,13 @@ tab_dir                         *tdir
 );
 
 void gd_close(gd_state *self);
-  
-
-  
-
-
 int conv_w_crd(char *mlb, struct coord_lab *c_lab, def_data *data);
 int srch_def(int srch_type, char *p_sys, struct lab_def_str *p_lb, def_data *data);
 int find_htr_route(int dtm1,int dtm2,htr_route *route,def_dtm_shift *shifts, int n_shifts);
 char *attach_pom_extension(char *dir, char *in);
+int get_mlb(char *mlb_str, char *mlb1, short *sepch, char *mlb2, char **h_mlb);
+int conv_crd2(struct lab_def_str *p_lb, struct coord_lab *c_lab, def_data *DEF_DATA, char *p_io);
+int conv_hgt2(struct lab_def_str *p_lb_ex,struct hgt_lab *h_lab,def_data  *DEF_DATA);
 
 
 
