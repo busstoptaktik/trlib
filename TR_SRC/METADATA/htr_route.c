@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "KmsFncs.h"
 static def_dtm_shift *find_1_step(int dtm1, int dtm2,def_dtm_shift *datum_shifts, int n_shifts);
-static def_dtm_shift *find_1_step(int dtm1, int dtm2,def_dtm_shift *datum_shifts, int n_shifts);
+static int find_2_steps(int dtm1, int dtm2,def_dtm_shift **o_shift1,def_dtm_shift **o_shift2, def_dtm_shift *datum_shifts, int n_shifts);
+
 #ifdef BOMBJACK
 typedef void* GRIM;
 typedef void  PR;
@@ -18,7 +19,7 @@ typedef struct{
 typedef struct {
 	int n_shifts;
 	def_dtm_shift *shifts[4];
-	int invert[4];
+	int direction[4];
 	double len;
 	PR *clab;
 } htr_route;
@@ -43,7 +44,9 @@ def_dtm_shift SHIFTS[]={
 static def_dtm_shift *find_1_step(int dtm1, int dtm2,def_dtm_shift *datum_shifts, int n_shifts){
 	def_dtm_shift *shift;
 	int i;
+	#ifdef BOMBJACK
 	printf("*** one step called with: %d to %d\n",dtm1,dtm2);
+	#endif
 	for(i=0; i<n_shifts; i++){
 		shift=datum_shifts+i;
 		if ((shift->dno1==dtm1 && shift->dno2==dtm2) || (shift->dno1==dtm2 && shift->dno2==dtm1))
@@ -60,16 +63,16 @@ static def_dtm_shift *find_1_step(int dtm1, int dtm2,def_dtm_shift *datum_shifts
 static int find_2_steps(int dtm1, int dtm2,def_dtm_shift **o_shift1,def_dtm_shift **o_shift2, def_dtm_shift *datum_shifts, int n_shifts){
 	int i,j,vertex;
 	def_dtm_shift *shift1,*shift2=NULL;
+	#ifdef BOMBJACK
 	printf("*** two steps called with: %d to %d\n",dtm1,dtm2);
+	#endif
 	for(i=0; i<n_shifts && shift2==NULL; i++){
 		shift1=datum_shifts+i;
 		vertex=-1;
 		if (shift1->dno1==dtm1){
-			puts("1");
 			vertex=shift1->dno2;
 		}
 		else if (shift1->dno2==dtm1){
-			puts("2");
 			vertex=shift1->dno1;
 		}
 		if (vertex==-1)
@@ -77,12 +80,16 @@ static int find_2_steps(int dtm1, int dtm2,def_dtm_shift **o_shift1,def_dtm_shif
 		/*intermediate vertex found, we could also assume it's not dtm2, as we might already have found it by applying find_1_step...*/
 		if (vertex==dtm2){
 			shift2=shift1;
+			#ifdef BOMBJACK
 			puts("Found a 1-link connection!");
 			printf("vertex: %d\n",vertex);
 			printf("i: %d, shift: %d to %d, %s to %s\n",i,shift1->dno1,shift1->dno2,shift1->mlb1,shift1->mlb2);
+			#endif
 		}
 		else {
+			#ifdef BOMBJACK
 			printf("Found possible vertex: %d\n",vertex);
+			#endif
 			shift2=find_1_step(vertex,dtm2,datum_shifts,n_shifts);
 		}
 	}
@@ -102,24 +109,28 @@ int find_htr_route(int dtm1,int dtm2,htr_route *route,def_dtm_shift *shifts, int
 	route->n_shifts=0;
 	route->len=0;
 	if (dtm1==dtm2){
+		#ifdef BOMBJACK
 		puts("Equal datums...");
+		#endif
 		return 0; /*no brainer*/
 	}
 	shift1=find_1_step(dtm1,dtm2,shifts,n_shifts);
 	if (shift1!=NULL){
 		route->shifts[0]=shift1;
 		route->n_shifts=1;
-		route->invert[0]=(shift1->dno1==dtm2);
+		route->direction[0]=(shift1->dno1==dtm1)?1: -1;
 		route->len=shift1->len;
 		return 0;
 	}
 	if (find_2_steps(dtm1,dtm2,&shift1,&shift2,shifts,n_shifts)==0){
+		#ifdef BOMBJACK
 		printf("In two gos from %d to %d...\n",dtm1,dtm2);
+		#endif
 		route->n_shifts=2;
 		route->shifts[0]=shift1;
 		route->shifts[1]=shift2;
-		route->invert[0]=(shift1->dno1!=dtm1);
-		route->invert[1]=(shift2->dno2!=dtm2);
+		route->direction[0]=(shift1->dno1!=dtm1)?1:-1;
+		route->direction[1]=(shift2->dno2!=dtm2)?1:-1;
 		route->len=shift1->len+shift2->len;
 		return 0;
 	}
@@ -130,23 +141,23 @@ int find_htr_route(int dtm1,int dtm2,htr_route *route,def_dtm_shift *shifts, int
 	if (find_2_steps(200,dtm1,&shift1,&shift2,shifts,n_shifts)==0 && find_2_steps(200,dtm2,&shift3,&shift4,shifts,n_shifts)==0){
 		/*dtm1 to E*/
 		route->shifts[0]=shift2;
-		route->invert[0]=(shift2->dno1!=dtm1);
+		route->direction[0]=(shift2->dno1==dtm1)?1:-1;
 		route->n_shifts=1;
 		route->len+=shift2->len;
 		if (shift2!=shift1){
 			route->shifts[1]=shift1;
-			route->invert[1]=(shift1->dno2!=200);
+			route->direction[1]=(shift1->dno2==200)?1:-1;
 			route->n_shifts=2;
 			route->len+=shift1->len;
 		}
 		/*E to dtm2*/
 		route->shifts[route->n_shifts]=shift3;
-		route->invert[route->n_shifts]=(shift3->dno1!=200);
+		route->direction[route->n_shifts]=(shift3->dno1==200)?1:-1;
 		route->n_shifts++;
 		route->len+=shift3->len;
 		if (shift3!=shift4){
 			route->shifts[3]=shift4;
-			route->invert[3]=(shift4->dno2!=dtm2);
+			route->direction[3]=(shift4->dno2==dtm2)?1:-1;
 			route->n_shifts++;
 			route->len+=shift4->len;
 		}
@@ -170,7 +181,7 @@ int main(int argc, char **argv){
 	if (res==0){
 		printf("Found route of length: %.2f\n",route.len);
 		for(i=0; i<route.n_shifts; i++)
-			printf("From %s to %s, inv: %d\n",route.shifts[i]->mlb1,route.shifts[i]->mlb2,route.invert[i]);
+			printf("From %s to %s, direction: %d\n",route.shifts[i]->mlb1,route.shifts[i]->mlb2,route.direction[i]);
 		
 	}
 	else

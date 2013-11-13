@@ -106,7 +106,7 @@ tab_dir *tab_dir_open(char *path){
 		goto CLEANUP;
 	}
 	ok=parse_table_manager(&def_tab_tag,self);
-	if (!ok)
+	if (ok!=TR_OK)
 		goto CLEANUP;
 	free(xml);
 	return self;

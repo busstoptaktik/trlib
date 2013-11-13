@@ -85,7 +85,6 @@ extern "C" {
 #include "gtc.h"
 #include "grim.h"
 #include "hlm_tr.h"
-#include "htr_init.h"
 #include "inpoly.h"
 #include "labchsum.h"
 #include "lord.h"

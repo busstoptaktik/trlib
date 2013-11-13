@@ -394,8 +394,8 @@ const char *grim_crs(const GRIM g);
 const char *grim_field_name(const GRIM g, const char *name);
 GRIM grim_polynomial(double lat_0, double lon_0, double *coefficients, int n_coeff, int channels, int degree, char *mlb);
 int grim_polynomial_workhorse(const GRIM g, double northing, double easting, double *record, int channels);
-double grim_rows(const GRIM g);
-double grim_columns(const GRIM g);
+long grim_rows(const GRIM g);
+long grim_columns(const GRIM g);
 
 
 

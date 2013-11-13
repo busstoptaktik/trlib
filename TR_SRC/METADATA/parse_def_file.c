@@ -40,7 +40,7 @@ static int int_converter(char *in, void *out, size_t buf_size, void *extra);
 static int double_converter(char *in, void *out, size_t buf_size, void *extra);
 static int set_projection(struct tag *prj_tag,  def_projection *proj);
 static int set_datum(struct tag *dtm_tag, def_datum *dtm);
-static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift,def_datum *datums, int n_datums, char *dir_name);
+static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, char *dir_name);
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn);
 static int set_alias(struct tag *alias_tag, def_alias *alias);
 //static char BUF[256];
@@ -243,38 +243,21 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 	return 1;
 }
 
-static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift,def_datum *datums, int n_datums, char *dir_name){
+static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, char *dir_name){
 	struct tag t;
 	int i,n_ok;
-	char file_name[512],mlb1[MLBLNG],mlb2[MLBLNG];
+	char file_name[512];
 	GRIM g;
 	
 	t=get_named_child(dtm_shift_tag,"from");
-	if (!get_value_as_string(&t,mlb1,MLBLNG))
+	if (1!=get_value(&t,&dtm_shift->dno1,1,int_converter,NULL))
 		return 0;
 	
 	t=get_named_child(dtm_shift_tag,"to");
-	if (!get_value_as_string(&t,mlb2,MLBLNG))
+	if (!get_value(&t,&dtm_shift->dno2,1,int_converter,NULL))
 		return 0;
-	n_ok=0;
-	for(i=0; i<n_datums; i++){
-		if (!strcmp(datums[i].mlb,mlb1)){
-			dtm_shift->dno1=datums[i].no;
-			dtm_shift->mlb1=datums[i].mlb;
-			n_ok+=1;
-		}
-		else if (!strcmp(datums[i].mlb,mlb2)){
-			dtm_shift->dno2=datums[i].no;
-			dtm_shift->mlb2=datums[i].mlb;
-			n_ok+=1;
-		}
-		if (n_ok==2)
-			break;
-	}
-	if (n_ok!=2){
-		lord_error(TR_LABEL_ERROR,LORD("Did not find both datums for datum-shift definition!"));
-		return 0;
-	}
+	
+	
 	t=get_named_child(dtm_shift_tag,"file");
 	if (t.valid){
 		if (!get_value_as_string(&t,file_name,128))
@@ -344,6 +327,8 @@ static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift,def
 	dtm_shift->n_tabs=1;
 	dtm_shift->g[0]=g;
 	dtm_shift->len=1; /*TODO*/
+	lord_debug(0,LORD("DATUM SHIFT from: %d, to: %d, mlb: %s, adress: %p"),dtm_shift->dno1,dtm_shift->dno2,grim_crs(dtm_shift->g[0]),dtm_shift->g[0]);
+	lord_debug(0,LORD("rows: %d, columns: %d"),grim_rows(dtm_shift->g[0]),grim_columns(dtm_shift->g[0]));
 	return 1;
 }
 
@@ -437,7 +422,7 @@ Function that parses def_lab file. Now in XML :-)
 						ok=set_alias(&item_tag, (def_alias*) entry+n_set[mode]);
 						break;
 					case mode_dtm_shift:
-						ok=set_dtm_shift(&item_tag, (def_dtm_shift*) entry+n_set[mode], (def_datum*) entries[mode_dtm], n_set[mode_dtm],dir_name);
+						ok=set_dtm_shift(&item_tag, (def_dtm_shift*) entry+n_set[mode], dir_name);
 						break;
 					case mode_grs:
 						ok=set_ellips(&item_tag,(def_grs*) entry+n_set[mode]);
@@ -482,21 +467,23 @@ Function that parses def_lab file. Now in XML :-)
 	/*set parent no of datums*/
 	
 	{
-	def_datum *dtm1,*dtm2;
-	int j;
-	for(i=0;i<n_set[mode_dtm]; i++){
-		dtm1=((def_datum*) entries[mode_dtm])+i;
-		/*dtm1->p_no=-1;*/
-		for (j=0;j<n_set[mode_dtm];j++){
-			dtm2=((def_datum*) entries[mode_dtm])+j;
-			if (!strcmp(dtm2->mlb,dtm1->p_datum)){
-				dtm1->p_no=dtm2->no;
-				break;
+		def_datum *dtm1,*dtm2;
+		int j;
+		for(i=0;i<n_set[mode_dtm]; i++){
+			dtm1=((def_datum*) entries[mode_dtm])+i;
+			/*dtm1->p_no=-1;*/
+			for (j=0;j<n_set[mode_dtm];j++){
+				dtm2=((def_datum*) entries[mode_dtm])+j;
+				if (!strcmp(dtm2->mlb,dtm1->p_datum)){
+					dtm1->p_no=dtm2->no;
+					break;
+				}
+			}
+			if (dtm1->p_no<=0){
+				lord_debug(0,LORD("Could not find p_datum: %s"),dtm1->p_datum);
+				*n_err++;
 			}
 		}
-		if (dtm1->p_no<=0)
-			lord_debug(0,"parse_def: Could not find p_datum!\n");
-	}
 	}
 	
 	/*transfer stuff to data object */
@@ -512,6 +499,8 @@ Function that parses def_lab file. Now in XML :-)
 	data->regions=entries[mode_rgn];
 	data->dtm_shifts=entries[mode_dtm_shift];
 	data->alias_table=entries[mode_alias];
+	lord_debug(0,LORD("n_prj: %d, n_rgn: %d, n_ellip: %d, n_dtm: %d, n_shifts: %d, n_alias: %d"),data->n_prj,data->n_rgn,data->n_ellip,data->n_dtm,
+	data->n_dtm_shifts,data->n_alias);
 	/* perhaps sort entries after number?? */
 	//present_data(stdout,data);
 	return data;
@@ -531,8 +520,10 @@ void close_def_data( def_data *data){
 	free(data->datums);
 	free(data->ellipsoids);
 	free(data->regions);
-	for (i=0; i<data->n_dtm_shifts;i++)
+	for (i=0; i<data->n_dtm_shifts;i++){
 		grim_close(data->dtm_shifts[i].g[0]); /*TODO: close all*/
+		free(data->dtm_shifts[i].g);
+	}
 	free(data->dtm_shifts);
 	free(data->alias_table);
 	free(data);

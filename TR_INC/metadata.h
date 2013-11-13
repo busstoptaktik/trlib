@@ -120,7 +120,7 @@ typedef struct def_alias def_alias;
 typedef struct {
 	int n_shifts;
 	def_dtm_shift *shifts[4];
-	int invert[4];
+	int direction[4]; /*1 or -1*/
 	double len;
 	struct coord_lab *clab;
 } htr_route;
@@ -177,6 +177,7 @@ struct gd_state{
 	struct coord_lab *lab_in, *lab_out;
 	struct coord_lab *tcgeo_in, *tcgeo_out; /*should be freed*/
 	int start,stop;
+	int dtm_in,dtm_out,hdtm_in,hdtm_out;
 	htr_route *geoid_route;
 	htr_route *dh_route;
 	TRANSF_FCT trf_in, trf_out;

@@ -245,12 +245,12 @@ n_hth: 9
       <mode>10</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itm</native>
       <parameters>0dg 0m 930nt 200km 0.999950</parameters>
       <description>
-       KortProjektion 2000 Jylland etrs89
+       KortProjektion 2000 Jylland etrf89
       </description>
     </prj>
     <prj>
@@ -259,12 +259,12 @@ n_hth: 9
       <mode>11</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itm</native>
       <parameters>0dg 0m 12dg 500km 0.999950</parameters>
       <description>
-       KortProjektion 2000 Sjaelland etrs89
+       KortProjektion 2000 Sjaelland etrf89
       </description>
     </prj>
     <prj>
@@ -273,12 +273,12 @@ n_hth: 9
       <mode>12</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itm</native>
       <parameters>0dg 0m 15dg 900km 1.0</parameters>
       <description>
-       KortProjektion 2000 Bornholm etrs89
+       KortProjektion 2000 Bornholm etrf89
       </description>
     </prj>
     <prj>
@@ -287,7 +287,7 @@ n_hth: 9
       <mode>14</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itm</native>
       <parameters>0dg -6092030m 1234nt 40km 1.0</parameters>
@@ -301,12 +301,12 @@ n_hth: 9
       <mode>15</mode> <mask>0</mask>
       <kms_seq>EN</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itmi</native>
       <parameters>0dg -5000km 9dg 200km 0.999980</parameters>
       <description>
-       DKTM1 etrs89 (E  N)
+       DKTM1 etrf89 (E  N)
       </description>
     </prj>
     <prj>
@@ -315,12 +315,12 @@ n_hth: 9
       <mode>16</mode> <mask>0</mask>
       <kms_seq>EN</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itmi</native>
       <parameters>0dg -5000km 10dg 400km 0.999980</parameters>
       <description>
-       DKTM2 etrs89 (E  N)
+       DKTM2 etrf89 (E  N)
       </description>
     </prj>
     <prj>
@@ -329,12 +329,12 @@ n_hth: 9
       <mode>17</mode> <mask>0</mask>
       <kms_seq>EN</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itmi</native>
       <parameters>0dg -5000km 11.75dg 600km 0.999980</parameters>
       <description>
-       DKTM3 etrs89 (E  N)
+       DKTM3 etrf89 (E  N)
       </description>
     </prj>
     <prj>
@@ -343,12 +343,12 @@ n_hth: 9
       <mode>18</mode> <mask>0</mask>
       <kms_seq>EN</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itmi</native>
       <parameters>0dg -5000km 15dg 800km 1.0</parameters>
       <description>
-       DKTM4 etrs89 (E  N)
+       DKTM4 etrf89 (E  N)
       </description>
     </prj>
     <prj>
@@ -357,12 +357,12 @@ n_hth: 9
       <mode>19</mode> <mask>0</mask>
       <kms_seq>EN</kms_seq>
       <region>FO</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itmi</native>
       <parameters>0dg -6000km -7dg 200km 0.999997</parameters>
       <description>
-       Faroe TM etrs89 (E  N)
+       Faroe TM etrf89 (E  N)
       </description>
     </prj>
     <prj>
@@ -371,7 +371,7 @@ n_hth: 9
       <mode>20</mode> <mask>0</mask>
       <kms_seq>EN</kms_seq>
       <region>DK</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>itmi</native>
       <parameters>0dg -6013km 1152nt 40km 1.000000</parameters>
@@ -1213,11 +1213,11 @@ n_hth: 9
       <cha_str>7</cha_str> <type>1</type> <cstm>3</cstm>
       <mode>0</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>0</n_parameters>
       <native>itm</native>
       <description>
-       etrs89 zone ?? (?? = 2 digits)
+       etrf89 zone ?? (?? = 2 digits)
       </description>
     </prj>
     <prj>
@@ -1225,11 +1225,11 @@ n_hth: 9
       <cha_str>7</cha_str> <type>1</type> <cstm>3</cstm>
       <mode>0</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>0</n_parameters>
       <native>itm</native>
       <description>
-       etrs89 zone ?? (?? = 2 digits)
+       etrf89 zone ?? (?? = 2 digits)
       </description>
     </prj>
     <prj>
@@ -1252,12 +1252,12 @@ n_hth: 9
       <mode>1</mode> <mask>0</mask>
       <kms_seq>NW</kms_seq>
       <region>FO</region>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>5</n_parameters>
       <native>lmb</native>
       <parameters>62dg 500km -9dg 500km 62dg</parameters>
       <description>
-       Conf. con. Faeroe  etrs89
+       Conf. con. Faeroe  etrf89
       </description>
     </prj>
     <prj>
@@ -1279,12 +1279,12 @@ n_hth: 9
       <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
       <mode>2</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>6</n_parameters>
       <native>dlmb</native>
       <parameters>52dg 2800km 10dg 4000km 35dg 65dg</parameters>
       <description>
-       etrs89 Lambert Conformal Conical
+       etrf89 Lambert Conformal Conical
       </description>
     </prj>
     <prj>
@@ -1292,12 +1292,12 @@ n_hth: 9
       <cha_str>0</cha_str> <type>1</type> <cstm>5</cstm>
       <mode>2</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>6</n_parameters>
       <native>dlmb</native>
       <parameters>52dg 2800km 10dg 4000km 35dg 65dg</parameters>
       <description>
-       etrs89 Lambert Conformal Conical
+       etrf89 Lambert Conformal Conical
       </description>
     </prj>
     <prj>
@@ -1333,12 +1333,12 @@ n_hth: 9
       <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
       <mode>7</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>4</n_parameters>
       <native>lmbap</native>
       <parameters>52dg 3210km 10dg 4321km</parameters>
       <description>
-       etrs89 Lambert Azimuthal Equal Area
+       etrf89 Lambert Azimuthal Equal Area
       </description>
     </prj>
     <prj>
@@ -1346,12 +1346,12 @@ n_hth: 9
       <cha_str>0</cha_str> <type>1</type> <cstm>7</cstm>
       <mode>7</mode> <mask>0</mask>
       <kms_seq>NE</kms_seq>
-      <parent_datum>etrs89</parent_datum>
+      <parent_datum>etrf89</parent_datum>
       <n_parameters>4</n_parameters>
       <native>lmbap</native>
       <parameters>52dg 3210km 10dg 4321km</parameters>
       <description>
-       etrs89 Lambert Azimuthal Equal Area
+       etrf89 Lambert Azimuthal Equal Area
       </description>
     </prj>
     <prj>
@@ -2022,7 +2022,7 @@ n_hth: 9
     <dtm>
       <mlb>ed50</mlb>
       <id>2</id>
-      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Hayford</ellipsoid>
       <imit>3</imit> <type>7</type> <region>DK</region>
       <t_x>-81.0703 m</t_x> <t_y>-89.3603 m</t_y> <t_z>-115.7526 m</t_z>
       <rot_x>-0.4849 sx</rot_x> <rot_y>-0.0244 sx</rot_y> <rot_z>-0.4132 sx</rot_z>
@@ -2093,7 +2093,7 @@ n_hth: 9
     <dtm>
       <mlb>topex</mlb>
       <id>9</id>
-      <parent>etrs89</parent> <ellipsoid>TOPEX</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>TOPEX</ellipsoid>
       <imit>0</imit> <type>0</type> <region>ZZ</region>
       <description>
       TOPEX
@@ -2291,7 +2291,7 @@ n_hth: 9
     <dtm>
       <mlb>dhdn</mlb>
       <id>41</id>
-      <parent>etrs89</parent> <ellipsoid>Bessel</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Bessel</ellipsoid>
       <imit>0</imit> <type>7</type> <region>DE</region>
       <t_x>598.1 m</t_x> <t_y>73.7 m</t_y> <t_z>418.2 m</t_z>
       <rot_x>-0.2020 sx</rot_x> <rot_y>-0.0450 sx</rot_y> <rot_z>2.4450 sx</rot_z>
@@ -2303,7 +2303,7 @@ n_hth: 9
     <dtm>
       <mlb>dhdnd</mlb>
       <id>46</id>
-      <parent>etrs89</parent> <ellipsoid>Bessel</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Bessel</ellipsoid>
       <imit>0</imit> <type>7</type> <region>DE</region>
       <t_x>582 m</t_x> <t_y>105 m</t_y> <t_z>414 m</t_z>
       <rot_x>-1.0400 sx</rot_x> <rot_y>-0.3500 sx</rot_y> <rot_z>3.0800 sx</rot_z>
@@ -2315,7 +2315,7 @@ n_hth: 9
     <dtm>
       <mlb>dhdn1</mlb>
       <id>42</id>
-      <parent>etrs89</parent> <ellipsoid>Bessel</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Bessel</ellipsoid>
       <imit>0</imit> <type>7</type> <region>DE</region>
       <t_x>590.5 m</t_x> <t_y>69.5 m</t_y> <t_z>411.6 m</t_z>
       <rot_x>0.7960 sx</rot_x> <rot_y>0.0520 sx</rot_y> <rot_z>3.6010 sx</rot_z>
@@ -2339,7 +2339,7 @@ n_hth: 9
     <dtm>
       <mlb>feh10</mlb>
       <id>32</id>
-      <parent>etrs89</parent> <ellipsoid>GRS80</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>GRS80</ellipsoid>
       <imit>7</imit> <type>7</type> <region>DK</region>
       <t_x>0.6002 m</t_x> <t_y>-0.0022 m</t_y> <t_z>-0.6009 m</t_z>
       <rot_x>-0.0050 sx</rot_x> <rot_y>0.0132 sx</rot_y> <rot_z>0.0103 sx</rot_z>
@@ -2351,7 +2351,7 @@ n_hth: 9
     <dtm>
       <mlb>detrs89</mlb>
       <id>33</id>
-      <parent>etrs89</parent> <ellipsoid>GRS80</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>GRS80</ellipsoid>
       <imit>0</imit> <type>7</type> <region>DE</region>
       <t_x>-2.2023 m</t_x> <t_y>-10.5537 m</t_y> <t_z>-3.5459 m</t_z>
       <rot_x>0.2231 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>-0.2461 sx</rot_z>
@@ -2363,25 +2363,25 @@ n_hth: 9
     <dtm>
       <mlb>detrf89</mlb>
       <id>33</id>
-      <parent>etrs89</parent> <ellipsoid>GRS80</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>GRS80</ellipsoid>
       <imit>0</imit> <type>7</type> <region>DE</region>
       <t_x>-2.2023 m</t_x> <t_y>-10.5537 m</t_y> <t_z>-3.5459 m</t_z>
       <rot_x>0.2231 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>-0.2461 sx</rot_z>
       <scale>0.84036959 ppm</scale>
       <description>
-      Germany ETRS89
+      Germany etrf89
       </description>
     </dtm>
     <dtm>
       <mlb>deuref89</mlb>
       <id>33</id>
-      <parent>etrs89</parent> <ellipsoid>GRS80</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>GRS80</ellipsoid>
       <imit>0</imit> <type>7</type> <region>DE</region>
       <t_x>-2.2023 m</t_x> <t_y>-10.5537 m</t_y> <t_z>-3.5459 m</t_z>
       <rot_x>0.2231 sx</rot_x> <rot_y>0.0000 sx</rot_y> <rot_z>-0.2461 sx</rot_z>
       <scale>0.84036959 ppm</scale>
       <description>
-      Germany ETRS89
+      Germany etrf89
       </description>
     </dtm>
     <dtm>
@@ -2498,7 +2498,7 @@ n_hth: 9
     <dtm>
       <mlb>fg54</mlb>
       <id>142</id>
-      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Hayford</ellipsoid>
       <imit>5</imit> <type>0</type> <region>FO</region>
       <description>
       @ Geogr. Faroe Island 1954
@@ -2507,7 +2507,7 @@ n_hth: 9
     <dtm>
       <mlb>fg50</mlb>
       <id>143</id>
-      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Hayford</ellipsoid>
       <imit>5</imit> <type>0</type> <region>FO</region>
       <description>
       @ Geogr. Faroe ED 1950
@@ -2516,7 +2516,7 @@ n_hth: 9
     <dtm>
       <mlb>fk54</mlb>
       <id>144</id>
-      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Hayford</ellipsoid>
       <imit>5</imit> <type>0</type> <region>FO</region>
       <description>
       @ Konf. con. Faroe 1954
@@ -2525,7 +2525,7 @@ n_hth: 9
     <dtm>
       <mlb>fu50</mlb>
       <id>145</id>
-      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Hayford</ellipsoid>
       <imit>5</imit> <type>0</type> <region>FO</region>
       <description>
       @ UTM 29 Topogr. grid ED 50
@@ -2534,7 +2534,7 @@ n_hth: 9
     <dtm>
       <mlb>fk89</mlb>
       <id>146</id>
-      <parent>etrs89</parent> <ellipsoid>Hayford</ellipsoid>
+      <parent>etrf89</parent> <ellipsoid>Hayford</ellipsoid>
       <imit>5</imit> <type>0</type> <region>FO</region>
       <description>
       @ Konf. con. Faroe 1989
@@ -2900,7 +2900,8 @@ n_hth: 9
 </def_alias>
   
 
-  <def_dtm_shifts>
+  <def_dtm_shift>
+  <!--
     <dtm_shift>
         <from> nad83 </from> <to>gr96</to>
     </dtm_shift>
@@ -2908,6 +2909,7 @@ n_hth: 9
          <from>s34</from> <to> ed50 </to>
 	 <file> s34ed50poly</file>
     </dtm_shift>
+    -->
 
 <!-- 
   def_hth constants:
@@ -2926,8 +2928,8 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
   
   -->
     <dtm_shift>
-      <from>dvr90</from> <to>evrf2000</to>
-      <mlb>DK_geoHetrs89</mlb> 
+      <from>208</from> <to>207</to>
+      <mlb>geoHetrf89</mlb> 
       <description>http://www.crs-geo.eu/   National CRS,  DK</description>
       <htr_constants>
          <lat_0>5602.00 nt</lat_0> <lon_0>914.00 nt</lon_0>
@@ -2935,17 +2937,18 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
     </htr_constants>
     </dtm_shift>
     
-    
+    <dtm_shift>
+      <from>209</from> <to>208</to>
+      <file>dhdnndvr.02</file>
+    </dtm_shift>
+   
     
     <dtm_shift>
-      <from>dvr90</from> <to>evrf2007</to>
-      <file>dhdvr90evrf2007</file>
+    <from>208</from> <to>200</to>
+    <file> dvr90g2013.02</file>
     </dtm_shift>
     
-    <hth>
-      <from>dnn</from> <to>dvr90</to>
-      <file>dhdnndvr.02</file>
-    </hth>
+    <!--
     
     <hth>
       <from>dnn1945</from> <to>dnn</to>
@@ -2975,6 +2978,11 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
       <description>Fehmarn Bridge Project Height to DHDHHN92</description>
     </hth>
     
+     <dtm_shift>
+      <from>dvr90</from> <to>evrf2007</to>
+      <file>dhdvr90evrf2007</file>
+    </dtm_shift>
+    
     <hth>
       <from>dvr90</from> <to>kn44</to>
       <type>2</type>
@@ -2987,8 +2995,8 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
        <type>6</type>
        <step>fcsvr10</step>
     </hth>
-    
-  </def_hth>
+    -->
+  </def_dtm_shift>
  <def_grs>
    
     <grs>
@@ -3158,7 +3166,6 @@ type == 3:: (defined by transformtion formula below, constants provided in tags)
 <!-- manager tab -->
 	<def_tab_manager>
 	   <tables>
-	      <table> dvr90g2002.01 </table>
-	   </tables>
+	  </tables>
 	</def_tab_manager>
 </def_trlib>

@@ -354,7 +354,6 @@ GRIM grim_open (char *pomfilename) {
     GRIM g;
 	POM *p;
     int res;
-    g->file = NULL;
     if (0==pomfilename)
         return 0;
 
@@ -368,14 +367,19 @@ GRIM grim_open (char *pomfilename) {
     if (0==g)
 		return (GRIM) pom_free (p);
     g->pom = p;
-    if (!strcmp(pomval(p,"type"),"table"))
-	g->type=0;
-    else
+    if (!strcmp(pomval(p,"type"),"polynomial"))
 	g->type=1;
+    else
+	g->type=0;
+    strncpy(g->crs,pomval(p,"crs"),32);
+    g->xllcenter = pomtod (p, "xllcenter");
+    g->yllcenter = pomtod (p, "yllcenter");
+    g->channels  = pomtod (p, "channels");
     /* Extract the grid header information from the pom */
     if (g->type==0){
 	g->ncols     = pomtod (p, "ncols");
 	g->nrows     = pomtod (p, "nrows");
+	/*lord_debug(0,LORD("rows: %d, cols: %d"),g->ncols, g->nrows);*/
 	g->xcellsize = pomtod (p, "xcellsize");
 	g->ycellsize = pomtod (p, "ycellsize");
 	g->nodata    = pomtod (p, "nodata");
@@ -401,10 +405,7 @@ GRIM grim_open (char *pomfilename) {
 
     else
 	return NULL;
-    
-    g->xllcenter = pomtod (p, "xllcenter");
-    g->yllcenter = pomtod (p, "yllcenter");
-    g->channels  = pomtod (p, "channels");
+   
 
     if (g->type==0){
 	    if (0!=(res=memory_map_file (g, pomfilename))){
@@ -607,11 +608,11 @@ const char *grim_crs(const GRIM g){
 }
 
 
-double grim_rows(const GRIM g){
+long grim_rows(const GRIM g){
 	return g->nrows;
 }
 
-double grim_columns(const GRIM g){
+long grim_columns(const GRIM g){
 	return g->ncols;
 }
 
