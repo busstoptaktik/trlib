@@ -2025,7 +2025,7 @@ n_hth: 9
       <parent>etrf89</parent> <ellipsoid>Hayford</ellipsoid>
       <imit>3</imit> <type>7</type> <region>DK</region>
       <t_x>-81.0703 m</t_x> <t_y>-89.3603 m</t_y> <t_z>-115.7526 m</t_z>
-      <rot_x>-0.4849 sx</rot_x> <rot_y>-0.0244 sx</rot_y> <rot_z>-0.4132 sx</rot_z>
+      <rot_x>-0.48488 sx</rot_x> <rot_y>-0.02436 sx</rot_y> <rot_z>-0.41321 sx</rot_z>
       <scale>-0.540645 ppm</scale>
       <description>
       European Datum 1950

@@ -187,6 +187,13 @@ int updown(struct coord_lab *lab1, struct coord_lab *lab2, double N, double E, d
 	/*change dtm*/
 	/*check this step - seems to give differences to old trlib! - debug set_dtm1 and conv_crd2*/
 	res=ctc(lab1,lab2,out[0],out[1],out[2],out,out+1,out+2,tdir);
+	lord_debug(0,"*******ctc: in: dtm: %d, p_dtm: %d, out:  dtm: %d, p_dtm: %d",GET_DTM(lab1),GET_PDTM(lab1),GET_DTM(lab2),GET_PDTM(lab2));
+	lord_debug(0,"********ctc: dsh1: %.10f %.3f %.3f %.3f",lab1->dsh_con.scale,lab1->dsh_con.tx, lab1->dsh_con.ty,lab1->dsh_con.tz);
+	lord_debug(0,"********ctc: dsh1: %.8f %.8f %.8f %.8f %8f",lab1->dsh_con.r11,lab1->dsh_con.r12, lab1->dsh_con.r13,lab1->dsh_con.r22,lab1->dsh_con.r23);
+	if (GET_DTM(lab2)!=1){
+		lord_debug(0,"********ctc: dsh1: %.10f %.3f %.3f %.3f",lab2->dsh_con.scale,lab2->dsh_con.tx, lab2->dsh_con.ty,lab2->dsh_con.tz);
+		lord_debug(0,"********ctc: dsh1: %.8f %.8f %.8f %.8f %8f",lab2->dsh_con.r11,lab2->dsh_con.r12, lab2->dsh_con.r13,lab2->dsh_con.r22,lab2->dsh_con.r23);
+	}
 	lord_debug(0,"****** res: %d",res);
 	lord_debug(0,"****** crt_o_dtm : %.10f, %.10f, %.10f",out[0],out[1],out[2]);
 	/*down to geoE in dtm2*/

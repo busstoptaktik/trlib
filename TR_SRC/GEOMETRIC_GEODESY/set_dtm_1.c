@@ -203,12 +203,12 @@ def_data          *DEF_DATA
     
     /* search alias*/
     for(i=0; i<DEF_DATA->n_alias ; i++){
-	    if(!strcmp(DEF_DATA->alias_table[i].key,w_name)) {
+	 if(!strcmp(DEF_DATA->alias_table[i].key,w_name)) {
 		    strcpy(w_name, DEF_DATA->alias_table[i].value);
+		    lord_debug(3,LORD("Alias found: %s"),w_name); /*quite verbose*/
 		    break;
 	    }
     }    
-    
     /* get datum info from datum name */
     for(mode=0; mode<2; mode++){
 	    /* do the actual search */

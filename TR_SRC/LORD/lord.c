@@ -64,12 +64,11 @@ int use_warning=1;
 int use_error=1;
 int use_critical=1;
 
-/* The level output for each type -defaults to very verbose */
-int    verbosity_debug=3;
-int	verbosity_info=3;
-int	verbosity_warning=3;
-int	verbosity_error=3;
-int	verbosity_critical=3;
+/* The level output for each type -defaults to quite verbose */
+int    verbosity_debug=2;
+int	verbosity_info=2;
+int	verbosity_warning=2;
+
 
 /* The output stream used for each type -NULLS assigned automatically*/
 FILE * stream_debug;
@@ -172,17 +171,7 @@ void lord_debug(int lord_code, char *frmt, ...)
 	if (use_debug)
 	{
 		/*Determine if the message shall be outputted according to verbosity level*/
-		int output = 0;
-		if (lord_code == 3 || lord_code == 0) {
-			output = 1; }
-		else if (lord_code == 2 && verbosity_debug >= 2) {
-			output = 1; }
-		else if (lord_code == 1 && verbosity_debug == 3) {
-			output = 1; }
-		else {
-			output = 0; }
-
-		if (output)
+		if (lord_code<=verbosity_debug)
 		{
 			
 			va_list ap;
@@ -199,17 +188,7 @@ void lord_info(int lord_code, char *frmt, ...)
 	if (use_info)
 	{
 		/*Determine if the message shall be outputted according to verbosity */
-		int output = 0;
-		if (lord_code == 3 || lord_code == 0) {
-			output = 1; }
-		else if (lord_code == 2 && verbosity_info >= 2) {
-			output = 1; }
-		else if (lord_code == 1 && verbosity_info == 3) {
-			output = 1; }
-		else {
-			output = 0; }
-
-		if (output)
+		if (lord_code<=verbosity_info) /*less verbose than the limit*/
 		{
 			va_list ap;
 			va_start(ap, frmt);
@@ -225,17 +204,7 @@ void lord_warning(int lord_code, char *frmt, ...)
 	if (use_warning)
 	{
 			/* Determine if the message shall be outputted according to verbosity level*/
-		int output = 0;
-		if (lord_code == 3 || lord_code == 0) {
-			output = 1; }
-		else if (lord_code == 2 && verbosity_warning >= 2) {
-			output = 1; }
-		else if (lord_code == 1 && verbosity_warning == 3) {
-			output = 1; }
-		else {
-			output = 0; }
-
-		if (output)
+		if (lord_code<=verbosity_warning)
 		{
 			va_list ap;
 			va_start(ap, frmt);
@@ -389,8 +358,7 @@ void set_lord_error_mode(FILE * stream, char *verbosity)
 		use_error = 0;
 	}
 
-	/* All error messages shall be outputted if the module is turned on*/
-	verbosity_error = 3;
+	
 }
 
 /* Set and initialise the critical module*/
@@ -411,8 +379,7 @@ void set_lord_critical_mode(FILE * stream, char *verbosity)
 		use_critical = 0;
 	}
 
-	/* All critical messages shall be outputted if the module is turned on*/
-	verbosity_critical = 3;
+	
 }
 
 /* Initialise the lord module with default */
@@ -430,11 +397,10 @@ void init_lord()
 	use_error= 1;
 	use_critical = 1;
 
-	verbosity_debug = 3;
-	verbosity_info = 3;
-	verbosity_warning = 3;
-	verbosity_error = 3;
-	verbosity_critical = 3;
+	verbosity_debug = 2;
+	verbosity_info = 2;
+	verbosity_warning = 2;
+	
 
 	stream_debug = NULL;
 	stream_info = NULL;

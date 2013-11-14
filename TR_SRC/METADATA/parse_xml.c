@@ -22,7 +22,7 @@ static int copy_string(char *in, void *out, size_t len, void *nothing);
 /*get value */
 int get_value(struct tag *t, void *out, size_t size, item_converter conv, void *conv_data){
 	int res=0;
-	char *pos=t->pos[1]+1;
+	char *pos=t->pos[1]+1,*tmp,c;
 	ptrdiff_t len=item_len(t);
 	if (len==0 || t->is_simple){
 		t->err_no=XML_EMPTY_ITEM;
@@ -33,9 +33,18 @@ int get_value(struct tag *t, void *out, size_t size, item_converter conv, void *
 		return 0;
 	}
 	SKIP_SPACE(pos);
-	*(t->pos[2])='\0'; /*insert break*/
+	if (pos==t->pos[2]) /*empty content*/
+		return 0;
+	/* oh no - we also need to skip right space*/
+	tmp=t->pos[2]-1;
+	while(isspace(*tmp) && tmp>pos){
+		tmp--;
+	}
+	tmp++;
+	c=*tmp;
+	*tmp='\0'; /*insert a break*/
 	res=conv(pos,out,size,conv_data); /*number of items converted*/
-	*(t->pos[2])='<';
+	*tmp=c; /*restore*/
 	return res;
 }
 
