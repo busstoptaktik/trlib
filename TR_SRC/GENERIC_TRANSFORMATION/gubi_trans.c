@@ -149,8 +149,9 @@ int apply_datum_shift(def_dtm_shift *shifts[], int *direction, int n_shifts, dou
 	/*only one channel for now - todo...*/
 	int i,j,c,ok=0;
 	double v=0,res=0;
-	lord_debug(0,LORD("Datum shift called with lat: %.4f lon: %.4f"),tlat*DOUT,tlon*DOUT);
+	lord_debug(0,LORD("Datum shift called with lat: %.7f lon: %.7f"),tlat*DOUT,tlon*DOUT);
 	for(c=0; c<channels; c++){
+		res=0;
 		for(i=0; i<n_shifts; i++){
 			ok=0;
 			lord_debug(0,LORD("n_tabs: %d"),shifts[i]->n_tabs);
@@ -162,7 +163,7 @@ int apply_datum_shift(def_dtm_shift *shifts[], int *direction, int n_shifts, dou
 				v=grim_value(shifts[i]->g[j],tlat,tlon,0,0);
 				lord_debug(0,LORD("v is %.4f"),v);
 				if (v!=HUGE_VAL){
-					res=v*direction[i];
+					res+=v*direction[i];
 					ok=1;
 					break;
 				}
@@ -174,6 +175,25 @@ int apply_datum_shift(def_dtm_shift *shifts[], int *direction, int n_shifts, dou
 		out[c]=res;
 	}
 	return 0;
+}
+
+int updown(struct coord_lab *lab1, struct coord_lab *lab2, double N, double E, double H, double *out, tab_dir *tdir){
+	int res;
+	lord_debug(0,"**** updown: input - lat: %.10f, lon: %.10f, H: %.5f",N*DOUT,E*DOUT,H);
+	/*geo to crt - up */
+	res=gtc(lab1,1,N,E,H,out,out+1,out+2,"",NULL);
+	lord_debug(0,"****** res: %d",res);
+	lord_debug(0,"****** crt_i_dtm : %.10f, %.10f, %.10f",out[0],out[1],out[2]);
+	/*change dtm*/
+	/*check this step - seems to give differences to old trlib! - debug set_dtm1 and conv_crd2*/
+	res=ctc(lab1,lab2,out[0],out[1],out[2],out,out+1,out+2,tdir);
+	lord_debug(0,"****** res: %d",res);
+	lord_debug(0,"****** crt_o_dtm : %.10f, %.10f, %.10f",out[0],out[1],out[2]);
+	/*down to geoE in dtm2*/
+	res=gtc(lab2,-1,out[0],out[1],out[2],out,out+1,out+2,"",NULL);
+	lord_debug(0,"****** res: %d",res);
+	lord_debug(0,"**** updown: output - lat: %.10f, lon: %.10f, H: %.5f",out[0]*DOUT,out[1]*DOUT,out[2]);
+	return res;
 }
 
 int gd_trans(gd_state *state, double N, double E, double H, double *No, double *Eo, double *Ho, double *gh){
@@ -197,8 +217,10 @@ int gd_trans(gd_state *state, double N, double E, double H, double *No, double *
 	/* prj -> geo */
 	if (state->start==0){
 		lord_debug(0,LORD("*** ptg ***"));
-		if (state->trf_in!=NULL)
+		if (state->trf_in!=NULL){
+			lord_debug(0,LORD("Special ptg...!"));
 			state->trf_in(state->lab_in,state->tcgeo_in,N,E,0,&N,&E,&HH,tdir); 
+		}
 		else
 			ptg(state->lab_in,1,N,E,&N,&E,"",NULL);
 		
@@ -212,7 +234,8 @@ int gd_trans(gd_state *state, double N, double E, double H, double *No, double *
 	if (state->start==2 || GET_DTM(in_step)!=GET_DTM(state->lab_out) || state->hdtm_in!=state->hdtm_out || state->stop==3){
 		/*we need to go up - test which way to go... */
 		if (state->hdtm_in!=200 && state->start<2){ /* go to the complex way - via a geoid*/
-			double X,Y,Z;
+			double out[3],dh;
+			int n_iter=0;
 			if (!geoid_route){
 				lord_error(TAB_C_NON_,LORD("Geoid table is NULL - unable to perform this transformation."));
 				return TAB_C_NON_;
@@ -221,17 +244,33 @@ int gd_trans(gd_state *state, double N, double E, double H, double *No, double *
 			as long as h is small compared to R and the axes of the table system and the input system are more or less aligned*/
 			lord_debug(0,LORD("*** Taking the scenic gtc route ***"));
 			lord_debug(0,LORD("Input hdtm is: %d, output hdtm is: %d, H is: %.3f"),state->hdtm_in, state->hdtm_out,H);
-			lord_debug(0,LORD("geo-coords with 'fake' ellipsoidal heights: %.4f %.4f %.4f"),N*DOUT,E*DOUT,H); 
-			gtc(in_step,1,N,E,H,&X,&Y,&Z,"",NULL); /*go up from fake 'geoE' to crt*/
-			ctc(in_step,geoid_route->clab,X,Y,Z,&X,&Y,&Z,tdir); /*change to table dtm*/
-			gtc(geoid_route->clab,-1,X,Y,Z,&tlat,&tlon,&tE,"",NULL); /*go down to geo_coords*/
-			res=apply_datum_shift(geoid_route->shifts,geoid_route->direction,geoid_route->n_shifts,tlat,tlon,&Z,1); /*get the geoid height*/
-			if (res!=0)
-				return TAB_C_ARE_;
-			/*add the geoid height to H and we're pretty much in Ellipsodal heights*/
-			H=2*H+Z-tE;
-			lord_debug(0,LORD("geo-coords with 'real' ellipsoidal heights: %.4f %.4f %.4f"),N*DOUT,E*DOUT,H); 
-			gtc(in_step,1,N,E,H,&E,&N,&H,"",NULL); /*now go to the true 3d coords*/
+			dh=1;
+			while (dh>0.02 && n_iter<4){
+				/*This is converging fast - a kind of Newton-Rapson which works well if the ellipsoids are not 'very' misaligned and the geoid is not too 'bumpy'*/ 
+				n_iter++;
+				lord_debug(0,LORD(" +++++++++++++  Iteration %d +++++++++++++"),n_iter);
+				lord_debug(0,LORD("geo-coords with 'fake' ellipsoidal heights: %.4f %.4f %.4f"),N*DOUT,E*DOUT,H);
+				res=updown(in_step,geoid_route->clab,N,E,H,out,state->tdir);
+				/*now out is N,E,E_h in table dtm*/
+				lord_debug(0,LORD("'fake' geoE coords in table dtm: lat: %.7f lon:%.7f E:%.4f"),out[0]*DOUT,out[1]*DOUT,out[2]);
+				/*TODO: only get table values if we have moved 'significantly' (first iteration)*/
+				res=apply_datum_shift(geoid_route->shifts,geoid_route->direction,geoid_route->n_shifts,out[0],out[1],out+2,1); /*get the geoid height*/
+				if (res!=0)
+					return TAB_C_ARE_;
+				out[2]+=*Ho;
+				lord_debug(0,LORD("'real' geoE coords in table dtm: lat: %.7f lon:%.7f E:%.4f"),out[0]*DOUT,out[1]*DOUT,out[2]);
+				tlat=out[0];
+				tlon=out[1];
+				/*now reverse*/
+				res=updown(geoid_route->clab,in_step,out[0],out[1],out[2],out,state->tdir);
+				lord_debug(0,LORD("geoE in input dtm: lat: %.7f  lon:%.7f  E:%.4f"),out[0]*DOUT,out[1]*DOUT,out[2]);
+				/*convergence can also be checked by looking at out[0]-N and out[1]-E*/
+				dh=fabs(H-out[2]);
+				lord_debug(0,LORD("dh is: %.8f"),dh);
+				H=out[2];
+			}
+			/*TODO: if bad convergence return TRF_TOLE_*/
+			gtc(in_step,1,N,E,H,&E,&N,&H,"",NULL);
 			lord_debug(0,LORD("crt coords in input dtm: %.2f %.2f %.2f"),E,N,H); 
 			ctc(in_step,state->tcgeo_out,E,N,H,&E,&N,&H,tdir);
 			lord_debug(0,LORD("crt coords in output dtm: %.2f %.2f %.2f"),E,N,H); 
