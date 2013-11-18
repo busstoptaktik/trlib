@@ -246,7 +246,11 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, char *dir_name){
 	struct tag t;
 	int i,n_ok;
-	char file_name[512];
+	static char file_name[512];
+	static char mlb[MLBLNG];
+	static int degree;
+	static	double coefficients[4];
+	static	double lon_0=0.0,lat_0=0.0;
 	GRIM g;
 	
 	t=get_named_child(dtm_shift_tag,"from");
@@ -267,10 +271,8 @@ static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, ch
 			return 0; /*TODO: check for POM proj_mlb field name is set*/
 	}
 	else{
-		int degree;
-		double coefficients[4];
-		double lon_0=0.0,lat_0=0.0;
-		char mlb[MLBLNG];
+		
+		
 		mlb[0]='\0';
 		
 		t=get_named_child(dtm_shift_tag,"mlb");

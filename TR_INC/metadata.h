@@ -176,7 +176,9 @@ tab_dir              *tdir
 struct gd_state{
 	struct coord_lab *lab_in, *lab_out;
 	struct coord_lab *tcgeo_in, *tcgeo_out; /*should be freed*/
-	int start,stop;
+	struct coord_lab *table_system;
+	int actions[7];
+	int free_tc_in,free_tc_out;
 	int dtm_in,dtm_out,hdtm_in,hdtm_out;
 	htr_route *geoid_route;
 	htr_route *dh_route;
