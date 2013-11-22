@@ -28,6 +28,7 @@
 /*Utility macros implemented in order the hide the detailed composition of a PR-object (which may change) */
 #define IS_CARTESIC(pr)           (pr->cstm==1)
 #define IS_GEOGRAPHIC(pr)       (pr->cstm==2)
+#define IS_PROJECTION(pr)       (pr->cstm>2)
 #define IS_TM(pr)                    (pr->cstm==3)
 #define IS_MERCATOR(pr)          (pr->cstm==4)
 #define GET_MLB(pr)                 (pr->mlb)

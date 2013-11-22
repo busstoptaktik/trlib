@@ -17,6 +17,7 @@ OPTIONS={"-thread_safe": "Compile a thread safe library.",
 "-all":"Build all c-source.",
 "-buildtest":"<path(s)> Build (single file) test programs in specified by <path(s)> (globbing allowed).",
 "-pattern":" <pattern>  : Build files matching pattern.",
+"-define":" comma separated list of defines...",
 "-clean": "Delete objcet files.",
 "-test":"Run tests.",
 "-gprof":"Include symbols for gprof.",
@@ -160,6 +161,9 @@ def main(args):
 	# #  # # # # # # # # # # # # # # #
 	src_dirs,inc_dirs=GetSource(TRLIB)
 	if "-build" in args:
+		if "-define" in args:
+			vals=args[args.index("-define")+1].split(",")
+			defines.extend(vals)
 		outdir=os.path.dirname(outname)
 		if not os.path.exists(outdir):
 			os.mkdir(outdir)
