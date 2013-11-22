@@ -40,7 +40,7 @@ elif "darwin" in sys.platform:
 else:
 	STD_LIB="KMSTRLIB.so"
 STD_DIRNAME=os.path.dirname(__file__)
-REQUIRED_FILES=["def_lab.txt","def_shp.txt"]
+REQUIRED_FILES=["def_trlib.xml"]
 tr_lib=None
 #define return codes, really defined in trlib_api.h
 TR_OK=0

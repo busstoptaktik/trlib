@@ -89,7 +89,7 @@ endif
 #include <stdlib.h>     /*  for malloc/free         */
 #include <ctype.h>      /*  for isspace()           */
 #include <math.h>       /*  for HUGE_VAL            */
-#include "pom.h"
+#include "pom.h"    /*  plain ol' metadata */
 #include "grim.h"
 #include "lord.h"
 
@@ -103,7 +103,7 @@ endif
 #endif
 
 
-/*#include "pom.c"*/        /*  plain ol' metadata */
+     
 #include "affine.h"     /*  affine transformations and ESRI worldfile */
 
 
@@ -599,13 +599,7 @@ size_t grim_channels (const GRIM g) {
     return g->channels;
 }
 
-const char *grim_filename(const GRIM g){
-	return g->filename;
-}
 
-const char *grim_crs(const GRIM g){
-	return g->crs;
-}
 
 
 long grim_rows(const GRIM g){
@@ -614,6 +608,18 @@ long grim_rows(const GRIM g){
 
 long grim_columns(const GRIM g){
 	return g->ncols;
+}
+
+double grim_nodata(const GRIM g){
+	return g->nodata;
+}
+
+const char *grim_filename(const GRIM g){
+	return g->filename;
+}
+
+const char *grim_crs(const GRIM g){
+	return g->crs;
 }
 
 const char *grim_field_name(const GRIM g, const char *field_name){

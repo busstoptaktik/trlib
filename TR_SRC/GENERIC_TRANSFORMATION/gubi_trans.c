@@ -4,36 +4,19 @@
 #include <math.h>
 #include "KmsFncs.h"
 
-
-#define PTG  0
-#define GTC  1
-#define TGTC 2   /*simple way to tdtm*/
-#define DGE 3 /*differential way to geoE*/
-#define TCTC  5
-#define CTC  6
-
-#define HTH   7
-#define CTG   8
-#define GTP   9
-#define IDT    10
-/*TODO - simplify stuff for NO datum shift and E in */
-/* TODO - skip idt!*/
-/*roads with dh-shift*/
-/* not E in*/
-/*static int DH1[7]={PTG,DTGTC,IDT,CTC,CTG,GTP,HTH};*/
-/*E in*/
-/*static int DH2[7]={PTG,TGTC,IDT,CTC,CTG,GTP,HTH}; */
-/*static int DH3[7]={IDT,IDT,TCTC,CTC,CTG,GTP,HTH}; hmmm, what if crt_ in ??*/
-/*roads without dh_shift*/
-
-/*not E in*/
-/*static int NDH1[7]={PTG,DTGTC,IDT,CTC,CTG,GTP,HTH};*/
-/*E in - the simple road*/
-/*static int NDH2[7]={PTG,GTC,IDT,CTC,CTG,GTP,HTH};*/
+/*the bulding blocks of a transformation*/
+#define PTG    0    /*proj to geo*/
+#define GTC    1    /*geo to cartesian*/
+#define DGE    3      /*differential way to geoE*/
+#define TCTC  5    /*simple way to crt_table_dtm*/
+#define CTC    6   /*cartesian to cartesian (datum shift)*/
+#define HTH    7   /* height transformation - or just STOP*/
+#define CTG    8   /* cartesian to geo*/
+#define GTP    9  /*  geo to proj*/
+#define IDT    10  /*do nothing */
 
 /* get to 3D - perform dshifts - go down*/
-/* DGTC and TCTC will produce table_lat and table_lon */
-/* TCTC dshift to table_dtm and produce table_lat and table_lon*/
+/* DGE and TCTC will produce table_lat and table_lon */
 /* Entry point for crt_coords is always second slot of TO3D*/
 /*roads which need to go over table datum  */
 static int D3_TO_TABLE1[4]={DGE,GTC,CTC,CTG}; /*input not in 'E' - what if output is geoEsame_dtm??*/
@@ -44,14 +27,11 @@ static int D3_SIMPLE[4]={GTC,IDT,CTC,CTG};
 PTG->DGTC->...->CTG  covered by D3_TO_TABLE1*/
 /* DGTC shall produce crt in input dtm...*/
 
-
-
-
 static void convert2geo(char *mlb_in, char *mlb_out);
 int apply_datum_shift(def_dtm_shift *shifts[], int *direction, int n_shifts, double tlat, double tlon, double *out,int channels);
 
 	
-/*TODO - fix this up! */
+/*Not used at the moment...*/
 static void convert2geo(char *mlb_in, char *mlb_out){
 	short sep;
 	char dtm[MLBLNG];
@@ -59,9 +39,11 @@ static void convert2geo(char *mlb_in, char *mlb_out){
 	char *p;
 	get_mlb(mlb_in,prj,&sep,dtm,&p);
 	sprintf(mlb_out,"geoE%s",dtm);
-	lord_debug(0,LORD("in: %s, out: %s"),mlb_in,mlb_out);
+	
 }
 
+
+/*open an transformation 'state' - set up h-datum-shift tables and the sequence of actions*/
 gd_state *gd_open(struct coord_lab *lab_in, struct coord_lab *lab_out, char *extra, tab_dir *tdir){
 	gd_state         *self;
 	static int init=0;
@@ -243,7 +225,7 @@ int apply_datum_shift(def_dtm_shift *shifts[], int *direction, int n_shifts, dou
 				lord_debug(0,LORD("Direction is: %d"),direction[i]);
 				lord_debug(0,LORD("v is %.4f"),v);
 				#endif
-				if (v!=-999.0){ /*todo - handle no_data*/
+				if (v!=grim_nodata(shifts[i]->g[j])){ /*slightly inefficient to use a getter here - but what the heck...*/
 					res+=v*direction[i];
 					ok=1;
 					break;
@@ -399,22 +381,21 @@ int gd_trans(gd_state *state, double N, double E, double H, double *No, double *
 					
 					/*convergence can also be checked by looking at out[0]-N and out[1]-E*/
 					dh=fabs(H-out[2]);
+					H=out[2];
 					#ifdef HARD_DEBUG
 					lord_debug(0,LORD("geoE in input dtm: lat: %.7f  lon:%.7f  E:%.4f"),out[0]*DOUT,out[1]*DOUT,out[2]);
 					lord_debug(0,LORD("dh is: %.8f"),dh);
 					#endif
+					/*TODO: REALLY, really do this. Another escape early test - would speed things up a lot!
+					if (fabs(out[0]-N)<1e-7 etc...*/
 					
-					H=out[2];
-					/*TODO: other escape early test*/
+					
 				}
 				/*TODO: if bad convergence return TRF_TOLE_*/
 				/*no need to set in_step here!   in_step=state->tcgeo_in;*/
 				break;
 			case CTC:
 				lord_debug(0,LORD("*** ctc ***"));
-				/*
-				lord_debug(0,"tc_geo_out: adress %p dtm: %d",state->tcgeo_out,GET_DTM(state->tcgeo_out)); 
-				lord_debug(0,"in_step: adress %p dtm: %d",in_step,GET_DTM(in_step));*/
 				if (GET_DTM(in_step)!=state->dtm_out)
 					ctc(in_step,state->tcgeo_out,E,N,H,&E,&N,&H,tdir);
 				break;

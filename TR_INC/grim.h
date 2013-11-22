@@ -396,6 +396,7 @@ GRIM grim_polynomial(double lat_0, double lon_0, double *coefficients, int n_coe
 int grim_polynomial_workhorse(const GRIM g, double northing, double easting, double *record, int channels);
 long grim_rows(const GRIM g);
 long grim_columns(const GRIM g);
+double grim_nodata(const GRIM g);
 
 
 
