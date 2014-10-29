@@ -514,24 +514,7 @@ FILE                     *tr_error
 
       case FEMASK: /* fe_trans */
         init    = (short) conv_lab("FO_utm29_etrs89", &t_lab,"")==CRD_LAB;
-        /* utm29_etrs89 => nonp_i/o must be zero */
-        if ((R_N == REG_NON || R_N == NON_NON) && w_oclb->cstm == 1) {
-          (void) sprintf(dstr, "geoE%s", w_oclb->mlb+4);
-          init &= (short) conv_lab(dstr, &g_lab,"")==CRD_LAB;
-          if (i_clb->cstm == 1) {
-            /* WARN: ONLY POSSIBLE when no gh */
-            (void) sprintf(dstr, "geoE%s", i_clb->mlb+4);
-            init &= (short) conv_lab(dstr, &t_lab,"")==CRD_LAB;
-            if (req_gh) return((tr_error==NULL) ? TRF_ILLEG_ :
-              t_status(tr_error, usertxt,
-                       "geoid NOT posible", TRF_ILLEG_));
-          }
-        } else
-        if ((R_N == NON_REG || R_N == NON_NON) && i_clb->cstm == 1) {
-          (void) sprintf(dstr, "geoE%s", i_clb->mlb+4);
-          init &= (short) conv_lab(dstr, &g_lab,"")==CRD_LAB;
-        }
-        else g_lab = t_lab;
+        g_lab   = t_lab;
         dfb_trf = fe_trans;
         break;
 
@@ -542,11 +525,6 @@ FILE                     *tr_error
         else
         init   &= (short) conv_lab("GR_geo_nad83g", &g_lab,"")==CRD_LAB;
         dfb_trf = ng_trans;
-        break;
-
-      case EEMASK: /* ee_trans */
-        init = (short) conv_lab("EE_utm35_euref89", &t_lab,"")==CRD_LAB;
-        dfb_trf = ee_trans;
         break;
 
       case FHMASK: /* fh_trans */

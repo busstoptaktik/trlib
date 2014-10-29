@@ -83,7 +83,7 @@ struct gde_lab          *t_lab,
   union rgn_un               rgn_pref;
   long                       pos;
   size_t                     qr;
-  int                        r, used, conv_mode, all_out, r_size;
+  int                        geo_def = 0, r, used, conv_mode, all_out, r_size;
   FILE                      *tab_file;
 
   char                       t_lab_info[128];
@@ -143,6 +143,7 @@ struct gde_lab          *t_lab,
     (void) strcpy(t_lab->mlb, p_lb->name);
 
     tab_file = i_tabdir_file(4, t_lab->mlb, &r, pth_mlb);
+    t_lab->local = (pth_mlb[0] == '\0') ? 1 : 0;
     if (r) {
       if (all_out)
          lord_error(0,LORD("table: %s NOT FOUND"), t_lab->mlb);
@@ -188,21 +189,28 @@ struct gde_lab          *t_lab,
     }
 
     /* ezf[1] == 0  => geographical coord grid */
-    if (ezf[1] != 0 && f777 == 777) {
+    /* ezf[1] == -99=> geographical coord grid NO rounding of limits */
+    geo_def = (ezf[1] == 0 || ezf[1] == -99) ? 1 : 0;
+    if (geo_def == 0 && f777 == 777) {
       lord_error(0,LORD("%s not geogr. grid"), pth_mlb);
       fclose(tab_file);
       return (ILL_LAB);
     }
 
     t_lab->global = 0;
-    if (ezf[1] == 0) {
-      /* round the area limits to nearest integer sx */
-      g_tpd = *set_tpd("sx", 10, 0);
-      for (r = 0; r < 6; r++) {
-        (void) sputg(t_lab_info, *(BL + r) * M_PI / 180.0,
-                                 &g_tpd, "+u!");
-        *(BL + r) = sgetg(t_lab_info, &w_tpd, &used, "");
+    if (geo_def) {
+      for (r = 0; r < 6; r++) *(BL + r) *= M_PI / 180.0;
+      if (ezf[1] == 0) {
+        /* round the area limits to nearest integer sx */
+        g_tpd = *set_tpd("sx", 10, 0);
+        for (r = 0; r < 6; r++) {
+          (void) sputg(t_lab_info, *(BL + r), &g_tpd, "+u!");
+          *(BL + r) = sgetg(t_lab_info, &w_tpd, &used, "");
+        }
       }
+      else g_tpd = *set_tpd("dg", 10, 6);
+
+      t_lab->g_tpd = g_tpd;
 
       /* area limits */
       *(BL + 2) = v_std(*(BL + 2));
@@ -216,8 +224,7 @@ struct gde_lab          *t_lab,
       }
 
       /* Test for fortran identification of a binary grid file */
-      t_lab->f_comp   = 1;
-      t_lab->g_tpd    = *set_tpd("dg", 10, 6);
+      t_lab->f_comp   = 2;
     }
     else {
       t_lab->f_comp  = 2;
@@ -267,7 +274,7 @@ struct gde_lab          *t_lab,
     {
       union geo_lab   lab1;
       if (conv_lab(d_name, &lab1, "  20000101") == CRD_LAB) {
-        if (t_lab->cstm == 0) /* geo */
+        if (geo_def) /* geo */
           r = lab1.u_c_lab.cstm != 2 ||
               t_lab->mode != lab1.u_c_lab.mode;
         else
@@ -359,9 +366,8 @@ struct gde_lab          *t_lab,
 #if defined(sparc) || defined(__sparc)
         if(*p_tp == '\0') p_tp = settabdir(NULL);
 #endif
+        (void) fprintf(iofile, "\n * FULL NAME: %s%s\n ", p_tp, t_lab->mlb);
       }
-      (void) fprintf(iofile, "\n * FULL NAME: %s%s\n ",
-                     p_tp, t_lab->mlb);
 
       (void) fprintf(iofile, "\nlng       = %15ld", (long) sizeof (*t_lab));
       (void) fprintf(iofile, "\nlab_type  = %15d", t_lab->lab_type);
