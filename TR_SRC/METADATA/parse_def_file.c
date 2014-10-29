@@ -123,7 +123,7 @@ static int set_ellips(struct tag *grs_tag,  def_grs *ellip){
 }
 
 
-
+/* fill in a def_projection entry from xml definition*/
 static int set_projection(struct tag *prj_tag,  def_projection *proj){
 	struct tag t;
 	t=get_named_child(prj_tag,"description");
@@ -187,7 +187,9 @@ static int set_projection(struct tag *prj_tag,  def_projection *proj){
 	}
 	return 1;
 }
-	
+
+
+/* fill in a def_datum entry from xml definition*/
 static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 	struct tag t;
 	t=get_named_child(dtm_tag,"mlb");
@@ -243,6 +245,8 @@ static int set_datum(struct tag *dtm_tag, def_datum *dtm){
 	return 1;
 }
 
+
+/* fill in a def_dtm_shift entry from xml definition*/
 static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, char *dir_name){
 	struct tag t;
 	int i,n_ok;
@@ -325,15 +329,16 @@ static int set_dtm_shift(struct tag *dtm_shift_tag, def_dtm_shift *dtm_shift, ch
 	}
 	if (g==NULL)
 		return 0;
-	dtm_shift->g=calloc(sizeof(GRIM),1);
+	dtm_shift->g=calloc(sizeof(GRIM),1); /*TODO: add ability to have more datumshifts*/
 	dtm_shift->n_tabs=1;
 	dtm_shift->g[0]=g;
 	dtm_shift->len=1; /*TODO*/
-	lord_debug(0,LORD("DATUM SHIFT from: %d, to: %d, mlb: %s, adress: %p"),dtm_shift->dno1,dtm_shift->dno2,grim_crs(dtm_shift->g[0]),dtm_shift->g[0]);
-	lord_debug(0,LORD("rows: %d, columns: %d"),grim_rows(dtm_shift->g[0]),grim_columns(dtm_shift->g[0]));
+	lord_debug(3,LORD("DATUM SHIFT from: %d, to: %d, mlb: %s, adress: %p"),dtm_shift->dno1,dtm_shift->dno2,grim_crs(dtm_shift->g[0]),dtm_shift->g[0]);
+	lord_debug(3,LORD("rows: %d, columns: %d"),grim_rows(dtm_shift->g[0]),grim_columns(dtm_shift->g[0]));
 	return 1;
 }
 
+/* fill in an alias entry from xml definition*/
 static int set_alias(struct tag *alias_tag, def_alias *alias){
 	struct tag t;
 	t=get_named_child(alias_tag,"key");
@@ -345,6 +350,8 @@ static int set_alias(struct tag *alias_tag, def_alias *alias){
 	return 1;
 }
 
+
+/* fill in a def_rgn entry from xml definition*/
 static int set_rgn(struct tag *rgn_tag, def_rgn *rgn){
 	struct tag t;
 	t=get_named_child(rgn_tag,"new");
@@ -367,7 +374,7 @@ Function that parses def_lab file. Now in XML :-)
 	/*stuff that match the formatting and 'modes' of the def_lab file */
 	struct tag def_tag,item_tag;
 	def_data *data=NULL;
-	int n_set[N_MODES]={0,0,0,0,0,0},mode,i;
+	int n_set[N_MODES]={0,0,0,0,0,0},mode,i,j;
 	enum modes {mode_prj=0,mode_rgn=1,mode_dtm=2,mode_alias=3,mode_dtm_shift=4,mode_grs=5};
 	void *entries[N_MODES]={NULL,NULL,NULL,NULL,NULL,NULL};
 	char *mode_names[N_MODES]={"def_prj","def_rgn","def_dtm","def_alias","def_dtm_shift","def_grs"};
@@ -376,7 +383,6 @@ Function that parses def_lab file. Now in XML :-)
 	int n_prealloc[N_MODES]={256,128,128,20,128,64};
 	int n_alloc[N_MODES]={256,128,128,20,128,64};
 	size_t mode_sizes[N_MODES]={sizeof( def_projection),sizeof(def_rgn),sizeof( def_datum), sizeof(def_alias), sizeof( def_dtm_shift),sizeof( def_grs)};
-	/*printf("def_grs: %d\n",sizeof(def_grs));*/
 	*n_err=0; /* set no errors - yet! */
 	/* allocate memory for objects */
 	for(mode=0;mode<N_MODES;mode++){
@@ -394,7 +400,6 @@ Function that parses def_lab file. Now in XML :-)
 	}
 	/*iterate over modes*/
 	for(mode=0; mode<N_MODES; mode++){
-		lord_debug(0,LORD("Hello - mode is : %d"),mode);
 		def_tag=get_named_child(root,mode_names[mode]);
 		if (!def_tag.valid){
 			lord_error(XML_ROOT_NOT_FOUND,LORD("Failed to find tag %s."),mode_names[mode]);
@@ -409,7 +414,7 @@ Function that parses def_lab file. Now in XML :-)
 			else{
 				int ok=0;
 				void *entry=entries[mode];
-				/*lord_debug(0,LORD("mode: %d, n_set: %d"),mode,n_set[mode]);*/
+				lord_debug(3,LORD("mode: %d, n_set: %d"),mode,n_set[mode]);
 				switch(mode){
 					case mode_prj:
 						ok=set_projection(&item_tag,(def_projection*) entry+n_set[mode]);
@@ -501,29 +506,43 @@ Function that parses def_lab file. Now in XML :-)
 	data->regions=entries[mode_rgn];
 	data->dtm_shifts=entries[mode_dtm_shift];
 	data->alias_table=entries[mode_alias];
-	lord_debug(0,LORD("n_prj: %d, n_rgn: %d, n_ellip: %d, n_dtm: %d, n_shifts: %d, n_alias: %d"),data->n_prj,data->n_rgn,data->n_ellip,data->n_dtm,
+	lord_debug(3,LORD("n_prj: %d, n_rgn: %d, n_ellip: %d, n_dtm: %d, n_shifts: %d, n_alias: %d"),data->n_prj,data->n_rgn,data->n_ellip,data->n_dtm,
 	data->n_dtm_shifts,data->n_alias);
 	/* perhaps sort entries after number?? */
-	//present_data(stdout,data);
 	return data;
 	error:
 	    (*n_err)++;
-	    for(i=0;i<5;i++)
+	     /*hmm- perhaps reuse close_def_data*/
+	    for(i=0;i<N_MODES;i++){
+		    if (i==mode_dtm_shift){
+			    def_dtm_shift *dtm_shift;
+			    int n_tabs;
+			    for(j=0; j<n_set[mode_dtm_shift]; j++){
+				    dtm_shift=((def_dtm_shift*) entries[mode_dtm_shift])+j;
+				    n_tabs=dtm_shift->n_tabs;
+				    while (n_tabs>0){
+					    grim_close(dtm_shift->g[--n_tabs]);
+				    }
+				    free(dtm_shift->g);
+			    }
+			    
 	        free(entries[i]);
+	    }
 	    free(data);
 	    return NULL;
 }
 
 void close_def_data( def_data *data){
-	int i;
+	int i,j;
 	if (!data)
 		return;
 	free(data->projections);
 	free(data->datums);
 	free(data->ellipsoids);
 	free(data->regions);
-	for (i=0; i<data->n_dtm_shifts;i++){
-		grim_close(data->dtm_shifts[i].g[0]); /*TODO: close all*/
+	for (i=0; i<data->n_dtm_shifts; i++){
+		for(j=0; j<data->dtm_shifts[i].n_tabs; j++)
+			grim_close(data->dtm_shifts[i].g[j]); /*TODO: close all*/
 		free(data->dtm_shifts[i].g);
 	}
 	free(data->dtm_shifts);
