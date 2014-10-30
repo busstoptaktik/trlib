@@ -53,7 +53,7 @@ char                     *err_str
 
   int                         val_mode, nw_idx, idx = 0;
   long                        nw_pos, pos = 0;
-  int                         n_i, e_i, c_geo = 0, t_geo = 0;
+  int                         n_i, e_i, geo = 0;
   double                      N_frac, E_frac, N_i, E_i;
   double                      L_p, scale;
 
@@ -61,7 +61,8 @@ char                     *err_str
 
   /* table value at vertices */
   double                      gh[4];
-  int                         s, i, t, g, miss, res = 0;
+  int                         s, i, t, g, res = 0;
+  int                         miss, qr, qr1;
 
   *g_v = 9999.9;
 
@@ -72,14 +73,13 @@ char                     *err_str
 
   /* select the table */
   t_lab = &(grid_table->table_u[0]);
-  for (g = 0, miss = 1; (g < *tab_max) && miss; t_lab++, g++) {
+  for (g = 0, miss = 1; g < *tab_max && miss; t_lab++, g++) {
 
-    c_geo = (crd_lab->cstm == 2) ? 1 : 0;
-    t_geo = (t_lab->cstm == 0 || t_lab->cstm == -99) ? 1 : 0;
-    if (!c_geo &&  t_geo) continue;
-    if ( c_geo && !t_geo) continue;
+    geo = (crd_lab->cstm == 2) ? 1 : 0;
+    if (!geo && t_lab->cstm == 0) continue;
+    if ( geo && t_lab->cstm != 0) continue;
     L_p = E - t_lab->L_min;
-    if (c_geo) L_p = v_std(L_p);
+    if (geo) L_p = v_std(L_p);
     if (t_lab->B_min <= N && N <= t_lab->B_max 
                         && L_p <= t_lab->deltaL) {
       /* TEST datum */               /* !s34j / !s34s */
@@ -126,8 +126,9 @@ char                     *err_str
       E_b      = t_lab->L_min + e_i * t_lab->dL; */
 
       /* addressing of nw-corner block */
-      nw_pos   = (long) t_lab->row_size * n_i + t_lab->nbase
-               + (long) t_lab->blk_size * ((e_i)/t_lab->rec_p_bl);
+      qr       = n_i * ((int) t_lab->row_size) + t_lab->nbase;
+      qr1      = ((e_i)/t_lab->rec_p_bl)* ((int) t_lab->blk_size);
+      nw_pos   = (long) qr + (long) qr1;
       nw_idx   = e_i % t_lab->rec_p_bl;
 
       /* Interpolation loop */
@@ -217,13 +218,13 @@ char                     *err_str
 
       else {
         return(s_status(err_str, "grid_val",
-               TAB_C_ARE_, (c_geo) ? "sx" : "m", "", N, E));
+               TAB_C_ARE_, (geo) ? "sx" : "m", "", N, E));
       } /* end outside error */
     } /* end inside selected table */
     else
     if (!strcmp(t_lab->clb, "geo_feh10")) {
       return(s_status(err_str, "grid_val",
-             TAB_C_ARE_, (c_geo) ? "sx" : "m", "", N, E));
+             TAB_C_ARE_, (geo) ? "sx" : "m", "", N, E));
     }
 
   }
@@ -233,7 +234,7 @@ char                     *err_str
     if (*tab_max == 1) {
       (void) sprintf(name, "grid_val(%s)", t_lab->mlb);
       return(s_status(err_str, name, TAB_C_ARE_,
-                    (c_geo) ? "sx" : "m", "", N, E));
+                    (geo) ? "sx" : "m", "", N, E));
     } else {
       (void) sprintf(name, "grid_val(%s)",
              (t_lab->lab_type == GDE_LAB) ? "geoid" :
