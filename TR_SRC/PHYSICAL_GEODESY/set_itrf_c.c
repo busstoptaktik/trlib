@@ -154,6 +154,7 @@ char                    *err_str
   char                     ipl_nam[MLBLNG];
   char                    *i_dtm, *o_dtm, pth_mlb[1024], *p_tp;
   long                     pos;
+  int                      iwgs_ii =0, owgs_ii =0, fr_ch, to_ch;
   int                      inkg_ii =0, onkg_ii =0, ipl_std = 0;
   int                      ieur_ii =0, oeur_ii =0, eur_yy =0;
   int                      igs_yy  =0, igs_xx  =0, igs_ii =0;
@@ -163,10 +164,9 @@ char                    *err_str
   int                      yy, xx, i, g_zz = -100000; 
   int                      i_zz = -100000, o_zz = -100000;
   double                   dd, ff, run_JD, gate_1d, gate_2d;
-  double                   i_plm_dt, o_plm_dt;
+  double                   i_plm_dt, o_plm_dt, GMT;
   struct gps_c_str        *p_gps, *D_gps = NULL, gate_igs, D_gate_igs;
   struct plate_info       *p_pl_inf;
-  int                      dtm_lng[] = {0, 4, 3, 4, 5, 2, 3};
   size_t                   size;
 
   /* initialize */
@@ -197,6 +197,8 @@ char                    *err_str
 
   i_dtm = from_lb->mlb + from_lb->sepix +1;
   o_dtm =   to_lb->mlb +   to_lb->sepix +1;
+  fr_ch = strlen(i_dtm);
+  to_ch = strlen(o_dtm);
   i_sys =  (!strncmp(i_dtm, "itrf", 4))    ? 1
         : ((!strncmp(i_dtm, "igs", 3))     ? 2
         : ((!strncmp(i_dtm, "etrf", 4))    ? 3
@@ -209,16 +211,16 @@ char                    *err_str
   o_sys =  (!strncmp(o_dtm, "itrf", 4))    ? 1
         : ((!strncmp(o_dtm, "igs", 3))     ? 2
         : ((!strncmp(o_dtm, "etrf", 4))    ? 3
-        : ((!strncmp(i_dtm, "etrs", 4))    ? 3
+        : ((!strncmp(o_dtm, "etrs", 4))    ? 3
         : ((!strncmp(o_dtm, "euref89", 7)) ? 4
         : ((!strncmp(o_dtm, "gr96", 4))    ? 5
         : ((!strncmp(o_dtm, "wgs84", 5))   ? 6 : 9))))));
   if (i_sys == 9 || o_sys == 9) return(
                     s_status(err_str, "set_itrf_c", ITRF_DTM_));
 
-  p_tp  = i_dtm + dtm_lng[i_sys];
+  p_tp  = i_dtm + fr_ch - 2;
   (void) sscanf(p_tp, "%d", &yy);
-  p_tp  = o_dtm + dtm_lng[o_sys];
+  p_tp  = o_dtm + to_ch - 2;
   (void) sscanf(p_tp, "%d", &xx);
   if (i_sys == 4) i_sys = 3; // 3 is national std or ITRFplate/StnVel
   if (o_sys == 4) o_sys = 3; // 4 is euref std
@@ -249,8 +251,8 @@ char                    *err_str
   }
 
   if ((i_sys == 4 && o_sys == 3 && onkg_ii) ||
-      (o_sys == 4 && i_sys == 3 && inkg_ii) ||
-      (onkg_ii && inkg_ii))
+      (o_sys == 4 && i_sys == 3 && inkg_ii) /* ||
+      (onkg_ii && inkg_ii)*/)
       return(s_status(err_str, "set_itrf_c", TRF_ILLEG_));
 
   if (inkg_ii || onkg_ii) {
@@ -303,13 +305,17 @@ char                    *err_str
                          &gps_table->i_ipl_dt, &gps_table->plm_dt);
     } else
     if (i_sys == 6) {
-      (void) strcpy(from_str, "wgs84");
+      (void) strcpy(from_str, i_dtm);
+      if (fr_ch == 5) {
+        (void) strcat(from_str, "g0");
+        fr_ch += 2;
+      }
       (void) strcpy(to___str, "itrf");
       i_zz = get_yy_item(0, pth_mlb, p_gps, D_gps,
-                         from_str, 5, 4,
+                         from_str, fr_ch, 4,
                          &gps_table->i_ipl_dt, &gps_table->plm_dt);
+      (void) cwtJD(gps_table->i_ipl_dt, i_JD, &GMT, 0, 0);
     }
-
 
     if (i_zz >= 0) {
       gps_table->seq[i_seq ++] = 3;  /* IGAT */
@@ -350,11 +356,17 @@ char                    *err_str
                          &gps_table->o_ipl_dt, &gps_table->plm_dt);
     } else
     if (o_sys == 6) {
-      (void) strcpy(from_str, "wgs84");
+      (void) strcpy(from_str, o_dtm);
+      if (to_ch == 5) {
+        (void) strcat(from_str, "g0");
+        to_ch += 2;
+      }
       (void) strcpy(to___str, "itrf");
       o_zz = get_yy_item(0, pth_mlb, &(gps_table->ogat_tr), D_gps,
-                         from_str, 5, 4,
+                         from_str, to_ch, 4,
                          &gps_table->o_ipl_dt, &gps_table->plm_dt);
+      (void) cwtJD(gps_table->o_ipl_dt, &(to_lb->JD), &GMT, 0, 0);
+      to_lb->date = gps_table->o_ipl_dt;
     }
     if (o_zz >= 0) {
       xx = o_zz;
