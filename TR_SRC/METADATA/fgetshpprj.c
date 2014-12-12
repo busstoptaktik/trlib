@@ -21,7 +21,7 @@
  int fgetshpprj(FILE *fh_in, union geo_lab   *g_lab){
 	char wkt[4096];
 	size_t n_read=fread(wkt,1,4096,fh_in);
-	if (n_read==4096) /*overflow??*/
+	if (n_read==4096 || n_read==0) /*overflow??/empty*/
 		return -1;
 	return sgetshpprj(wkt,g_lab,NULL);
 

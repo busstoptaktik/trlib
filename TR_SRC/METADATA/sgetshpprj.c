@@ -59,7 +59,7 @@ char            *mlb_out)
   if (g_lab!=NULL)
 	  g_lab->u_c_lab.g_tpd = *set_tpd("dg", 2, 7);
   k = 0;
-  *mlb_out='\0';
+  if (mlb_out != NULL) *mlb_out='\0';
   /*added some extra bullet-proofing - simlk, ,arch 2013*/
   if (wkt_in==NULL || strlen(wkt_in)==0){
 	  lord_error(TR_LABEL_ERROR,LORD("Empty input string."));
