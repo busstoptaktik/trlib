@@ -37,8 +37,11 @@
 /* (int) tab_adm_f(                                          */
 /*   char *tab_name,  name of table (or empty at mode 'b')   */
 /*   char  mode,      mode = 'b' / 't' / 'd' / 'z' / 'l'     */
-/*   int   header,    = 0/1  recommended == 1                */
-/*   int   hd_limits, = 0/1  recommended == 1                */
+/*   int   header,    = 0/1    recommended == 1              */
+/*   int   hd_limits, = 0/1/2  recommended == 1/2            */
+/*                    = 0      no header in file             */
+/*                    = 1      header in file                */
+/*                    = 2      NO ROUNDING of limits         */
 /*   char *global_dir, directory for tables                  */
 /*   FILE *fi,        table is read from fi                  */
 /*   FILE *fo,        control output is written on fo        */
@@ -68,9 +71,9 @@
 /* nr    crd1    crd2    val    val                          */
 /*   from the binary file tab_name, controloutput to fo      */
 
-void                 reset_dir();
+static void          reset_dir();
 
-char                 sav_dir[256], in[256];
+static char          sav_dir[256], in[256];
 
 int                  tab_adm_f(
 /*___________________________*/
@@ -99,9 +102,9 @@ int                  tab_adm_f(
 
   int                    n = 0, e, n1, e1, j, val_mode;
   int                    n_max, e_max, recsz, estop, r_size;
-  long                   pos, size = 0, sz_u, pgsize;
-  int                    tbwd, chsz = 0, fill = 0;
-  size_t                 load_sz, rest_sz;
+  int                    tbwd;
+  size_t                 pos = 0, fill = 0, pgsize, qr_t;
+  size_t                 size = 0, sz_u, chsz = 0, load_sz, rest_sz;
   int                    head = GEOIDHEADER*4*GEOIDPGSIZE;
   double                 B, L, B1, L1;
   double                 diff, conv_f = 1.0, lim = 1.0, scale;
@@ -195,14 +198,19 @@ prst = gettabdir();
                      -1 <= c_lab->mode && c_lab->mode <= 1;
       prj_def      = !(geo_def || utm_def);
       t_lab->datum = c_lab->datum;
-      t_lab->cstm  = (short) ((geo_def) ? 0 :
+      /*     cstm    -99  is used for geo NO rounding                 */
+      t_lab->cstm  = (short) ((geo_def) ? ((hd_limits == 1) ? 0 : -99) :
                      (utm_def) ? get_zone(&x_lab_u) : -c_lab->cstm);
       t_lab->mode  = (short) ((prj_def) ? c_lab->mode : 0);
 
     } else {
-      geo_def      = t_lab->cstm == 0;
+      geo_def      = t_lab->cstm == 0 || t_lab->cstm == -99;
       utm_def      = t_lab->cstm  > 0;
       prj_def      = !(geo_def || utm_def);
+      if (geo_def && hd_limits == 2) t_lab->cstm = -99;
+      else if (t_lab->cstm == -99) hd_limits = 2; /* NO rounding */
+      g_tpd        = (!geo_def) ? *set_tpd("m", 10, i)
+                   : (hd_limits == 1) ? *set_tpd("sx", 10, 0) : *set_tpd("dg", 10, 6);
     }
     dim3      = (t_lab->lab_type == T3D_LAB) ? 3
               : (t_lab->lab_type == T2D_LAB) ? 2
@@ -333,24 +341,30 @@ prst = gettabdir();
           *(BL+3) += 360.0;
         }
 
-        g_tpd = *set_tpd("sx", 10, 0);
-        (void) fprintf(fo,
-               "\n      limit -> rounded to nearest integer sx");
-        for (r = 0; r < 6; r ++) {
-          (void) fprintf(fo, "\n BL[%d] = %+12.6f", r, *(BL+r));
+        if (hd_limits == 1) {
+          (void) fprintf(fo,
+                 "\n      limit -> rounded to nearest integer sx");
+          for (r = 0; r < 6; r ++) {
+            (void) fprintf(fo, "\n BL[%d] = %+12.6f", r, *(BL+r));
 
-          /* round the area limits to nearest integer sx */
-          (void) sputg(ptx, *(BL + r) / conv_f, &g_tpd, "+u!");
-          *(BL + r) = conv_f * sgetg(ptx, &r_tpd, &used, "");
-          (void) fprintf(fo, " -> %+12.6f", *(BL+r));
-        }
-        /* change for equal longitudes */
-        if (fabs(*(BL+2) - *(BL+3)) < 0.00000278 /* 0.01sx */)
-          *(BL+3) += 360.0;
+            /* round the area limits to nearest integer sx */
+            (void) sputg(ptx, *(BL + r) / conv_f, &g_tpd, "+u!");
+            *(BL + r) = conv_f * sgetg(ptx, &r_tpd, &used, "");
+            (void) fprintf(fo, " -> %+12.6f", *(BL+r));
+          }
+          /* change for equal longitudes */
+          if (fabs(*(BL+2) - *(BL+3)) < 0.00000278 /* 0.01sx */)
+            *(BL+3) += 360.0;
+        } 
+        else {
+          (void) fprintf(fo,
+                 "\n      limit -> NO rounding");
+          for (r = 0; r < 6; r ++)
+            (void) fprintf(fo, "\n BL[%d] = %+12.6f", r, *(BL+r));
+        } 
       } 
       else {
         i     = strncmp("grsoek", t_lab->mlb, 6) ? 0 : 6;
-        g_tpd = *set_tpd("m", 10, i);
       } 
 
       if (lab_ok) {
@@ -363,34 +377,34 @@ prst = gettabdir();
               ((i == 5) ? t_lab->dL   : -11000000.0)))))) * conv_f
               - BL[i]) > lim) ++ n;
         }
-        g_tpd = t_lab->g_tpd;
+        r_tpd = t_lab->g_tpd;
       }
 
       if (n && lab_ok) {
         (void) fprintf(fo, "\n\nLabel changed +++\n");
         (void) fprintf(fo, "\nBmin :");
-        (void) fputg(fo, t_lab->B_min, &g_tpd, " +u");
+        (void) fputg(fo, t_lab->B_min, &r_tpd, " +u");
         (void) fprintf(fo, "  ->  ");
         (void) fputg(fo, BL[0] / conv_f, &g_tpd, " +u");
         (void) fprintf(fo, "\nBmax :");
-        (void) fputg(fo, t_lab->B_max, &g_tpd, " +u");
+        (void) fputg(fo, t_lab->B_max, &r_tpd, " +u");
         (void) fprintf(fo, "  ->  ");
         (void) fputg(fo, BL[1] / conv_f, &g_tpd, " +u");
         (void) fprintf(fo, "\nLmin :");
-        (void) fputg(fo, t_lab->L_min, &g_tpd, " +u");
+        (void) fputg(fo, t_lab->L_min, &r_tpd, " +u");
         (void) fprintf(fo, "  ->  ");
         (void) fputg(fo, BL[2] / conv_f, &g_tpd, " +u");
         (void) fprintf(fo, "\nLmax :");
         (void) fputg(fo, t_lab->L_min + t_lab->deltaL,
-                     &g_tpd, " +u");
+                     &r_tpd, " +u");
         (void) fprintf(fo, "  ->  ");
         (void) fputg(fo, BL[3] / conv_f, &g_tpd, " +u");
         (void) fprintf(fo, "\ndB   :");
-        (void) fputg(fo, t_lab->dB, &g_tpd, " +u");
+        (void) fputg(fo, t_lab->dB, &r_tpd, " +u");
         (void) fprintf(fo, "  ->  ");
         (void) fputg(fo, BL[4] / conv_f, &g_tpd, " +u");
         (void) fprintf(fo, "\ndL   :");
-        (void) fputg(fo, t_lab->dL, &g_tpd, " +u");
+        (void) fputg(fo, t_lab->dL, &r_tpd, " +u");
         (void) fprintf(fo, "  ->  ");
         (void) fputg(fo, BL[5] / conv_f, &g_tpd, " +u");
         t_lab->B_min    = BL[0] / conv_f;
@@ -399,6 +413,7 @@ prst = gettabdir();
         t_lab->deltaL   = (BL[3] - BL[2])/ conv_f;
         t_lab->dB       = BL[4] / conv_f;
         t_lab->dL       = BL[5] / conv_f;
+        t_lab->g_tpd    = g_tpd;
         t_lab->n_max    = (int) ((t_lab->B_max - t_lab->B_min)
                                                / t_lab->dB + 1.1);
         t_lab->e_max    = (int) ((t_lab->deltaL              )
@@ -422,14 +437,14 @@ prst = gettabdir();
         t_lab->e_max    = (int) ((t_lab->deltaL              )
                                                / t_lab->dL + 1.1);
         t_lab->nbase    = (GEOIDHEADER) * 4L * (GEOIDPGSIZE);
-        t_lab->blk_size = r_size * pgsize;
+        t_lab->blk_size = pgsize * r_size;
         load_sz         = t_lab->blk_size;
         t_lab->rec_p_bl = (int) (t_lab->blk_size / r_size / dim3);
         t_lab->estop    = ((t_lab->e_max + t_lab->rec_p_bl -1)
                                  / t_lab->rec_p_bl) * t_lab->rec_p_bl;
         t_lab->row_size = (t_lab->estop / t_lab->rec_p_bl)
                                         * t_lab->blk_size;
-        t_lab->f_comp   = (geo_def) ? 1 : 2;
+        t_lab->f_comp   = 2;
       }
     } else
     if (lab_ok) {
@@ -439,6 +454,7 @@ prst = gettabdir();
       BL[3] = conv_f *(t_lab->L_min + t_lab->deltaL);
       BL[4] = conv_f * t_lab->dB;
       BL[5] = conv_f * t_lab->dL;
+      g_tpd = t_lab->g_tpd;
     } else {
       (void) sprintf(errtx, "%s%s",
              "\n\ntab_adm_f missing label or header limits ::", 
@@ -449,23 +465,28 @@ prst = gettabdir();
     (void) fprintf(fo, "\n\nFrom label\n");
     (void) fprintf(fo, "\nBmax :");
     (void) fputg(fo, t_lab->B_max, &g_tpd, " +u");
+    (void) fputg(fo, BL[1] / conv_f, &g_tpd, " +u");
     (void) fprintf(fo, "\nBmin :");
     (void) fputg(fo, t_lab->B_min, &g_tpd, " +u");
+    (void) fputg(fo, BL[0] / conv_f, &g_tpd, " +u");
     (void) fprintf(fo, "\nLmax :");
     (void) fputg(fo, t_lab->L_min + t_lab->deltaL, &g_tpd, " +u");
+    (void) fputg(fo, BL[3] / conv_f, &g_tpd, " +u");
     (void) fprintf(fo, "\nLmin :");
     (void) fputg(fo, t_lab->L_min, &g_tpd, " +u");
+    (void) fputg(fo, BL[2] / conv_f, &g_tpd, " +u");
     (void) fprintf(fo, "\ndB   :");
     (void) fputg(fo, t_lab->dB, &g_tpd, " +u");
+    (void) fputg(fo, BL[4] / conv_f, &g_tpd, " +u");
     (void) fprintf(fo, "\ndL   :");
     (void) fputg(fo, t_lab->dL, &g_tpd, " +u");
+    (void) fputg(fo, BL[5] / conv_f, &g_tpd, " +u");
 
-    pos   = 0L;
     e_max = t_lab->e_max;
     estop = t_lab->estop;
 
     /* write HEAD info */
-    if ((qr = (int) fwrite((void *) &f777, sizeof(int), 1, fd)) - 1) {
+    if (fwrite((void *) &f777, sizeof(int), 1, fd) - 1) {
       (void) sprintf(errtx,
           "\n*** tab_adm_f: ERROR at output of table-mark");
       if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -474,7 +495,7 @@ prst = gettabdir();
     pos = ftell(fd);
     (void) fprintf(fo, "\n\nPos after f777  %ld", pos);
 
-    if ((qr = (int) fwrite((void *) BL, sizeof(BL), 1, fd)) - 1) {
+    if (fwrite((void *) BL, sizeof(BL), 1, fd) - 1) {
       (void) sprintf(errtx,
           "\n*** tab_adm_f: ERROR at output of lat/long info");
       if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -483,7 +504,7 @@ prst = gettabdir();
     pos = ftell(fd);
     (void) fprintf(fo, "\nPos after BL   %ld", pos);
 
-    if ((qr = (int) fwrite((void *) ezf, sizeof(ezf), 1, fd)) - 1) {
+    if (fwrite((void *) ezf, sizeof(ezf), 1, fd) - 1) {
       (void) sprintf(errtx,
           "\n*** tab_adm_f: ERROR at output of projection info");
       if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -619,17 +640,17 @@ prst = gettabdir();
           s = 0;
           /* grid_tab of floats, int or double */
           if (val_mode == 1)
-             qr = (int) fwrite((void *) pfgh, (size_t) load_sz, 1, fd);
+             qr_t = fwrite((void *) pfgh, (size_t) load_sz, 1, fd);
           else if (val_mode == 2)
-             qr = (int) fwrite((void *) ifgh, (size_t) load_sz, 1, fd);
+             qr_t = fwrite((void *) ifgh, (size_t) load_sz, 1, fd);
           else
-             qr = (int) fwrite((void *) dfgh, (size_t) load_sz, 1, fd);
-          if (qr != 1) {
+             qr_t = fwrite((void *) dfgh, (size_t) load_sz, 1, fd);
+          if (qr_t != 1) {
             (void) fprintf(fo,
                 "\n*** tab_adm_f: ERROR at output of table value");
             (void) fprintf(fo,
-                "\n blockaddr %8ld count  = %4d size = %4ld ;",
-                ftell(fd), qr, (long) load_sz);
+                "\n blockaddr %8ld size = %4ld ;",
+                ftell(fd), (long) load_sz);
           }
         }
 
@@ -678,13 +699,13 @@ prst = gettabdir();
 
     chsz *= r_size;
     fill *= r_size;
-    sz_u  = (long) (head + dim3 * (chsz + fill));
+    sz_u  = (chsz + fill) * dim3 + head;
     (void) fprintf(fo, "\n  %-18s  %8d   -  ", "Head", head);
-    (void) fprintf(fo, "\n  %-18s  %8d   -  ", "Table data", chsz);
+    (void) fprintf(fo, "\n  %-18s  %ld   -  ", "Table data", chsz);
     if (dim3 == 2) (void) fprintf(fo, "  2 dim.");
     else
     if (dim3 == 3) (void) fprintf(fo, "  3 dim.");
-    (void) fprintf(fo, "\n  %-18s  %8d   -  ", "Fill-in", fill);
+    (void) fprintf(fo, "\n  %-18s  %8ld   -  ", "Fill-in", fill);
     if (dim3 == 2) (void) fprintf(fo, "  2 dim.");
     else
     if (dim3 == 3) (void) fprintf(fo, "  3 dim.");
@@ -716,7 +737,7 @@ prst = gettabdir();
                 ((dim3 == 2) ? TAB3DPGSIZE * 2 / 3 : TAB3DPGSIZE));
     scale    = (t_lab->rec_size != -4) ? 0.0 : 0.000001;
     utm_def  = t_lab->cstm  > 0;
-    geo_def  = t_lab->cstm == 0;
+    geo_def  = t_lab->cstm == 0 || t_lab->cstm == -99;
     prj_def  = t_lab->cstm  < 0;
     
     if (dim3 > 1) {
@@ -772,7 +793,7 @@ prst = gettabdir();
 
       if (t_lab->f_comp == 0) head = 0L;
 
-      chsz = (int) size - head;
+      chsz = size - head;
       tbwd = chsz/t_lab->n_max/r_size;
 
       /* consistency check */
@@ -812,7 +833,7 @@ prst = gettabdir();
     (void) fprintf(fo, "\nFull Path for input: %s\n\n", in);
 
     fd  = t_lab->fd;
-    pos = 0L;
+    pos = 0;
 
     for (f_act = fo, r = 0; r < dim3; r ++) {
       (void) fprintf(f_act, "\n # %s \n\n", t_lab->mlb);
@@ -835,7 +856,7 @@ prst = gettabdir();
 
     if (hd_limits) {
       (void) fseek(fd, pos, SEEK_SET);
-      if ((qr = (int) fread((void *) &res, sizeof(int), 1, fd)) - 1) {
+      if (fread((void *) &res, sizeof(int), 1, fd) - 1) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: ERROR at input of table-mark");
         if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -850,14 +871,14 @@ prst = gettabdir();
         return(-1);
       }
 
-      if ((qr = (int) fread((void *) BL, sizeof(BL), 1, fd)) - 1) {
+      if (fread((void *) BL, sizeof(BL), 1, fd) - 1) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: ERROR at input of table-limits");
         if (strcmp(sav_dir, global_dir)) reset_dir();
         return(-1);
       }
 
-      if ((qr = (int) fread((void *) ezf, sizeof(ezf), 1, fd)) - 1) {
+      if (fread((void *) ezf, sizeof(ezf), 1, fd) - 1) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: ERROR at input of projection-info");
         if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -896,7 +917,7 @@ prst = gettabdir();
       }
     }
 
-    chsz  = 0L;
+    chsz  = 0;
     e_max = t_lab->e_max;
     r_tpd = t_lab->g_tpd;
 
@@ -930,12 +951,12 @@ prst = gettabdir();
 
           /* grid_tab of floats, int or double */
           if (val_mode == 1)
-             qr = (int) fread((void *) pfgh, (size_t) load_sz, 1, fd);
+             qr_t = fread((void *) pfgh, (size_t) load_sz, 1, fd);
           else if (val_mode == 2)
-             qr = (int) fread((void *) ifgh, (size_t) load_sz, 1, fd);
+             qr_t = fread((void *) ifgh, (size_t) load_sz, 1, fd);
           else
-             qr = (int) fread((void *) dfgh, (size_t) load_sz, 1, fd);
-          if (qr != 1) {
+             qr_t = fread((void *) dfgh, (size_t) load_sz, 1, fd);
+          if (qr_t != 1) {
             (void) sprintf(errtx,
                 "\n*** tab_adm_f: FEJL ved input af table values");
             if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -986,16 +1007,16 @@ prst = gettabdir();
 
     chsz *= r_size;
     fill  = (t_lab->estop - e_max) * t_lab->n_max * r_size;
-    sz_u  = (long) (head + dim3 * (chsz + fill));
+    sz_u  = (chsz + fill) * dim3 + head;
     for (f_act = fo, r = 0; r < dim3; r ++) {
       (void) fprintf(f_act,
             "\n\n\nTABLE\n  %-18s  %8ld bytes", t_lab->mlb, size);
       (void) fprintf(f_act, "\n  %-18s  %8d   -  ", "Head", head);
-      (void) fprintf(f_act, "\n  %-18s  %8d   -  ", "Table data", chsz);
+      (void) fprintf(f_act, "\n  %-18s  %ld   -  ", "Table data", chsz);
       if (dim3 == 2) (void) fprintf(f_act, "  2 dim.");
       else
       if (dim3 == 3) (void) fprintf(f_act, "  3 dim.");
-      (void) fprintf(f_act, "\n  %-18s  %8d   -  ", "Fill-in", fill);
+      (void) fprintf(f_act, "\n  %-18s  %8ld   -  ", "Fill-in", fill);
       if (dim3 == 2) (void) fprintf(f_act, "  2 dim.");
       else
       if (dim3 == 3) (void) fprintf(f_act, "  3 dim.");
@@ -1034,7 +1055,7 @@ prst = gettabdir();
                 ((dim3 == 2) ? TAB3DPGSIZE * 2 / 3 : TAB3DPGSIZE));
     scale    = (t_lab->rec_size != -4) ? 0.0 : 0.000001;
     utm_def  = t_lab->cstm  > 0;
-    geo_def  = t_lab->cstm == 0;
+    geo_def  = t_lab->cstm == 0 || t_lab->cstm == -99;
     prj_def  = t_lab->cstm  < 0;
     
     if (geo_def) {
@@ -1060,7 +1081,7 @@ prst = gettabdir();
 
       if (t_lab->f_comp == 0) head = 0L;
 
-      chsz = (int) size - head;
+      chsz = size - head;
       tbwd = chsz/t_lab->n_max/r_size;
 
       /* consistency check */
@@ -1097,13 +1118,13 @@ prst = gettabdir();
     (void) fprintf(fo, "\nFull Path for input: %s\n\n", in);
 
     fd  = t_lab->fd;
-    pos = 0L;
+    pos = 0;
 
     (void) fprintf(fo, "\n#%s\n", t_lab_u.u_g_lab.clb);
 
     if (hd_limits) {
       (void) fseek(fd, pos, SEEK_SET);
-      if ((qr = (int) fread((void *) &res, sizeof(int), 1, fd)) - 1) {
+      if (fread((void *) &res, sizeof(int), 1, fd) - 1) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: ERROR at input of table-mark");
         if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -1125,7 +1146,7 @@ prst = gettabdir();
         return(-1);
       }
 
-      if ((qr = (int) fread((void *) ezf, sizeof(ezf), 1, fd)) - 1) {
+      if (fread((void *) ezf, sizeof(ezf), 1, fd) - 1) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: ERROR at input of projection-info");
         if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -1165,7 +1186,7 @@ prst = gettabdir();
     }
 
     s     = 0;
-    chsz  = 0L;
+    chsz  = 0;
     e_max = t_lab->e_max;
     r_tpd = t_lab->g_tpd;
 
@@ -1188,12 +1209,12 @@ prst = gettabdir();
 
           /* grid_tab of floats, int or double */
           if (val_mode == 1)
-             qr = (int) fread((void *) pfgh, (size_t) load_sz, 1, fd);
+             qr_t = fread((void *) pfgh, (size_t) load_sz, 1, fd);
           else if (val_mode == 2)
-             qr = (int) fread((void *) ifgh, (size_t) load_sz, 1, fd);
+             qr_t = fread((void *) ifgh, (size_t) load_sz, 1, fd);
           else
-             qr = (int) fread((void *) dfgh, (size_t) load_sz, 1, fd);
-          if (qr != 1) {
+             qr_t = fread((void *) dfgh, (size_t) load_sz, 1, fd);
+          if (qr_t != 1) {
             (void) sprintf(errtx,
                 "\n*** tab_adm_f: FEJL ved input af table values");
             if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -1255,7 +1276,7 @@ prst = gettabdir();
     pgsize    = (dim3 == 1) ? GEOIDPGSIZE :
                 ((dim3 == 2 && val_mode == 3) ? TABDDPGSIZE :
                 ((dim3 == 2) ? TAB3DPGSIZE * 2 / 3 : TAB3DPGSIZE));
-    geo_def = t_lab->cstm == 0;
+    geo_def = t_lab->cstm == 0 || t_lab->cstm == -99;
     utm_def = t_lab->cstm  < 0;
     prj_def = !(geo_def || utm_def);
     if (geo_def) {
@@ -1286,10 +1307,9 @@ prst = gettabdir();
       (void) fprintf(fo,
           "\n  table_file: %s  size = %ld", in, size);
 
-      pos = 0L;
+      pos = 0;
       (void) fseek(fd, pos, SEEK_SET);
-      if ((qr = (int) fread((void *) &res, sizeof(int),
-          1, fd)) - 1) {
+      if (fread((void *) &res, sizeof(int), 1, fd) - 1) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: ERROR at input of table-mark");
         if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -1304,16 +1324,14 @@ prst = gettabdir();
         return(-1);
       }
 
-      if ((qr = (int) fread((void *) BL, sizeof(BL),
-          1, fd)) - 1) {
+      if (fread((void *) BL, sizeof(BL), 1, fd) - 1) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: ERROR at input of table-limits");
         if (strcmp(sav_dir, global_dir)) reset_dir();
         return(-1);
       }
 
-      if ((qr = (int) fread((void *) ezf, sizeof(ezf),
-          1, fd)) - 1) {
+      if (fread((void *) ezf, sizeof(ezf), 1, fd) - 1) {
         (void) sprintf(errtx,
             "\n*** tab_adm_f: ERROR at input of projection-info");
         if (strcmp(sav_dir, global_dir)) reset_dir();
@@ -1334,7 +1352,7 @@ prst = gettabdir();
       recsz = ((int) size - head) / (n_max * e_max);
       estop = ((e_max + t_lab->rec_p_bl -1)
               / t_lab->rec_p_bl) * t_lab->rec_p_bl;
-      sz_u  = (long) (head + dim3 * n_max * estop * recsz);
+      sz_u  = head + dim3 * n_max * estop * recsz;
       if (sz_u != size) {
         (void) fprintf(fo,
             "\ntab_adm_f check: file %s inconsistent", in);
@@ -1377,16 +1395,16 @@ prst = gettabdir();
       (void) fprintf(fo, "\n  %-18s  %8ld bytes", "File", size);
       (void) fprintf(fo, "\n  %-18s  %8d   -  ", "Head", head);
       (void) fprintf(fo,
-             "\n  %-18s  %8d   -  ", "Table data", chsz);
+             "\n  %-18s  %ld   -  ", "Table data", chsz);
       if (dim3 == 2) (void) fprintf(fo, "  2 dim.");
       else
       if (dim3 == 3) (void) fprintf(fo, "  3 dim.");
-      (void) fprintf(fo, "\n  %-18s  %8d   -  ", "Fill-in", fill);
+      (void) fprintf(fo, "\n  %-18s  %8ld   -  ", "Fill-in", fill);
       if (dim3 == 2) (void) fprintf(fo, "  2 dim.");
       else
       if (dim3 == 3) (void) fprintf(fo, "  3 dim.");
 
-      sz_u  = (long) (head + dim3 * (chsz + fill));
+      sz_u  = (chsz + fill) * dim3 + head;
       if (size == sz_u) (void) fprintf(fo, "\n\n File OK\n");
       else {
         (void) sprintf(errtx, "\n****tab_adm_f: %s input error ;\n",
