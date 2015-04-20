@@ -87,7 +87,7 @@ class gcc(ccompiler):
 	LINK_OUTPUT_SWITCH="-o"
 	LINK_LIBRARIES=[]
 	DEF_FILE_SWITCH=""
-	IMPLIB_SWITCH=""
+	IMPLIB_SWITCH="-Wl,--out-implib,"
 	OBJ_EXTENSION=".o"
 
 #gcc subvariants
