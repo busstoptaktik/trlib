@@ -1,77 +1,131 @@
-BUILDDIR = ../BUILD/trlib
-CC = gcc
-CFLAGS = -W -Wall -pedantic -fPIC -O -pg -g -I./TR_INC -I./TR_INC/DEPRECATED -DTHREAD_SAFE -D_ROUT
+#
+# MAKEFILE:  For KMS transformations bibliotek, version 1.1
+#
+#
+# Eksempler på kald:
+#
+# 1. Nyt bibliotek (libtr.dll libtr.lib) med funktionerne i makefilen:
+#
+#    make all
+#
+# 2. word count på alle funktionerne
+#
+#    make wordcount
+#
+	
+MAKEFILE           = Makefile
+
+
+# GST transformations funktioner (det bibliotek vi ønsker at danne)
+TR_VERSION          =  1
+TR_MINOR_VERSION    =  1
+TRLIBRARY           = trlib.${TR_VERSION}.${TR_MINOR_VERSION}
+TRLIB_NAME          = libtr
+LIBTR               = ${TRLIB_NAME}.dll
+LINTLIBTR           = -l${TRLIBRARY}
+
+BUILDDIR            = c:/Work/Projects/BUILD/${TRLIB_NAME}
+
+CC                 = gcc
+CCOPTION           = -w -pedantic -fPIC ${CCWARNING}
+CFLAGS             = -O -std=c99 -mdll -mwin32
+CCWARNING          = -Wall
+
+# Simon skriver om D_ROUT. Tænder debug mode giver nogle ekstra meddelelser og laver en fil TR_Errlog.log hvor tingene skrives ud i. 
+# Så er nok heller ikke nødvendig i release udgaver men måske praktisk til aftestning. Sættes i CFLAGS
+
 #-pthread
-LDFLAGS = -I./TR_INC -shared  -DTHREAD_SAFE -pg -g
-#-pthread
- 
-EXENAME = main
+LD                 = ${CC}
+LDFLAGS            = -L. -shared -DTHREAD_SAFE
 
-#SRCS       =  $(wildcard TR_SRC/*.c)
-GEOMETRIC_GEODESYSRC    = $(wildcard TR_SRC/GEOMETRIC_GEODESY/*c)
-PHYSICAL_GEODESYSRC    = $(wildcard TR_SRC/PHYSICAL_GEODESY/*c)
-UTILITIESSSRC   =  $(wildcard TR_SRC/UTILITIES/*.c)
-GENERIC_TRANSFORMATIONSRC   =  $(wildcard TR_SRC/GENERIC_TRANSFORMATION/*.c)
-SPECIFIC_TRANSFORMATIONSRC   =  $(wildcard TR_SRC/SPECIFIC_TRANSFORMATION/*.c)
-METADATASRC    = $(wildcard TR_SRC/METADATA/*c)
-LORDSRC    = $(wildcard TR_SRC/LORD/*c)
-DEPSRC     =  $(wildcard TR_SRC/DEPRECATED/*.c)
-APISRC     =  $(wildcard TR_SRC/API/*.c)
-JNISRC     =  $(wildcard java/*.c)
-STRONGSRC  =  $(wildcard TR_SRC/STRONG/*.c)
 
-#ALLSRC =  $(SRCS) $(LORDSRC) $(APISRC) $(JNISRC) $(DEPSRC)
-ALLSRC =  $(GEOMETRIC_GEODESYSRC) $(PHYSICAL_GEODESYSRC) $(UTILITIESSRC) $(GENERIC_TRANSFORMATION) $(SPECIFIC_TRANSFORMATION) $(METADATASRC) $(LORDSRC) $(DEPSRC) $(APISRC) $(STRONGSRC)
+# ar and flags
+# ar og flag
+ARFLAGS             = rvs 
+ARLISTFLAG          = tv
 
-#OBJS       =  $(patsubst TR_SRC/%.c,     $(BUILDDIR)/%.o,  $(SRCS))
-GEOMETRIC_GEODESYOBJ =  $(patsubst TR_SRC/GEOMETRIC_GEODESY/%.c,     $(BUILDDIR)/%.o,  $(GEOMETRIC_GEODESYSRC))
-PHYSICAL_GEODESYOBJ =  $(patsubst TR_SRC/PHYSICAL_GEODESY/%.c,     $(BUILDDIR)/%.o,  $(PHYSICAL_GEODESYSRC))
-UTILITIESOBJ   =  $(patsubst TR_SRC/UTILS/%.c,   $(BUILDDIR)/%.o,  $(UTILITIESSRC))
-GENERIC_TRANSFORMATIONOBJ   =  $(patsubst TR_SRC/GENERIC_TRANSFORMATION/%.c,   $(BUILDDIR)/%.o,  $(GENERIC_TRANSFORMATIONSRC))
-SPECIFIC_TRANSFORMATIONOBJ   =  $(patsubst TR_SRC/SPECIFIC_TRANSFORMATION/%.c,   $(BUILDDIR)/%.o,  $(SPECIFIC_TRANSFORMATIONSRC))
-METADATAOBJ    =  $(patsubst TR_SRC/METADATA/%.c,     $(BUILDDIR)/%.o,  $(METADATASRC))
-LORDOBJ    =  $(patsubst TR_SRC/LORD/%.c,     $(BUILDDIR)/%.o,  $(LORDSRC))
-APIOBJ     =  $(patsubst TR_SRC/API/%.c, $(BUILDDIR)/%.o,  $(APISRC))
-DEPOBJ     =  $(patsubst TR_SRC/DEPRECATED/%.c, $(BUILDDIR)/%.o,  $(DEPSRC))
-JNIOBJ     =  $(patsubst java/%.c,       $(BUILDDIR)/%.o,  $(JNISRC))
-STRONGOBJ   =  $(patsubst TR_SRC/STRONG/%.c,   $(BUILDDIR)/%.o,  $(STRONGSRC))
-#ALLOBJ =  $(OBJS) $(LORDOBJ) $(APIOBJ) $(JNIOBJ) $(DEPOBJ)  $(UTILSOBJ) $(PARSINGOBJ)
-ALLOBJ =  $(GEOMETRIC_GEODESYOBJ) $(PHYSICAL_GEODESYOBJ) $(UTILITIESOBJ) $(GENERIC_TRANSFORMATION) $(SPECIFIC_TRANSFORMATION) $(METADATAOBJ) $(LORDOBJ) $(DEPOBJ) $(APIOBJ) $(STRONGOBJ)
-.PHONY: pre
+# Compiler flags
+LD_LIBRARY_PATH    =  c:/Work/Projects/BUILD/${TRLIBRARY}
+LD_LIBRARY_PATH_64 =  
 
-all: lib so
 
-lib: pre $(ALLOBJ)
+# path til projekt
+PROJ                = c:/SRC/trlib
+# projekt kilder
+SRC                 = TR_SRC
+SRC_APPS	    = apps
+INC      	    = TR_INC
+# path til projekt kilde koder
+PROJ_SRC_PATH       = ${PROJ}/${SRC}
+# path til projekt kilde headere
+PROJ_INC_PATH       = ${PROJ}/${INC}/
+INC_LIBTR_DEP	    = ${PROJ_INC_PATH}/DEPRECATED/
 
-so:
-	$(CC) $(LDFLAGS) -o $(BUILDDIR)/libtr.so $(BUILDDIR)/*.o
+ALL_HEADERS         = -I${PROJ_INC_PATH}
+
+
+# drop: Buffer overflow possible with sprintf.  Recommend using snprintf instead: sprintf
+#       Use of function that may lead to buffer overflow. (Use -bufferoverflowhigh to inhibit warning)
+# drop: Format argument 1 to fprintf (%ld) expects long int gets size_t: strlen(select_1)
+#       To allow arbitrary integral types to match long unsigned, use +longintegral.
+# drop: A function or variable is redefined. One of the declarations should use extern. (Use -redef to inhibit warning)
+# drop: A variable declared outside a macro body starts with the macrovarprefix.
+#       (Use either -macrovarprefixexclude or -namechecks to
+#
+
+GEOMETRIC_GEODESYSRC       = ${PROJ_SRC_PATH}/GEOMETRIC_GEODESY/*c
+PHYSICAL_GEODESYSRC        = ${PROJ_SRC_PATH}/PHYSICAL_GEODESY/*c
+UTILITIESSSRC              = ${PROJ_SRC_PATH}/UTILITIES/*.c
+GENERIC_TRANSFORMATIONSRC  = ${PROJ_SRC_PATH}/GENERIC_TRANSFORMATION/*.c
+SPECIFIC_TRANSFORMATIONSRC = ${PROJ_SRC_PATH}/SPECIFIC_TRANSFORMATION/*.c
+METADATASRC                = ${PROJ_SRC_PATH}/METADATA/*c
+LORDSRC                    = ${PROJ_SRC_PATH}/LORD/*c
+APISRC                     = ${PROJ_SRC_PATH}/API/*.c
+JNISRC                     = ${PROJ_SRC_PATH}/java/*.c
+STRONGSRC                  = ${PROJ_SRC_PATH}/STRONG/*.c
+
+ALLSRC                     = $(GEOMETRIC_GEODESYSRC) $(PHYSICAL_GEODESYSRC) $(UTILITIESSSRC) $(GENERIC_TRANSFORMATIONSRC) $(SPECIFIC_TRANSFORMATIONSRC) $(METADATASRC) $(LORDSRC) $(APISRC) $(STRONGSRC)
+
+all: lib cleanup
+
+lib: pre objects
 
 pre:
-	-rm ../BUILD/trlib/compile.err
+	@echo "start of pre"
+	@-rm compile.err
+	@-rm *.o
+	@-rm ${LIBTR}
+	@-rm $(TRLIB_NAME).lib
+	@echo "end of pre"
 
-#../BUILD/trlib/%.o: TR_SRC/%.c
-$(BUILDDIR)/%.o: TR_SRC/%.c
-	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
-$(BUILDDIR)/%.o: TR_SRC/LORD/%.c
-	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
-$(BUILDDIR)/%.o: TR_SRC/API/%.c
-	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
-$(BUILDDIR)/%.o: TR_SRC/DEPRECATED/%.c
-	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
-$(BUILDDIR)/%.o: java/%.c
-	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CFLAGS) 2>>$(BUILDDIR)/compile.err
+objects :
+	@echo "Compiling source files"        
+	@echo "Compiling source files" >> compile.err       
+	@echo "----------------------" >> compile.err       
+	@-${CC} -c ${ALL_HEADERS} ${CFLAGS} ${CCOPTION} ${ALLSRC} 2>>compile.err
+	@echo "exports source files"        
+	@${AR} ${ARFLAGS} ${LIBTR} *.o
+	@-dlltool -d Kmsfncs.def -l ${TRLIB_NAME}.lib
+
+cleanup:
+	@echo "Cleaning object files"
+	@-rm *.o
+
+# Funktioner i biblioteket ved ar
+#lslib:
+#	@echo "Functions in library"
+#	@if [ -s ${LIBTR} ] ; \
+#	then ${AR} ${ARLISTFLAG} ${LIBTR} ; \
+#	else \
+#	echo "Function library ${LIBTR} does not exist" ; \
+#	fi
 
 
+#
+## word count on functions
+wordcount:
+	@echo "wordcount on C functions "
+	@echo "  linier    ord    tegn fil "
+	@wc ${ALLSRC}
 
 
-
-$(EXENAME): $(OBJS)
-	$(CC) -o $@ $< $(LDFLAGS) 
-
-clean:
-	rm -rf $(EXENAME) $(BUILDDIR)
