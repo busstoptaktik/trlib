@@ -1,3 +1,17 @@
+# Copyright (c) 2015, Danish Geodata Agency <gst@gst.dk>
+# 
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
 import sys
 IS_WINDOWS=sys.platform.startswith("win")
 IS_MAC="darwin" in sys.platform
@@ -72,7 +86,7 @@ class sunc64(sunc):
 class gcc(ccompiler):
 	COMPILER="gcc"
 	LINKER="gcc"
-	ALL_BUILD=["-c","-Wall","-pedantic"]
+	ALL_BUILD=["-c", "-W", "-Wall", "-Wextra", "-Wno-long-long" , "-pedantic"]
 	COMPILE_LIBRARY_RELEASE=ALL_BUILD+["-O3"]
 	COMPILE_LIBRARY_DEBUG=ALL_BUILD+["-g","-O"]
 	COMPILE_EXE_RELEASE=ALL_BUILD+["-O3"]
@@ -87,7 +101,7 @@ class gcc(ccompiler):
 	LINK_OUTPUT_SWITCH="-o"
 	LINK_LIBRARIES=[]
 	DEF_FILE_SWITCH=""
-	IMPLIB_SWITCH="-Wl,--out-implib,"
+	IMPLIB_SWITCH=""
 	OBJ_EXTENSION=".o"
 
 #gcc subvariants
