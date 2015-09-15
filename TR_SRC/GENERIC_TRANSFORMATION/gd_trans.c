@@ -311,7 +311,9 @@ FILE                     *tr_error
           else G_Nlab = &H0_lab;
         } else {
           if (i_clb->imit != FHMASK && o_clb->imit != FHMASK &&
-            i_rgn != rgn_DE.r_nr[0] && o_rgn != rgn_DE.r_nr[0]) {
+			  i_clb->datum != 33 && o_clb->datum != 33 /* == detrs89 */
+			  /* fehmarn belt project benytter detrs89; alle andre benytter etrs89 */
+			  /*i_rgn != rgn_DE.r_nr[0] && o_rgn != rgn_DE.r_nr[0]*/) {
             if (grid_tab->init &&
                 (!strcmp(grid_tab->table_u[0].mlb, "fehmarngeoid10.bin")
               || !strcmp(grid_tab->table_u[0].mlb, "fbeltgeoid.bin")))
@@ -341,7 +343,7 @@ FILE                     *tr_error
               res = (grid_tab->init) ? 0
                   : geoid_i("fehmarngeoid10.bin",
                             GDE_LAB, grid_tab, err_txt);
-            } else { /* region DE */
+            } else { /* fehmarn belt project: detrs89 */
               if (grid_tab->init &&
                   strcmp(grid_tab->table_u[0].mlb, "fbeltgeoid.bin"))
                   (void) geoid_c(grid_tab, 0, NULL);
