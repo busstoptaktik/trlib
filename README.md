@@ -11,4 +11,4 @@ trlib functionality is currently being reimplemented as part of the (much more w
 Also, see https://github.com/OSGeo/proj.4/pull/388
 for some initial discussions specificly targeting preparations for trlib reimplementation.
 
-Comments and requests regarding trlib may be sent to Thomas Knudsen thokn@sdfe.dk
+Comments and requests regarding trlib and KMSTrans2 may be sent to grf@sdfe.dk
